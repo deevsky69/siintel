@@ -14,11 +14,11 @@
 
     "lint": "pnpm lint:web && pnpm lint:api",
     "lint:web": "pnpm --filter @prediksi-presisi/web lint",
-    "lint:api": "cd apps/api && uv run ruff check . && uv run ruff format --check .",
+    "lint:api": "cd apps/api && uv run ruff check . ../../database/migrations && uv run ruff format --check . ../../database/migrations",
 
     "format": "pnpm format:web && pnpm format:api",
     "format:web": "pnpm --filter @prediksi-presisi/web format",
-    "format:api": "cd apps/api && uv run ruff check --fix . && uv run ruff format .",
+    "format:api": "cd apps/api && uv run ruff check --fix . ../../database/migrations && uv run ruff format . ../../database/migrations",
 
     "typecheck": "pnpm typecheck:web && pnpm typecheck:api",
     "typecheck:web": "pnpm --filter @prediksi-presisi/web typecheck",
@@ -32,6 +32,12 @@
 
     "db:up": "docker compose -f infra/docker/docker-compose.yml up -d db",
     "db:down": "docker compose -f infra/docker/docker-compose.yml down",
-    "gis:up": "docker compose -f infra/docker/docker-compose.yml --profile gis up -d"
+    "gis:up": "docker compose -f infra/docker/docker-compose.yml --profile gis up -d",
+
+    "db:migrate": "cd apps/api && uv run alembic upgrade head",
+    "db:rollback": "cd apps/api && uv run alembic downgrade -1",
+    "db:current": "cd apps/api && uv run alembic current",
+    "db:history": "cd apps/api && uv run alembic history",
+    "db:sql": "cd apps/api && uv run alembic upgrade head --sql"
   }
 }

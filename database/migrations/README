@@ -1,0 +1,4 @@
+Migration Alembic PREDIKSI PRESISI.
+
+Konfigurasi: apps/api/alembic.ini (script_location menunjuk ke direktori ini).
+Jalankan dari apps/api:  uv run alembic upgrade head

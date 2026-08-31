@@ -18,6 +18,28 @@ Definisi field: `docs/02-data-dictionary.md`. Relasi: `docs/04-erd.md`.
 
 Migration harus reproducible dari database kosong. Tidak ada perubahan manual pada database sebagai bagian workflow normal.
 
+## 1.1 Letak dan perintah migration (TASK 010)
+
+| Berkas | Peran |
+|---|---|
+| `apps/api/alembic.ini` | Konfigurasi Alembic. **Tidak memuat URL database.** |
+| `database/migrations/env.py` | Membaca `DATABASE_URL` dari environment (CLAUDE.md §28) |
+| `database/migrations/versions/` | Berkas migration |
+| `apps/api/src/prediksi_presisi_api/db.py` | Engine, session factory, dan `Base` untuk model |
+
+```bash
+pnpm db:up         # jalankan PostGIS lewat docker compose
+pnpm db:migrate    # alembic upgrade head
+pnpm db:current    # revisi yang sedang terpasang
+pnpm db:history    # rangkaian migration
+pnpm db:sql        # render SQL tanpa menyentuh database (mode offline)
+pnpm db:rollback   # alembic downgrade -1
+```
+
+Baseline `0001` hanya mengaktifkan ekstensi `postgis` dan `pgcrypto`; belum ada tabel.
+Tabel inti dibuat mulai TASK 011. Engine dibuat secara *lazy* sehingga mengimpor modul aplikasi
+tidak membuka koneksi — test dan build tidak memerlukan database yang hidup.
+
 ---
 
 ## 2. CLOSED LOOP

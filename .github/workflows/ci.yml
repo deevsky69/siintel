@@ -40,7 +40,11 @@ jobs:
           enable-cache: true
       - name: Install
         run: uv sync --all-groups --frozen
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
+      - run: uv run ruff check . ../../database/migrations
+      - run: uv run ruff format --check . ../../database/migrations
       - run: uv run mypy
       - run: uv run pytest
+      - name: Migration chain is linear and renders SQL
+        run: uv run alembic upgrade head --sql
+        env:
+          DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/ci

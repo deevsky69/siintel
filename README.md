@@ -68,8 +68,18 @@ uv sync
 uv run uvicorn prediksi_presisi_api.main:app --reload --port 8000
 ```
 
-Salin `.env.example` menjadi `.env` untuk pengembangan lokal. Belum ada database, autentikasi,
-maupun endpoint domain — semuanya dibangun pada PHASE 2 dan seterusnya.
+```bash
+# database (PostgreSQL + PostGIS via Docker)
+pnpm db:up          # jalankan container
+pnpm db:migrate     # alembic upgrade head
+pnpm db:current     # revisi terpasang
+
+# pemeriksaan mutu
+pnpm verify         # lint + typecheck + test untuk web dan API
+```
+
+Salin `.env.example` menjadi `.env` untuk pengembangan lokal. Database baru berisi ekstensi
+PostGIS/pgcrypto — tabel dibuat mulai TASK 011. Autentikasi dan endpoint domain menyusul.
 
 ## Cara kerja
 
