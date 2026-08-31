@@ -45,3 +45,11 @@ Baca berurutan:
 7. `docs/07-project-structure.md`
 
 Dataset dummy berada di `data/sample/`.
+
+## Claude Implementation Guide
+
+Start with:
+- `CLAUDE.md`
+- `docs/08-implementation-roadmap.md`
+
+Claude must not skip the roadmap phases.
