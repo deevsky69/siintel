@@ -1,0 +1,7 @@
+user_id,username,role_id,status
+USER-001,demo.pimpinan,ROLE-01,Aktif
+USER-002,demo.commandcenter,ROLE-02,Aktif
+USER-003,demo.analyst,ROLE-03,Aktif
+USER-004,demo.fungsi,ROLE-04,Aktif
+USER-005,demo.polsek,ROLE-05,Aktif
+USER-006,demo.admin,ROLE-06,Aktif

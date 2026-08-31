@@ -1,0 +1,85 @@
+recommendation_id,prediction_id,warning_id,recommended_function,recommendation_text,priority,status,created_at
+REC-0001,PRD-00001,WRN-0001,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-12-26 15:10
+REC-0002,PRD-00003,WRN-0002,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Rejected,2025-12-02 15:10
+REC-0003,PRD-00004,WRN-0003,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-12-09 15:10
+REC-0004,PRD-00006,WRN-0004,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-12-01 15:10
+REC-0005,PRD-00007,WRN-0005,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-12-10 15:10
+REC-0006,PRD-00011,WRN-0006,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-10-20 15:10
+REC-0007,PRD-00013,WRN-0007,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-10-13 15:10
+REC-0008,PRD-00015,WRN-0008,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-12-31 15:10
+REC-0009,PRD-00020,WRN-0009,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-10-14 15:10
+REC-0010,PRD-00021,WRN-0010,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-12-11 15:10
+REC-0011,PRD-00023,WRN-0011,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-11-21 15:10
+REC-0012,PRD-00027,WRN-0012,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-12-20 15:10
+REC-0013,PRD-00028,WRN-0013,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-10-11 15:10
+REC-0014,PRD-00029,WRN-0014,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-11-10 15:10
+REC-0015,PRD-00031,WRN-0015,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-12-26 15:10
+REC-0016,PRD-00033,WRN-0016,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-11-03 15:10
+REC-0017,PRD-00035,WRN-0017,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-10-24 15:10
+REC-0018,PRD-00037,WRN-0018,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-10-23 15:10
+REC-0019,PRD-00043,WRN-0019,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-10-25 15:10
+REC-0020,PRD-00046,WRN-0020,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-10-22 15:10
+REC-0021,PRD-00047,WRN-0021,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Modified,2025-12-07 15:10
+REC-0022,PRD-00048,WRN-0022,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-10-29 15:10
+REC-0023,PRD-00049,WRN-0023,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-11-26 15:10
+REC-0024,PRD-00051,WRN-0024,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-10-30 15:10
+REC-0025,PRD-00059,WRN-0025,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-12-08 15:10
+REC-0026,PRD-00060,WRN-0026,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-11-20 15:10
+REC-0027,PRD-00061,WRN-0027,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-12-11 15:10
+REC-0028,PRD-00062,WRN-0028,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-12-28 15:10
+REC-0029,PRD-00064,WRN-0029,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Modified,2025-10-24 15:10
+REC-0030,PRD-00066,WRN-0030,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-10-15 15:10
+REC-0031,PRD-00067,WRN-0031,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Modified,2025-12-25 15:10
+REC-0032,PRD-00070,WRN-0032,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-11-16 15:10
+REC-0033,PRD-00072,WRN-0033,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Modified,2025-12-07 15:10
+REC-0034,PRD-00076,WRN-0034,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-12-17 15:10
+REC-0035,PRD-00079,WRN-0035,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-12-09 15:10
+REC-0036,PRD-00080,WRN-0036,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-10-28 15:10
+REC-0037,PRD-00081,WRN-0037,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-11-07 15:10
+REC-0038,PRD-00082,WRN-0038,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-11-17 15:10
+REC-0039,PRD-00083,WRN-0039,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-12-08 15:10
+REC-0040,PRD-00084,WRN-0040,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-12-27 15:10
+REC-0041,PRD-00088,WRN-0041,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-10-24 15:10
+REC-0042,PRD-00090,WRN-0042,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-10-17 15:10
+REC-0043,PRD-00094,WRN-0043,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-12-29 15:10
+REC-0044,PRD-00097,WRN-0044,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-12-12 15:10
+REC-0045,PRD-00099,WRN-0045,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-10-19 15:10
+REC-0046,PRD-00101,WRN-0046,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-12-28 15:10
+REC-0047,PRD-00104,WRN-0047,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-10-18 15:10
+REC-0048,PRD-00105,WRN-0048,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-11-18 15:10
+REC-0049,PRD-00106,WRN-0049,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-12-19 15:10
+REC-0050,PRD-00108,WRN-0050,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Modified,2025-11-04 15:10
+REC-0051,PRD-00109,WRN-0051,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-11-26 15:10
+REC-0052,PRD-00110,WRN-0052,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-12-10 15:10
+REC-0053,PRD-00111,WRN-0053,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-12-16 15:10
+REC-0054,PRD-00112,WRN-0054,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-10-16 15:10
+REC-0055,PRD-00114,WRN-0055,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-12-24 15:10
+REC-0056,PRD-00117,WRN-0056,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-11-12 15:10
+REC-0057,PRD-00118,WRN-0057,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-11-08 15:10
+REC-0058,PRD-00126,WRN-0058,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-10-16 15:10
+REC-0059,PRD-00128,WRN-0059,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-11-22 15:10
+REC-0060,PRD-00129,WRN-0060,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-11-13 15:10
+REC-0061,PRD-00130,WRN-0061,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-10-18 15:10
+REC-0062,PRD-00133,WRN-0062,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-10-30 15:10
+REC-0063,PRD-00134,WRN-0063,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Modified,2025-11-12 15:10
+REC-0064,PRD-00135,WRN-0064,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-12-11 15:10
+REC-0065,PRD-00139,WRN-0065,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Modified,2025-12-29 15:10
+REC-0066,PRD-00142,WRN-0066,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-11-27 15:10
+REC-0067,PRD-00143,WRN-0067,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-10-12 15:10
+REC-0068,PRD-00145,WRN-0068,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-12-06 15:10
+REC-0069,PRD-00148,WRN-0069,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-12-21 15:10
+REC-0070,PRD-00152,WRN-0070,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Modified,2025-12-28 15:10
+REC-0071,PRD-00156,WRN-0071,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-12-29 15:10
+REC-0072,PRD-00158,WRN-0072,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-11-20 15:10
+REC-0073,PRD-00161,WRN-0073,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Pending Review,2025-10-17 15:10
+REC-0074,PRD-00162,WRN-0074,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-12-04 15:10
+REC-0075,PRD-00164,WRN-0075,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-10-08 15:10
+REC-0076,PRD-00165,WRN-0076,Samapta,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Rejected,2025-12-03 15:10
+REC-0077,PRD-00166,WRN-0077,Binmas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-10-26 15:10
+REC-0078,PRD-00167,WRN-0078,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-10-17 15:10
+REC-0079,PRD-00170,WRN-0079,Lantas,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Modified,2025-12-05 15:10
+REC-0080,PRD-00173,WRN-0080,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-10-29 15:10
+REC-0081,PRD-00174,WRN-0081,Intelkam,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-10-09 15:10
+REC-0082,PRD-00175,WRN-0082,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Sedang,Approved,2025-11-15 15:10
+REC-0083,PRD-00177,WRN-0083,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Pending Review,2025-11-26 15:10
+REC-0084,PRD-00179,WRN-0084,Reskrim,Pertimbangkan penguatan kegiatan preventif pada area dan rentang waktu berisiko; keputusan tetap pada pejabat berwenang.,Tinggi,Approved,2025-11-17 15:10

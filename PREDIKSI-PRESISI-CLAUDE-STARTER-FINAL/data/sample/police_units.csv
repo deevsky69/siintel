@@ -1,0 +1,7 @@
+unit_id,function,unit_name,jurisdiction,status
+UNIT-001,Samapta,Unit Patroli Alpha,Polsek Kebayoran Baru,Aktif
+UNIT-002,Samapta,Unit Patroli Bravo,Polsek Tebet,Aktif
+UNIT-003,Samapta,Unit Patroli Charlie,Polsek Pasar Minggu,Standby
+UNIT-004,Binmas,Unit Pembinaan Wilayah,Polres Metro Jakarta Selatan,Aktif
+UNIT-005,Intelkam,Unit Monitoring Wilayah,Polres Metro Jakarta Selatan,Aktif
+UNIT-006,Reskrim,Unit Analisis Kejahatan,Polres Metro Jakarta Selatan,Aktif

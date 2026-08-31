@@ -1,0 +1,121 @@
+intelligence_id,report_date,category,kecamatan,kelurahan,grid_id,reliability,confidence,urgency,impact,status
+INT-0001,2025-05-23,Potensi Tawuran,Pasar Minggu,Pejaten Barat,JKS-013,A,78,72,Kritis,Diverifikasi
+INT-0002,2025-01-27,Gangguan Kamtibmas,Kebayoran Lama,Grogol Utara,JKS-008,C,85,82,Tinggi,Selesai
+INT-0003,2025-05-04,Kegiatan Masyarakat,Jagakarsa,Lenteng Agung,JKS-032,A,95,55,Tinggi,Selesai
+INT-0004,2025-04-01,Gangguan Kamtibmas,Kebayoran Baru,Pulo,JKS-005,C,82,51,Sedang,Baru
+INT-0005,2025-08-26,Kegiatan Masyarakat,Kebayoran Lama,Pondok Pinang,JKS-006,A,86,63,Tinggi,Diverifikasi
+INT-0006,2025-04-17,Kegiatan Masyarakat,Mampang Prapatan,Mampang Prapatan,JKS-024,B,71,57,Kritis,Ditindaklanjuti
+INT-0007,2025-07-15,Potensi Tawuran,Pasar Minggu,Pejaten Barat,JKS-013,A,86,51,Kritis,Diverifikasi
+INT-0008,2025-03-30,Kerawanan Lokasi,Kebayoran Baru,Senayan,JKS-001,A,66,42,Rendah,Ditindaklanjuti
+INT-0009,2025-04-27,Potensi Tawuran,Kebayoran Baru,Kramat Pela,JKS-003,A,58,70,Sedang,Selesai
+INT-0010,2025-09-23,Kegiatan Masyarakat,Cilandak,Cilandak Barat,JKS-012,A,82,47,Rendah,Diverifikasi
+INT-0011,2025-09-09,Kegiatan Masyarakat,Tebet,Tebet Barat,JKS-020,A,62,50,Kritis,Selesai
+INT-0012,2025-08-29,Potensi Tawuran,Tebet,Menteng Dalam,JKS-022,B,79,31,Rendah,Diverifikasi
+INT-0013,2025-12-06,Gangguan Kamtibmas,Kebayoran Lama,Grogol Utara,JKS-008,B,57,89,Sedang,Ditindaklanjuti
+INT-0014,2025-12-15,Gangguan Kamtibmas,Cilandak,Cipete Selatan,JKS-009,B,66,65,Kritis,Selesai
+INT-0015,2025-10-19,Potensi Tawuran,Mampang Prapatan,Bangka,JKS-025,A,88,31,Rendah,Diverifikasi
+INT-0016,2025-09-12,Kerawanan Lokasi,Cilandak,Lebak Bulus,JKS-011,B,64,84,Sedang,Selesai
+INT-0017,2025-02-14,Kerawanan Lokasi,Kebayoran Lama,Grogol Utara,JKS-008,C,93,50,Rendah,Selesai
+INT-0018,2025-09-17,Kerawanan Lokasi,Pancoran,Pancoran,JKS-017,A,64,45,Sedang,Selesai
+INT-0019,2025-08-09,Potensi Tawuran,Pasar Minggu,Jati Padang,JKS-016,B,59,51,Tinggi,Ditindaklanjuti
+INT-0020,2025-07-04,Kerawanan Lokasi,Kebayoran Baru,Kramat Pela,JKS-003,B,79,90,Kritis,Diverifikasi
+INT-0021,2025-12-05,Gangguan Kamtibmas,Jagakarsa,Lenteng Agung,JKS-032,A,77,69,Sedang,Baru
+INT-0022,2025-04-04,Kerawanan Lokasi,Kebayoran Baru,Pulo,JKS-005,A,85,64,Tinggi,Selesai
+INT-0023,2025-10-21,Kegiatan Masyarakat,Pasar Minggu,Pejaten Barat,JKS-013,A,86,56,Rendah,Ditindaklanjuti
+INT-0024,2025-12-24,Kegiatan Masyarakat,Cilandak,Cipete Selatan,JKS-009,A,91,56,Sedang,Baru
+INT-0025,2025-11-10,Kerawanan Lokasi,Cilandak,Gandaria Selatan,JKS-010,A,60,81,Sedang,Baru
+INT-0026,2025-12-30,Kerawanan Lokasi,Kebayoran Lama,Grogol Utara,JKS-008,A,71,67,Tinggi,Diverifikasi
+INT-0027,2025-01-30,Gangguan Kamtibmas,Tebet,Tebet Timur,JKS-021,A,61,39,Tinggi,Diverifikasi
+INT-0028,2025-04-14,Kerawanan Lokasi,Pasar Minggu,Jati Padang,JKS-016,B,87,71,Sedang,Ditindaklanjuti
+INT-0029,2025-07-24,Gangguan Kamtibmas,Mampang Prapatan,Mampang Prapatan,JKS-024,A,71,44,Sedang,Selesai
+INT-0030,2025-08-23,Gangguan Kamtibmas,Kebayoran Lama,Grogol Utara,JKS-008,A,62,84,Sedang,Baru
+INT-0031,2025-10-27,Kegiatan Masyarakat,Jagakarsa,Ciganjur,JKS-031,B,55,39,Sedang,Ditindaklanjuti
+INT-0032,2025-10-05,Kegiatan Masyarakat,Mampang Prapatan,Mampang Prapatan,JKS-024,A,70,57,Kritis,Ditindaklanjuti
+INT-0033,2025-05-06,Kerawanan Lokasi,Pancoran,Kalibata,JKS-019,A,88,61,Tinggi,Selesai
+INT-0034,2025-04-08,Kerawanan Lokasi,Pasar Minggu,Pejaten Barat,JKS-013,C,71,92,Sedang,Diverifikasi
+INT-0035,2025-12-07,Gangguan Kamtibmas,Jagakarsa,Jagakarsa,JKS-030,A,64,89,Tinggi,Baru
+INT-0036,2025-01-03,Gangguan Kamtibmas,Pancoran,Duren Tiga,JKS-018,C,76,63,Sedang,Baru
+INT-0037,2025-07-03,Kerawanan Lokasi,Kebayoran Baru,Pulo,JKS-005,B,62,70,Sedang,Diverifikasi
+INT-0038,2025-05-12,Gangguan Kamtibmas,Jagakarsa,Jagakarsa,JKS-030,A,71,91,Kritis,Selesai
+INT-0039,2025-04-27,Kegiatan Masyarakat,Kebayoran Baru,Cipete Utara,JKS-004,B,75,95,Kritis,Selesai
+INT-0040,2025-06-01,Gangguan Kamtibmas,Cilandak,Lebak Bulus,JKS-011,B,62,45,Rendah,Ditindaklanjuti
+INT-0041,2025-01-18,Potensi Tawuran,Mampang Prapatan,Mampang Prapatan,JKS-024,A,66,86,Rendah,Ditindaklanjuti
+INT-0042,2025-03-25,Potensi Tawuran,Setiabudi,Menteng Atas,JKS-029,C,85,66,Rendah,Ditindaklanjuti
+INT-0043,2025-10-08,Potensi Tawuran,Mampang Prapatan,Mampang Prapatan,JKS-024,A,58,91,Sedang,Diverifikasi
+INT-0044,2025-07-29,Kerawanan Lokasi,Kebayoran Baru,Cipete Utara,JKS-004,C,93,69,Kritis,Baru
+INT-0045,2025-09-28,Gangguan Kamtibmas,Pasar Minggu,Ragunan,JKS-015,B,68,65,Tinggi,Baru
+INT-0046,2025-06-27,Potensi Tawuran,Setiabudi,Karet Kuningan,JKS-027,A,71,83,Tinggi,Diverifikasi
+INT-0047,2025-03-02,Kerawanan Lokasi,Mampang Prapatan,Mampang Prapatan,JKS-024,B,75,46,Tinggi,Selesai
+INT-0048,2025-09-08,Potensi Tawuran,Kebayoran Baru,Gunung,JKS-002,A,81,71,Sedang,Diverifikasi
+INT-0049,2025-04-23,Gangguan Kamtibmas,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,A,90,63,Kritis,Baru
+INT-0050,2025-01-10,Gangguan Kamtibmas,Tebet,Tebet Barat,JKS-020,A,68,51,Kritis,Diverifikasi
+INT-0051,2025-12-17,Kerawanan Lokasi,Kebayoran Baru,Senayan,JKS-001,B,70,57,Sedang,Selesai
+INT-0052,2025-09-14,Potensi Tawuran,Mampang Prapatan,Tegal Parang,JKS-026,A,76,42,Rendah,Selesai
+INT-0053,2025-08-31,Gangguan Kamtibmas,Cilandak,Gandaria Selatan,JKS-010,B,78,76,Kritis,Selesai
+INT-0054,2025-09-01,Kegiatan Masyarakat,Cilandak,Cipete Selatan,JKS-009,A,57,55,Rendah,Ditindaklanjuti
+INT-0055,2025-09-01,Kerawanan Lokasi,Kebayoran Lama,Pondok Pinang,JKS-006,A,79,56,Kritis,Ditindaklanjuti
+INT-0056,2025-10-24,Potensi Tawuran,Tebet,Menteng Dalam,JKS-022,A,78,91,Tinggi,Diverifikasi
+INT-0057,2025-12-29,Kegiatan Masyarakat,Pasar Minggu,Pejaten Barat,JKS-013,A,93,33,Kritis,Baru
+INT-0058,2025-02-09,Potensi Tawuran,Setiabudi,Kuningan Timur,JKS-028,B,75,45,Sedang,Baru
+INT-0059,2025-12-19,Kegiatan Masyarakat,Cilandak,Gandaria Selatan,JKS-010,B,75,93,Rendah,Selesai
+INT-0060,2025-11-15,Potensi Tawuran,Cilandak,Gandaria Selatan,JKS-010,A,72,95,Kritis,Ditindaklanjuti
+INT-0061,2025-02-04,Potensi Tawuran,Tebet,Manggarai,JKS-023,A,92,66,Rendah,Baru
+INT-0062,2025-03-18,Kegiatan Masyarakat,Kebayoran Lama,Grogol Utara,JKS-008,A,89,37,Kritis,Selesai
+INT-0063,2025-01-29,Gangguan Kamtibmas,Kebayoran Lama,Grogol Utara,JKS-008,A,73,87,Kritis,Selesai
+INT-0064,2025-01-28,Kegiatan Masyarakat,Pasar Minggu,Pejaten Barat,JKS-013,B,75,50,Kritis,Ditindaklanjuti
+INT-0065,2025-10-26,Kerawanan Lokasi,Kebayoran Lama,Grogol Utara,JKS-008,A,63,68,Rendah,Ditindaklanjuti
+INT-0066,2025-02-04,Kerawanan Lokasi,Setiabudi,Karet Kuningan,JKS-027,A,88,68,Sedang,Diverifikasi
+INT-0067,2025-05-27,Gangguan Kamtibmas,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,B,76,81,Tinggi,Ditindaklanjuti
+INT-0068,2025-12-31,Gangguan Kamtibmas,Jagakarsa,Ciganjur,JKS-031,A,78,88,Tinggi,Diverifikasi
+INT-0069,2025-12-21,Gangguan Kamtibmas,Jagakarsa,Jagakarsa,JKS-030,A,80,74,Tinggi,Baru
+INT-0070,2025-08-27,Kegiatan Masyarakat,Tebet,Menteng Dalam,JKS-022,B,80,30,Tinggi,Ditindaklanjuti
+INT-0071,2025-06-04,Kerawanan Lokasi,Jagakarsa,Srengseng Sawah,JKS-033,B,86,42,Kritis,Ditindaklanjuti
+INT-0072,2025-06-30,Potensi Tawuran,Cilandak,Lebak Bulus,JKS-011,A,70,92,Rendah,Baru
+INT-0073,2025-07-19,Kerawanan Lokasi,Pasar Minggu,Pejaten Timur,JKS-014,C,64,87,Kritis,Selesai
+INT-0074,2025-12-29,Gangguan Kamtibmas,Cilandak,Cilandak Barat,JKS-012,C,75,57,Tinggi,Diverifikasi
+INT-0075,2025-11-01,Kerawanan Lokasi,Tebet,Tebet Barat,JKS-020,C,83,42,Kritis,Baru
+INT-0076,2025-10-25,Potensi Tawuran,Tebet,Tebet Timur,JKS-021,A,89,61,Tinggi,Diverifikasi
+INT-0077,2025-11-14,Potensi Tawuran,Jagakarsa,Jagakarsa,JKS-030,C,78,42,Kritis,Selesai
+INT-0078,2025-09-05,Kegiatan Masyarakat,Jagakarsa,Ciganjur,JKS-031,A,66,40,Kritis,Baru
+INT-0079,2025-04-08,Kerawanan Lokasi,Tebet,Tebet Timur,JKS-021,B,83,91,Rendah,Baru
+INT-0080,2025-02-15,Kegiatan Masyarakat,Mampang Prapatan,Mampang Prapatan,JKS-024,A,72,65,Kritis,Diverifikasi
+INT-0081,2025-01-19,Potensi Tawuran,Kebayoran Lama,Grogol Utara,JKS-008,A,88,61,Kritis,Ditindaklanjuti
+INT-0082,2025-01-22,Potensi Tawuran,Kebayoran Baru,Gunung,JKS-002,B,90,73,Tinggi,Selesai
+INT-0083,2025-05-10,Gangguan Kamtibmas,Kebayoran Baru,Cipete Utara,JKS-004,A,95,80,Rendah,Baru
+INT-0084,2025-06-26,Potensi Tawuran,Kebayoran Lama,Pondok Pinang,JKS-006,A,55,83,Kritis,Selesai
+INT-0085,2025-03-18,Kerawanan Lokasi,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,A,62,92,Kritis,Ditindaklanjuti
+INT-0086,2025-11-28,Kegiatan Masyarakat,Jagakarsa,Srengseng Sawah,JKS-033,A,64,43,Sedang,Ditindaklanjuti
+INT-0087,2025-05-22,Kerawanan Lokasi,Pancoran,Kalibata,JKS-019,B,63,55,Rendah,Ditindaklanjuti
+INT-0088,2025-03-25,Kegiatan Masyarakat,Mampang Prapatan,Mampang Prapatan,JKS-024,A,78,68,Rendah,Diverifikasi
+INT-0089,2025-03-18,Kerawanan Lokasi,Setiabudi,Menteng Atas,JKS-029,A,88,45,Sedang,Diverifikasi
+INT-0090,2025-03-20,Gangguan Kamtibmas,Tebet,Tebet Timur,JKS-021,A,79,55,Tinggi,Baru
+INT-0091,2025-06-27,Kerawanan Lokasi,Jagakarsa,Lenteng Agung,JKS-032,B,83,66,Tinggi,Selesai
+INT-0092,2025-03-07,Potensi Tawuran,Kebayoran Baru,Pulo,JKS-005,A,69,92,Kritis,Diverifikasi
+INT-0093,2025-09-12,Potensi Tawuran,Pancoran,Kalibata,JKS-019,B,92,47,Kritis,Selesai
+INT-0094,2025-06-22,Gangguan Kamtibmas,Jagakarsa,Srengseng Sawah,JKS-033,C,82,61,Kritis,Baru
+INT-0095,2025-07-09,Potensi Tawuran,Kebayoran Lama,Pondok Pinang,JKS-006,C,70,88,Kritis,Diverifikasi
+INT-0096,2025-08-30,Gangguan Kamtibmas,Pasar Minggu,Ragunan,JKS-015,C,93,32,Sedang,Ditindaklanjuti
+INT-0097,2025-08-31,Kegiatan Masyarakat,Pancoran,Kalibata,JKS-019,B,80,90,Rendah,Selesai
+INT-0098,2025-06-15,Kegiatan Masyarakat,Mampang Prapatan,Mampang Prapatan,JKS-024,A,82,68,Rendah,Ditindaklanjuti
+INT-0099,2025-09-21,Gangguan Kamtibmas,Cilandak,Cilandak Barat,JKS-012,A,63,48,Kritis,Ditindaklanjuti
+INT-0100,2025-07-22,Kerawanan Lokasi,Jagakarsa,Jagakarsa,JKS-030,A,58,65,Tinggi,Selesai
+INT-0101,2025-04-12,Gangguan Kamtibmas,Cilandak,Cipete Selatan,JKS-009,B,59,52,Tinggi,Diverifikasi
+INT-0102,2025-01-27,Kerawanan Lokasi,Kebayoran Baru,Senayan,JKS-001,A,95,85,Kritis,Diverifikasi
+INT-0103,2025-03-21,Kerawanan Lokasi,Kebayoran Baru,Kramat Pela,JKS-003,B,78,87,Tinggi,Ditindaklanjuti
+INT-0104,2025-03-12,Kegiatan Masyarakat,Kebayoran Lama,Grogol Utara,JKS-008,A,71,83,Kritis,Diverifikasi
+INT-0105,2025-10-10,Potensi Tawuran,Pancoran,Duren Tiga,JKS-018,B,83,77,Sedang,Diverifikasi
+INT-0106,2025-11-05,Potensi Tawuran,Pancoran,Kalibata,JKS-019,A,81,75,Sedang,Ditindaklanjuti
+INT-0107,2025-07-28,Kegiatan Masyarakat,Pancoran,Pancoran,JKS-017,A,70,60,Tinggi,Baru
+INT-0108,2025-08-07,Gangguan Kamtibmas,Kebayoran Lama,Pondok Pinang,JKS-006,A,91,89,Tinggi,Selesai
+INT-0109,2025-08-04,Gangguan Kamtibmas,Cilandak,Lebak Bulus,JKS-011,B,85,41,Tinggi,Baru
+INT-0110,2025-01-17,Kegiatan Masyarakat,Pancoran,Kalibata,JKS-019,A,57,34,Kritis,Baru
+INT-0111,2025-06-17,Kegiatan Masyarakat,Mampang Prapatan,Mampang Prapatan,JKS-024,A,61,69,Tinggi,Ditindaklanjuti
+INT-0112,2025-02-06,Kerawanan Lokasi,Pasar Minggu,Pejaten Timur,JKS-014,C,82,60,Rendah,Baru
+INT-0113,2025-09-16,Kerawanan Lokasi,Pancoran,Kalibata,JKS-019,A,86,88,Sedang,Selesai
+INT-0114,2025-09-01,Kegiatan Masyarakat,Pancoran,Kalibata,JKS-019,B,67,76,Tinggi,Baru
+INT-0115,2025-03-03,Kerawanan Lokasi,Kebayoran Lama,Pondok Pinang,JKS-006,C,94,37,Sedang,Baru
+INT-0116,2025-12-06,Potensi Tawuran,Jagakarsa,Lenteng Agung,JKS-032,B,81,55,Kritis,Diverifikasi
+INT-0117,2025-04-20,Gangguan Kamtibmas,Pasar Minggu,Pejaten Barat,JKS-013,B,65,60,Kritis,Baru
+INT-0118,2025-12-29,Kegiatan Masyarakat,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,A,80,45,Rendah,Ditindaklanjuti
+INT-0119,2025-02-04,Potensi Tawuran,Jagakarsa,Jagakarsa,JKS-030,A,76,52,Kritis,Ditindaklanjuti
+INT-0120,2025-01-01,Kerawanan Lokasi,Jagakarsa,Lenteng Agung,JKS-032,B,92,51,Sedang,Selesai

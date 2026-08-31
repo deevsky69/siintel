@@ -1,0 +1,13 @@
+permission_id,resource,action
+PERM-01,dashboard,read
+PERM-02,crime,read
+PERM-03,crime,write
+PERM-04,map,read
+PERM-05,analytics,read
+PERM-06,prediction,read
+PERM-07,prediction,run
+PERM-08,warning,read
+PERM-09,recommendation,read
+PERM-10,commander_decision,approve
+PERM-11,evaluation,read
+PERM-12,users,manage

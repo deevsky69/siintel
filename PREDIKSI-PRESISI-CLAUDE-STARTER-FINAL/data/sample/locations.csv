@@ -1,0 +1,34 @@
+location_id,polsek,kecamatan,kelurahan,grid_id,grid_size_m,latitude,longitude,location_type
+LOC-001,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,500,-6.227,106.8,Parkiran
+LOC-002,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,500,-6.237,106.793,Jalan
+LOC-003,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,500,-6.247,106.793,Fasilitas Publik
+LOC-004,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,500,-6.267,106.8,Parkiran
+LOC-005,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,500,-6.24,106.809,Permukiman
+LOC-006,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,500,-6.276,106.767,Pertokoan
+LOC-007,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,500,-6.252,106.77,Parkiran
+LOC-008,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,500,-6.23,106.78,Pertokoan
+LOC-009,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,500,-6.279,106.811,Fasilitas Publik
+LOC-010,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,500,-6.286,106.797,Jalan
+LOC-011,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,500,-6.293,106.774,Permukiman
+LOC-012,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,500,-6.291,106.802,Pusat Aktivitas
+LOC-013,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,500,-6.275,106.833,Parkiran
+LOC-014,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,500,-6.276,106.849,Jalan
+LOC-015,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,500,-6.31,106.82,Pertokoan
+LOC-016,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,500,-6.285,106.835,Fasilitas Publik
+LOC-017,Polsek Pancoran,Pancoran,Pancoran,JKS-017,500,-6.25,106.839,Pertokoan
+LOC-018,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,500,-6.254,106.831,Fasilitas Publik
+LOC-019,Polsek Pancoran,Pancoran,Kalibata,JKS-019,500,-6.257,106.856,Fasilitas Publik
+LOC-020,Polsek Tebet,Tebet,Tebet Barat,JKS-020,500,-6.235,106.847,Jalan
+LOC-021,Polsek Tebet,Tebet,Tebet Timur,JKS-021,500,-6.23,106.855,Parkiran
+LOC-022,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,500,-6.239,106.835,Pusat Aktivitas
+LOC-023,Polsek Tebet,Tebet,Manggarai,JKS-023,500,-6.209,106.85,Parkiran
+LOC-024,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,500,-6.247,106.82,Permukiman
+LOC-025,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,500,-6.257,106.814,Parkiran
+LOC-026,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,500,-6.255,106.823,Fasilitas Publik
+LOC-027,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,500,-6.218,106.829,Fasilitas Publik
+LOC-028,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,500,-6.23,106.833,Permukiman
+LOC-029,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,500,-6.218,106.839,Pertokoan
+LOC-030,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,500,-6.335,106.819,Fasilitas Publik
+LOC-031,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,500,-6.333,106.795,Permukiman
+LOC-032,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,500,-6.312,106.836,Fasilitas Publik
+LOC-033,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,500,-6.345,106.824,Pusat Aktivitas

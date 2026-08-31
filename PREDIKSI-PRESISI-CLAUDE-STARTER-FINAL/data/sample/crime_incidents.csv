@@ -1,0 +1,1201 @@
+incident_id,incident_type,incident_date,incident_time,polsek,kecamatan,kelurahan,grid_id,latitude,longitude,location_type,modus,target_type,status,is_synthetic
+INC-00001,CURANMOR,2023-07-09,13:51,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230653,106.855133,Permukiman,kunci_t,motor,Dilaporkan,True
+INC-00002,KEJAHATAN_JALANAN,2024-01-23,13:25,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256651,106.855237,Permukiman,pencurian_ringan,pejalan_kaki,Selesai,True
+INC-00003,KEJAHATAN_JALANAN,2023-02-04,20:01,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.280654,106.810576,Permukiman,jambret,pedagang,Selesai,True
+INC-00004,CURAT,2023-06-11,15:14,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333139,106.794639,Parkiran,rusak_kunci,kantor,Selesai,True
+INC-00005,CURANMOR,2023-08-05,03:14,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.259251,106.85436,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00006,CURAS,2024-01-27,01:38,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254205,106.823289,Pusat Aktivitas,lainnya,pengendara,Dilaporkan,True
+INC-00007,CURANMOR,2024-05-17,20:39,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292451,106.771979,Parkiran,kelalaian_pengguna,mobil,Selesai,True
+INC-00008,CURAT,2025-10-25,06:26,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.258144,106.823986,Jalan,congkel,kantor,Dilaporkan,True
+INC-00009,CURAT,2025-01-12,03:29,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256643,106.854766,Permukiman,congkel,rumah,Dilaporkan,True
+INC-00010,CURAS,2024-07-31,01:27,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286636,106.797616,Pusat Aktivitas,perampasan_jalanan,pengendara,Dilaporkan,True
+INC-00011,CURANMOR,2023-07-09,15:51,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.231619,106.778777,Jalan,kelalaian_pengguna,motor,Penyidikan,True
+INC-00012,CURANMOR,2024-11-14,06:23,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.241132,106.810685,Fasilitas Publik,lainnya,mobil,Penyelidikan,True
+INC-00013,CURANMOR,2025-08-09,18:53,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235096,106.84671,Permukiman,duplikasi_kunci,mobil,Penyidikan,True
+INC-00014,KEJAHATAN_JALANAN,2024-12-30,20:10,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.231586,106.779198,Pertokoan,jambret,pengendara,Selesai,True
+INC-00015,TAWURAN,2025-01-21,15:15,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.23988,106.808396,Pertokoan,konflik_spontan,kelompok_pemuda,Penyidikan,True
+INC-00016,CURANMOR,2023-05-27,23:39,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246255,106.792807,Jalan,lainnya,motor,Dilaporkan,True
+INC-00017,CURAT,2023-05-31,06:59,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.211053,106.850143,Fasilitas Publik,rusak_kunci,rumah,Selesai,True
+INC-00018,CURANMOR,2025-10-11,20:02,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291343,106.803278,Pusat Aktivitas,lainnya,motor,Selesai,True
+INC-00019,CURAS,2023-04-14,01:34,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227172,106.797679,Permukiman,ancaman,pejalan_kaki,Dilaporkan,True
+INC-00020,CURAT,2025-03-11,23:07,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.275491,106.768129,Permukiman,lainnya,kantor,Penyelidikan,True
+INC-00021,CURANMOR,2025-11-11,13:53,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345169,106.825047,Parkiran,kunci_t,mobil,Selesai,True
+INC-00022,CURANMOR,2024-03-28,18:48,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.25214,106.838708,Pusat Aktivitas,lainnya,motor,Selesai,True
+INC-00023,CURAT,2024-05-11,00:51,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.258016,106.854182,Pusat Aktivitas,lainnya,kantor,Dilaporkan,True
+INC-00024,CURAS,2024-07-19,01:31,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.258377,106.857668,Parkiran,senjata_tajam,pengendara,Penyelidikan,True
+INC-00025,CURANMOR,2023-09-03,21:34,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.285212,106.795277,Jalan,kelalaian_pengguna,motor,Penyidikan,True
+INC-00026,CURAS,2023-01-20,21:11,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.210873,106.8524,Pertokoan,perampasan_jalanan,pejalan_kaki,Dilaporkan,True
+INC-00027,CURAT,2023-05-30,19:41,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227566,106.801307,Jalan,congkel,rumah,Penyelidikan,True
+INC-00028,CURAT,2023-01-05,19:29,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.227427,106.833761,Pertokoan,congkel,toko,Penyidikan,True
+INC-00029,CURAT,2024-10-18,22:25,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309394,106.821039,Parkiran,rusak_kunci,toko,Dilaporkan,True
+INC-00030,CURANMOR,2025-03-12,04:44,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246547,106.794982,Permukiman,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00031,CURANMOR,2025-09-23,01:46,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291285,106.804246,Jalan,lainnya,motor,Penyidikan,True
+INC-00032,CURAT,2023-12-23,04:35,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230154,106.854441,Permukiman,rusak_kunci,rumah,Penyidikan,True
+INC-00033,CURAS,2024-05-30,23:27,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.332223,106.795151,Permukiman,senjata_tajam,toko,Selesai,True
+INC-00034,CURAT,2025-08-14,02:00,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.332663,106.794253,Jalan,lainnya,rumah,Selesai,True
+INC-00035,TAWURAN,2025-10-18,03:52,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.285365,106.796779,Jalan,kelompok_pelajar,kelompok_pelajar,Selesai,True
+INC-00036,CURANMOR,2024-11-06,21:48,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257738,106.814459,Parkiran,lainnya,mobil,Selesai,True
+INC-00037,CURANMOR,2023-02-06,20:34,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.207433,106.850025,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00038,KEJAHATAN_JALANAN,2024-01-31,12:27,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.227705,106.834278,Permukiman,pencurian_ringan,pejalan_kaki,Penyidikan,True
+INC-00039,CURANMOR,2024-07-22,23:13,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.335508,106.797125,Pusat Aktivitas,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00040,CURAS,2024-08-10,22:37,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229706,106.832392,Jalan,senjata_tajam,toko,Selesai,True
+INC-00041,CURANMOR,2023-01-29,13:00,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345381,106.82455,Pusat Aktivitas,kunci_t,mobil,Penyelidikan,True
+INC-00042,CURANMOR,2024-03-20,07:18,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209023,106.848797,Jalan,lainnya,mobil,Dilaporkan,True
+INC-00043,TAWURAN,2024-04-20,19:02,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229409,106.833107,Parkiran,kelompok_pelajar,kelompok_pelajar,Selesai,True
+INC-00044,CURAT,2025-07-22,12:31,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.220276,106.829719,Jalan,congkel,kantor,Selesai,True
+INC-00045,CURAS,2023-02-16,16:52,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.210077,106.851831,Pertokoan,perampasan_jalanan,pengendara,Selesai,True
+INC-00046,CURAT,2025-08-25,20:07,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266445,106.798751,Parkiran,lainnya,toko,Penyelidikan,True
+INC-00047,KEJAHATAN_JALANAN,2025-05-18,20:16,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345774,106.822079,Permukiman,lainnya,pejalan_kaki,Dilaporkan,True
+INC-00048,KEJAHATAN_JALANAN,2024-01-25,19:01,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.248478,106.820228,Parkiran,pemalakan,pejalan_kaki,Penyidikan,True
+INC-00049,CURANMOR,2023-06-26,13:58,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256669,106.814334,Permukiman,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00050,TAWURAN,2025-04-02,23:37,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.2178,106.829969,Pertokoan,kelompok_pemuda,kelompok_pemuda,Penyelidikan,True
+INC-00051,CURANMOR,2024-04-01,19:00,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310727,106.83785,Parkiran,lainnya,motor,Selesai,True
+INC-00052,CURAT,2024-11-04,17:11,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230676,106.836047,Parkiran,congkel,rumah,Selesai,True
+INC-00053,CURANMOR,2023-03-16,00:37,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.265067,106.801529,Permukiman,kelalaian_pengguna,motor,Selesai,True
+INC-00054,CURAT,2023-09-06,22:41,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.257044,106.822933,Permukiman,rusak_kunci,toko,Penyidikan,True
+INC-00055,CURANMOR,2023-07-24,11:46,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.258322,106.856585,Parkiran,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00056,KEJAHATAN_JALANAN,2023-04-03,06:20,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235636,106.846049,Jalan,jambret,pengendara,Dilaporkan,True
+INC-00057,CURANMOR,2023-08-21,02:25,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335122,106.819051,Pertokoan,kunci_t,mobil,Dilaporkan,True
+INC-00058,CURANMOR,2023-12-16,00:35,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274263,106.833909,Jalan,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00059,CURANMOR,2024-12-26,18:01,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.255978,106.812814,Pusat Aktivitas,duplikasi_kunci,motor,Penyidikan,True
+INC-00060,CURAT,2025-03-16,22:36,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229688,106.778451,Pusat Aktivitas,rusak_kunci,toko,Penyidikan,True
+INC-00061,KEJAHATAN_JALANAN,2024-06-20,20:02,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235358,106.849607,Permukiman,pemalakan,pengendara,Penyidikan,True
+INC-00062,CURANMOR,2025-01-17,12:25,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.287698,106.797714,Permukiman,duplikasi_kunci,motor,Selesai,True
+INC-00063,CURANMOR,2024-10-23,17:29,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275711,106.831963,Jalan,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00064,CURANMOR,2023-08-31,23:05,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208532,106.849898,Pusat Aktivitas,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00065,CURAS,2024-05-18,20:10,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.232003,106.833652,Pertokoan,senjata_tajam,pengendara,Penyelidikan,True
+INC-00066,CURAT,2024-12-24,14:00,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.231829,106.780957,Permukiman,pecah_kaca,kantor,Penyidikan,True
+INC-00067,CURANMOR,2023-09-16,02:22,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.29268,106.802276,Pertokoan,lainnya,motor,Dilaporkan,True
+INC-00068,TAWURAN,2023-11-25,14:54,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235256,106.847191,Pusat Aktivitas,lainnya,kelompok_pemuda,Dilaporkan,True
+INC-00069,KEJAHATAN_JALANAN,2024-01-11,13:00,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251414,106.771896,Pusat Aktivitas,lainnya,pedagang,Selesai,True
+INC-00070,TAWURAN,2023-09-27,06:18,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229652,106.83549,Parkiran,kelompok_pelajar,kelompok_pemuda,Penyelidikan,True
+INC-00071,CURAT,2023-10-23,18:37,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.249792,106.821813,Permukiman,congkel,rumah,Penyelidikan,True
+INC-00072,KEJAHATAN_JALANAN,2025-03-31,02:05,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.228542,106.853943,Pertokoan,lainnya,pedagang,Selesai,True
+INC-00073,KEJAHATAN_JALANAN,2024-04-22,03:32,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.253836,106.823865,Jalan,lainnya,pengendara,Selesai,True
+INC-00074,KEJAHATAN_JALANAN,2024-05-31,21:30,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291935,106.799364,Permukiman,pencurian_ringan,pejalan_kaki,Penyidikan,True
+INC-00075,CURAT,2023-02-16,18:50,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.252953,106.82362,Permukiman,lainnya,kantor,Selesai,True
+INC-00076,CURAT,2025-05-21,14:25,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274783,106.836172,Permukiman,pecah_kaca,kantor,Selesai,True
+INC-00077,KEJAHATAN_JALANAN,2023-12-22,00:41,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.255723,106.824562,Jalan,pencurian_ringan,pejalan_kaki,Dilaporkan,True
+INC-00078,CURAT,2025-02-17,20:25,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.263954,106.800629,Parkiran,congkel,rumah,Penyelidikan,True
+INC-00079,CURANMOR,2023-11-09,14:24,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.292867,106.798658,Pusat Aktivitas,lainnya,motor,Dilaporkan,True
+INC-00080,CURANMOR,2025-02-01,18:05,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276862,106.768087,Parkiran,duplikasi_kunci,motor,Penyidikan,True
+INC-00081,KEJAHATAN_JALANAN,2025-04-28,14:27,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.241608,106.809179,Parkiran,lainnya,pejalan_kaki,Penyelidikan,True
+INC-00082,CURANMOR,2024-03-10,05:28,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.33672,106.820758,Pusat Aktivitas,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00083,CURAT,2025-10-06,17:29,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311413,106.820244,Jalan,congkel,kantor,Selesai,True
+INC-00084,CURANMOR,2025-03-10,18:32,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.333877,106.820526,Jalan,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00085,CURAT,2024-03-18,14:36,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234399,106.845736,Parkiran,rusak_kunci,kantor,Penyelidikan,True
+INC-00086,TAWURAN,2025-03-24,18:20,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.277032,106.831919,Jalan,kelompok_pemuda,pengguna_jalan,Selesai,True
+INC-00087,CURANMOR,2023-05-27,19:17,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.21949,106.83802,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00088,CURANMOR,2023-09-18,12:52,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254747,106.822884,Pertokoan,lainnya,motor,Selesai,True
+INC-00089,KEJAHATAN_JALANAN,2024-09-23,04:49,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.282414,106.835807,Parkiran,pemalakan,pengendara,Selesai,True
+INC-00090,CURANMOR,2023-01-04,20:36,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334765,106.817826,Parkiran,kunci_t,motor,Selesai,True
+INC-00091,CURANMOR,2024-08-10,03:56,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.225906,106.7989,Parkiran,kunci_t,motor,Penyidikan,True
+INC-00092,KEJAHATAN_JALANAN,2025-06-24,13:57,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.278226,106.847813,Fasilitas Publik,jambret,pedagang,Dilaporkan,True
+INC-00093,CURANMOR,2025-03-04,15:35,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231171,106.834264,Permukiman,duplikasi_kunci,motor,Selesai,True
+INC-00094,CURANMOR,2025-01-27,08:46,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.284271,106.833177,Jalan,duplikasi_kunci,motor,Penyidikan,True
+INC-00095,CURAS,2024-04-26,11:39,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285042,106.837125,Pertokoan,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-00096,CURANMOR,2023-05-11,23:37,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.229115,106.801373,Jalan,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00097,CURAS,2023-11-26,01:15,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253544,106.831733,Pertokoan,perampasan_jalanan,pejalan_kaki,Selesai,True
+INC-00098,KEJAHATAN_JALANAN,2024-12-10,19:58,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334018,106.819161,Jalan,jambret,pedagang,Penyelidikan,True
+INC-00099,CURANMOR,2024-11-18,21:30,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275966,106.849036,Parkiran,duplikasi_kunci,motor,Dilaporkan,True
+INC-00100,CURAT,2025-09-21,02:36,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.288035,106.836558,Parkiran,pecah_kaca,kantor,Selesai,True
+INC-00101,CURANMOR,2025-09-08,22:41,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230262,106.856195,Permukiman,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00102,CURANMOR,2025-11-28,01:52,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.233883,106.79222,Parkiran,kunci_t,mobil,Dilaporkan,True
+INC-00103,CURAS,2023-12-06,01:13,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229057,106.779457,Pertokoan,ancaman,pejalan_kaki,Penyelidikan,True
+INC-00104,KEJAHATAN_JALANAN,2025-08-06,13:23,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.276778,106.849962,Permukiman,pencurian_ringan,pedagang,Selesai,True
+INC-00105,KEJAHATAN_JALANAN,2023-01-11,20:03,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.343599,106.825945,Permukiman,pemalakan,pedagang,Dilaporkan,True
+INC-00106,CURANMOR,2023-08-06,21:04,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310295,106.835315,Pertokoan,lainnya,motor,Selesai,True
+INC-00107,CURANMOR,2025-02-19,19:13,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.25416,106.832351,Parkiran,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00108,TAWURAN,2025-07-09,10:24,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228021,106.800126,Parkiran,konflik_spontan,kelompok_pemuda,Penyelidikan,True
+INC-00109,CURANMOR,2025-07-02,20:04,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251948,106.771237,Pusat Aktivitas,kelalaian_pengguna,mobil,Selesai,True
+INC-00110,CURAT,2023-02-09,05:23,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.278291,106.81233,Pusat Aktivitas,pecah_kaca,rumah,Penyelidikan,True
+INC-00111,CURAS,2024-07-10,19:37,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208766,106.84981,Fasilitas Publik,ancaman,toko,Selesai,True
+INC-00112,CURANMOR,2024-03-01,20:30,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291973,106.803035,Jalan,kunci_t,mobil,Penyelidikan,True
+INC-00113,CURANMOR,2023-01-17,00:44,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275369,106.833263,Pertokoan,duplikasi_kunci,motor,Selesai,True
+INC-00114,CURANMOR,2024-07-25,21:19,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257536,106.814233,Parkiran,kunci_t,mobil,Dilaporkan,True
+INC-00115,CURANMOR,2025-06-04,00:49,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.227576,106.854112,Permukiman,lainnya,motor,Dilaporkan,True
+INC-00116,CURANMOR,2025-11-22,21:57,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249186,106.838942,Jalan,kunci_t,motor,Penyidikan,True
+INC-00117,CURAS,2025-03-07,01:13,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.252581,106.769574,Pusat Aktivitas,senjata_tajam,pejalan_kaki,Selesai,True
+INC-00118,CURAS,2025-05-18,08:02,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.27634,106.831594,Pertokoan,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-00119,CURAS,2025-10-05,22:15,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.276459,106.833185,Jalan,ancaman,pejalan_kaki,Dilaporkan,True
+INC-00120,TAWURAN,2025-11-16,17:43,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.255501,106.81459,Permukiman,kelompok_pemuda,pengguna_jalan,Dilaporkan,True
+INC-00121,CURANMOR,2024-06-04,01:53,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.248931,106.836939,Parkiran,lainnya,motor,Dilaporkan,True
+INC-00122,CURAS,2023-10-01,23:37,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273772,106.831688,Pusat Aktivitas,senjata_tajam,pejalan_kaki,Dilaporkan,True
+INC-00123,CURAS,2023-08-02,01:45,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.240004,106.80761,Permukiman,lainnya,pejalan_kaki,Penyidikan,True
+INC-00124,CURANMOR,2023-08-30,01:12,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.255662,106.829671,Fasilitas Publik,duplikasi_kunci,mobil,Selesai,True
+INC-00125,CURANMOR,2023-05-23,01:10,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.237958,106.81066,Permukiman,kunci_t,mobil,Selesai,True
+INC-00126,TAWURAN,2023-04-21,21:03,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.245378,106.793557,Permukiman,konflik_spontan,kelompok_pelajar,Dilaporkan,True
+INC-00127,CURANMOR,2023-01-14,07:12,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.234158,106.792491,Parkiran,duplikasi_kunci,mobil,Selesai,True
+INC-00128,CURAS,2023-11-05,18:17,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.251573,106.840438,Permukiman,perampasan_jalanan,toko,Dilaporkan,True
+INC-00129,CURAS,2025-01-24,00:32,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.247404,106.793422,Fasilitas Publik,senjata_tajam,pejalan_kaki,Selesai,True
+INC-00130,CURANMOR,2025-03-15,23:23,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273857,106.836535,Permukiman,duplikasi_kunci,motor,Penyelidikan,True
+INC-00131,CURAT,2024-07-31,06:41,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.219533,106.827141,Permukiman,congkel,kantor,Penyelidikan,True
+INC-00132,CURAS,2025-03-04,04:43,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334723,106.81621,Parkiran,senjata_tajam,pejalan_kaki,Penyidikan,True
+INC-00133,CURAT,2024-01-16,19:01,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253678,106.830144,Parkiran,lainnya,toko,Selesai,True
+INC-00134,CURANMOR,2023-09-18,02:44,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.25592,106.822088,Pusat Aktivitas,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00135,TAWURAN,2025-04-23,08:42,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.277556,106.847185,Permukiman,konflik_spontan,kelompok_pelajar,Penyidikan,True
+INC-00136,TAWURAN,2023-11-01,16:14,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.216099,106.831769,Jalan,kelompok_pemuda,kelompok_pemuda,Dilaporkan,True
+INC-00137,CURANMOR,2025-11-09,06:36,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.239228,106.835538,Permukiman,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00138,CURAT,2024-11-23,01:24,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.2079,106.850416,Permukiman,pecah_kaca,kantor,Penyidikan,True
+INC-00139,CURANMOR,2023-05-31,20:41,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293879,106.774607,Jalan,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-00140,KEJAHATAN_JALANAN,2024-05-31,20:54,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.278819,106.811438,Permukiman,jambret,pengendara,Selesai,True
+INC-00141,TAWURAN,2025-01-13,20:03,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268292,106.800802,Permukiman,kelompok_pelajar,kelompok_pelajar,Penyidikan,True
+INC-00142,CURAS,2025-10-06,22:24,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292614,106.774506,Permukiman,ancaman,toko,Selesai,True
+INC-00143,KEJAHATAN_JALANAN,2024-05-08,22:12,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310357,106.821651,Pertokoan,lainnya,pengendara,Penyidikan,True
+INC-00144,CURANMOR,2024-12-25,13:20,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.27395,106.830412,Permukiman,lainnya,motor,Penyidikan,True
+INC-00145,CURANMOR,2023-04-12,20:09,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234997,106.848945,Permukiman,lainnya,mobil,Selesai,True
+INC-00146,TAWURAN,2024-09-20,04:47,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.265773,106.802928,Permukiman,lainnya,pengguna_jalan,Selesai,True
+INC-00147,CURAS,2024-05-12,21:42,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.254303,106.831471,Pusat Aktivitas,perampasan_jalanan,pejalan_kaki,Penyidikan,True
+INC-00148,CURANMOR,2025-02-25,08:51,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.284373,106.835248,Permukiman,lainnya,mobil,Dilaporkan,True
+INC-00149,CURAS,2024-10-31,14:24,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.28027,106.811076,Pusat Aktivitas,perampasan_jalanan,pejalan_kaki,Penyelidikan,True
+INC-00150,CURANMOR,2025-08-16,08:35,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257987,106.85582,Pertokoan,lainnya,mobil,Penyidikan,True
+INC-00151,KEJAHATAN_JALANAN,2024-07-12,21:21,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23341,106.847506,Permukiman,lainnya,pengendara,Penyelidikan,True
+INC-00152,KEJAHATAN_JALANAN,2024-11-12,07:36,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.289716,106.800904,Pusat Aktivitas,pencurian_ringan,pengendara,Selesai,True
+INC-00153,CURAS,2025-07-03,19:46,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309397,106.819567,Permukiman,ancaman,pejalan_kaki,Dilaporkan,True
+INC-00154,CURAS,2025-03-15,18:09,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234119,106.845377,Jalan,ancaman,pengendara,Penyelidikan,True
+INC-00155,CURAS,2023-09-20,15:38,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273749,106.832376,Permukiman,senjata_tajam,pengendara,Selesai,True
+INC-00156,CURANMOR,2024-09-12,22:02,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.249025,106.791496,Parkiran,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00157,CURANMOR,2025-04-07,07:20,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.217242,106.827132,Pertokoan,lainnya,motor,Penyidikan,True
+INC-00158,CURAS,2023-12-08,20:16,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345015,106.824136,Parkiran,senjata_tajam,pengendara,Selesai,True
+INC-00159,TAWURAN,2023-10-14,13:29,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.2741,106.766632,Parkiran,lainnya,pengguna_jalan,Selesai,True
+INC-00160,CURANMOR,2023-08-25,00:19,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344912,106.824936,Pusat Aktivitas,kunci_t,mobil,Penyidikan,True
+INC-00161,TAWURAN,2025-09-04,17:11,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.21715,106.840148,Jalan,kelompok_pelajar,pengguna_jalan,Penyelidikan,True
+INC-00162,CURANMOR,2023-12-27,18:10,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333661,106.795976,Fasilitas Publik,duplikasi_kunci,motor,Dilaporkan,True
+INC-00163,CURAT,2024-02-10,04:51,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344902,106.823881,Parkiran,lainnya,toko,Selesai,True
+INC-00164,CURANMOR,2023-05-14,21:14,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.253425,106.769576,Pertokoan,duplikasi_kunci,mobil,Selesai,True
+INC-00165,TAWURAN,2023-09-23,21:35,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268228,106.800362,Pusat Aktivitas,kelompok_pemuda,kelompok_pelajar,Penyelidikan,True
+INC-00166,CURAT,2024-04-27,20:33,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239391,106.809065,Parkiran,congkel,kantor,Penyidikan,True
+INC-00167,CURANMOR,2025-09-15,06:01,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.24016,106.835501,Jalan,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00168,CURAT,2024-10-03,23:14,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257736,106.813637,Pertokoan,lainnya,rumah,Penyidikan,True
+INC-00169,CURANMOR,2025-02-23,04:35,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.255065,106.771121,Jalan,lainnya,motor,Penyidikan,True
+INC-00170,CURANMOR,2024-04-27,21:36,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275498,106.848878,Parkiran,duplikasi_kunci,motor,Penyelidikan,True
+INC-00171,CURANMOR,2025-01-11,03:38,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.258839,106.81524,Pusat Aktivitas,kunci_t,motor,Penyelidikan,True
+INC-00172,CURANMOR,2023-06-22,08:10,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273564,106.83281,Jalan,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00173,CURAS,2024-09-15,13:51,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285369,106.836231,Fasilitas Publik,ancaman,pejalan_kaki,Dilaporkan,True
+INC-00174,KEJAHATAN_JALANAN,2024-01-28,01:32,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218106,106.830106,Permukiman,pemalakan,pedagang,Penyidikan,True
+INC-00175,CURAS,2025-08-02,18:18,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.237725,106.792909,Jalan,perampasan_jalanan,toko,Selesai,True
+INC-00176,CURANMOR,2024-02-12,18:39,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228617,106.798834,Parkiran,kelalaian_pengguna,motor,Selesai,True
+INC-00177,CURANMOR,2024-06-23,18:53,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.276938,106.850056,Jalan,lainnya,mobil,Selesai,True
+INC-00178,CURAS,2023-12-26,05:48,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.276034,106.831943,Jalan,ancaman,pengendara,Penyidikan,True
+INC-00179,KEJAHATAN_JALANAN,2025-02-05,09:39,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218044,106.827782,Pusat Aktivitas,lainnya,pengendara,Dilaporkan,True
+INC-00180,CURANMOR,2025-02-21,01:39,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.237085,106.844663,Permukiman,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00181,CURANMOR,2024-11-16,20:29,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345201,106.824339,Pertokoan,kunci_t,mobil,Selesai,True
+INC-00182,TAWURAN,2023-08-26,05:21,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.239994,106.836091,Permukiman,kelompok_pelajar,kelompok_pemuda,Dilaporkan,True
+INC-00183,CURAS,2023-08-01,06:50,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218509,106.827872,Parkiran,ancaman,pejalan_kaki,Selesai,True
+INC-00184,CURANMOR,2024-05-29,20:38,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.255798,106.856246,Parkiran,lainnya,mobil,Penyidikan,True
+INC-00185,CURAS,2023-05-09,08:34,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.216454,106.838493,Jalan,senjata_tajam,pejalan_kaki,Selesai,True
+INC-00186,CURAS,2023-08-19,13:08,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209161,106.850018,Pertokoan,senjata_tajam,pejalan_kaki,Dilaporkan,True
+INC-00187,CURANMOR,2025-11-09,10:55,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.241286,106.809007,Parkiran,lainnya,mobil,Selesai,True
+INC-00188,CURAT,2025-10-10,20:53,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.276831,106.834515,Pertokoan,lainnya,rumah,Penyidikan,True
+INC-00189,CURAT,2024-05-30,04:15,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.246119,106.818808,Jalan,lainnya,toko,Penyidikan,True
+INC-00190,CURANMOR,2023-06-08,19:18,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293204,106.773456,Pertokoan,duplikasi_kunci,motor,Selesai,True
+INC-00191,CURAT,2023-01-19,22:48,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.241012,106.808838,Parkiran,pecah_kaca,kantor,Selesai,True
+INC-00192,CURANMOR,2025-10-16,19:19,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.27642,106.767314,Parkiran,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00193,KEJAHATAN_JALANAN,2023-05-17,18:09,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251831,106.767878,Parkiran,jambret,pedagang,Penyelidikan,True
+INC-00194,KEJAHATAN_JALANAN,2025-07-10,05:48,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229167,106.832877,Pertokoan,pemalakan,pengendara,Selesai,True
+INC-00195,KEJAHATAN_JALANAN,2025-10-06,00:40,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254574,106.821683,Jalan,pencurian_ringan,pejalan_kaki,Selesai,True
+INC-00196,CURANMOR,2025-07-14,00:06,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.236574,106.792735,Parkiran,lainnya,mobil,Selesai,True
+INC-00197,CURANMOR,2023-07-24,22:42,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239878,106.807643,Parkiran,kelalaian_pengguna,mobil,Selesai,True
+INC-00198,CURAS,2024-11-02,18:06,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310608,106.835548,Pertokoan,senjata_tajam,pejalan_kaki,Penyidikan,True
+INC-00199,CURANMOR,2023-01-21,05:23,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.240524,106.833712,Fasilitas Publik,lainnya,motor,Penyelidikan,True
+INC-00200,CURANMOR,2023-06-10,07:06,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229436,106.782298,Fasilitas Publik,kunci_t,mobil,Penyelidikan,True
+INC-00201,CURANMOR,2023-02-12,18:05,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208338,106.849478,Parkiran,kunci_t,mobil,Selesai,True
+INC-00202,CURAS,2025-12-16,14:38,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285853,106.835089,Permukiman,lainnya,toko,Penyidikan,True
+INC-00203,TAWURAN,2023-08-31,08:19,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.250101,106.77033,Pertokoan,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00204,KEJAHATAN_JALANAN,2024-09-19,16:57,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229559,106.781906,Permukiman,lainnya,pengendara,Penyelidikan,True
+INC-00205,CURAT,2025-12-03,05:38,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.248754,106.839607,Parkiran,pecah_kaca,rumah,Selesai,True
+INC-00206,CURANMOR,2024-05-18,12:40,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.244752,106.794296,Pertokoan,kelalaian_pengguna,motor,Selesai,True
+INC-00207,CURAT,2024-07-07,01:06,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.258879,106.857557,Pusat Aktivitas,pecah_kaca,toko,Dilaporkan,True
+INC-00208,CURANMOR,2025-10-11,19:42,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.333796,106.818247,Fasilitas Publik,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-00209,CURANMOR,2025-03-24,17:52,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.343622,106.825719,Jalan,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00210,CURANMOR,2023-09-04,01:03,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208304,106.850391,Jalan,kunci_t,motor,Penyelidikan,True
+INC-00211,TAWURAN,2023-09-22,18:43,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.255594,106.8323,Parkiran,kelompok_pemuda,pengguna_jalan,Selesai,True
+INC-00212,CURANMOR,2025-09-12,01:32,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267678,106.799507,Parkiran,kelalaian_pengguna,mobil,Selesai,True
+INC-00213,CURAT,2025-08-10,16:04,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256485,106.856459,Parkiran,congkel,rumah,Selesai,True
+INC-00214,CURANMOR,2025-12-25,20:05,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227482,106.800629,Pusat Aktivitas,kelalaian_pengguna,mobil,Selesai,True
+INC-00215,TAWURAN,2024-05-30,11:20,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251383,106.770215,Pusat Aktivitas,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00216,KEJAHATAN_JALANAN,2025-04-24,22:26,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.24016,106.83518,Permukiman,pemalakan,pengendara,Selesai,True
+INC-00217,CURANMOR,2025-04-19,21:58,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.276642,106.848891,Pertokoan,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00218,KEJAHATAN_JALANAN,2023-03-24,20:27,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231123,106.834303,Pusat Aktivitas,lainnya,pedagang,Selesai,True
+INC-00219,CURANMOR,2024-02-02,01:16,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.269262,106.799644,Permukiman,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00220,CURAT,2023-08-10,07:01,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.23586,106.795053,Pusat Aktivitas,pecah_kaca,kantor,Dilaporkan,True
+INC-00221,TAWURAN,2024-04-21,14:10,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286881,106.797043,Pusat Aktivitas,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00222,TAWURAN,2025-11-24,16:44,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.218621,106.839289,Pusat Aktivitas,kelompok_pemuda,pengguna_jalan,Dilaporkan,True
+INC-00223,KEJAHATAN_JALANAN,2024-10-20,19:50,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.308281,106.819674,Permukiman,pencurian_ringan,pedagang,Dilaporkan,True
+INC-00224,CURAT,2025-02-10,21:43,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249852,106.839662,Pertokoan,congkel,kantor,Penyelidikan,True
+INC-00225,CURANMOR,2023-08-02,17:25,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275234,106.833366,Permukiman,kunci_t,motor,Penyidikan,True
+INC-00226,CURANMOR,2025-05-16,09:55,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.233845,106.849836,Pusat Aktivitas,kunci_t,mobil,Selesai,True
+INC-00227,CURANMOR,2024-02-08,21:48,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291591,106.800389,Jalan,kunci_t,motor,Selesai,True
+INC-00228,CURAS,2025-03-27,11:38,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267523,106.800083,Pertokoan,senjata_tajam,toko,Penyidikan,True
+INC-00229,CURANMOR,2023-05-07,15:11,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274587,106.833923,Parkiran,kunci_t,mobil,Penyelidikan,True
+INC-00230,KEJAHATAN_JALANAN,2024-08-24,00:26,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230452,106.833691,Pertokoan,jambret,pedagang,Selesai,True
+INC-00231,CURANMOR,2024-04-29,21:32,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.278009,106.847925,Pertokoan,duplikasi_kunci,motor,Selesai,True
+INC-00232,CURANMOR,2023-07-21,00:17,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235362,106.846619,Permukiman,kunci_t,mobil,Penyidikan,True
+INC-00233,CURAT,2024-01-22,16:40,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.242037,106.808225,Permukiman,congkel,kantor,Dilaporkan,True
+INC-00234,CURAT,2024-07-27,22:23,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.289837,106.802513,Pertokoan,rusak_kunci,kantor,Dilaporkan,True
+INC-00235,CURANMOR,2023-03-14,16:33,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.256115,106.820413,Permukiman,kunci_t,motor,Dilaporkan,True
+INC-00236,CURANMOR,2024-07-13,00:59,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.276184,106.834778,Jalan,kunci_t,motor,Dilaporkan,True
+INC-00237,CURANMOR,2025-04-12,00:59,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.238472,106.808402,Permukiman,kunci_t,mobil,Selesai,True
+INC-00238,TAWURAN,2025-07-18,16:30,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257972,106.856509,Permukiman,lainnya,pengguna_jalan,Penyidikan,True
+INC-00239,CURAT,2024-07-10,21:42,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228318,106.799566,Jalan,pecah_kaca,rumah,Penyidikan,True
+INC-00240,CURANMOR,2024-06-25,12:59,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229164,106.832599,Permukiman,lainnya,motor,Selesai,True
+INC-00241,CURAS,2023-03-18,00:31,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239365,106.806553,Jalan,ancaman,pejalan_kaki,Penyidikan,True
+INC-00242,TAWURAN,2025-03-31,09:31,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311032,106.820668,Permukiman,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00243,CURAT,2023-12-25,23:34,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239611,106.808571,Jalan,congkel,rumah,Selesai,True
+INC-00244,CURANMOR,2023-04-14,16:38,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218558,106.828873,Permukiman,lainnya,mobil,Penyelidikan,True
+INC-00245,CURAT,2023-03-05,21:44,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235655,106.846941,Pertokoan,pecah_kaca,rumah,Selesai,True
+INC-00246,CURAT,2025-11-09,05:16,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.226977,106.800784,Jalan,lainnya,toko,Penyidikan,True
+INC-00247,CURAT,2024-02-11,18:49,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249356,106.839368,Permukiman,lainnya,kantor,Penyidikan,True
+INC-00248,TAWURAN,2025-02-10,23:07,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285234,106.836361,Pusat Aktivitas,lainnya,pengguna_jalan,Penyelidikan,True
+INC-00249,CURANMOR,2024-03-18,06:54,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.312022,106.835534,Pertokoan,kelalaian_pengguna,motor,Selesai,True
+INC-00250,CURANMOR,2023-11-16,21:23,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.290746,106.804071,Pertokoan,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00251,TAWURAN,2025-03-04,00:00,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.284549,106.795273,Jalan,kelompok_pelajar,kelompok_pelajar,Selesai,True
+INC-00252,TAWURAN,2023-07-20,17:39,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228152,106.832165,Parkiran,lainnya,kelompok_pemuda,Dilaporkan,True
+INC-00253,TAWURAN,2025-06-28,02:18,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.314272,106.836256,Jalan,konflik_spontan,kelompok_pemuda,Selesai,True
+INC-00254,CURANMOR,2023-11-18,09:59,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275335,106.834233,Parkiran,lainnya,mobil,Penyelidikan,True
+INC-00255,CURAT,2025-01-02,16:40,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230488,106.831341,Pertokoan,pecah_kaca,rumah,Selesai,True
+INC-00256,CURAT,2024-06-27,07:53,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234748,106.84641,Parkiran,lainnya,toko,Selesai,True
+INC-00257,CURANMOR,2024-02-12,02:58,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257887,106.857068,Permukiman,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00258,CURAS,2023-12-20,14:56,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.279,106.810989,Jalan,lainnya,pengendara,Selesai,True
+INC-00259,CURAT,2025-03-28,11:56,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291203,106.80218,Permukiman,rusak_kunci,toko,Selesai,True
+INC-00260,CURAT,2023-05-21,23:11,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275899,106.83341,Jalan,congkel,rumah,Selesai,True
+INC-00261,CURAS,2024-09-23,07:42,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.26677,106.800082,Pertokoan,ancaman,toko,Selesai,True
+INC-00262,CURAT,2024-06-16,04:41,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230004,106.853836,Parkiran,lainnya,rumah,Penyidikan,True
+INC-00263,CURANMOR,2023-08-15,21:17,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.239598,106.794606,Pertokoan,kunci_t,motor,Selesai,True
+INC-00264,CURAS,2025-08-09,21:44,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.21889,106.828498,Permukiman,senjata_tajam,toko,Penyelidikan,True
+INC-00265,CURAT,2025-07-28,21:00,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.247394,106.820724,Parkiran,congkel,rumah,Dilaporkan,True
+INC-00266,CURANMOR,2024-07-18,00:36,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229788,106.833099,Jalan,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00267,CURANMOR,2025-06-02,23:59,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.283306,106.834339,Permukiman,lainnya,motor,Penyelidikan,True
+INC-00268,TAWURAN,2024-11-28,02:46,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257285,106.856231,Parkiran,lainnya,kelompok_pelajar,Penyelidikan,True
+INC-00269,CURAT,2023-02-24,11:15,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.288741,106.802944,Permukiman,lainnya,kantor,Selesai,True
+INC-00270,KEJAHATAN_JALANAN,2023-06-09,21:07,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.255566,106.822523,Pusat Aktivitas,jambret,pejalan_kaki,Selesai,True
+INC-00271,CURAT,2024-02-16,11:25,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.236818,106.793031,Parkiran,lainnya,toko,Selesai,True
+INC-00272,TAWURAN,2024-06-23,18:06,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251593,106.768807,Pertokoan,kelompok_pelajar,pengguna_jalan,Dilaporkan,True
+INC-00273,CURAS,2024-03-31,20:42,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273508,106.831921,Permukiman,perampasan_jalanan,pejalan_kaki,Selesai,True
+INC-00274,CURANMOR,2025-03-04,19:10,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227121,106.799347,Parkiran,duplikasi_kunci,motor,Penyelidikan,True
+INC-00275,KEJAHATAN_JALANAN,2023-10-04,23:17,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.231569,106.85523,Permukiman,pencurian_ringan,pengendara,Selesai,True
+INC-00276,CURANMOR,2024-06-03,22:47,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.236988,106.793222,Parkiran,lainnya,mobil,Dilaporkan,True
+INC-00277,KEJAHATAN_JALANAN,2024-08-02,20:25,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.346812,106.824145,Permukiman,pemalakan,pedagang,Dilaporkan,True
+INC-00278,CURAS,2025-05-19,05:50,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345987,106.82558,Pertokoan,perampasan_jalanan,pejalan_kaki,Selesai,True
+INC-00279,TAWURAN,2025-07-18,14:31,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.241269,106.8081,Permukiman,kelompok_pelajar,pengguna_jalan,Selesai,True
+INC-00280,TAWURAN,2025-01-23,00:09,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250659,106.840524,Permukiman,konflik_spontan,pengguna_jalan,Dilaporkan,True
+INC-00281,CURANMOR,2023-06-19,20:26,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231014,106.832018,Parkiran,lainnya,motor,Dilaporkan,True
+INC-00282,CURANMOR,2025-01-09,23:50,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.270805,106.831244,Permukiman,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-00283,CURAS,2024-12-18,13:52,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.343346,106.822506,Parkiran,senjata_tajam,pengendara,Selesai,True
+INC-00284,CURANMOR,2023-11-11,00:16,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.22647,106.798962,Parkiran,lainnya,motor,Selesai,True
+INC-00285,CURAT,2025-04-03,18:18,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.254262,106.829667,Pusat Aktivitas,rusak_kunci,rumah,Penyelidikan,True
+INC-00286,TAWURAN,2023-05-12,15:44,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.219503,106.839436,Parkiran,konflik_spontan,kelompok_pemuda,Penyelidikan,True
+INC-00287,CURANMOR,2024-04-19,18:02,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333784,106.796456,Pusat Aktivitas,duplikasi_kunci,motor,Penyidikan,True
+INC-00288,CURAT,2024-09-19,20:40,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227811,106.800041,Fasilitas Publik,pecah_kaca,kantor,Penyelidikan,True
+INC-00289,CURANMOR,2023-07-31,20:27,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.225672,106.798911,Permukiman,kunci_t,motor,Selesai,True
+INC-00290,KEJAHATAN_JALANAN,2023-11-02,07:50,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218552,106.827637,Pusat Aktivitas,pemalakan,pedagang,Penyelidikan,True
+INC-00291,CURAT,2025-11-11,16:15,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234898,106.84603,Pertokoan,pecah_kaca,toko,Selesai,True
+INC-00292,CURANMOR,2024-06-04,17:16,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.231906,106.855952,Pertokoan,kunci_t,motor,Dilaporkan,True
+INC-00293,CURANMOR,2024-07-16,21:39,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333329,106.795264,Jalan,kunci_t,mobil,Penyelidikan,True
+INC-00294,CURANMOR,2025-02-01,06:19,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.23873,106.810125,Permukiman,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00295,CURAT,2025-08-20,03:17,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249693,106.838612,Permukiman,rusak_kunci,rumah,Dilaporkan,True
+INC-00296,CURAS,2024-12-28,18:48,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.220799,106.83062,Parkiran,lainnya,pengendara,Dilaporkan,True
+INC-00297,CURAT,2024-10-20,09:24,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267575,106.798965,Parkiran,lainnya,toko,Selesai,True
+INC-00298,CURANMOR,2025-04-19,18:15,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.229968,106.855122,Parkiran,lainnya,mobil,Penyelidikan,True
+INC-00299,CURANMOR,2025-11-01,12:16,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293135,106.774844,Pusat Aktivitas,kunci_t,mobil,Penyelidikan,True
+INC-00300,CURANMOR,2025-11-22,20:04,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309802,106.819951,Pertokoan,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00301,CURAT,2023-08-03,23:19,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.258157,106.812851,Parkiran,congkel,toko,Penyidikan,True
+INC-00302,CURANMOR,2023-07-21,02:40,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310932,106.837242,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00303,CURAS,2025-10-15,20:01,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.252862,106.829457,Fasilitas Publik,perampasan_jalanan,toko,Dilaporkan,True
+INC-00304,KEJAHATAN_JALANAN,2024-10-30,15:19,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.234992,106.794609,Permukiman,pemalakan,pejalan_kaki,Dilaporkan,True
+INC-00305,CURAS,2023-03-14,10:35,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.232414,106.845827,Jalan,perampasan_jalanan,pejalan_kaki,Penyelidikan,True
+INC-00306,CURAS,2025-05-17,14:48,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208255,106.849805,Permukiman,perampasan_jalanan,pejalan_kaki,Penyelidikan,True
+INC-00307,CURANMOR,2023-02-15,23:16,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.20696,106.849984,Parkiran,lainnya,motor,Dilaporkan,True
+INC-00308,CURANMOR,2024-01-02,20:25,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.307642,106.820648,Pertokoan,kunci_t,mobil,Selesai,True
+INC-00309,KEJAHATAN_JALANAN,2025-01-26,00:32,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257838,106.812955,Parkiran,lainnya,pedagang,Penyidikan,True
+INC-00310,CURANMOR,2025-08-20,19:29,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.2344,106.847566,Pusat Aktivitas,kunci_t,mobil,Penyelidikan,True
+INC-00311,CURAS,2025-05-19,18:50,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257472,106.815764,Jalan,perampasan_jalanan,pejalan_kaki,Penyelidikan,True
+INC-00312,KEJAHATAN_JALANAN,2025-03-06,00:58,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.22743,106.832099,Parkiran,lainnya,pengendara,Penyelidikan,True
+INC-00313,CURAT,2024-02-24,14:27,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239997,106.805758,Pertokoan,rusak_kunci,rumah,Penyelidikan,True
+INC-00314,CURAT,2023-09-13,23:03,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285817,106.833918,Pertokoan,rusak_kunci,toko,Penyelidikan,True
+INC-00315,CURANMOR,2025-11-27,21:27,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253052,106.831408,Pertokoan,lainnya,motor,Dilaporkan,True
+INC-00316,CURANMOR,2023-03-10,15:41,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.335574,106.795639,Parkiran,lainnya,mobil,Selesai,True
+INC-00317,TAWURAN,2024-06-27,17:48,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254151,106.823011,Pusat Aktivitas,kelompok_pelajar,kelompok_pelajar,Penyelidikan,True
+INC-00318,TAWURAN,2025-10-07,15:04,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.289894,106.802579,Pusat Aktivitas,konflik_spontan,kelompok_pemuda,Penyidikan,True
+INC-00319,CURANMOR,2024-12-26,14:31,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.286244,106.835893,Jalan,kunci_t,motor,Dilaporkan,True
+INC-00320,CURAT,2024-03-25,21:53,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.255851,106.82149,Jalan,lainnya,toko,Penyidikan,True
+INC-00321,CURANMOR,2025-10-31,13:18,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.235561,106.792052,Permukiman,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00322,KEJAHATAN_JALANAN,2025-08-15,14:41,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208999,106.848443,Parkiran,pemalakan,pejalan_kaki,Selesai,True
+INC-00323,CURANMOR,2023-08-27,02:28,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234574,106.846946,Permukiman,kunci_t,motor,Selesai,True
+INC-00324,TAWURAN,2025-10-27,19:16,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.311497,106.837037,Parkiran,kelompok_pelajar,kelompok_pelajar,Penyelidikan,True
+INC-00325,CURANMOR,2025-03-04,20:55,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.22727,106.801951,Pusat Aktivitas,kunci_t,motor,Dilaporkan,True
+INC-00326,TAWURAN,2024-09-21,06:01,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310498,106.816964,Jalan,kelompok_pemuda,kelompok_pemuda,Selesai,True
+INC-00327,KEJAHATAN_JALANAN,2024-10-19,01:21,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.253606,106.769895,Pertokoan,pencurian_ringan,pejalan_kaki,Selesai,True
+INC-00328,CURANMOR,2023-03-23,15:28,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.220252,106.829744,Parkiran,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00329,CURAS,2023-02-28,12:10,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273453,106.834162,Jalan,perampasan_jalanan,pengendara,Selesai,True
+INC-00330,CURANMOR,2024-07-14,01:55,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230881,106.855098,Pertokoan,duplikasi_kunci,mobil,Selesai,True
+INC-00331,CURAS,2025-03-17,00:18,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.255316,106.814837,Jalan,ancaman,toko,Selesai,True
+INC-00332,CURANMOR,2025-07-13,19:20,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.278059,106.811373,Permukiman,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00333,CURANMOR,2023-09-24,10:39,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.250759,106.770342,Pusat Aktivitas,duplikasi_kunci,mobil,Selesai,True
+INC-00334,CURAT,2024-08-15,18:25,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266321,106.799927,Parkiran,rusak_kunci,toko,Penyidikan,True
+INC-00335,KEJAHATAN_JALANAN,2023-07-14,10:44,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230175,106.856548,Parkiran,pencurian_ringan,pedagang,Penyelidikan,True
+INC-00336,TAWURAN,2025-09-25,14:54,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231139,106.834722,Parkiran,kelompok_pelajar,kelompok_pelajar,Penyelidikan,True
+INC-00337,CURAT,2025-12-29,14:04,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.216824,106.839427,Pertokoan,congkel,toko,Selesai,True
+INC-00338,KEJAHATAN_JALANAN,2024-03-30,22:10,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.22929,106.834074,Fasilitas Publik,pencurian_ringan,pedagang,Selesai,True
+INC-00339,CURAS,2024-04-24,16:30,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227117,106.799395,Jalan,lainnya,toko,Penyelidikan,True
+INC-00340,CURAT,2024-05-13,15:52,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.226254,106.801595,Pertokoan,lainnya,kantor,Selesai,True
+INC-00341,CURAS,2024-05-29,19:24,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217768,106.838277,Pertokoan,senjata_tajam,pengendara,Dilaporkan,True
+INC-00342,CURAT,2025-12-07,13:33,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.332559,106.79248,Jalan,pecah_kaca,rumah,Selesai,True
+INC-00343,CURAS,2023-06-19,00:10,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235525,106.84827,Pusat Aktivitas,lainnya,toko,Selesai,True
+INC-00344,CURAT,2025-07-28,08:53,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209891,106.849418,Permukiman,lainnya,rumah,Dilaporkan,True
+INC-00345,CURAT,2024-02-10,13:13,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208797,106.849519,Jalan,pecah_kaca,kantor,Penyidikan,True
+INC-00346,KEJAHATAN_JALANAN,2024-06-15,17:29,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253743,106.832163,Pusat Aktivitas,pemalakan,pengendara,Penyidikan,True
+INC-00347,CURANMOR,2025-05-25,00:39,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.236803,106.792872,Permukiman,kelalaian_pengguna,mobil,Selesai,True
+INC-00348,CURAT,2024-06-02,23:47,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.343545,106.823396,Pusat Aktivitas,congkel,kantor,Penyelidikan,True
+INC-00349,CURAS,2024-04-09,16:30,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345533,106.824395,Parkiran,ancaman,toko,Penyelidikan,True
+INC-00350,KEJAHATAN_JALANAN,2025-12-23,18:33,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293212,106.772142,Parkiran,pemalakan,pedagang,Dilaporkan,True
+INC-00351,CURAT,2024-08-06,07:10,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.280444,106.80975,Parkiran,lainnya,toko,Penyelidikan,True
+INC-00352,CURANMOR,2025-12-08,23:25,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286455,106.797398,Parkiran,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-00353,CURAT,2025-02-28,13:31,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286091,106.795539,Pertokoan,lainnya,toko,Penyelidikan,True
+INC-00354,CURAT,2025-12-24,22:41,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.294037,106.77234,Jalan,congkel,toko,Selesai,True
+INC-00355,CURAS,2025-07-24,00:54,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.252335,106.771014,Jalan,senjata_tajam,pejalan_kaki,Selesai,True
+INC-00356,CURAT,2024-03-22,06:56,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209328,106.851265,Parkiran,lainnya,kantor,Selesai,True
+INC-00357,KEJAHATAN_JALANAN,2025-04-09,21:05,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.215715,106.840951,Permukiman,pencurian_ringan,pengendara,Penyelidikan,True
+INC-00358,CURANMOR,2025-12-31,03:37,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.23926,106.835276,Pusat Aktivitas,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00359,CURANMOR,2024-12-20,23:07,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.331504,106.794325,Parkiran,duplikasi_kunci,motor,Selesai,True
+INC-00360,TAWURAN,2025-04-06,05:24,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.215025,106.831721,Permukiman,lainnya,kelompok_pelajar,Penyidikan,True
+INC-00361,TAWURAN,2025-07-26,19:53,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.229537,106.853002,Jalan,lainnya,kelompok_pemuda,Penyelidikan,True
+INC-00362,KEJAHATAN_JALANAN,2023-04-19,23:46,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235083,106.848068,Permukiman,jambret,pejalan_kaki,Dilaporkan,True
+INC-00363,TAWURAN,2025-10-22,18:12,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250631,106.840666,Pusat Aktivitas,kelompok_pelajar,pengguna_jalan,Dilaporkan,True
+INC-00364,CURANMOR,2024-10-22,06:14,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.238974,106.836064,Permukiman,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-00365,TAWURAN,2024-02-21,23:43,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333055,106.794491,Parkiran,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00366,CURAS,2025-10-13,04:00,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.287504,106.797555,Jalan,perampasan_jalanan,toko,Selesai,True
+INC-00367,CURAT,2024-02-20,07:22,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230238,106.83376,Parkiran,congkel,kantor,Penyidikan,True
+INC-00368,CURAT,2023-08-15,20:50,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.28455,106.799043,Permukiman,lainnya,toko,Penyelidikan,True
+INC-00369,KEJAHATAN_JALANAN,2023-10-20,08:42,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257672,106.811573,Pertokoan,jambret,pejalan_kaki,Penyelidikan,True
+INC-00370,KEJAHATAN_JALANAN,2024-11-30,11:39,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.29198,106.773455,Jalan,lainnya,pejalan_kaki,Selesai,True
+INC-00371,KEJAHATAN_JALANAN,2025-08-25,05:26,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311314,106.820358,Fasilitas Publik,jambret,pedagang,Penyidikan,True
+INC-00372,CURAT,2025-07-08,19:39,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.237962,106.8352,Pertokoan,rusak_kunci,kantor,Dilaporkan,True
+INC-00373,CURAT,2023-09-28,11:25,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217128,106.839532,Parkiran,lainnya,kantor,Penyelidikan,True
+INC-00374,CURANMOR,2023-07-02,20:02,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311003,106.817738,Pusat Aktivitas,duplikasi_kunci,motor,Selesai,True
+INC-00375,CURANMOR,2025-06-02,09:51,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249069,106.840646,Permukiman,duplikasi_kunci,motor,Penyelidikan,True
+INC-00376,CURANMOR,2025-05-24,19:17,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.244724,106.820264,Parkiran,duplikasi_kunci,motor,Selesai,True
+INC-00377,CURANMOR,2024-05-17,01:52,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.256234,106.822883,Fasilitas Publik,kunci_t,motor,Dilaporkan,True
+INC-00378,TAWURAN,2025-01-21,17:10,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.210142,106.850093,Jalan,konflik_spontan,pengguna_jalan,Penyidikan,True
+INC-00379,TAWURAN,2025-06-11,08:30,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345837,106.824909,Jalan,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00380,CURANMOR,2023-10-05,07:41,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.228701,106.854435,Pusat Aktivitas,duplikasi_kunci,motor,Penyelidikan,True
+INC-00381,CURANMOR,2023-01-08,18:12,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.237082,106.791978,Permukiman,duplikasi_kunci,motor,Penyelidikan,True
+INC-00382,TAWURAN,2023-03-13,12:48,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231044,106.832208,Jalan,kelompok_pelajar,kelompok_pemuda,Dilaporkan,True
+INC-00383,CURAT,2024-02-11,04:25,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228377,106.799625,Permukiman,rusak_kunci,rumah,Selesai,True
+INC-00384,CURANMOR,2023-01-13,18:42,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229909,106.779784,Permukiman,lainnya,mobil,Selesai,True
+INC-00385,TAWURAN,2023-05-02,17:16,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.216085,106.828572,Permukiman,lainnya,kelompok_pemuda,Penyelidikan,True
+INC-00386,CURAT,2024-04-07,15:27,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.275881,106.765179,Pertokoan,pecah_kaca,toko,Penyelidikan,True
+INC-00387,CURANMOR,2023-06-20,22:06,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291356,106.775715,Parkiran,duplikasi_kunci,mobil,Penyidikan,True
+INC-00388,CURAT,2025-01-02,12:22,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309818,106.821506,Pusat Aktivitas,rusak_kunci,rumah,Selesai,True
+INC-00389,CURAT,2023-10-15,08:36,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.230173,106.780244,Pusat Aktivitas,pecah_kaca,kantor,Selesai,True
+INC-00390,KEJAHATAN_JALANAN,2025-03-21,13:40,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.311458,106.835561,Pusat Aktivitas,pencurian_ringan,pengendara,Dilaporkan,True
+INC-00391,TAWURAN,2023-05-30,23:02,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.281805,106.80936,Parkiran,kelompok_pelajar,pengguna_jalan,Dilaporkan,True
+INC-00392,CURANMOR,2023-05-05,18:29,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293545,106.774408,Permukiman,kelalaian_pengguna,motor,Selesai,True
+INC-00393,CURAS,2025-10-13,21:24,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.289742,106.803986,Jalan,perampasan_jalanan,toko,Dilaporkan,True
+INC-00394,KEJAHATAN_JALANAN,2024-02-09,08:01,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286167,106.797888,Jalan,pencurian_ringan,pejalan_kaki,Dilaporkan,True
+INC-00395,CURANMOR,2024-04-27,00:43,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.258319,106.855025,Pertokoan,lainnya,motor,Penyidikan,True
+INC-00396,CURANMOR,2024-10-03,18:07,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.25429,106.831936,Permukiman,lainnya,mobil,Penyelidikan,True
+INC-00397,CURANMOR,2023-01-17,08:07,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.295383,106.773268,Pusat Aktivitas,duplikasi_kunci,motor,Penyelidikan,True
+INC-00398,CURAS,2025-08-27,21:28,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.219246,106.837042,Permukiman,perampasan_jalanan,pejalan_kaki,Penyidikan,True
+INC-00399,CURANMOR,2023-03-05,18:24,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335968,106.817385,Parkiran,lainnya,mobil,Dilaporkan,True
+INC-00400,CURAT,2025-11-19,12:42,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.210581,106.850931,Pusat Aktivitas,lainnya,kantor,Penyelidikan,True
+INC-00401,CURAT,2025-10-07,14:14,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.22938,106.781168,Pusat Aktivitas,rusak_kunci,rumah,Dilaporkan,True
+INC-00402,CURAT,2024-09-29,03:28,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246705,106.789456,Jalan,rusak_kunci,toko,Penyelidikan,True
+INC-00403,CURAT,2023-06-12,18:30,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.215262,106.838259,Parkiran,rusak_kunci,toko,Penyelidikan,True
+INC-00404,CURAS,2023-05-24,15:23,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.226733,106.801535,Pertokoan,senjata_tajam,toko,Selesai,True
+INC-00405,CURAT,2024-08-29,00:46,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249204,106.838131,Parkiran,lainnya,kantor,Dilaporkan,True
+INC-00406,CURAS,2025-03-28,10:41,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.22918,106.832933,Parkiran,lainnya,pejalan_kaki,Selesai,True
+INC-00407,CURANMOR,2023-10-30,19:19,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267789,106.800411,Fasilitas Publik,lainnya,mobil,Penyidikan,True
+INC-00408,CURANMOR,2023-01-12,00:31,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.28448,106.835466,Permukiman,duplikasi_kunci,motor,Selesai,True
+INC-00409,CURAS,2025-07-11,14:14,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.217778,106.830125,Permukiman,lainnya,pejalan_kaki,Dilaporkan,True
+INC-00410,TAWURAN,2025-04-25,20:57,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268281,106.799665,Pertokoan,lainnya,kelompok_pemuda,Penyidikan,True
+INC-00411,KEJAHATAN_JALANAN,2025-04-27,10:44,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234559,106.847178,Parkiran,lainnya,pejalan_kaki,Penyelidikan,True
+INC-00412,KEJAHATAN_JALANAN,2024-11-29,02:38,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291602,106.772505,Permukiman,pencurian_ringan,pengendara,Dilaporkan,True
+INC-00413,CURAT,2024-11-11,04:44,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249654,106.83994,Parkiran,rusak_kunci,kantor,Selesai,True
+INC-00414,CURAT,2025-02-23,22:31,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.23927,106.812319,Jalan,congkel,kantor,Penyelidikan,True
+INC-00415,CURAT,2025-04-16,22:00,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.230753,106.779654,Jalan,pecah_kaca,toko,Penyidikan,True
+INC-00416,KEJAHATAN_JALANAN,2023-02-23,19:00,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345313,106.821604,Parkiran,pemalakan,pejalan_kaki,Selesai,True
+INC-00417,CURANMOR,2023-01-08,19:34,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267947,106.800415,Permukiman,lainnya,motor,Selesai,True
+INC-00418,CURAT,2023-08-31,12:42,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.247551,106.817914,Permukiman,rusak_kunci,kantor,Penyelidikan,True
+INC-00419,CURANMOR,2025-05-07,19:27,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.284193,106.836443,Pusat Aktivitas,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00420,CURANMOR,2024-03-14,21:37,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.232108,106.855214,Parkiran,lainnya,mobil,Selesai,True
+INC-00421,CURAT,2023-11-24,23:06,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.247623,106.822597,Jalan,rusak_kunci,toko,Penyidikan,True
+INC-00422,CURAS,2023-02-15,23:53,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.332248,106.795224,Pertokoan,senjata_tajam,toko,Penyelidikan,True
+INC-00423,CURANMOR,2024-03-04,23:25,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257169,106.857608,Jalan,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00424,KEJAHATAN_JALANAN,2023-12-14,12:28,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310164,106.821272,Fasilitas Publik,pemalakan,pengendara,Penyidikan,True
+INC-00425,CURAT,2024-07-29,22:24,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274793,106.833613,Fasilitas Publik,congkel,toko,Penyidikan,True
+INC-00426,CURAT,2024-01-26,19:32,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267336,106.798843,Jalan,congkel,kantor,Selesai,True
+INC-00427,CURAT,2023-03-12,02:07,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.216673,106.838323,Permukiman,pecah_kaca,kantor,Penyidikan,True
+INC-00428,CURAT,2024-01-12,15:34,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286266,106.795621,Permukiman,congkel,kantor,Selesai,True
+INC-00429,CURAT,2025-11-28,21:10,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.25367,106.768787,Jalan,congkel,rumah,Penyelidikan,True
+INC-00430,CURANMOR,2024-08-21,19:23,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274477,106.829961,Permukiman,kunci_t,mobil,Selesai,True
+INC-00431,CURANMOR,2023-02-02,19:38,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.255708,106.824013,Jalan,kelalaian_pengguna,mobil,Selesai,True
+INC-00432,CURANMOR,2023-06-21,22:43,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234563,106.847272,Pusat Aktivitas,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00433,CURAT,2025-06-09,23:21,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.293921,106.800188,Jalan,pecah_kaca,kantor,Penyidikan,True
+INC-00434,CURANMOR,2023-08-12,18:44,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.229479,106.855513,Pertokoan,kunci_t,mobil,Selesai,True
+INC-00435,CURANMOR,2025-06-08,04:18,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311031,106.820976,Permukiman,lainnya,motor,Selesai,True
+INC-00436,CURAT,2025-12-26,19:46,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230873,106.833011,Jalan,pecah_kaca,rumah,Selesai,True
+INC-00437,CURAT,2023-01-09,06:14,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.31127,106.836629,Pusat Aktivitas,congkel,rumah,Penyidikan,True
+INC-00438,KEJAHATAN_JALANAN,2023-09-23,09:24,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229226,106.833894,Pertokoan,lainnya,pejalan_kaki,Dilaporkan,True
+INC-00439,CURAS,2023-05-14,03:12,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.312315,106.835398,Pertokoan,perampasan_jalanan,pejalan_kaki,Dilaporkan,True
+INC-00440,CURAT,2025-12-15,07:31,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249868,106.839609,Pertokoan,lainnya,kantor,Penyelidikan,True
+INC-00441,CURANMOR,2023-05-28,20:54,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218392,106.828096,Pertokoan,kunci_t,mobil,Penyidikan,True
+INC-00442,CURANMOR,2023-02-04,23:44,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209602,106.848353,Parkiran,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00443,CURAS,2023-03-17,19:18,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.276912,106.849046,Jalan,ancaman,pengendara,Selesai,True
+INC-00444,CURAT,2023-05-07,12:22,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257801,106.856125,Permukiman,pecah_kaca,rumah,Dilaporkan,True
+INC-00445,CURAS,2023-08-24,15:20,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.255358,106.854598,Permukiman,perampasan_jalanan,pengendara,Selesai,True
+INC-00446,CURANMOR,2023-11-09,06:23,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291554,106.773251,Permukiman,duplikasi_kunci,motor,Selesai,True
+INC-00447,CURAT,2023-04-19,07:47,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276205,106.765725,Parkiran,rusak_kunci,rumah,Dilaporkan,True
+INC-00448,CURAT,2023-01-28,17:40,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.288208,106.796961,Pertokoan,congkel,kantor,Penyidikan,True
+INC-00449,CURANMOR,2025-02-09,01:17,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.286067,106.836654,Jalan,kelalaian_pengguna,mobil,Selesai,True
+INC-00450,CURANMOR,2023-06-02,19:24,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228776,106.831228,Pertokoan,kunci_t,mobil,Penyelidikan,True
+INC-00451,CURAT,2025-04-20,01:15,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276755,106.766101,Parkiran,congkel,rumah,Penyidikan,True
+INC-00452,CURAS,2025-12-29,01:41,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246103,106.794138,Permukiman,lainnya,pejalan_kaki,Selesai,True
+INC-00453,CURAT,2023-01-15,12:08,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.219236,106.83791,Parkiran,congkel,rumah,Penyidikan,True
+INC-00454,TAWURAN,2025-02-26,20:03,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217221,106.838563,Jalan,kelompok_pemuda,kelompok_pelajar,Dilaporkan,True
+INC-00455,CURANMOR,2023-09-24,22:55,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.269176,106.79873,Pusat Aktivitas,kunci_t,mobil,Penyidikan,True
+INC-00456,CURANMOR,2024-07-25,19:22,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.346848,106.822327,Pusat Aktivitas,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00457,CURAT,2025-02-26,01:24,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266363,106.801947,Jalan,rusak_kunci,kantor,Penyelidikan,True
+INC-00458,CURANMOR,2024-08-16,19:21,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.294851,106.773241,Jalan,lainnya,mobil,Selesai,True
+INC-00459,TAWURAN,2023-11-20,19:13,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.29481,106.772612,Jalan,konflik_spontan,kelompok_pemuda,Dilaporkan,True
+INC-00460,KEJAHATAN_JALANAN,2024-08-17,22:26,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286841,106.798059,Pusat Aktivitas,pemalakan,pedagang,Selesai,True
+INC-00461,CURAS,2024-11-16,02:33,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250017,106.838844,Jalan,senjata_tajam,toko,Selesai,True
+INC-00462,KEJAHATAN_JALANAN,2023-06-28,22:08,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292959,106.774203,Jalan,pemalakan,pedagang,Selesai,True
+INC-00463,CURANMOR,2023-08-25,17:37,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.246353,106.821174,Permukiman,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00464,CURAT,2024-01-18,15:31,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218918,106.826123,Pertokoan,congkel,kantor,Dilaporkan,True
+INC-00465,CURAS,2025-06-10,14:13,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267617,106.79975,Parkiran,senjata_tajam,toko,Penyelidikan,True
+INC-00466,CURAS,2024-01-22,02:39,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.219227,106.838636,Jalan,ancaman,pejalan_kaki,Selesai,True
+INC-00467,CURANMOR,2023-03-20,18:53,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291613,106.801951,Jalan,kunci_t,mobil,Dilaporkan,True
+INC-00468,CURAT,2023-11-06,23:29,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311966,106.817856,Pertokoan,pecah_kaca,rumah,Selesai,True
+INC-00469,CURAS,2024-09-25,08:54,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266899,106.801981,Parkiran,senjata_tajam,pejalan_kaki,Selesai,True
+INC-00470,CURANMOR,2023-11-21,13:36,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227445,106.798382,Jalan,kunci_t,motor,Selesai,True
+INC-00471,CURANMOR,2025-04-11,21:58,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229821,106.832654,Pusat Aktivitas,kunci_t,motor,Dilaporkan,True
+INC-00472,CURANMOR,2023-05-05,19:27,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274075,106.832015,Pusat Aktivitas,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00473,CURANMOR,2025-05-23,01:53,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230831,106.852637,Pertokoan,duplikasi_kunci,motor,Selesai,True
+INC-00474,CURAS,2025-07-07,18:03,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227012,106.800356,Fasilitas Publik,lainnya,pengendara,Penyelidikan,True
+INC-00475,KEJAHATAN_JALANAN,2023-07-12,22:28,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.27617,106.834564,Jalan,lainnya,pengendara,Penyelidikan,True
+INC-00476,CURANMOR,2024-11-21,01:07,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.336277,106.818052,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00477,CURANMOR,2025-08-08,15:10,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275019,106.834099,Parkiran,duplikasi_kunci,motor,Selesai,True
+INC-00478,CURAS,2023-04-22,10:22,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344443,106.823339,Jalan,lainnya,toko,Dilaporkan,True
+INC-00479,TAWURAN,2025-06-15,02:50,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.254948,106.855798,Jalan,konflik_spontan,kelompok_pelajar,Penyidikan,True
+INC-00480,CURAT,2024-06-21,09:42,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254936,106.823292,Permukiman,rusak_kunci,toko,Selesai,True
+INC-00481,CURAT,2024-08-12,01:09,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235282,106.845366,Pusat Aktivitas,rusak_kunci,rumah,Selesai,True
+INC-00482,CURANMOR,2024-03-13,21:05,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275604,106.832886,Parkiran,kelalaian_pengguna,motor,Selesai,True
+INC-00483,CURAS,2025-03-04,22:26,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.20948,106.850323,Fasilitas Publik,perampasan_jalanan,pengendara,Penyidikan,True
+INC-00484,CURAS,2023-03-20,16:40,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.228582,106.855577,Jalan,ancaman,pejalan_kaki,Penyelidikan,True
+INC-00485,CURANMOR,2024-06-01,19:35,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.241884,106.809379,Parkiran,kelalaian_pengguna,motor,Selesai,True
+INC-00486,CURAT,2023-02-25,16:45,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.256642,106.828242,Parkiran,rusak_kunci,kantor,Penyelidikan,True
+INC-00487,CURANMOR,2024-03-19,10:09,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.210007,106.851625,Jalan,kunci_t,motor,Penyidikan,True
+INC-00488,CURANMOR,2024-01-01,22:01,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.248724,106.792304,Pertokoan,lainnya,motor,Dilaporkan,True
+INC-00489,KEJAHATAN_JALANAN,2025-03-28,20:20,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.254078,106.769463,Jalan,jambret,pengendara,Selesai,True
+INC-00490,CURAT,2023-04-11,13:48,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.248786,106.770078,Permukiman,lainnya,rumah,Penyelidikan,True
+INC-00491,CURAT,2023-06-04,18:25,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.230172,106.780944,Parkiran,lainnya,rumah,Penyidikan,True
+INC-00492,KEJAHATAN_JALANAN,2024-03-25,09:11,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257649,106.85728,Parkiran,pencurian_ringan,pengendara,Penyelidikan,True
+INC-00493,KEJAHATAN_JALANAN,2025-05-17,20:15,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230443,106.85495,Jalan,lainnya,pengendara,Penyidikan,True
+INC-00494,CURANMOR,2024-05-01,05:40,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230409,106.854703,Permukiman,kunci_t,mobil,Dilaporkan,True
+INC-00495,CURANMOR,2024-12-24,20:10,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310527,106.836545,Parkiran,duplikasi_kunci,mobil,Penyidikan,True
+INC-00496,CURAT,2025-06-12,15:35,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.26866,106.798583,Parkiran,lainnya,toko,Dilaporkan,True
+INC-00497,CURAS,2024-07-11,21:35,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.249069,106.819113,Pusat Aktivitas,senjata_tajam,pengendara,Penyidikan,True
+INC-00498,CURANMOR,2023-10-05,19:52,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230716,106.830132,Pusat Aktivitas,duplikasi_kunci,mobil,Selesai,True
+INC-00499,CURANMOR,2024-09-10,20:14,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.29245,106.801698,Pertokoan,kunci_t,motor,Selesai,True
+INC-00500,CURANMOR,2023-04-03,21:56,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.25266,106.831224,Pertokoan,kelalaian_pengguna,motor,Selesai,True
+INC-00501,CURAS,2025-11-03,01:33,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.27644,106.766154,Permukiman,lainnya,toko,Penyidikan,True
+INC-00502,CURANMOR,2025-05-15,23:04,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.231001,106.8557,Parkiran,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00503,CURAT,2024-10-13,10:59,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.255695,106.831108,Pertokoan,lainnya,rumah,Penyelidikan,True
+INC-00504,CURAS,2023-09-10,08:20,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310295,106.821034,Parkiran,senjata_tajam,pengendara,Selesai,True
+INC-00505,CURANMOR,2023-03-27,00:16,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333717,106.795203,Parkiran,lainnya,mobil,Penyelidikan,True
+INC-00506,CURAS,2023-03-11,17:58,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229158,106.780952,Permukiman,lainnya,pengendara,Penyelidikan,True
+INC-00507,TAWURAN,2023-04-20,23:24,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273587,106.832745,Parkiran,kelompok_pelajar,kelompok_pelajar,Dilaporkan,True
+INC-00508,CURAT,2024-03-10,13:23,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.255929,106.856326,Parkiran,pecah_kaca,rumah,Selesai,True
+INC-00509,CURANMOR,2025-07-31,22:17,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.255381,106.827593,Pertokoan,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00510,CURAT,2025-03-02,17:56,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268483,106.800209,Jalan,pecah_kaca,rumah,Penyelidikan,True
+INC-00511,CURAT,2024-09-07,11:01,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.252356,106.829041,Jalan,congkel,kantor,Selesai,True
+INC-00512,CURANMOR,2023-01-16,21:14,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256605,106.815008,Pusat Aktivitas,kunci_t,motor,Dilaporkan,True
+INC-00513,CURANMOR,2024-10-16,21:31,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.333908,106.817242,Jalan,duplikasi_kunci,motor,Penyelidikan,True
+INC-00514,KEJAHATAN_JALANAN,2023-01-26,16:44,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345466,106.823633,Jalan,jambret,pedagang,Penyelidikan,True
+INC-00515,TAWURAN,2023-12-02,00:25,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292905,106.774078,Jalan,lainnya,kelompok_pelajar,Selesai,True
+INC-00516,TAWURAN,2023-10-11,22:12,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267753,106.79653,Pertokoan,konflik_spontan,kelompok_pemuda,Penyelidikan,True
+INC-00517,CURANMOR,2024-06-28,23:50,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.229285,106.854292,Pertokoan,kunci_t,motor,Penyelidikan,True
+INC-00518,CURANMOR,2023-11-03,23:15,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310545,106.835408,Parkiran,kunci_t,motor,Penyelidikan,True
+INC-00519,CURAS,2025-12-22,19:28,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.280301,106.81354,Pertokoan,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-00520,CURANMOR,2025-05-13,01:34,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.272844,106.833956,Jalan,duplikasi_kunci,mobil,Selesai,True
+INC-00521,CURANMOR,2024-03-08,08:48,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.233716,106.848526,Jalan,kelalaian_pengguna,motor,Selesai,True
+INC-00522,CURAT,2025-12-10,16:59,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229333,106.830413,Pertokoan,pecah_kaca,toko,Penyelidikan,True
+INC-00523,CURAS,2024-12-07,22:54,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.248141,106.792785,Jalan,lainnya,toko,Selesai,True
+INC-00524,TAWURAN,2023-07-26,13:16,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291625,106.773882,Parkiran,kelompok_pemuda,kelompok_pemuda,Dilaporkan,True
+INC-00525,CURAS,2025-05-17,05:56,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345581,106.822841,Pusat Aktivitas,ancaman,toko,Selesai,True
+INC-00526,CURANMOR,2023-02-11,16:09,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.238167,106.794179,Jalan,kunci_t,motor,Dilaporkan,True
+INC-00527,CURANMOR,2023-03-10,14:39,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.2765,106.766924,Pertokoan,kunci_t,motor,Selesai,True
+INC-00528,CURAT,2024-08-31,03:57,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254922,106.820999,Pusat Aktivitas,pecah_kaca,toko,Penyidikan,True
+INC-00529,KEJAHATAN_JALANAN,2023-04-02,18:19,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310833,106.836141,Parkiran,jambret,pengendara,Penyelidikan,True
+INC-00530,CURANMOR,2025-12-16,23:02,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.276478,106.850422,Permukiman,kunci_t,motor,Penyelidikan,True
+INC-00531,CURANMOR,2023-02-24,22:55,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266043,106.797769,Pusat Aktivitas,kunci_t,motor,Selesai,True
+INC-00532,CURAS,2023-07-30,19:58,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257385,106.85603,Parkiran,perampasan_jalanan,pengendara,Selesai,True
+INC-00533,KEJAHATAN_JALANAN,2025-04-16,18:16,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286092,106.796823,Jalan,jambret,pengendara,Dilaporkan,True
+INC-00534,CURAS,2024-12-23,21:34,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275075,106.832787,Permukiman,perampasan_jalanan,toko,Penyelidikan,True
+INC-00535,CURANMOR,2024-12-25,08:58,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.25057,106.838436,Permukiman,lainnya,mobil,Dilaporkan,True
+INC-00536,CURAS,2024-06-13,07:07,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.216042,106.839746,Parkiran,senjata_tajam,pengendara,Penyelidikan,True
+INC-00537,TAWURAN,2024-01-28,22:34,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229037,106.783476,Pertokoan,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00538,CURAT,2023-07-13,22:47,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209159,106.849372,Parkiran,congkel,kantor,Penyidikan,True
+INC-00539,CURAS,2023-05-13,21:38,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228585,106.797452,Permukiman,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-00540,CURANMOR,2023-11-14,13:38,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230549,106.833223,Permukiman,duplikasi_kunci,motor,Penyelidikan,True
+INC-00541,CURAS,2024-07-09,14:31,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218531,106.828591,Fasilitas Publik,perampasan_jalanan,pejalan_kaki,Penyelidikan,True
+INC-00542,CURANMOR,2024-11-18,22:09,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.280182,106.810049,Jalan,kunci_t,mobil,Selesai,True
+INC-00543,CURANMOR,2024-12-17,23:58,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.27672,106.830474,Parkiran,lainnya,mobil,Penyelidikan,True
+INC-00544,CURAT,2025-12-15,03:45,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.255491,106.824207,Pertokoan,lainnya,rumah,Dilaporkan,True
+INC-00545,CURANMOR,2025-02-08,11:42,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.276198,106.850299,Jalan,kelalaian_pengguna,motor,Selesai,True
+INC-00546,CURAS,2024-01-31,23:40,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208807,106.848893,Permukiman,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-00547,CURANMOR,2024-10-01,11:10,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285966,106.835659,Permukiman,lainnya,mobil,Penyidikan,True
+INC-00548,CURANMOR,2024-06-26,10:40,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249586,106.83798,Jalan,lainnya,motor,Penyidikan,True
+INC-00549,CURANMOR,2024-01-30,19:37,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.28529,106.797816,Jalan,lainnya,motor,Selesai,True
+INC-00550,CURAS,2023-02-18,18:38,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310003,106.821339,Parkiran,perampasan_jalanan,pengendara,Penyidikan,True
+INC-00551,CURANMOR,2023-03-23,19:33,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266905,106.801265,Permukiman,kelalaian_pengguna,motor,Selesai,True
+INC-00552,CURANMOR,2023-06-30,19:29,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257729,106.813515,Parkiran,duplikasi_kunci,motor,Selesai,True
+INC-00553,KEJAHATAN_JALANAN,2025-01-07,18:18,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311083,106.821136,Permukiman,pencurian_ringan,pedagang,Selesai,True
+INC-00554,TAWURAN,2025-10-23,17:37,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.233704,106.848131,Pusat Aktivitas,konflik_spontan,kelompok_pemuda,Selesai,True
+INC-00555,CURANMOR,2024-08-25,22:34,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.210984,106.850318,Pertokoan,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00556,CURANMOR,2024-12-03,20:09,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230125,106.832238,Permukiman,kunci_t,motor,Selesai,True
+INC-00557,CURAT,2024-11-06,05:47,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.237421,106.790338,Parkiran,congkel,rumah,Selesai,True
+INC-00558,CURANMOR,2023-09-12,02:58,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292485,106.77314,Fasilitas Publik,lainnya,motor,Penyidikan,True
+INC-00559,CURAS,2024-03-13,18:37,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249627,106.837106,Jalan,ancaman,toko,Selesai,True
+INC-00560,TAWURAN,2025-05-02,20:30,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.236448,106.795693,Permukiman,kelompok_pemuda,kelompok_pemuda,Selesai,True
+INC-00561,CURANMOR,2024-05-16,05:21,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276157,106.767679,Jalan,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00562,TAWURAN,2023-06-08,11:26,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292104,106.775678,Permukiman,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00563,CURANMOR,2025-12-01,02:24,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266247,106.801631,Jalan,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00564,CURAS,2023-03-08,21:57,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291985,106.774617,Jalan,ancaman,toko,Selesai,True
+INC-00565,CURANMOR,2024-07-30,00:44,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311433,106.820343,Pertokoan,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00566,CURANMOR,2025-04-24,21:27,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.240808,106.808231,Pertokoan,kelalaian_pengguna,mobil,Selesai,True
+INC-00567,CURANMOR,2025-01-30,18:03,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.232604,106.831567,Fasilitas Publik,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00568,CURANMOR,2025-09-28,16:11,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229403,106.832647,Jalan,kelalaian_pengguna,mobil,Selesai,True
+INC-00569,CURANMOR,2024-03-30,20:31,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.258424,106.857269,Jalan,lainnya,mobil,Dilaporkan,True
+INC-00570,CURANMOR,2024-03-14,21:50,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275582,106.847923,Jalan,kunci_t,mobil,Dilaporkan,True
+INC-00571,CURANMOR,2023-10-19,02:17,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.237633,106.809498,Pertokoan,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00572,CURANMOR,2025-04-01,18:50,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275399,106.847946,Pertokoan,kelalaian_pengguna,motor,Selesai,True
+INC-00573,CURANMOR,2025-05-20,08:40,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217847,106.839104,Parkiran,lainnya,motor,Penyidikan,True
+INC-00574,CURANMOR,2025-11-01,23:09,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256235,106.812394,Permukiman,duplikasi_kunci,motor,Penyelidikan,True
+INC-00575,CURAS,2025-11-18,08:55,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.246223,106.821253,Parkiran,senjata_tajam,pejalan_kaki,Dilaporkan,True
+INC-00576,KEJAHATAN_JALANAN,2024-12-20,22:41,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345293,106.824521,Pertokoan,jambret,pejalan_kaki,Penyelidikan,True
+INC-00577,CURAT,2024-12-08,19:36,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208883,106.849819,Permukiman,congkel,kantor,Penyelidikan,True
+INC-00578,CURANMOR,2023-08-22,01:11,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.28678,106.797742,Parkiran,kunci_t,mobil,Penyelidikan,True
+INC-00579,CURAS,2024-05-29,04:43,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.274485,106.850052,Pertokoan,lainnya,pengendara,Penyelidikan,True
+INC-00580,CURANMOR,2023-02-27,23:24,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235,106.848982,Jalan,duplikasi_kunci,motor,Penyelidikan,True
+INC-00581,CURAS,2023-01-26,11:59,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228888,106.833274,Parkiran,senjata_tajam,toko,Selesai,True
+INC-00582,CURANMOR,2025-09-12,00:43,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230414,106.855587,Jalan,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00583,KEJAHATAN_JALANAN,2025-04-04,20:18,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.27427,106.766385,Jalan,pencurian_ringan,pedagang,Dilaporkan,True
+INC-00584,CURAT,2023-01-26,17:41,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253001,106.832016,Jalan,congkel,kantor,Penyelidikan,True
+INC-00585,TAWURAN,2024-06-11,06:04,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235888,106.846877,Permukiman,kelompok_pelajar,kelompok_pemuda,Selesai,True
+INC-00586,CURAT,2024-11-03,17:49,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.236917,106.795282,Permukiman,congkel,toko,Penyelidikan,True
+INC-00587,TAWURAN,2024-10-07,18:26,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309047,106.82176,Jalan,kelompok_pemuda,kelompok_pelajar,Penyelidikan,True
+INC-00588,CURAT,2023-05-30,11:34,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249063,106.839322,Permukiman,lainnya,toko,Selesai,True
+INC-00589,CURAT,2024-12-25,08:14,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.253598,106.822874,Pusat Aktivitas,rusak_kunci,toko,Dilaporkan,True
+INC-00590,CURANMOR,2023-05-11,20:47,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.343303,106.825035,Parkiran,kunci_t,mobil,Selesai,True
+INC-00591,CURANMOR,2025-04-14,21:26,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.246974,106.818864,Jalan,lainnya,mobil,Penyelidikan,True
+INC-00592,KEJAHATAN_JALANAN,2023-12-22,22:47,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218783,106.827074,Parkiran,pencurian_ringan,pengendara,Dilaporkan,True
+INC-00593,CURANMOR,2023-03-05,23:30,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.279353,106.811325,Jalan,duplikasi_kunci,mobil,Penyidikan,True
+INC-00594,CURANMOR,2025-04-12,22:37,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.2292,106.855694,Parkiran,duplikasi_kunci,motor,Penyelidikan,True
+INC-00595,CURANMOR,2025-10-20,20:58,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246412,106.793657,Jalan,duplikasi_kunci,motor,Selesai,True
+INC-00596,KEJAHATAN_JALANAN,2024-01-28,18:01,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.273134,106.768421,Permukiman,jambret,pedagang,Selesai,True
+INC-00597,CURAT,2023-01-31,07:40,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.281016,106.812265,Fasilitas Publik,congkel,rumah,Selesai,True
+INC-00598,CURAS,2023-02-07,21:25,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268427,106.79994,Permukiman,perampasan_jalanan,pejalan_kaki,Selesai,True
+INC-00599,CURANMOR,2025-07-09,21:33,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.240638,106.835842,Pertokoan,kelalaian_pengguna,mobil,Selesai,True
+INC-00600,CURAT,2023-03-10,07:23,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.254601,106.816433,Jalan,lainnya,rumah,Selesai,True
+INC-00601,KEJAHATAN_JALANAN,2024-07-04,21:47,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335642,106.819354,Permukiman,pencurian_ringan,pengendara,Selesai,True
+INC-00602,CURANMOR,2025-04-10,21:17,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.294193,106.774299,Parkiran,lainnya,mobil,Selesai,True
+INC-00603,CURANMOR,2025-01-26,21:16,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.252657,106.838512,Parkiran,kunci_t,mobil,Penyidikan,True
+INC-00604,TAWURAN,2024-08-11,01:39,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.293029,106.800826,Permukiman,kelompok_pelajar,pengguna_jalan,Penyelidikan,True
+INC-00605,CURAS,2025-09-21,18:09,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.255061,106.830375,Permukiman,perampasan_jalanan,pejalan_kaki,Dilaporkan,True
+INC-00606,CURANMOR,2025-10-14,09:20,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.247119,106.793452,Parkiran,kunci_t,mobil,Penyidikan,True
+INC-00607,CURAS,2024-02-08,20:37,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.245287,106.792497,Parkiran,ancaman,pejalan_kaki,Penyelidikan,True
+INC-00608,CURAT,2023-08-14,13:57,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.28541,106.836041,Pertokoan,lainnya,kantor,Selesai,True
+INC-00609,CURANMOR,2024-09-09,07:57,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.254075,106.831289,Pusat Aktivitas,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00610,CURAS,2023-05-17,08:41,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.346712,106.824161,Jalan,perampasan_jalanan,toko,Selesai,True
+INC-00611,TAWURAN,2024-03-08,09:11,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.247905,106.840106,Jalan,kelompok_pelajar,kelompok_pemuda,Penyelidikan,True
+INC-00612,CURANMOR,2023-03-25,23:22,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275866,106.850421,Permukiman,duplikasi_kunci,motor,Selesai,True
+INC-00613,CURANMOR,2024-03-14,14:08,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.226868,106.80074,Permukiman,kunci_t,motor,Dilaporkan,True
+INC-00614,CURANMOR,2023-03-16,20:18,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257099,106.81652,Pusat Aktivitas,lainnya,mobil,Selesai,True
+INC-00615,CURANMOR,2025-12-28,14:50,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.247683,106.840031,Parkiran,lainnya,motor,Penyelidikan,True
+INC-00616,TAWURAN,2025-04-28,15:02,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249779,106.840181,Parkiran,konflik_spontan,pengguna_jalan,Penyidikan,True
+INC-00617,CURANMOR,2024-10-08,07:31,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275818,106.834161,Jalan,duplikasi_kunci,mobil,Selesai,True
+INC-00618,CURANMOR,2023-10-07,00:21,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.34556,106.823248,Pusat Aktivitas,kunci_t,motor,Dilaporkan,True
+INC-00619,CURANMOR,2024-01-15,18:41,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335986,106.817537,Parkiran,lainnya,mobil,Penyidikan,True
+INC-00620,CURAT,2023-11-05,04:32,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291518,106.802453,Parkiran,pecah_kaca,toko,Dilaporkan,True
+INC-00621,CURANMOR,2025-01-07,21:38,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275679,106.848012,Jalan,lainnya,mobil,Selesai,True
+INC-00622,CURAT,2024-02-13,02:43,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335506,106.817643,Pusat Aktivitas,lainnya,kantor,Penyelidikan,True
+INC-00623,CURAS,2025-02-13,06:18,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.250962,106.770972,Permukiman,lainnya,pejalan_kaki,Selesai,True
+INC-00624,CURAT,2025-03-03,15:26,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276061,106.766704,Permukiman,pecah_kaca,rumah,Selesai,True
+INC-00625,KEJAHATAN_JALANAN,2025-07-17,18:36,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.284533,106.835001,Jalan,lainnya,pejalan_kaki,Selesai,True
+INC-00626,CURAS,2024-12-13,22:43,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311511,106.820944,Parkiran,perampasan_jalanan,pengendara,Penyelidikan,True
+INC-00627,CURAT,2025-01-18,10:51,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256608,106.812333,Pusat Aktivitas,rusak_kunci,rumah,Dilaporkan,True
+INC-00628,CURANMOR,2023-05-17,23:52,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273788,106.831547,Pertokoan,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00629,CURANMOR,2025-10-28,04:07,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.232487,106.853858,Parkiran,lainnya,motor,Selesai,True
+INC-00630,KEJAHATAN_JALANAN,2023-09-30,20:28,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.284656,106.834823,Pertokoan,jambret,pengendara,Selesai,True
+INC-00631,CURAS,2025-02-16,12:19,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209803,106.84973,Jalan,ancaman,pejalan_kaki,Penyelidikan,True
+INC-00632,KEJAHATAN_JALANAN,2025-11-01,23:53,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.230647,106.778083,Jalan,lainnya,pejalan_kaki,Penyelidikan,True
+INC-00633,KEJAHATAN_JALANAN,2025-06-18,01:51,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.237742,106.835585,Parkiran,lainnya,pedagang,Penyelidikan,True
+INC-00634,CURAS,2025-04-22,23:38,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.279667,106.811026,Permukiman,senjata_tajam,pengendara,Selesai,True
+INC-00635,KEJAHATAN_JALANAN,2023-08-20,10:54,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333069,106.794118,Parkiran,jambret,pedagang,Penyidikan,True
+INC-00636,TAWURAN,2023-10-11,15:32,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.229411,106.856186,Parkiran,lainnya,kelompok_pemuda,Penyelidikan,True
+INC-00637,CURAS,2025-10-11,23:42,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228748,106.834635,Pusat Aktivitas,perampasan_jalanan,pengendara,Penyidikan,True
+INC-00638,CURAS,2023-03-03,18:07,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.28419,106.796375,Pertokoan,senjata_tajam,pengendara,Penyidikan,True
+INC-00639,CURAT,2025-01-21,16:58,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.332549,106.79661,Fasilitas Publik,lainnya,kantor,Penyidikan,True
+INC-00640,CURAT,2023-06-15,03:25,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286738,106.79627,Jalan,pecah_kaca,rumah,Penyelidikan,True
+INC-00641,CURAT,2024-11-18,17:14,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334632,106.819004,Permukiman,pecah_kaca,toko,Penyelidikan,True
+INC-00642,CURANMOR,2023-07-01,13:24,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.246269,106.818134,Pertokoan,kelalaian_pengguna,mobil,Selesai,True
+INC-00643,CURANMOR,2025-04-23,20:22,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.23208,106.855266,Jalan,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-00644,CURANMOR,2023-02-08,19:32,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344899,106.823144,Pusat Aktivitas,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00645,CURAT,2023-11-14,21:24,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.236114,106.847914,Pertokoan,congkel,toko,Selesai,True
+INC-00646,CURAS,2025-05-01,12:58,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230322,106.831229,Pertokoan,ancaman,pengendara,Selesai,True
+INC-00647,CURAT,2025-09-22,21:11,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266704,106.798806,Permukiman,pecah_kaca,kantor,Selesai,True
+INC-00648,CURAT,2025-02-22,15:42,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.309992,106.835293,Permukiman,rusak_kunci,kantor,Penyelidikan,True
+INC-00649,KEJAHATAN_JALANAN,2023-02-18,12:24,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266904,106.798602,Fasilitas Publik,pencurian_ringan,pejalan_kaki,Selesai,True
+INC-00650,CURANMOR,2023-01-11,09:27,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.239404,106.835165,Pertokoan,lainnya,mobil,Selesai,True
+INC-00651,CURANMOR,2025-09-15,20:14,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.227969,106.833317,Permukiman,kunci_t,mobil,Selesai,True
+INC-00652,KEJAHATAN_JALANAN,2025-03-15,22:37,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.225857,106.799552,Parkiran,pencurian_ringan,pengendara,Dilaporkan,True
+INC-00653,TAWURAN,2024-09-06,02:01,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.251467,106.839504,Pertokoan,kelompok_pelajar,kelompok_pelajar,Penyelidikan,True
+INC-00654,KEJAHATAN_JALANAN,2024-03-30,20:05,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209221,106.848644,Parkiran,jambret,pejalan_kaki,Penyidikan,True
+INC-00655,CURANMOR,2025-12-11,09:16,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.22819,106.799336,Permukiman,kunci_t,mobil,Penyelidikan,True
+INC-00656,CURANMOR,2024-05-14,11:25,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.23915,106.835019,Jalan,lainnya,motor,Dilaporkan,True
+INC-00657,CURANMOR,2024-09-23,18:24,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274225,106.833304,Pusat Aktivitas,duplikasi_kunci,mobil,Penyidikan,True
+INC-00658,CURAT,2023-04-23,12:26,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.238292,106.792425,Pertokoan,pecah_kaca,kantor,Penyidikan,True
+INC-00659,CURANMOR,2025-09-21,07:28,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267145,106.801089,Permukiman,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00660,CURANMOR,2025-01-07,18:23,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.26776,106.800703,Jalan,kunci_t,motor,Dilaporkan,True
+INC-00661,CURANMOR,2023-11-17,05:14,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.244858,106.820016,Jalan,kunci_t,mobil,Penyidikan,True
+INC-00662,CURANMOR,2023-10-29,20:41,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218491,106.830931,Pertokoan,kelalaian_pengguna,motor,Selesai,True
+INC-00663,CURANMOR,2023-11-10,19:40,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.307967,106.818937,Parkiran,kelalaian_pengguna,motor,Selesai,True
+INC-00664,CURANMOR,2025-12-15,22:09,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.277619,106.84863,Parkiran,kunci_t,mobil,Penyelidikan,True
+INC-00665,CURAT,2023-03-25,05:29,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.230495,106.779114,Permukiman,congkel,kantor,Penyelidikan,True
+INC-00666,CURANMOR,2024-04-15,23:19,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.245689,106.792343,Parkiran,lainnya,mobil,Dilaporkan,True
+INC-00667,KEJAHATAN_JALANAN,2024-10-25,08:00,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.226382,106.799548,Parkiran,jambret,pejalan_kaki,Dilaporkan,True
+INC-00668,CURANMOR,2023-02-11,01:58,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25744,106.857573,Parkiran,lainnya,mobil,Penyidikan,True
+INC-00669,CURAS,2023-01-26,21:01,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.289691,106.801651,Pertokoan,lainnya,pejalan_kaki,Penyelidikan,True
+INC-00670,CURANMOR,2023-06-17,15:17,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249659,106.839309,Parkiran,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00671,CURAT,2025-10-27,18:36,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23463,106.847586,Jalan,lainnya,toko,Selesai,True
+INC-00672,CURAT,2025-08-14,14:19,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231366,106.83267,Pertokoan,congkel,rumah,Dilaporkan,True
+INC-00673,CURANMOR,2025-02-03,04:18,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.33231,106.796437,Pusat Aktivitas,duplikasi_kunci,motor,Selesai,True
+INC-00674,CURANMOR,2024-01-28,14:40,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344942,106.822782,Permukiman,lainnya,motor,Selesai,True
+INC-00675,TAWURAN,2025-09-13,23:59,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256825,106.855222,Permukiman,kelompok_pelajar,pengguna_jalan,Selesai,True
+INC-00676,KEJAHATAN_JALANAN,2025-12-21,07:14,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.346084,106.8228,Permukiman,lainnya,pengendara,Dilaporkan,True
+INC-00677,CURAT,2024-12-16,09:36,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.285687,106.79697,Jalan,rusak_kunci,rumah,Penyidikan,True
+INC-00678,CURAT,2025-12-24,19:09,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.278767,106.812311,Parkiran,rusak_kunci,toko,Dilaporkan,True
+INC-00679,CURANMOR,2023-11-29,09:30,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.28277,106.836392,Parkiran,kunci_t,motor,Selesai,True
+INC-00680,CURAT,2024-04-01,17:04,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.289738,106.802683,Permukiman,congkel,toko,Selesai,True
+INC-00681,TAWURAN,2023-09-22,22:09,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218629,106.829647,Jalan,lainnya,kelompok_pelajar,Penyelidikan,True
+INC-00682,TAWURAN,2024-03-07,10:09,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273379,106.831185,Jalan,lainnya,kelompok_pelajar,Penyidikan,True
+INC-00683,CURANMOR,2023-06-27,22:50,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.247595,106.794057,Permukiman,duplikasi_kunci,mobil,Selesai,True
+INC-00684,CURAS,2023-05-25,01:28,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.236693,106.847964,Pusat Aktivitas,lainnya,toko,Dilaporkan,True
+INC-00685,TAWURAN,2024-06-14,06:46,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.231425,106.779523,Permukiman,lainnya,kelompok_pelajar,Penyidikan,True
+INC-00686,CURAS,2025-08-30,11:58,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.292601,106.80166,Jalan,lainnya,pengendara,Penyelidikan,True
+INC-00687,CURANMOR,2023-04-15,18:09,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.244455,106.792726,Permukiman,kunci_t,mobil,Selesai,True
+INC-00688,CURAT,2024-02-22,07:41,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266835,106.801691,Permukiman,congkel,kantor,Selesai,True
+INC-00689,TAWURAN,2023-08-11,11:35,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254498,106.823431,Permukiman,kelompok_pelajar,kelompok_pelajar,Dilaporkan,True
+INC-00690,CURAS,2023-10-18,21:03,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274742,106.83392,Parkiran,lainnya,toko,Penyelidikan,True
+INC-00691,KEJAHATAN_JALANAN,2025-05-01,19:03,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.255394,106.857209,Permukiman,pemalakan,pengendara,Dilaporkan,True
+INC-00692,CURANMOR,2025-04-05,17:57,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.314356,106.837393,Pertokoan,kunci_t,mobil,Penyidikan,True
+INC-00693,CURAS,2023-05-22,18:16,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.237801,106.793905,Pusat Aktivitas,lainnya,toko,Penyidikan,True
+INC-00694,CURANMOR,2024-08-18,20:42,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.256415,106.831119,Fasilitas Publik,lainnya,motor,Selesai,True
+INC-00695,CURANMOR,2024-08-26,12:14,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231694,106.832836,Permukiman,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00696,CURAT,2025-07-28,19:53,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256535,106.813008,Permukiman,congkel,rumah,Selesai,True
+INC-00697,CURANMOR,2025-04-04,17:15,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.27481,106.84856,Pertokoan,kunci_t,mobil,Selesai,True
+INC-00698,KEJAHATAN_JALANAN,2023-11-06,20:02,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.255948,106.856675,Parkiran,jambret,pedagang,Penyelidikan,True
+INC-00699,TAWURAN,2023-05-13,12:34,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.292374,106.802962,Jalan,kelompok_pelajar,pengguna_jalan,Penyidikan,True
+INC-00700,CURAT,2025-11-12,08:12,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.218264,106.838226,Pertokoan,rusak_kunci,rumah,Penyelidikan,True
+INC-00701,TAWURAN,2025-12-10,15:42,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23413,106.848732,Jalan,konflik_spontan,kelompok_pelajar,Penyelidikan,True
+INC-00702,CURAS,2023-05-28,22:17,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310498,106.820772,Permukiman,perampasan_jalanan,pejalan_kaki,Dilaporkan,True
+INC-00703,TAWURAN,2024-09-19,04:58,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.217909,106.830259,Pusat Aktivitas,konflik_spontan,kelompok_pelajar,Penyidikan,True
+INC-00704,KEJAHATAN_JALANAN,2024-03-09,18:25,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.307578,106.820277,Pertokoan,lainnya,pedagang,Penyidikan,True
+INC-00705,CURAT,2023-03-13,02:22,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.241176,106.806651,Permukiman,pecah_kaca,rumah,Penyidikan,True
+INC-00706,CURAT,2023-11-20,16:25,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.231007,106.85646,Pertokoan,pecah_kaca,rumah,Penyidikan,True
+INC-00707,CURAT,2024-10-25,21:14,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.252045,106.830862,Permukiman,pecah_kaca,toko,Penyidikan,True
+INC-00708,CURANMOR,2025-09-15,22:39,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.230177,106.777631,Pertokoan,duplikasi_kunci,mobil,Selesai,True
+INC-00709,CURAS,2024-10-29,14:14,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.33248,106.794383,Parkiran,perampasan_jalanan,pejalan_kaki,Dilaporkan,True
+INC-00710,CURAT,2024-01-16,07:43,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334509,106.820664,Jalan,congkel,toko,Penyelidikan,True
+INC-00711,KEJAHATAN_JALANAN,2025-10-06,16:05,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.2841,106.797195,Jalan,pencurian_ringan,pejalan_kaki,Penyelidikan,True
+INC-00712,CURANMOR,2025-06-23,02:30,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.311754,106.835867,Pertokoan,lainnya,mobil,Penyelidikan,True
+INC-00713,CURANMOR,2023-12-31,19:27,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292056,106.773329,Permukiman,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00714,CURAS,2025-05-18,22:54,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.234542,106.791638,Permukiman,perampasan_jalanan,pengendara,Selesai,True
+INC-00715,TAWURAN,2023-01-13,20:57,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291066,106.800893,Fasilitas Publik,lainnya,kelompok_pemuda,Penyelidikan,True
+INC-00716,CURANMOR,2025-07-13,21:28,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.279438,106.846734,Permukiman,duplikasi_kunci,motor,Dilaporkan,True
+INC-00717,CURAS,2024-12-10,17:53,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256142,106.856713,Pusat Aktivitas,lainnya,pejalan_kaki,Penyelidikan,True
+INC-00718,KEJAHATAN_JALANAN,2023-09-28,12:25,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.312294,106.83659,Permukiman,pencurian_ringan,pedagang,Selesai,True
+INC-00719,CURAT,2025-01-12,15:44,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.277418,106.767037,Permukiman,pecah_kaca,rumah,Selesai,True
+INC-00720,CURANMOR,2023-09-01,23:12,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25748,106.855106,Pusat Aktivitas,lainnya,motor,Selesai,True
+INC-00721,CURANMOR,2025-12-05,01:38,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25693,106.855275,Parkiran,lainnya,motor,Penyidikan,True
+INC-00722,CURAS,2025-02-20,21:47,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309896,106.818757,Parkiran,senjata_tajam,pengendara,Selesai,True
+INC-00723,CURAT,2025-08-16,03:28,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.238525,106.808735,Pusat Aktivitas,pecah_kaca,toko,Penyelidikan,True
+INC-00724,KEJAHATAN_JALANAN,2024-09-14,21:10,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.332319,106.79376,Jalan,lainnya,pedagang,Dilaporkan,True
+INC-00725,CURAT,2025-05-08,14:57,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.284837,106.834937,Permukiman,pecah_kaca,toko,Penyidikan,True
+INC-00726,CURAS,2024-05-12,21:00,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.274448,106.85134,Jalan,perampasan_jalanan,pejalan_kaki,Penyidikan,True
+INC-00727,CURAT,2024-07-22,14:55,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.285412,106.797906,Jalan,congkel,rumah,Penyidikan,True
+INC-00728,CURAT,2024-11-02,18:59,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334676,106.818895,Pertokoan,congkel,toko,Penyelidikan,True
+INC-00729,CURANMOR,2025-04-23,20:49,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.278965,106.81162,Parkiran,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-00730,KEJAHATAN_JALANAN,2024-09-28,02:23,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23687,106.8504,Pertokoan,pemalakan,pedagang,Penyelidikan,True
+INC-00731,CURAS,2023-03-15,01:30,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229458,106.779573,Fasilitas Publik,ancaman,pejalan_kaki,Penyelidikan,True
+INC-00732,KEJAHATAN_JALANAN,2024-10-08,23:10,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276166,106.767709,Pertokoan,pencurian_ringan,pejalan_kaki,Penyidikan,True
+INC-00733,CURANMOR,2025-07-14,20:47,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230206,106.855532,Jalan,lainnya,mobil,Penyidikan,True
+INC-00734,CURANMOR,2025-07-10,04:25,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208646,106.849714,Pertokoan,kunci_t,mobil,Penyidikan,True
+INC-00735,CURANMOR,2024-11-10,19:15,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249649,106.839807,Permukiman,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00736,CURANMOR,2023-12-03,14:18,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.252625,106.832372,Permukiman,duplikasi_kunci,mobil,Selesai,True
+INC-00737,CURAS,2025-02-08,01:15,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293027,106.773914,Pertokoan,perampasan_jalanan,pejalan_kaki,Penyelidikan,True
+INC-00738,CURAT,2023-02-16,15:18,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.258344,106.815283,Permukiman,lainnya,kantor,Penyidikan,True
+INC-00739,CURANMOR,2025-02-04,20:57,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.252643,106.769749,Jalan,lainnya,motor,Penyelidikan,True
+INC-00740,TAWURAN,2023-09-14,15:51,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.286116,106.834269,Jalan,lainnya,pengguna_jalan,Selesai,True
+INC-00741,CURAT,2023-01-28,03:14,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285361,106.834242,Pertokoan,lainnya,kantor,Penyelidikan,True
+INC-00742,CURANMOR,2023-10-18,21:00,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.27619,106.849261,Parkiran,kunci_t,mobil,Dilaporkan,True
+INC-00743,TAWURAN,2025-06-08,19:32,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.308475,106.818824,Permukiman,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-00744,KEJAHATAN_JALANAN,2023-08-01,20:10,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311775,106.822007,Parkiran,pencurian_ringan,pengendara,Penyidikan,True
+INC-00745,CURAS,2023-11-30,22:32,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.225679,106.799543,Permukiman,senjata_tajam,toko,Penyelidikan,True
+INC-00746,CURANMOR,2025-03-07,00:47,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293084,106.770973,Pertokoan,duplikasi_kunci,motor,Selesai,True
+INC-00747,CURANMOR,2024-07-17,18:31,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309373,106.819584,Pertokoan,lainnya,motor,Selesai,True
+INC-00748,CURAT,2024-12-03,17:31,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291478,106.802583,Pertokoan,lainnya,toko,Selesai,True
+INC-00749,CURANMOR,2023-05-01,23:03,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256387,106.855607,Permukiman,lainnya,mobil,Penyelidikan,True
+INC-00750,CURANMOR,2025-12-21,21:08,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257189,106.855357,Permukiman,kelalaian_pengguna,mobil,Selesai,True
+INC-00751,TAWURAN,2025-04-25,09:08,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.248585,106.820926,Jalan,konflik_spontan,kelompok_pelajar,Penyelidikan,True
+INC-00752,CURAT,2023-07-22,20:38,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249409,106.83845,Pusat Aktivitas,congkel,rumah,Selesai,True
+INC-00753,CURAT,2023-10-02,09:28,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344156,106.823367,Pertokoan,pecah_kaca,toko,Penyelidikan,True
+INC-00754,TAWURAN,2025-01-09,08:56,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253958,106.829349,Permukiman,kelompok_pemuda,kelompok_pemuda,Selesai,True
+INC-00755,CURAS,2024-08-05,22:23,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250631,106.839931,Pertokoan,senjata_tajam,toko,Selesai,True
+INC-00756,CURAS,2024-06-28,04:26,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227025,106.800912,Permukiman,ancaman,toko,Penyelidikan,True
+INC-00757,CURANMOR,2023-01-09,20:07,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253278,106.830382,Permukiman,lainnya,mobil,Selesai,True
+INC-00758,CURAS,2024-05-31,02:18,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.33557,106.820408,Parkiran,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-00759,CURAT,2024-11-20,17:56,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334477,106.819669,Pusat Aktivitas,congkel,kantor,Penyidikan,True
+INC-00760,CURANMOR,2024-03-12,14:58,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334865,106.818551,Jalan,kunci_t,mobil,Selesai,True
+INC-00761,CURAT,2024-11-26,02:32,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.237386,106.809233,Pusat Aktivitas,congkel,toko,Selesai,True
+INC-00762,CURAT,2023-02-08,23:33,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.225866,106.800164,Fasilitas Publik,congkel,toko,Penyelidikan,True
+INC-00763,TAWURAN,2023-11-13,03:48,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.237965,106.832966,Jalan,kelompok_pelajar,pengguna_jalan,Dilaporkan,True
+INC-00764,TAWURAN,2025-12-18,03:30,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.273358,106.766573,Jalan,lainnya,pengguna_jalan,Selesai,True
+INC-00765,CURANMOR,2024-06-25,19:01,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.279356,106.81241,Pertokoan,lainnya,motor,Penyelidikan,True
+INC-00766,KEJAHATAN_JALANAN,2024-03-02,23:32,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.247215,106.839724,Permukiman,jambret,pengendara,Selesai,True
+INC-00767,CURANMOR,2024-03-02,22:09,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293773,106.774514,Pusat Aktivitas,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00768,CURAT,2025-01-16,03:32,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208113,106.851536,Parkiran,lainnya,kantor,Dilaporkan,True
+INC-00769,CURANMOR,2024-11-17,00:08,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285114,106.8346,Parkiran,duplikasi_kunci,mobil,Dilaporkan,True
+INC-00770,CURANMOR,2023-06-14,03:12,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.20915,106.849277,Jalan,lainnya,mobil,Penyidikan,True
+INC-00771,CURANMOR,2024-03-25,15:54,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.245346,106.792799,Jalan,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00772,CURANMOR,2025-06-16,22:58,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.229319,106.856936,Jalan,lainnya,motor,Dilaporkan,True
+INC-00773,CURANMOR,2023-08-11,19:24,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.28342,106.834728,Pusat Aktivitas,duplikasi_kunci,motor,Penyidikan,True
+INC-00774,CURANMOR,2023-06-23,22:51,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217178,106.839145,Pusat Aktivitas,kelalaian_pengguna,motor,Penyidikan,True
+INC-00775,CURANMOR,2024-05-13,18:28,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.247522,106.820928,Pusat Aktivitas,kelalaian_pengguna,motor,Selesai,True
+INC-00776,CURAT,2024-11-05,05:07,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.331916,106.793342,Parkiran,pecah_kaca,toko,Penyelidikan,True
+INC-00777,KEJAHATAN_JALANAN,2023-10-29,19:18,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.226212,106.800188,Jalan,lainnya,pengendara,Selesai,True
+INC-00778,CURANMOR,2025-09-09,02:40,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.22846,106.801371,Parkiran,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00779,CURANMOR,2023-01-18,06:48,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227467,106.802858,Permukiman,kelalaian_pengguna,motor,Penyidikan,True
+INC-00780,KEJAHATAN_JALANAN,2025-06-16,18:31,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334934,106.819733,Pertokoan,pemalakan,pejalan_kaki,Selesai,True
+INC-00781,KEJAHATAN_JALANAN,2023-03-17,18:24,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.292182,106.801701,Pertokoan,pemalakan,pengendara,Penyidikan,True
+INC-00782,CURANMOR,2023-01-01,22:13,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.336742,106.818412,Pertokoan,kelalaian_pengguna,mobil,Selesai,True
+INC-00783,CURAS,2024-12-17,18:06,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231533,106.833894,Pusat Aktivitas,perampasan_jalanan,toko,Dilaporkan,True
+INC-00784,CURAT,2023-08-22,08:42,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.23177,106.781227,Fasilitas Publik,rusak_kunci,toko,Penyelidikan,True
+INC-00785,CURANMOR,2024-09-30,21:06,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23225,106.849241,Permukiman,lainnya,mobil,Selesai,True
+INC-00786,CURAT,2023-09-01,16:23,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257605,106.814673,Parkiran,pecah_kaca,rumah,Penyelidikan,True
+INC-00787,CURANMOR,2025-01-28,17:38,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209105,106.852256,Parkiran,lainnya,motor,Penyidikan,True
+INC-00788,TAWURAN,2023-11-03,14:00,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257548,106.815541,Permukiman,konflik_spontan,kelompok_pemuda,Selesai,True
+INC-00789,CURANMOR,2024-10-08,20:22,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.227385,106.779505,Jalan,kelalaian_pengguna,mobil,Selesai,True
+INC-00790,CURANMOR,2025-07-04,19:49,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292554,106.774594,Jalan,duplikasi_kunci,mobil,Selesai,True
+INC-00791,CURANMOR,2025-10-16,02:12,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.281164,106.812312,Permukiman,kelalaian_pengguna,mobil,Selesai,True
+INC-00792,CURAT,2025-07-01,11:45,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.266247,106.801334,Parkiran,pecah_kaca,kantor,Dilaporkan,True
+INC-00793,CURANMOR,2024-01-02,18:01,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334044,106.818071,Permukiman,lainnya,mobil,Selesai,True
+INC-00794,CURANMOR,2023-05-13,19:18,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.210248,106.850505,Pusat Aktivitas,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00795,CURAS,2023-10-24,05:28,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209396,106.851905,Parkiran,lainnya,pengendara,Penyelidikan,True
+INC-00796,TAWURAN,2023-03-02,17:21,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229758,106.83392,Permukiman,kelompok_pemuda,kelompok_pemuda,Penyidikan,True
+INC-00797,KEJAHATAN_JALANAN,2025-05-04,20:41,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.26725,106.798956,Jalan,lainnya,pejalan_kaki,Dilaporkan,True
+INC-00798,CURANMOR,2025-07-11,22:35,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208171,106.848695,Pertokoan,duplikasi_kunci,mobil,Penyidikan,True
+INC-00799,KEJAHATAN_JALANAN,2024-05-06,22:19,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.251385,106.84171,Pertokoan,pemalakan,pejalan_kaki,Dilaporkan,True
+INC-00800,CURAT,2023-05-05,11:17,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.216509,106.828382,Pusat Aktivitas,congkel,toko,Selesai,True
+INC-00801,TAWURAN,2025-05-05,23:16,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.290179,106.80192,Pusat Aktivitas,konflik_spontan,kelompok_pelajar,Dilaporkan,True
+INC-00802,CURANMOR,2024-08-29,03:56,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217592,106.838233,Pusat Aktivitas,kelalaian_pengguna,motor,Selesai,True
+INC-00803,CURAT,2023-05-13,22:03,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257016,106.855589,Parkiran,congkel,toko,Penyelidikan,True
+INC-00804,CURAS,2025-07-17,22:21,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.206983,106.850483,Permukiman,senjata_tajam,pejalan_kaki,Selesai,True
+INC-00805,TAWURAN,2024-06-12,21:35,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256525,106.814169,Pertokoan,kelompok_pemuda,kelompok_pemuda,Selesai,True
+INC-00806,CURANMOR,2023-07-27,02:23,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257308,106.854396,Permukiman,kelalaian_pengguna,mobil,Selesai,True
+INC-00807,TAWURAN,2025-01-16,06:57,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234398,106.845562,Pertokoan,kelompok_pemuda,kelompok_pemuda,Selesai,True
+INC-00808,CURAT,2024-04-09,01:38,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291892,106.773365,Permukiman,lainnya,toko,Selesai,True
+INC-00809,CURANMOR,2024-08-19,09:31,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.239366,106.834396,Pusat Aktivitas,lainnya,motor,Penyidikan,True
+INC-00810,CURAS,2023-07-23,13:21,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.312183,106.835231,Fasilitas Publik,senjata_tajam,toko,Penyelidikan,True
+INC-00811,CURAT,2025-09-28,09:05,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.272858,106.833525,Jalan,pecah_kaca,kantor,Penyelidikan,True
+INC-00812,CURAT,2023-07-06,07:58,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229313,106.831967,Parkiran,pecah_kaca,toko,Selesai,True
+INC-00813,CURAT,2023-06-30,16:40,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.24816,106.840455,Jalan,pecah_kaca,kantor,Selesai,True
+INC-00814,CURANMOR,2025-08-10,20:20,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.230805,106.778607,Fasilitas Publik,lainnya,motor,Penyelidikan,True
+INC-00815,CURANMOR,2023-05-02,02:49,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228318,106.799257,Parkiran,lainnya,mobil,Selesai,True
+INC-00816,CURANMOR,2023-03-21,14:17,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276265,106.765899,Pertokoan,kunci_t,mobil,Selesai,True
+INC-00817,CURANMOR,2023-08-05,04:55,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.240946,106.810648,Jalan,kelalaian_pengguna,mobil,Selesai,True
+INC-00818,KEJAHATAN_JALANAN,2023-10-25,04:44,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218341,106.829904,Permukiman,pemalakan,pedagang,Dilaporkan,True
+INC-00819,CURAT,2023-03-27,23:20,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.229413,106.800367,Jalan,lainnya,rumah,Selesai,True
+INC-00820,CURANMOR,2025-12-28,00:49,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.239093,106.791894,Pertokoan,kunci_t,motor,Penyidikan,True
+INC-00821,TAWURAN,2025-03-13,23:17,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333781,106.794086,Fasilitas Publik,lainnya,kelompok_pelajar,Selesai,True
+INC-00822,TAWURAN,2024-06-03,06:57,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.245927,106.791,Permukiman,kelompok_pelajar,kelompok_pelajar,Selesai,True
+INC-00823,CURAT,2025-11-18,15:09,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.257244,106.831407,Parkiran,congkel,toko,Penyelidikan,True
+INC-00824,CURANMOR,2025-11-08,22:11,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234659,106.847799,Pusat Aktivitas,kunci_t,mobil,Penyidikan,True
+INC-00825,CURANMOR,2024-11-06,21:11,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.277171,106.767795,Jalan,duplikasi_kunci,motor,Penyidikan,True
+INC-00826,CURANMOR,2023-12-08,05:37,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.2264,106.801512,Fasilitas Publik,duplikasi_kunci,motor,Selesai,True
+INC-00827,CURAT,2023-11-19,22:24,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.28526,106.79751,Permukiman,pecah_kaca,rumah,Selesai,True
+INC-00828,CURAT,2023-03-13,20:18,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.245549,106.821225,Permukiman,lainnya,kantor,Dilaporkan,True
+INC-00829,CURAT,2025-08-23,09:49,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268869,106.799118,Jalan,congkel,toko,Penyidikan,True
+INC-00830,TAWURAN,2023-08-06,05:54,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256376,106.855914,Pusat Aktivitas,kelompok_pemuda,kelompok_pelajar,Penyelidikan,True
+INC-00831,CURANMOR,2025-04-17,17:58,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334551,106.818509,Jalan,lainnya,mobil,Penyidikan,True
+INC-00832,CURAS,2023-08-01,23:16,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.240056,106.835323,Jalan,lainnya,toko,Penyelidikan,True
+INC-00833,CURAT,2024-12-19,01:41,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.284998,106.832841,Jalan,pecah_kaca,toko,Penyelidikan,True
+INC-00834,CURANMOR,2024-01-06,18:21,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230972,106.833225,Permukiman,duplikasi_kunci,mobil,Selesai,True
+INC-00835,CURANMOR,2025-01-09,19:39,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.235648,106.792811,Fasilitas Publik,kunci_t,mobil,Selesai,True
+INC-00836,CURAT,2024-01-16,19:05,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.312854,106.820231,Permukiman,pecah_kaca,kantor,Selesai,True
+INC-00837,CURANMOR,2024-12-31,21:42,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.237709,106.793528,Permukiman,duplikasi_kunci,mobil,Penyelidikan,True
+INC-00838,TAWURAN,2024-09-26,18:12,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.279912,106.810528,Jalan,konflik_spontan,kelompok_pelajar,Dilaporkan,True
+INC-00839,CURAT,2025-07-24,12:02,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.274532,106.847929,Pertokoan,pecah_kaca,toko,Selesai,True
+INC-00840,CURAS,2024-07-10,04:45,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.277288,106.84805,Parkiran,perampasan_jalanan,pejalan_kaki,Selesai,True
+INC-00841,CURANMOR,2024-03-15,13:32,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.238215,106.834042,Pertokoan,lainnya,motor,Penyidikan,True
+INC-00842,KEJAHATAN_JALANAN,2024-11-29,10:46,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267864,106.798891,Permukiman,jambret,pedagang,Selesai,True
+INC-00843,CURAT,2024-12-30,06:46,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.255273,106.820046,Jalan,lainnya,kantor,Penyelidikan,True
+INC-00844,TAWURAN,2023-12-13,15:13,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246893,106.793081,Fasilitas Publik,kelompok_pemuda,pengguna_jalan,Penyelidikan,True
+INC-00845,KEJAHATAN_JALANAN,2024-11-04,04:40,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256812,106.857285,Permukiman,lainnya,pengendara,Selesai,True
+INC-00846,TAWURAN,2023-07-06,11:23,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268046,106.799295,Permukiman,lainnya,pengguna_jalan,Selesai,True
+INC-00847,CURANMOR,2023-03-10,17:34,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.274571,106.848824,Permukiman,duplikasi_kunci,motor,Dilaporkan,True
+INC-00848,CURANMOR,2024-10-07,20:26,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249178,106.840284,Permukiman,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00849,CURAT,2025-08-02,09:46,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257668,106.854994,Fasilitas Publik,rusak_kunci,rumah,Penyidikan,True
+INC-00850,CURANMOR,2024-12-09,19:35,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228305,106.833076,Parkiran,lainnya,motor,Dilaporkan,True
+INC-00851,CURAS,2023-12-29,14:43,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.278367,106.85004,Parkiran,perampasan_jalanan,pejalan_kaki,Selesai,True
+INC-00852,KEJAHATAN_JALANAN,2023-02-21,22:42,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.239544,106.834732,Permukiman,jambret,pedagang,Penyelidikan,True
+INC-00853,CURAT,2025-01-01,03:01,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.276057,106.831567,Permukiman,congkel,toko,Dilaporkan,True
+INC-00854,KEJAHATAN_JALANAN,2023-05-11,16:54,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251585,106.77059,Permukiman,pencurian_ringan,pedagang,Selesai,True
+INC-00855,CURAT,2024-09-05,12:58,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.336491,106.816959,Jalan,congkel,kantor,Selesai,True
+INC-00856,CURANMOR,2025-11-19,14:14,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310028,106.819003,Jalan,kunci_t,motor,Penyelidikan,True
+INC-00857,CURAT,2024-10-02,13:07,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.332334,106.819212,Jalan,lainnya,kantor,Penyidikan,True
+INC-00858,TAWURAN,2025-02-09,16:28,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.22851,106.799029,Parkiran,kelompok_pemuda,pengguna_jalan,Penyelidikan,True
+INC-00859,CURAT,2024-02-21,02:42,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344231,106.824096,Permukiman,pecah_kaca,kantor,Penyelidikan,True
+INC-00860,CURANMOR,2023-05-12,16:36,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.25382,106.831868,Parkiran,kunci_t,motor,Selesai,True
+INC-00861,CURAT,2025-12-03,03:51,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275563,106.832515,Pusat Aktivitas,pecah_kaca,kantor,Penyelidikan,True
+INC-00862,KEJAHATAN_JALANAN,2023-07-06,23:02,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.334042,106.795669,Parkiran,pemalakan,pedagang,Selesai,True
+INC-00863,CURAT,2023-06-24,06:54,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.253037,106.769492,Pertokoan,lainnya,kantor,Dilaporkan,True
+INC-00864,KEJAHATAN_JALANAN,2023-01-20,22:16,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.343886,106.821875,Parkiran,pemalakan,pedagang,Penyelidikan,True
+INC-00865,CURAT,2025-03-12,00:11,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228345,106.797199,Parkiran,rusak_kunci,toko,Penyelidikan,True
+INC-00866,CURAT,2023-04-18,14:21,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256818,106.813649,Pertokoan,lainnya,toko,Selesai,True
+INC-00867,CURAS,2023-04-27,01:43,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229157,106.833421,Permukiman,ancaman,pejalan_kaki,Selesai,True
+INC-00868,CURAT,2025-05-25,11:50,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.21962,106.838454,Parkiran,lainnya,kantor,Dilaporkan,True
+INC-00869,TAWURAN,2023-07-19,23:08,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250057,106.839252,Jalan,lainnya,kelompok_pelajar,Penyidikan,True
+INC-00870,CURANMOR,2025-09-14,07:50,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.285894,106.796576,Pertokoan,kunci_t,motor,Selesai,True
+INC-00871,CURAS,2025-04-30,07:13,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.27653,106.76827,Jalan,senjata_tajam,toko,Penyelidikan,True
+INC-00872,CURANMOR,2024-07-12,07:51,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.217493,106.828441,Pertokoan,kunci_t,motor,Penyelidikan,True
+INC-00873,CURANMOR,2025-12-06,18:11,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.276784,106.811381,Parkiran,kunci_t,motor,Penyelidikan,True
+INC-00874,CURANMOR,2023-09-27,22:25,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.240276,106.80755,Permukiman,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00875,CURANMOR,2023-11-05,23:31,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.290481,106.801139,Parkiran,lainnya,mobil,Dilaporkan,True
+INC-00876,CURAT,2023-02-27,07:05,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256703,106.813988,Pertokoan,lainnya,toko,Penyelidikan,True
+INC-00877,CURANMOR,2025-11-23,14:26,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251875,106.769517,Parkiran,lainnya,motor,Selesai,True
+INC-00878,CURAT,2023-01-07,23:21,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291898,106.802502,Parkiran,lainnya,rumah,Penyidikan,True
+INC-00879,CURANMOR,2025-06-14,00:17,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.2358,106.835117,Pusat Aktivitas,kunci_t,motor,Penyidikan,True
+INC-00880,CURANMOR,2024-04-22,02:04,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246766,106.793645,Parkiran,kunci_t,mobil,Selesai,True
+INC-00881,CURANMOR,2025-11-02,17:45,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.210033,106.850282,Permukiman,kelalaian_pengguna,mobil,Selesai,True
+INC-00882,CURAS,2025-12-05,20:07,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.224673,106.801023,Parkiran,perampasan_jalanan,toko,Dilaporkan,True
+INC-00883,CURANMOR,2024-11-17,18:10,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335332,106.818194,Parkiran,kunci_t,mobil,Penyidikan,True
+INC-00884,KEJAHATAN_JALANAN,2023-12-28,18:43,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.333664,106.820127,Pertokoan,pencurian_ringan,pengendara,Selesai,True
+INC-00885,TAWURAN,2024-08-29,16:40,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.288416,106.797376,Jalan,kelompok_pemuda,pengguna_jalan,Dilaporkan,True
+INC-00886,CURAT,2024-01-06,07:11,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.21765,106.839039,Pertokoan,lainnya,toko,Selesai,True
+INC-00887,TAWURAN,2023-04-14,23:11,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.237542,106.807049,Permukiman,konflik_spontan,pengguna_jalan,Penyidikan,True
+INC-00888,CURAT,2025-07-27,05:24,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.236637,106.846362,Jalan,pecah_kaca,toko,Penyidikan,True
+INC-00889,CURANMOR,2023-02-09,12:43,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.211743,106.849061,Pusat Aktivitas,duplikasi_kunci,motor,Penyelidikan,True
+INC-00890,KEJAHATAN_JALANAN,2023-05-13,19:15,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.231397,106.77957,Pertokoan,pemalakan,pejalan_kaki,Selesai,True
+INC-00891,TAWURAN,2024-08-20,21:59,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234384,106.845628,Permukiman,kelompok_pelajar,kelompok_pelajar,Selesai,True
+INC-00892,CURAT,2023-04-23,05:21,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.248864,106.820799,Jalan,lainnya,rumah,Penyidikan,True
+INC-00893,CURAS,2024-09-03,12:44,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208122,106.851505,Permukiman,perampasan_jalanan,toko,Dilaporkan,True
+INC-00894,CURAS,2025-06-10,20:52,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231814,106.833642,Jalan,ancaman,toko,Penyidikan,True
+INC-00895,CURAT,2023-11-15,16:39,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239936,106.810038,Pertokoan,congkel,kantor,Selesai,True
+INC-00896,CURAT,2025-11-06,08:58,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.27462,106.832444,Pusat Aktivitas,congkel,rumah,Selesai,True
+INC-00897,CURANMOR,2023-09-26,19:29,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254877,106.822643,Parkiran,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00898,CURANMOR,2024-08-18,18:55,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.220244,106.837899,Pertokoan,duplikasi_kunci,motor,Selesai,True
+INC-00899,CURAT,2025-01-18,21:12,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257253,106.854698,Parkiran,lainnya,rumah,Dilaporkan,True
+INC-00900,CURAT,2025-11-15,01:07,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309768,106.821572,Jalan,rusak_kunci,kantor,Penyelidikan,True
+INC-00901,TAWURAN,2025-01-26,07:22,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229246,106.780138,Pertokoan,konflik_spontan,pengguna_jalan,Selesai,True
+INC-00902,CURANMOR,2024-09-11,22:26,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268175,106.800043,Pertokoan,lainnya,motor,Selesai,True
+INC-00903,CURANMOR,2023-05-31,20:37,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.335442,106.794565,Pertokoan,duplikasi_kunci,motor,Dilaporkan,True
+INC-00904,TAWURAN,2025-08-30,01:23,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218891,106.828861,Permukiman,lainnya,pengguna_jalan,Dilaporkan,True
+INC-00905,CURANMOR,2025-12-16,13:55,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.334472,106.795098,Jalan,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00906,CURANMOR,2024-10-25,06:44,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.216913,106.827753,Pertokoan,kelalaian_pengguna,motor,Dilaporkan,True
+INC-00907,CURAS,2025-05-05,23:43,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345716,106.822255,Parkiran,perampasan_jalanan,pejalan_kaki,Selesai,True
+INC-00908,CURAS,2023-07-24,20:54,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23483,106.849008,Parkiran,senjata_tajam,pejalan_kaki,Selesai,True
+INC-00909,CURAS,2025-11-16,05:04,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.27734,106.851223,Permukiman,ancaman,pejalan_kaki,Selesai,True
+INC-00910,CURAT,2025-09-25,09:19,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.251542,106.838982,Jalan,rusak_kunci,kantor,Penyidikan,True
+INC-00911,CURAT,2025-03-15,13:18,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268347,106.799202,Permukiman,rusak_kunci,rumah,Penyidikan,True
+INC-00912,CURANMOR,2023-03-06,15:23,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.280025,106.810228,Parkiran,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00913,CURAT,2024-05-29,21:25,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.274572,106.850245,Pertokoan,pecah_kaca,rumah,Dilaporkan,True
+INC-00914,TAWURAN,2025-02-07,00:51,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335081,106.820467,Jalan,lainnya,kelompok_pemuda,Selesai,True
+INC-00915,CURAT,2024-11-16,06:35,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.312701,106.838943,Pusat Aktivitas,congkel,toko,Penyidikan,True
+INC-00916,CURANMOR,2025-02-25,18:32,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.230177,106.779212,Jalan,lainnya,mobil,Penyidikan,True
+INC-00917,CURANMOR,2025-04-30,19:41,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.253952,106.825911,Parkiran,duplikasi_kunci,motor,Selesai,True
+INC-00918,CURAT,2025-02-18,08:24,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311266,106.819919,Pusat Aktivitas,lainnya,kantor,Selesai,True
+INC-00919,CURANMOR,2024-09-10,11:26,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.231305,106.8565,Pertokoan,kelalaian_pengguna,motor,Selesai,True
+INC-00920,CURANMOR,2024-02-09,05:36,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310751,106.818826,Jalan,lainnya,motor,Penyelidikan,True
+INC-00921,TAWURAN,2024-03-06,11:26,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257548,106.814407,Permukiman,konflik_spontan,pengguna_jalan,Selesai,True
+INC-00922,TAWURAN,2023-04-30,09:04,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.237112,106.793281,Jalan,lainnya,kelompok_pelajar,Selesai,True
+INC-00923,CURAT,2023-01-16,08:03,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.246574,106.817829,Jalan,rusak_kunci,rumah,Penyidikan,True
+INC-00924,CURAS,2023-12-23,22:35,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.245533,106.794928,Permukiman,perampasan_jalanan,pengendara,Penyidikan,True
+INC-00925,CURAT,2024-04-10,21:56,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310083,106.820022,Permukiman,lainnya,rumah,Penyelidikan,True
+INC-00926,TAWURAN,2023-05-29,19:31,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250046,106.840908,Pusat Aktivitas,konflik_spontan,pengguna_jalan,Penyelidikan,True
+INC-00927,CURAS,2023-10-21,22:23,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25526,106.854476,Pertokoan,senjata_tajam,toko,Selesai,True
+INC-00928,CURAT,2025-10-25,16:15,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276912,106.767796,Parkiran,lainnya,kantor,Selesai,True
+INC-00929,KEJAHATAN_JALANAN,2023-04-22,03:36,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253325,106.829532,Fasilitas Publik,pemalakan,pengendara,Penyidikan,True
+INC-00930,CURAS,2024-10-05,17:02,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217313,106.839476,Permukiman,lainnya,toko,Dilaporkan,True
+INC-00931,CURANMOR,2023-08-06,09:52,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229362,106.833548,Jalan,lainnya,mobil,Selesai,True
+INC-00932,CURANMOR,2025-07-11,20:23,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256947,106.853797,Permukiman,duplikasi_kunci,motor,Selesai,True
+INC-00933,CURAT,2023-04-06,09:46,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.226586,106.854629,Permukiman,pecah_kaca,toko,Dilaporkan,True
+INC-00934,CURANMOR,2025-04-10,19:00,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286606,106.797153,Pusat Aktivitas,lainnya,motor,Selesai,True
+INC-00935,CURANMOR,2025-08-24,20:56,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257925,106.857721,Jalan,kelalaian_pengguna,mobil,Penyidikan,True
+INC-00936,CURANMOR,2024-10-24,09:27,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209315,106.849857,Permukiman,lainnya,motor,Selesai,True
+INC-00937,TAWURAN,2025-11-09,14:28,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.265505,106.800783,Jalan,kelompok_pemuda,kelompok_pelajar,Dilaporkan,True
+INC-00938,CURAT,2024-04-26,20:59,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274069,106.832419,Parkiran,rusak_kunci,rumah,Selesai,True
+INC-00939,CURANMOR,2025-09-25,23:47,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.237743,106.833865,Parkiran,duplikasi_kunci,mobil,Selesai,True
+INC-00940,CURAT,2025-05-27,15:22,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.245489,106.822445,Jalan,rusak_kunci,rumah,Penyidikan,True
+INC-00941,CURANMOR,2023-01-16,08:24,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230649,106.834082,Fasilitas Publik,duplikasi_kunci,mobil,Selesai,True
+INC-00942,CURAS,2024-07-01,21:08,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.248807,106.84016,Parkiran,ancaman,toko,Penyelidikan,True
+INC-00943,CURAS,2025-09-23,05:37,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.215923,106.84034,Parkiran,ancaman,pejalan_kaki,Penyelidikan,True
+INC-00944,CURANMOR,2024-01-13,19:12,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.28652,106.797334,Jalan,duplikasi_kunci,motor,Penyidikan,True
+INC-00945,CURAT,2025-05-17,04:44,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.22641,106.798712,Permukiman,pecah_kaca,toko,Penyelidikan,True
+INC-00946,CURAS,2024-02-09,23:45,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.247222,106.79378,Permukiman,perampasan_jalanan,pengendara,Penyidikan,True
+INC-00947,CURAT,2024-09-05,10:12,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.237519,106.792049,Pusat Aktivitas,congkel,kantor,Penyelidikan,True
+INC-00948,CURAS,2025-11-18,13:41,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253365,106.830987,Pusat Aktivitas,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-00949,CURANMOR,2024-07-09,23:22,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345863,106.823143,Jalan,kelalaian_pengguna,motor,Selesai,True
+INC-00950,CURANMOR,2025-02-15,05:31,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.233867,106.846171,Jalan,lainnya,motor,Penyelidikan,True
+INC-00951,CURAT,2024-04-18,14:00,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310332,106.837579,Pusat Aktivitas,rusak_kunci,toko,Penyidikan,True
+INC-00952,TAWURAN,2023-11-10,18:20,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.245482,106.794166,Jalan,kelompok_pemuda,kelompok_pemuda,Selesai,True
+INC-00953,KEJAHATAN_JALANAN,2023-04-24,05:43,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.241839,106.807646,Pertokoan,jambret,pengendara,Dilaporkan,True
+INC-00954,KEJAHATAN_JALANAN,2023-07-05,11:42,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.276616,106.849586,Parkiran,pemalakan,pejalan_kaki,Penyidikan,True
+INC-00955,CURANMOR,2024-11-10,20:22,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.247051,106.817171,Parkiran,lainnya,motor,Penyelidikan,True
+INC-00956,CURAT,2025-10-29,21:33,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.257686,106.822815,Pusat Aktivitas,lainnya,kantor,Penyelidikan,True
+INC-00957,CURAS,2024-11-09,07:27,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.208455,106.849942,Pusat Aktivitas,ancaman,pengendara,Penyelidikan,True
+INC-00958,KEJAHATAN_JALANAN,2024-09-24,09:50,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.274264,106.848207,Parkiran,pencurian_ringan,pedagang,Penyidikan,True
+INC-00959,CURANMOR,2025-09-08,23:36,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.346352,106.825242,Pusat Aktivitas,duplikasi_kunci,motor,Selesai,True
+INC-00960,TAWURAN,2025-09-05,06:39,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.255969,106.82253,Parkiran,kelompok_pelajar,pengguna_jalan,Selesai,True
+INC-00961,CURAT,2023-01-29,22:32,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.252593,106.7692,Parkiran,congkel,toko,Penyelidikan,True
+INC-00962,CURANMOR,2025-08-06,21:20,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.237807,106.834679,Parkiran,lainnya,mobil,Dilaporkan,True
+INC-00963,CURANMOR,2024-03-01,20:28,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251379,106.773198,Pertokoan,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00964,CURANMOR,2024-09-11,11:22,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250434,106.839226,Pusat Aktivitas,lainnya,motor,Selesai,True
+INC-00965,CURAT,2025-09-04,00:25,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.279669,106.810614,Permukiman,pecah_kaca,toko,Selesai,True
+INC-00966,KEJAHATAN_JALANAN,2023-01-03,02:00,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253315,106.831754,Jalan,lainnya,pedagang,Selesai,True
+INC-00967,CURANMOR,2023-05-22,16:09,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228381,106.8,Jalan,kunci_t,mobil,Penyelidikan,True
+INC-00968,CURAT,2024-11-28,20:50,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250925,106.838361,Pertokoan,rusak_kunci,rumah,Penyidikan,True
+INC-00969,TAWURAN,2023-02-19,05:59,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.2796,106.811652,Jalan,lainnya,pengguna_jalan,Selesai,True
+INC-00970,CURANMOR,2025-01-17,15:15,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228762,106.831309,Jalan,lainnya,mobil,Selesai,True
+INC-00971,TAWURAN,2023-08-05,11:13,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.239235,106.835656,Jalan,konflik_spontan,kelompok_pemuda,Selesai,True
+INC-00972,KEJAHATAN_JALANAN,2023-07-15,01:16,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229601,106.7784,Pusat Aktivitas,pencurian_ringan,pejalan_kaki,Selesai,True
+INC-00973,KEJAHATAN_JALANAN,2024-02-03,19:05,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.252982,106.771077,Permukiman,jambret,pedagang,Penyelidikan,True
+INC-00974,CURAT,2024-09-20,17:39,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.219083,106.828753,Pusat Aktivitas,congkel,toko,Penyidikan,True
+INC-00975,CURANMOR,2023-12-14,19:07,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.239485,106.835002,Parkiran,kunci_t,mobil,Dilaporkan,True
+INC-00976,TAWURAN,2023-06-15,10:34,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333416,106.794662,Pertokoan,lainnya,kelompok_pelajar,Selesai,True
+INC-00977,CURANMOR,2025-10-11,00:56,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234028,106.84613,Fasilitas Publik,kelalaian_pengguna,motor,Penyidikan,True
+INC-00978,CURANMOR,2023-03-31,19:09,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291092,106.803351,Fasilitas Publik,kunci_t,mobil,Selesai,True
+INC-00979,CURANMOR,2025-11-05,07:27,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227349,106.800533,Pertokoan,lainnya,mobil,Selesai,True
+INC-00980,CURANMOR,2023-06-23,02:00,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.206943,106.85024,Pusat Aktivitas,kelalaian_pengguna,mobil,Selesai,True
+INC-00981,CURANMOR,2024-03-31,14:56,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239097,106.809045,Pertokoan,duplikasi_kunci,motor,Dilaporkan,True
+INC-00982,CURANMOR,2024-02-01,18:18,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.287461,106.797355,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-00983,CURAT,2023-12-10,01:37,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275308,106.848786,Jalan,lainnya,rumah,Selesai,True
+INC-00984,CURANMOR,2025-06-02,06:11,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.255828,106.857117,Jalan,duplikasi_kunci,motor,Selesai,True
+INC-00985,CURAS,2023-03-18,17:11,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275017,106.849137,Parkiran,senjata_tajam,pejalan_kaki,Dilaporkan,True
+INC-00986,CURANMOR,2025-04-09,22:37,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293219,106.775952,Jalan,duplikasi_kunci,mobil,Selesai,True
+INC-00987,CURANMOR,2025-02-02,08:20,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309978,106.819516,Permukiman,kelalaian_pengguna,motor,Penyidikan,True
+INC-00988,KEJAHATAN_JALANAN,2023-12-20,22:43,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229604,106.833056,Pusat Aktivitas,lainnya,pedagang,Penyelidikan,True
+INC-00989,CURAS,2025-11-19,21:13,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.248201,106.791974,Parkiran,senjata_tajam,pengendara,Penyidikan,True
+INC-00990,CURAT,2024-01-21,18:46,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.331619,106.794319,Permukiman,pecah_kaca,toko,Selesai,True
+INC-00991,CURANMOR,2023-10-24,18:05,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.233392,106.846069,Permukiman,duplikasi_kunci,motor,Penyelidikan,True
+INC-00992,CURANMOR,2024-09-17,23:38,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344215,106.824572,Permukiman,duplikasi_kunci,motor,Penyelidikan,True
+INC-00993,CURAS,2025-06-13,19:27,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.290289,106.801904,Permukiman,perampasan_jalanan,toko,Penyelidikan,True
+INC-00994,TAWURAN,2025-08-17,10:41,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.308908,106.81996,Pusat Aktivitas,kelompok_pemuda,kelompok_pelajar,Selesai,True
+INC-00995,CURAS,2025-05-21,04:47,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257629,106.816887,Pusat Aktivitas,ancaman,pengendara,Selesai,True
+INC-00996,CURAS,2025-11-11,11:10,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.334463,106.797192,Permukiman,ancaman,pejalan_kaki,Selesai,True
+INC-00997,CURANMOR,2024-01-29,22:07,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228267,106.80116,Permukiman,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-00998,KEJAHATAN_JALANAN,2025-01-22,23:25,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.229088,106.85464,Parkiran,pemalakan,pejalan_kaki,Dilaporkan,True
+INC-00999,KEJAHATAN_JALANAN,2023-07-08,09:30,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.22627,106.801615,Parkiran,pencurian_ringan,pedagang,Selesai,True
+INC-01000,KEJAHATAN_JALANAN,2025-10-24,20:54,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217172,106.836005,Permukiman,jambret,pengendara,Selesai,True
+INC-01001,KEJAHATAN_JALANAN,2025-07-18,20:54,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.255733,106.831534,Jalan,jambret,pengendara,Selesai,True
+INC-01002,CURAT,2025-11-09,18:44,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.334389,106.820385,Parkiran,rusak_kunci,kantor,Penyelidikan,True
+INC-01003,CURAS,2025-01-09,08:01,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.255378,106.858519,Permukiman,perampasan_jalanan,toko,Dilaporkan,True
+INC-01004,CURAS,2025-06-20,21:16,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.277603,106.850285,Parkiran,lainnya,pejalan_kaki,Selesai,True
+INC-01005,CURAT,2023-06-29,16:48,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235786,106.846387,Fasilitas Publik,rusak_kunci,rumah,Penyelidikan,True
+INC-01006,CURAT,2024-11-24,22:40,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.289684,106.80373,Permukiman,congkel,kantor,Penyelidikan,True
+INC-01007,CURAT,2025-11-04,06:48,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246714,106.791991,Jalan,lainnya,kantor,Selesai,True
+INC-01008,KEJAHATAN_JALANAN,2024-04-08,01:12,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.246757,106.819745,Jalan,jambret,pedagang,Penyelidikan,True
+INC-01009,CURANMOR,2023-02-10,02:19,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227552,106.800227,Parkiran,kunci_t,mobil,Selesai,True
+INC-01010,CURAS,2025-06-27,21:26,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254831,106.823174,Permukiman,perampasan_jalanan,toko,Penyidikan,True
+INC-01011,CURAT,2023-02-21,15:59,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.255166,106.828631,Jalan,pecah_kaca,rumah,Penyidikan,True
+INC-01012,CURAT,2024-07-13,16:51,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228466,106.797435,Pusat Aktivitas,congkel,toko,Dilaporkan,True
+INC-01013,CURAT,2023-07-17,14:49,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230375,106.835317,Parkiran,rusak_kunci,kantor,Penyelidikan,True
+INC-01014,CURAT,2024-04-02,07:38,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273562,106.832979,Pusat Aktivitas,pecah_kaca,rumah,Dilaporkan,True
+INC-01015,CURAT,2024-01-03,19:47,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.207009,106.849681,Fasilitas Publik,pecah_kaca,kantor,Penyelidikan,True
+INC-01016,CURANMOR,2024-09-07,03:40,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291962,106.775601,Pertokoan,kunci_t,motor,Penyidikan,True
+INC-01017,CURANMOR,2024-07-14,18:12,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268526,106.800011,Pertokoan,kelalaian_pengguna,motor,Penyelidikan,True
+INC-01018,CURANMOR,2025-02-14,20:58,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25869,106.858151,Parkiran,kunci_t,motor,Penyidikan,True
+INC-01019,CURAT,2023-06-24,12:43,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218837,106.830366,Pusat Aktivitas,pecah_kaca,kantor,Penyidikan,True
+INC-01020,CURAT,2025-07-13,18:05,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.292314,106.802035,Pertokoan,pecah_kaca,rumah,Selesai,True
+INC-01021,KEJAHATAN_JALANAN,2025-09-19,23:08,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.217962,106.82879,Permukiman,pencurian_ringan,pedagang,Dilaporkan,True
+INC-01022,CURAT,2025-04-18,10:05,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.245654,106.8194,Permukiman,pecah_kaca,rumah,Selesai,True
+INC-01023,KEJAHATAN_JALANAN,2025-05-22,19:41,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.283473,106.835527,Permukiman,pemalakan,pedagang,Penyidikan,True
+INC-01024,TAWURAN,2023-01-26,03:04,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267543,106.800207,Permukiman,konflik_spontan,kelompok_pelajar,Penyidikan,True
+INC-01025,TAWURAN,2024-03-25,15:27,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.253945,106.821864,Pusat Aktivitas,lainnya,pengguna_jalan,Selesai,True
+INC-01026,KEJAHATAN_JALANAN,2024-05-06,23:48,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.285277,106.796818,Parkiran,lainnya,pejalan_kaki,Selesai,True
+INC-01027,CURAT,2025-11-12,13:13,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.216327,106.828547,Fasilitas Publik,rusak_kunci,toko,Selesai,True
+INC-01028,KEJAHATAN_JALANAN,2025-01-25,19:23,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.247303,106.819891,Jalan,jambret,pengendara,Selesai,True
+INC-01029,CURANMOR,2024-08-10,02:29,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230056,106.833588,Pusat Aktivitas,kunci_t,mobil,Selesai,True
+INC-01030,CURAT,2023-03-13,03:00,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250798,106.839384,Pusat Aktivitas,lainnya,rumah,Dilaporkan,True
+INC-01031,CURANMOR,2025-06-04,19:29,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267732,106.800164,Pertokoan,kunci_t,motor,Penyelidikan,True
+INC-01032,CURANMOR,2024-03-16,21:20,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.290092,106.801697,Permukiman,kelalaian_pengguna,mobil,Selesai,True
+INC-01033,CURAS,2024-07-12,07:50,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.236182,106.793785,Pertokoan,lainnya,pengendara,Selesai,True
+INC-01034,CURANMOR,2023-01-15,23:59,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268855,106.800505,Permukiman,kunci_t,mobil,Penyidikan,True
+INC-01035,TAWURAN,2025-10-08,13:39,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.297604,106.775484,Jalan,lainnya,kelompok_pelajar,Dilaporkan,True
+INC-01036,CURAT,2025-07-18,21:42,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.219293,106.829412,Pertokoan,lainnya,rumah,Penyelidikan,True
+INC-01037,CURANMOR,2023-09-01,18:27,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.276185,106.766055,Permukiman,kelalaian_pengguna,motor,Penyidikan,True
+INC-01038,CURANMOR,2025-11-27,22:03,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.257306,106.814298,Jalan,kunci_t,mobil,Penyidikan,True
+INC-01039,CURAT,2024-02-27,15:57,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239297,106.809517,Fasilitas Publik,lainnya,toko,Selesai,True
+INC-01040,CURAS,2025-07-11,00:21,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.333209,106.796606,Parkiran,ancaman,pengendara,Dilaporkan,True
+INC-01041,CURAT,2024-10-10,04:08,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.284982,106.834562,Pertokoan,lainnya,kantor,Dilaporkan,True
+INC-01042,TAWURAN,2025-05-13,16:46,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253424,106.832074,Jalan,kelompok_pemuda,pengguna_jalan,Selesai,True
+INC-01043,CURAT,2023-06-05,18:32,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.310757,106.836898,Parkiran,rusak_kunci,rumah,Selesai,True
+INC-01044,TAWURAN,2023-07-05,15:17,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.218639,106.828534,Permukiman,konflik_spontan,kelompok_pemuda,Penyidikan,True
+INC-01045,CURANMOR,2023-10-06,00:56,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227863,106.800063,Pertokoan,kunci_t,motor,Selesai,True
+INC-01046,CURANMOR,2024-12-20,21:48,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.27976,106.808713,Permukiman,kunci_t,motor,Penyidikan,True
+INC-01047,TAWURAN,2023-08-24,22:14,Polsek Kebayoran Lama,Kebayoran Lama,Kebayoran Lama Utara,JKS-007,-6.251061,106.77045,Parkiran,lainnya,kelompok_pemuda,Selesai,True
+INC-01048,CURAS,2023-01-12,00:59,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217846,106.83829,Parkiran,ancaman,pejalan_kaki,Dilaporkan,True
+INC-01049,CURAT,2024-03-16,11:10,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.219334,106.827594,Permukiman,congkel,kantor,Penyidikan,True
+INC-01050,CURANMOR,2023-12-05,14:22,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.308178,106.820608,Permukiman,kelalaian_pengguna,mobil,Selesai,True
+INC-01051,CURAT,2025-05-09,07:34,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.290836,106.802007,Permukiman,pecah_kaca,kantor,Penyelidikan,True
+INC-01052,CURAS,2024-06-27,09:07,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230888,106.831931,Permukiman,lainnya,pengendara,Selesai,True
+INC-01053,TAWURAN,2023-07-17,23:08,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.277489,106.8489,Parkiran,konflik_spontan,pengguna_jalan,Dilaporkan,True
+INC-01054,CURAT,2023-09-19,08:05,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23433,106.845824,Jalan,lainnya,rumah,Penyelidikan,True
+INC-01055,KEJAHATAN_JALANAN,2024-12-05,06:30,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274551,106.83367,Pusat Aktivitas,jambret,pedagang,Selesai,True
+INC-01056,CURAT,2023-02-06,23:27,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250556,106.837722,Parkiran,lainnya,kantor,Penyelidikan,True
+INC-01057,CURAS,2024-05-26,17:55,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.235044,106.793444,Jalan,ancaman,pengendara,Penyelidikan,True
+INC-01058,KEJAHATAN_JALANAN,2023-04-15,21:42,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.24589,106.820202,Permukiman,lainnya,pengendara,Penyelidikan,True
+INC-01059,KEJAHATAN_JALANAN,2025-02-28,23:04,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.231939,106.831485,Parkiran,jambret,pedagang,Penyidikan,True
+INC-01060,CURANMOR,2024-11-22,08:25,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.253371,106.831974,Pertokoan,duplikasi_kunci,mobil,Selesai,True
+INC-01061,CURAS,2023-04-28,22:26,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267389,106.800207,Parkiran,lainnya,toko,Penyidikan,True
+INC-01062,CURANMOR,2023-10-27,17:58,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.287128,106.796535,Pusat Aktivitas,lainnya,mobil,Penyelidikan,True
+INC-01063,CURANMOR,2025-02-14,07:53,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.217227,106.828315,Pusat Aktivitas,lainnya,mobil,Dilaporkan,True
+INC-01064,CURANMOR,2025-05-27,15:00,Polsek Kebayoran Lama,Kebayoran Lama,Pondok Pinang,JKS-006,-6.27621,106.766886,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-01065,CURANMOR,2025-08-02,10:40,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.240063,106.83425,Jalan,lainnya,mobil,Selesai,True
+INC-01066,CURAT,2024-09-09,23:33,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217379,106.838103,Permukiman,congkel,kantor,Penyelidikan,True
+INC-01067,TAWURAN,2025-05-06,19:51,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.28579,106.834287,Jalan,lainnya,kelompok_pelajar,Penyelidikan,True
+INC-01068,CURAT,2023-11-08,11:59,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257173,106.8573,Jalan,rusak_kunci,toko,Penyidikan,True
+INC-01069,CURAS,2025-08-27,21:25,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.285315,106.796132,Parkiran,ancaman,pengendara,Dilaporkan,True
+INC-01070,KEJAHATAN_JALANAN,2025-08-06,07:59,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.255564,106.816144,Parkiran,pemalakan,pengendara,Penyidikan,True
+INC-01071,CURAS,2023-08-28,05:29,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.308938,106.818546,Pertokoan,lainnya,pejalan_kaki,Penyidikan,True
+INC-01072,KEJAHATAN_JALANAN,2023-02-15,23:10,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.248317,106.837616,Permukiman,jambret,pedagang,Selesai,True
+INC-01073,CURAT,2025-07-06,04:39,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310189,106.819787,Parkiran,rusak_kunci,toko,Penyelidikan,True
+INC-01074,CURANMOR,2024-02-10,01:09,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.227947,106.834238,Jalan,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-01075,CURAT,2025-04-14,02:34,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.238377,106.83601,Permukiman,pecah_kaca,kantor,Selesai,True
+INC-01076,CURAS,2025-08-25,02:50,Polsek Tebet,Tebet,Menteng Dalam,JKS-022,-6.238927,106.837312,Jalan,perampasan_jalanan,pejalan_kaki,Selesai,True
+INC-01077,CURANMOR,2024-02-03,18:13,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.278901,106.810324,Parkiran,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-01078,CURAT,2023-12-26,18:04,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.216886,106.83925,Pusat Aktivitas,rusak_kunci,kantor,Penyidikan,True
+INC-01079,CURANMOR,2024-01-24,09:04,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.310865,106.820494,Pertokoan,lainnya,mobil,Selesai,True
+INC-01080,CURANMOR,2023-07-23,01:56,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.250682,106.838298,Permukiman,lainnya,mobil,Penyidikan,True
+INC-01081,KEJAHATAN_JALANAN,2025-09-20,16:43,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.285432,106.796883,Jalan,pemalakan,pejalan_kaki,Penyidikan,True
+INC-01082,CURAS,2023-10-21,20:18,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.251494,106.839815,Pertokoan,senjata_tajam,pejalan_kaki,Dilaporkan,True
+INC-01083,TAWURAN,2024-10-31,15:40,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285461,106.834085,Permukiman,kelompok_pelajar,kelompok_pemuda,Selesai,True
+INC-01084,CURAS,2023-09-17,17:39,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.276318,106.847468,Pertokoan,ancaman,toko,Penyelidikan,True
+INC-01085,CURAT,2024-06-05,13:14,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.234168,106.848901,Parkiran,lainnya,rumah,Penyelidikan,True
+INC-01086,TAWURAN,2024-01-05,16:50,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275165,106.846993,Parkiran,kelompok_pelajar,pengguna_jalan,Dilaporkan,True
+INC-01087,CURANMOR,2025-01-21,19:45,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.226865,106.799949,Pusat Aktivitas,duplikasi_kunci,motor,Selesai,True
+INC-01088,KEJAHATAN_JALANAN,2024-02-23,12:27,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.346606,106.824241,Jalan,pencurian_ringan,pejalan_kaki,Penyelidikan,True
+INC-01089,CURAT,2025-08-27,01:17,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228248,106.832245,Pusat Aktivitas,pecah_kaca,toko,Penyelidikan,True
+INC-01090,CURANMOR,2023-10-15,19:09,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257377,106.854776,Parkiran,kunci_t,mobil,Selesai,True
+INC-01091,KEJAHATAN_JALANAN,2025-01-31,16:57,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.245996,106.819041,Permukiman,lainnya,pejalan_kaki,Penyelidikan,True
+INC-01092,CURANMOR,2023-07-03,22:04,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.228108,106.800644,Permukiman,kelalaian_pengguna,mobil,Selesai,True
+INC-01093,CURANMOR,2024-11-07,18:27,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25653,106.859662,Parkiran,kelalaian_pengguna,motor,Dilaporkan,True
+INC-01094,CURAS,2024-08-01,01:57,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344727,106.824104,Parkiran,senjata_tajam,pejalan_kaki,Selesai,True
+INC-01095,CURANMOR,2024-05-14,00:22,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335041,106.820087,Permukiman,duplikasi_kunci,mobil,Dilaporkan,True
+INC-01096,CURANMOR,2025-12-16,17:00,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.207982,106.850778,Fasilitas Publik,duplikasi_kunci,mobil,Penyelidikan,True
+INC-01097,CURANMOR,2024-07-17,23:38,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.268688,106.797953,Jalan,duplikasi_kunci,motor,Dilaporkan,True
+INC-01098,CURAT,2024-11-06,01:23,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.279352,106.810445,Parkiran,congkel,toko,Dilaporkan,True
+INC-01099,CURANMOR,2024-06-10,11:37,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.236661,106.791206,Parkiran,lainnya,motor,Selesai,True
+INC-01100,CURANMOR,2025-01-07,14:08,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.254984,106.831846,Jalan,kelalaian_pengguna,motor,Penyidikan,True
+INC-01101,CURAT,2025-11-25,18:27,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254107,106.824274,Pertokoan,lainnya,rumah,Penyidikan,True
+INC-01102,CURAT,2024-10-16,19:45,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292344,106.774925,Fasilitas Publik,rusak_kunci,toko,Penyelidikan,True
+INC-01103,CURAS,2025-11-20,21:02,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.270316,106.801943,Pusat Aktivitas,perampasan_jalanan,pejalan_kaki,Penyelidikan,True
+INC-01104,KEJAHATAN_JALANAN,2023-10-27,18:31,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.33315,106.79552,Permukiman,pencurian_ringan,pejalan_kaki,Selesai,True
+INC-01105,TAWURAN,2023-09-02,14:05,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273761,106.832697,Pertokoan,kelompok_pemuda,kelompok_pemuda,Selesai,True
+INC-01106,CURANMOR,2023-07-10,22:55,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291533,106.773306,Jalan,lainnya,motor,Penyelidikan,True
+INC-01107,CURAS,2024-02-25,03:50,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.239924,106.808669,Parkiran,senjata_tajam,toko,Selesai,True
+INC-01108,CURANMOR,2023-07-26,00:03,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.258401,106.814973,Parkiran,lainnya,motor,Selesai,True
+INC-01109,CURANMOR,2023-06-17,06:50,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25804,106.855964,Pusat Aktivitas,lainnya,motor,Selesai,True
+INC-01110,CURAT,2025-10-30,10:53,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23595,106.846339,Parkiran,pecah_kaca,rumah,Selesai,True
+INC-01111,CURAT,2023-09-03,18:46,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.292004,106.774084,Pertokoan,rusak_kunci,toko,Selesai,True
+INC-01112,CURANMOR,2023-10-31,05:46,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230584,106.856132,Permukiman,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-01113,TAWURAN,2023-10-13,00:05,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345848,106.824864,Jalan,lainnya,kelompok_pemuda,Dilaporkan,True
+INC-01114,CURANMOR,2024-11-04,09:48,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.227757,106.832095,Parkiran,kelalaian_pengguna,motor,Dilaporkan,True
+INC-01115,CURANMOR,2023-11-02,20:54,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.247946,106.838225,Fasilitas Publik,kunci_t,motor,Penyidikan,True
+INC-01116,CURAS,2024-08-25,19:02,Polsek Kebayoran Baru,Kebayoran Baru,Cipete Utara,JKS-004,-6.267049,106.79941,Permukiman,senjata_tajam,pengendara,Selesai,True
+INC-01117,CURAT,2025-12-26,18:27,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23432,106.846222,Permukiman,congkel,kantor,Penyelidikan,True
+INC-01118,KEJAHATAN_JALANAN,2023-11-01,19:38,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.344593,106.823846,Jalan,lainnya,pedagang,Selesai,True
+INC-01119,CURANMOR,2024-08-03,18:58,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.227988,106.832453,Pusat Aktivitas,kelalaian_pengguna,motor,Penyelidikan,True
+INC-01120,CURANMOR,2023-02-08,18:47,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.246335,106.792539,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-01121,TAWURAN,2024-06-02,08:19,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.278665,106.811982,Parkiran,kelompok_pemuda,pengguna_jalan,Penyidikan,True
+INC-01122,CURAT,2023-02-19,21:52,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.20833,106.847735,Pertokoan,pecah_kaca,rumah,Dilaporkan,True
+INC-01123,CURANMOR,2025-05-30,11:13,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275734,106.847341,Jalan,lainnya,mobil,Dilaporkan,True
+INC-01124,CURAS,2025-09-14,01:30,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.237371,106.79283,Jalan,ancaman,pengendara,Selesai,True
+INC-01125,CURAT,2023-11-04,16:39,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.289302,106.80421,Parkiran,congkel,rumah,Selesai,True
+INC-01126,CURAS,2025-11-23,21:13,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.240901,106.809617,Permukiman,lainnya,pengendara,Dilaporkan,True
+INC-01127,CURANMOR,2025-02-16,22:19,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.276229,106.832979,Parkiran,kunci_t,motor,Penyidikan,True
+INC-01128,CURAT,2024-11-07,14:50,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.226624,106.799503,Fasilitas Publik,lainnya,toko,Dilaporkan,True
+INC-01129,CURAT,2023-08-22,21:02,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.256019,106.812904,Parkiran,lainnya,rumah,Penyelidikan,True
+INC-01130,CURANMOR,2025-11-15,01:36,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25603,106.855845,Permukiman,duplikasi_kunci,motor,Penyidikan,True
+INC-01131,CURANMOR,2023-03-23,21:17,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.277604,106.84771,Permukiman,duplikasi_kunci,motor,Selesai,True
+INC-01132,CURAS,2025-07-03,23:21,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.294087,106.774391,Pertokoan,perampasan_jalanan,pejalan_kaki,Penyidikan,True
+INC-01133,CURAT,2023-10-22,05:26,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217634,106.840378,Jalan,rusak_kunci,rumah,Penyidikan,True
+INC-01134,CURANMOR,2025-09-06,01:13,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.255219,106.821953,Parkiran,kelalaian_pengguna,motor,Penyelidikan,True
+INC-01135,CURAS,2023-09-16,23:51,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.279601,106.811279,Permukiman,ancaman,toko,Dilaporkan,True
+INC-01136,CURANMOR,2024-12-27,19:14,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.314201,106.835032,Pusat Aktivitas,lainnya,motor,Dilaporkan,True
+INC-01137,KEJAHATAN_JALANAN,2025-11-23,18:02,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230232,106.856076,Jalan,jambret,pengendara,Dilaporkan,True
+INC-01138,CURANMOR,2023-02-01,15:13,Polsek Pancoran,Pancoran,Duren Tiga,JKS-018,-6.254205,106.829928,Parkiran,duplikasi_kunci,motor,Selesai,True
+INC-01139,CURAT,2025-06-02,08:27,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293123,106.774045,Jalan,pecah_kaca,toko,Penyelidikan,True
+INC-01140,CURANMOR,2023-04-26,15:12,Polsek Jagakarsa,Jagakarsa,Srengseng Sawah,JKS-033,-6.345559,106.822332,Fasilitas Publik,lainnya,mobil,Penyidikan,True
+INC-01141,CURAS,2024-04-09,18:10,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.27382,106.833128,Pertokoan,perampasan_jalanan,pengendara,Penyidikan,True
+INC-01142,CURAS,2025-03-07,23:20,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.20872,106.851746,Permukiman,ancaman,toko,Penyelidikan,True
+INC-01143,KEJAHATAN_JALANAN,2023-10-05,22:59,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.291743,106.774047,Parkiran,pemalakan,pengendara,Selesai,True
+INC-01144,CURAT,2025-09-27,22:01,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.230231,106.855719,Parkiran,rusak_kunci,kantor,Penyelidikan,True
+INC-01145,CURAS,2023-10-12,20:44,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228308,106.83304,Pertokoan,senjata_tajam,pengendara,Penyelidikan,True
+INC-01146,TAWURAN,2024-03-02,18:43,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257749,106.857415,Parkiran,kelompok_pemuda,kelompok_pemuda,Penyidikan,True
+INC-01147,CURAS,2023-01-24,02:09,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230083,106.832062,Parkiran,ancaman,pejalan_kaki,Selesai,True
+INC-01148,CURAT,2024-01-04,08:44,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.245098,106.819736,Permukiman,congkel,toko,Penyelidikan,True
+INC-01149,CURANMOR,2025-05-01,14:18,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.228759,106.830933,Jalan,kelalaian_pengguna,motor,Selesai,True
+INC-01150,CURAT,2025-09-17,06:59,Polsek Kebayoran Baru,Kebayoran Baru,Kramat Pela,JKS-003,-6.247619,106.7935,Permukiman,rusak_kunci,toko,Selesai,True
+INC-01151,CURANMOR,2025-07-19,22:30,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229914,106.782054,Parkiran,duplikasi_kunci,motor,Selesai,True
+INC-01152,KEJAHATAN_JALANAN,2025-03-31,09:51,Polsek Cilandak,Cilandak,Cilandak Barat,JKS-012,-6.291965,106.803067,Jalan,pemalakan,pedagang,Penyelidikan,True
+INC-01153,CURAT,2025-08-06,10:58,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.230577,106.83444,Pertokoan,congkel,kantor,Dilaporkan,True
+INC-01154,CURAT,2025-03-08,09:36,Polsek Jagakarsa,Jagakarsa,Jagakarsa,JKS-030,-6.335649,106.820409,Jalan,pecah_kaca,toko,Dilaporkan,True
+INC-01155,CURAS,2025-05-31,21:24,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286107,106.798932,Parkiran,lainnya,pengendara,Penyelidikan,True
+INC-01156,CURANMOR,2025-01-28,00:11,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.207753,106.850904,Pusat Aktivitas,kunci_t,mobil,Selesai,True
+INC-01157,CURAS,2023-07-10,01:38,Polsek Cilandak,Cilandak,Cipete Selatan,JKS-009,-6.276602,106.811355,Parkiran,ancaman,pengendara,Penyelidikan,True
+INC-01158,KEJAHATAN_JALANAN,2023-03-20,15:28,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.258741,106.812891,Pusat Aktivitas,jambret,pedagang,Selesai,True
+INC-01159,CURANMOR,2024-01-15,22:50,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.256611,106.856602,Fasilitas Publik,lainnya,mobil,Penyelidikan,True
+INC-01160,CURANMOR,2023-09-03,18:24,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.229243,106.854081,Parkiran,kelalaian_pengguna,motor,Dilaporkan,True
+INC-01161,CURAS,2023-06-21,19:56,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293653,106.773004,Pusat Aktivitas,lainnya,pejalan_kaki,Dilaporkan,True
+INC-01162,CURAT,2025-11-18,10:26,Polsek Jagakarsa,Jagakarsa,Ciganjur,JKS-031,-6.334175,106.794987,Parkiran,pecah_kaca,toko,Selesai,True
+INC-01163,CURAT,2024-05-22,00:33,Polsek Kebayoran Baru,Kebayoran Baru,Gunung,JKS-002,-6.234134,106.794732,Parkiran,congkel,rumah,Selesai,True
+INC-01164,CURAT,2025-09-20,11:25,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.254028,106.823944,Jalan,lainnya,toko,Selesai,True
+INC-01165,TAWURAN,2025-10-09,08:10,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.25812,106.856808,Parkiran,kelompok_pelajar,kelompok_pemuda,Penyidikan,True
+INC-01166,CURANMOR,2023-09-17,22:12,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.219214,106.837583,Parkiran,kunci_t,mobil,Selesai,True
+INC-01167,CURANMOR,2024-06-16,07:31,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.225153,106.799487,Permukiman,kunci_t,motor,Selesai,True
+INC-01168,KEJAHATAN_JALANAN,2023-06-24,20:53,Polsek Pancoran,Pancoran,Pancoran,JKS-017,-6.249691,106.839265,Permukiman,jambret,pedagang,Penyelidikan,True
+INC-01169,CURANMOR,2024-05-22,01:45,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.22732,106.800388,Jalan,kunci_t,mobil,Penyelidikan,True
+INC-01170,CURANMOR,2025-11-12,20:27,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257634,106.856332,Pertokoan,lainnya,mobil,Selesai,True
+INC-01171,CURAT,2025-05-25,03:13,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229295,106.834878,Permukiman,lainnya,kantor,Dilaporkan,True
+INC-01172,CURANMOR,2025-02-08,04:29,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.273895,106.831531,Pusat Aktivitas,duplikasi_kunci,motor,Penyidikan,True
+INC-01173,CURAS,2023-10-12,23:22,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209583,106.84924,Permukiman,lainnya,pejalan_kaki,Penyelidikan,True
+INC-01174,CURANMOR,2023-04-10,19:47,Polsek Pasar Minggu,Pasar Minggu,Pejaten Timur,JKS-014,-6.275313,106.849627,Parkiran,duplikasi_kunci,mobil,Selesai,True
+INC-01175,CURANMOR,2024-06-17,21:41,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.309289,106.82046,Permukiman,duplikasi_kunci,mobil,Penyelidikan,True
+INC-01176,CURANMOR,2025-09-26,22:14,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.23765,106.847511,Permukiman,kelalaian_pengguna,motor,Selesai,True
+INC-01177,KEJAHATAN_JALANAN,2024-09-24,22:31,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.286514,106.798609,Permukiman,pencurian_ringan,pengendara,Penyelidikan,True
+INC-01178,CURANMOR,2023-09-14,23:31,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.21798,106.829094,Pertokoan,kunci_t,mobil,Selesai,True
+INC-01179,CURAT,2023-05-28,07:43,Polsek Pasar Minggu,Pasar Minggu,Jati Padang,JKS-016,-6.285388,106.836603,Permukiman,congkel,toko,Selesai,True
+INC-01180,TAWURAN,2024-05-21,22:00,Polsek Jagakarsa,Jagakarsa,Lenteng Agung,JKS-032,-6.314478,106.837466,Pertokoan,konflik_spontan,pengguna_jalan,Dilaporkan,True
+INC-01181,TAWURAN,2025-04-02,14:03,Polsek Kebayoran Lama,Kebayoran Lama,Grogol Utara,JKS-008,-6.229625,106.780774,Jalan,lainnya,pengguna_jalan,Selesai,True
+INC-01182,CURANMOR,2025-02-19,23:18,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.275144,106.834817,Parkiran,duplikasi_kunci,mobil,Selesai,True
+INC-01183,CURAS,2024-10-22,19:17,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.217595,106.83943,Parkiran,ancaman,pengendara,Selesai,True
+INC-01184,CURAS,2025-09-16,10:46,Polsek Pasar Minggu,Pasar Minggu,Ragunan,JKS-015,-6.311905,106.819751,Pertokoan,ancaman,toko,Penyidikan,True
+INC-01185,CURANMOR,2024-04-19,14:30,Polsek Mampang Prapatan,Mampang Prapatan,Tegal Parang,JKS-026,-6.256008,106.822282,Parkiran,duplikasi_kunci,mobil,Penyelidikan,True
+INC-01186,CURANMOR,2024-11-29,20:17,Polsek Pancoran,Pancoran,Kalibata,JKS-019,-6.257545,106.8571,Jalan,kunci_t,mobil,Penyelidikan,True
+INC-01187,KEJAHATAN_JALANAN,2024-04-04,10:03,Polsek Setiabudi,Setiabudi,Kuningan Timur,JKS-028,-6.229848,106.833206,Permukiman,lainnya,pejalan_kaki,Penyidikan,True
+INC-01188,CURANMOR,2024-07-14,13:03,Polsek Cilandak,Cilandak,Lebak Bulus,JKS-011,-6.293285,106.775414,Parkiran,kunci_t,motor,Selesai,True
+INC-01189,CURAS,2024-04-01,01:26,Polsek Kebayoran Baru,Kebayoran Baru,Pulo,JKS-005,-6.240288,106.807953,Permukiman,senjata_tajam,toko,Dilaporkan,True
+INC-01190,CURANMOR,2023-01-07,20:14,Polsek Kebayoran Baru,Kebayoran Baru,Senayan,JKS-001,-6.227458,106.800888,Pusat Aktivitas,kunci_t,mobil,Selesai,True
+INC-01191,CURAS,2025-07-23,01:39,Polsek Mampang Prapatan,Mampang Prapatan,Mampang Prapatan,JKS-024,-6.247148,106.820892,Pusat Aktivitas,ancaman,toko,Selesai,True
+INC-01192,CURANMOR,2023-02-17,01:42,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.22854,106.853785,Pertokoan,kunci_t,motor,Penyelidikan,True
+INC-01193,CURANMOR,2023-05-14,18:10,Polsek Mampang Prapatan,Mampang Prapatan,Bangka,JKS-025,-6.258277,106.815011,Fasilitas Publik,lainnya,motor,Selesai,True
+INC-01194,CURANMOR,2023-06-04,21:29,Polsek Cilandak,Cilandak,Gandaria Selatan,JKS-010,-6.287691,106.79733,Permukiman,kunci_t,motor,Selesai,True
+INC-01195,CURANMOR,2025-07-27,20:16,Polsek Tebet,Tebet,Tebet Barat,JKS-020,-6.235598,106.846084,Parkiran,kelalaian_pengguna,mobil,Selesai,True
+INC-01196,CURAT,2024-04-01,00:35,Polsek Pasar Minggu,Pasar Minggu,Pejaten Barat,JKS-013,-6.274789,106.83177,Fasilitas Publik,congkel,kantor,Penyidikan,True
+INC-01197,CURANMOR,2023-02-20,14:55,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.209484,106.850995,Permukiman,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-01198,CURAT,2025-02-15,23:49,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.215711,106.838214,Jalan,congkel,kantor,Penyidikan,True
+INC-01199,CURANMOR,2025-08-03,00:32,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.215603,106.830415,Permukiman,kunci_t,mobil,Penyelidikan,True
+INC-01200,TAWURAN,2023-08-22,06:24,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.22914,106.854656,Jalan,lainnya,kelompok_pelajar,Dilaporkan,True

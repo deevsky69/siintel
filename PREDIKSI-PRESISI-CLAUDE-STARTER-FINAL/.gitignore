@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.*
+!.env.example
+data/raw/*
+data/import/*
+data/processed/*
+!data/**/.gitkeep
+*.sqlite
+*.db
+__pycache__/
+.venv/
+dist/
+build/
+coverage/
+.DS_Store

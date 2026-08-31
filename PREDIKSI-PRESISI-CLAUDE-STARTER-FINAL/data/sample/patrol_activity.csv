@@ -1,0 +1,181 @@
+patrol_id,unit_id,patrol_date,start_time,end_time,grid_id,kecamatan,activity_type,result
+PAT-0001,UNIT-001,2025-05-29,20:00,22:00,JKS-031,Jagakarsa,Pengaturan,Normal
+PAT-0002,UNIT-004,2025-01-13,20:00,22:00,JKS-011,Cilandak,Patroli Preventif,Temuan Kerawanan
+PAT-0003,UNIT-006,2025-07-23,18:00,20:00,JKS-030,Jagakarsa,Dialogis,Tidak Ada Kejadian
+PAT-0004,UNIT-006,2025-01-01,06:00,08:00,JKS-019,Pancoran,Monitoring,Tindak Lanjut
+PAT-0005,UNIT-001,2025-11-08,06:00,08:00,JKS-010,Cilandak,Pengaturan,Tidak Ada Kejadian
+PAT-0006,UNIT-003,2025-04-05,18:00,20:00,JKS-028,Setiabudi,Monitoring,Tidak Ada Kejadian
+PAT-0007,UNIT-002,2025-09-30,14:00,16:00,JKS-013,Pasar Minggu,Pengaturan,Tindak Lanjut
+PAT-0008,UNIT-006,2025-01-02,18:00,20:00,JKS-026,Mampang Prapatan,Pengaturan,Tidak Ada Kejadian
+PAT-0009,UNIT-001,2025-08-08,20:00,22:00,JKS-010,Cilandak,Dialogis,Normal
+PAT-0010,UNIT-001,2025-12-07,18:00,20:00,JKS-018,Pancoran,Dialogis,Tidak Ada Kejadian
+PAT-0011,UNIT-004,2025-07-18,20:00,22:00,JKS-011,Cilandak,Pengaturan,Tidak Ada Kejadian
+PAT-0012,UNIT-005,2025-05-26,20:00,22:00,JKS-013,Pasar Minggu,Patroli Preventif,Normal
+PAT-0013,UNIT-002,2025-01-16,06:00,08:00,JKS-019,Pancoran,Dialogis,Normal
+PAT-0014,UNIT-004,2025-09-20,18:00,20:00,JKS-019,Pancoran,Dialogis,Tindak Lanjut
+PAT-0015,UNIT-006,2025-08-31,18:00,20:00,JKS-033,Jagakarsa,Monitoring,Temuan Kerawanan
+PAT-0016,UNIT-002,2025-05-19,20:00,22:00,JKS-032,Jagakarsa,Patroli Preventif,Tindak Lanjut
+PAT-0017,UNIT-006,2025-05-13,18:00,20:00,JKS-002,Kebayoran Baru,Monitoring,Temuan Kerawanan
+PAT-0018,UNIT-006,2025-10-13,10:00,12:00,JKS-016,Pasar Minggu,Patroli Preventif,Normal
+PAT-0019,UNIT-005,2025-06-28,10:00,12:00,JKS-020,Tebet,Pengaturan,Temuan Kerawanan
+PAT-0020,UNIT-004,2025-04-04,06:00,08:00,JKS-030,Jagakarsa,Monitoring,Normal
+PAT-0021,UNIT-004,2025-08-16,14:00,16:00,JKS-018,Pancoran,Patroli Preventif,Temuan Kerawanan
+PAT-0022,UNIT-005,2025-06-28,06:00,08:00,JKS-011,Cilandak,Pengaturan,Temuan Kerawanan
+PAT-0023,UNIT-004,2025-05-14,06:00,08:00,JKS-031,Jagakarsa,Monitoring,Tidak Ada Kejadian
+PAT-0024,UNIT-003,2025-02-19,14:00,16:00,JKS-021,Tebet,Pengaturan,Tidak Ada Kejadian
+PAT-0025,UNIT-001,2025-12-21,10:00,12:00,JKS-008,Kebayoran Lama,Pengaturan,Temuan Kerawanan
+PAT-0026,UNIT-005,2025-11-04,10:00,12:00,JKS-033,Jagakarsa,Dialogis,Temuan Kerawanan
+PAT-0027,UNIT-006,2025-08-01,10:00,12:00,JKS-031,Jagakarsa,Pengaturan,Normal
+PAT-0028,UNIT-005,2025-04-07,06:00,08:00,JKS-008,Kebayoran Lama,Monitoring,Normal
+PAT-0029,UNIT-006,2025-06-21,10:00,12:00,JKS-002,Kebayoran Baru,Monitoring,Tidak Ada Kejadian
+PAT-0030,UNIT-001,2025-09-08,18:00,20:00,JKS-011,Cilandak,Pengaturan,Tindak Lanjut
+PAT-0031,UNIT-001,2025-07-31,18:00,20:00,JKS-025,Mampang Prapatan,Pengaturan,Temuan Kerawanan
+PAT-0032,UNIT-001,2025-10-20,10:00,12:00,JKS-013,Pasar Minggu,Dialogis,Tindak Lanjut
+PAT-0033,UNIT-003,2025-08-04,18:00,20:00,JKS-014,Pasar Minggu,Dialogis,Tidak Ada Kejadian
+PAT-0034,UNIT-004,2025-08-16,20:00,22:00,JKS-020,Tebet,Dialogis,Normal
+PAT-0035,UNIT-001,2025-03-06,20:00,22:00,JKS-013,Pasar Minggu,Dialogis,Tindak Lanjut
+PAT-0036,UNIT-003,2025-05-17,10:00,12:00,JKS-005,Kebayoran Baru,Dialogis,Tidak Ada Kejadian
+PAT-0037,UNIT-002,2025-04-20,18:00,20:00,JKS-017,Pancoran,Pengaturan,Temuan Kerawanan
+PAT-0038,UNIT-006,2025-03-30,10:00,12:00,JKS-013,Pasar Minggu,Monitoring,Tidak Ada Kejadian
+PAT-0039,UNIT-002,2025-08-16,20:00,22:00,JKS-018,Pancoran,Monitoring,Temuan Kerawanan
+PAT-0040,UNIT-001,2025-03-25,20:00,22:00,JKS-025,Mampang Prapatan,Dialogis,Normal
+PAT-0041,UNIT-006,2025-02-16,06:00,08:00,JKS-025,Mampang Prapatan,Pengaturan,Tidak Ada Kejadian
+PAT-0042,UNIT-004,2025-08-29,14:00,16:00,JKS-022,Tebet,Dialogis,Normal
+PAT-0043,UNIT-006,2025-02-26,20:00,22:00,JKS-029,Setiabudi,Patroli Preventif,Tindak Lanjut
+PAT-0044,UNIT-001,2025-07-28,20:00,22:00,JKS-010,Cilandak,Dialogis,Temuan Kerawanan
+PAT-0045,UNIT-001,2025-08-30,10:00,12:00,JKS-005,Kebayoran Baru,Dialogis,Tidak Ada Kejadian
+PAT-0046,UNIT-001,2025-08-19,20:00,22:00,JKS-011,Cilandak,Monitoring,Tindak Lanjut
+PAT-0047,UNIT-002,2025-12-16,18:00,20:00,JKS-001,Kebayoran Baru,Dialogis,Tidak Ada Kejadian
+PAT-0048,UNIT-005,2025-11-07,10:00,12:00,JKS-030,Jagakarsa,Monitoring,Normal
+PAT-0049,UNIT-002,2025-08-06,20:00,22:00,JKS-019,Pancoran,Dialogis,Temuan Kerawanan
+PAT-0050,UNIT-003,2025-07-14,20:00,22:00,JKS-004,Kebayoran Baru,Monitoring,Tidak Ada Kejadian
+PAT-0051,UNIT-001,2025-12-27,10:00,12:00,JKS-003,Kebayoran Baru,Dialogis,Temuan Kerawanan
+PAT-0052,UNIT-002,2025-11-26,06:00,08:00,JKS-014,Pasar Minggu,Dialogis,Tindak Lanjut
+PAT-0053,UNIT-001,2025-11-21,10:00,12:00,JKS-008,Kebayoran Lama,Pengaturan,Normal
+PAT-0054,UNIT-003,2025-10-25,20:00,22:00,JKS-028,Setiabudi,Patroli Preventif,Temuan Kerawanan
+PAT-0055,UNIT-002,2025-04-21,06:00,08:00,JKS-023,Tebet,Monitoring,Tidak Ada Kejadian
+PAT-0056,UNIT-002,2025-03-12,20:00,22:00,JKS-015,Pasar Minggu,Pengaturan,Normal
+PAT-0057,UNIT-003,2025-08-10,06:00,08:00,JKS-019,Pancoran,Monitoring,Tidak Ada Kejadian
+PAT-0058,UNIT-002,2025-08-02,10:00,12:00,JKS-017,Pancoran,Patroli Preventif,Temuan Kerawanan
+PAT-0059,UNIT-002,2025-12-07,20:00,22:00,JKS-013,Pasar Minggu,Dialogis,Tindak Lanjut
+PAT-0060,UNIT-003,2025-06-18,14:00,16:00,JKS-032,Jagakarsa,Pengaturan,Temuan Kerawanan
+PAT-0061,UNIT-003,2025-07-03,20:00,22:00,JKS-021,Tebet,Pengaturan,Temuan Kerawanan
+PAT-0062,UNIT-004,2025-12-17,18:00,20:00,JKS-013,Pasar Minggu,Patroli Preventif,Tindak Lanjut
+PAT-0063,UNIT-003,2025-10-31,14:00,16:00,JKS-022,Tebet,Pengaturan,Normal
+PAT-0064,UNIT-005,2025-10-22,10:00,12:00,JKS-025,Mampang Prapatan,Patroli Preventif,Temuan Kerawanan
+PAT-0065,UNIT-006,2025-08-02,06:00,08:00,JKS-019,Pancoran,Dialogis,Tindak Lanjut
+PAT-0066,UNIT-003,2025-06-07,10:00,12:00,JKS-024,Mampang Prapatan,Monitoring,Tindak Lanjut
+PAT-0067,UNIT-006,2025-12-11,10:00,12:00,JKS-023,Tebet,Pengaturan,Normal
+PAT-0068,UNIT-003,2025-03-30,20:00,22:00,JKS-015,Pasar Minggu,Patroli Preventif,Normal
+PAT-0069,UNIT-006,2025-03-24,06:00,08:00,JKS-001,Kebayoran Baru,Monitoring,Tidak Ada Kejadian
+PAT-0070,UNIT-003,2025-11-12,18:00,20:00,JKS-023,Tebet,Pengaturan,Normal
+PAT-0071,UNIT-005,2025-12-26,20:00,22:00,JKS-006,Kebayoran Lama,Patroli Preventif,Temuan Kerawanan
+PAT-0072,UNIT-005,2025-07-31,10:00,12:00,JKS-017,Pancoran,Patroli Preventif,Temuan Kerawanan
+PAT-0073,UNIT-001,2025-06-22,18:00,20:00,JKS-017,Pancoran,Pengaturan,Normal
+PAT-0074,UNIT-001,2025-02-09,14:00,16:00,JKS-031,Jagakarsa,Dialogis,Tidak Ada Kejadian
+PAT-0075,UNIT-003,2025-03-30,10:00,12:00,JKS-028,Setiabudi,Patroli Preventif,Tidak Ada Kejadian
+PAT-0076,UNIT-005,2025-02-16,06:00,08:00,JKS-011,Cilandak,Patroli Preventif,Tindak Lanjut
+PAT-0077,UNIT-002,2025-05-17,14:00,16:00,JKS-011,Cilandak,Monitoring,Temuan Kerawanan
+PAT-0078,UNIT-004,2025-03-14,14:00,16:00,JKS-031,Jagakarsa,Patroli Preventif,Temuan Kerawanan
+PAT-0079,UNIT-006,2025-11-07,06:00,08:00,JKS-016,Pasar Minggu,Dialogis,Tidak Ada Kejadian
+PAT-0080,UNIT-006,2025-04-13,18:00,20:00,JKS-016,Pasar Minggu,Pengaturan,Tindak Lanjut
+PAT-0081,UNIT-005,2025-01-17,14:00,16:00,JKS-030,Jagakarsa,Monitoring,Temuan Kerawanan
+PAT-0082,UNIT-003,2025-04-04,18:00,20:00,JKS-009,Cilandak,Monitoring,Tidak Ada Kejadian
+PAT-0083,UNIT-002,2025-05-26,06:00,08:00,JKS-031,Jagakarsa,Pengaturan,Normal
+PAT-0084,UNIT-003,2025-04-13,18:00,20:00,JKS-022,Tebet,Dialogis,Tindak Lanjut
+PAT-0085,UNIT-003,2025-11-07,10:00,12:00,JKS-009,Cilandak,Dialogis,Temuan Kerawanan
+PAT-0086,UNIT-004,2025-12-05,10:00,12:00,JKS-004,Kebayoran Baru,Monitoring,Tindak Lanjut
+PAT-0087,UNIT-002,2025-07-18,14:00,16:00,JKS-005,Kebayoran Baru,Dialogis,Normal
+PAT-0088,UNIT-006,2025-03-29,14:00,16:00,JKS-024,Mampang Prapatan,Pengaturan,Normal
+PAT-0089,UNIT-006,2025-03-21,14:00,16:00,JKS-030,Jagakarsa,Monitoring,Tindak Lanjut
+PAT-0090,UNIT-003,2025-05-01,06:00,08:00,JKS-027,Setiabudi,Monitoring,Temuan Kerawanan
+PAT-0091,UNIT-001,2025-02-27,14:00,16:00,JKS-027,Setiabudi,Pengaturan,Normal
+PAT-0092,UNIT-006,2025-10-24,14:00,16:00,JKS-016,Pasar Minggu,Dialogis,Tindak Lanjut
+PAT-0093,UNIT-001,2025-09-12,18:00,20:00,JKS-010,Cilandak,Dialogis,Normal
+PAT-0094,UNIT-002,2025-10-13,06:00,08:00,JKS-001,Kebayoran Baru,Pengaturan,Tidak Ada Kejadian
+PAT-0095,UNIT-001,2025-11-15,10:00,12:00,JKS-029,Setiabudi,Pengaturan,Temuan Kerawanan
+PAT-0096,UNIT-001,2025-08-17,06:00,08:00,JKS-007,Kebayoran Lama,Patroli Preventif,Temuan Kerawanan
+PAT-0097,UNIT-006,2025-06-26,14:00,16:00,JKS-018,Pancoran,Patroli Preventif,Temuan Kerawanan
+PAT-0098,UNIT-005,2025-05-17,20:00,22:00,JKS-033,Jagakarsa,Monitoring,Normal
+PAT-0099,UNIT-002,2025-12-27,10:00,12:00,JKS-015,Pasar Minggu,Dialogis,Tindak Lanjut
+PAT-0100,UNIT-004,2025-04-24,06:00,08:00,JKS-032,Jagakarsa,Pengaturan,Normal
+PAT-0101,UNIT-006,2025-05-20,20:00,22:00,JKS-005,Kebayoran Baru,Patroli Preventif,Normal
+PAT-0102,UNIT-005,2025-07-19,20:00,22:00,JKS-010,Cilandak,Pengaturan,Temuan Kerawanan
+PAT-0103,UNIT-006,2025-12-02,18:00,20:00,JKS-020,Tebet,Pengaturan,Tindak Lanjut
+PAT-0104,UNIT-006,2025-06-28,14:00,16:00,JKS-014,Pasar Minggu,Pengaturan,Tidak Ada Kejadian
+PAT-0105,UNIT-006,2025-07-21,10:00,12:00,JKS-011,Cilandak,Patroli Preventif,Tidak Ada Kejadian
+PAT-0106,UNIT-001,2025-10-01,10:00,12:00,JKS-021,Tebet,Patroli Preventif,Normal
+PAT-0107,UNIT-003,2025-10-05,20:00,22:00,JKS-003,Kebayoran Baru,Pengaturan,Tindak Lanjut
+PAT-0108,UNIT-006,2025-05-18,06:00,08:00,JKS-006,Kebayoran Lama,Pengaturan,Normal
+PAT-0109,UNIT-004,2025-12-09,10:00,12:00,JKS-003,Kebayoran Baru,Dialogis,Normal
+PAT-0110,UNIT-004,2025-01-03,06:00,08:00,JKS-024,Mampang Prapatan,Pengaturan,Tidak Ada Kejadian
+PAT-0111,UNIT-001,2025-08-24,10:00,12:00,JKS-010,Cilandak,Pengaturan,Temuan Kerawanan
+PAT-0112,UNIT-006,2025-05-07,06:00,08:00,JKS-031,Jagakarsa,Patroli Preventif,Tidak Ada Kejadian
+PAT-0113,UNIT-004,2025-11-05,06:00,08:00,JKS-024,Mampang Prapatan,Patroli Preventif,Normal
+PAT-0114,UNIT-006,2025-09-28,06:00,08:00,JKS-020,Tebet,Dialogis,Tidak Ada Kejadian
+PAT-0115,UNIT-004,2025-05-02,20:00,22:00,JKS-019,Pancoran,Patroli Preventif,Tindak Lanjut
+PAT-0116,UNIT-006,2025-02-15,06:00,08:00,JKS-027,Setiabudi,Patroli Preventif,Tindak Lanjut
+PAT-0117,UNIT-006,2025-06-10,06:00,08:00,JKS-029,Setiabudi,Pengaturan,Tidak Ada Kejadian
+PAT-0118,UNIT-003,2025-08-21,14:00,16:00,JKS-030,Jagakarsa,Monitoring,Tindak Lanjut
+PAT-0119,UNIT-005,2025-12-24,14:00,16:00,JKS-018,Pancoran,Patroli Preventif,Tidak Ada Kejadian
+PAT-0120,UNIT-006,2025-11-20,18:00,20:00,JKS-006,Kebayoran Lama,Pengaturan,Temuan Kerawanan
+PAT-0121,UNIT-004,2025-03-27,20:00,22:00,JKS-009,Cilandak,Monitoring,Normal
+PAT-0122,UNIT-002,2025-08-12,14:00,16:00,JKS-023,Tebet,Monitoring,Tindak Lanjut
+PAT-0123,UNIT-002,2025-05-16,20:00,22:00,JKS-004,Kebayoran Baru,Patroli Preventif,Temuan Kerawanan
+PAT-0124,UNIT-006,2025-10-04,18:00,20:00,JKS-026,Mampang Prapatan,Pengaturan,Temuan Kerawanan
+PAT-0125,UNIT-002,2025-01-31,18:00,20:00,JKS-010,Cilandak,Monitoring,Tidak Ada Kejadian
+PAT-0126,UNIT-004,2025-09-27,20:00,22:00,JKS-021,Tebet,Patroli Preventif,Temuan Kerawanan
+PAT-0127,UNIT-004,2025-12-24,10:00,12:00,JKS-029,Setiabudi,Pengaturan,Temuan Kerawanan
+PAT-0128,UNIT-004,2025-03-04,18:00,20:00,JKS-027,Setiabudi,Patroli Preventif,Tidak Ada Kejadian
+PAT-0129,UNIT-004,2025-03-16,06:00,08:00,JKS-019,Pancoran,Pengaturan,Normal
+PAT-0130,UNIT-002,2025-05-22,20:00,22:00,JKS-030,Jagakarsa,Pengaturan,Tindak Lanjut
+PAT-0131,UNIT-003,2025-04-14,20:00,22:00,JKS-027,Setiabudi,Monitoring,Tidak Ada Kejadian
+PAT-0132,UNIT-002,2025-10-23,10:00,12:00,JKS-002,Kebayoran Baru,Pengaturan,Tidak Ada Kejadian
+PAT-0133,UNIT-003,2025-01-08,14:00,16:00,JKS-008,Kebayoran Lama,Pengaturan,Tindak Lanjut
+PAT-0134,UNIT-004,2025-05-24,14:00,16:00,JKS-031,Jagakarsa,Pengaturan,Tidak Ada Kejadian
+PAT-0135,UNIT-004,2025-02-11,20:00,22:00,JKS-023,Tebet,Dialogis,Tidak Ada Kejadian
+PAT-0136,UNIT-002,2025-02-19,06:00,08:00,JKS-019,Pancoran,Patroli Preventif,Tindak Lanjut
+PAT-0137,UNIT-001,2025-02-18,14:00,16:00,JKS-007,Kebayoran Lama,Monitoring,Tidak Ada Kejadian
+PAT-0138,UNIT-001,2025-05-04,18:00,20:00,JKS-007,Kebayoran Lama,Dialogis,Normal
+PAT-0139,UNIT-004,2025-03-06,18:00,20:00,JKS-029,Setiabudi,Pengaturan,Normal
+PAT-0140,UNIT-001,2025-09-21,14:00,16:00,JKS-020,Tebet,Dialogis,Temuan Kerawanan
+PAT-0141,UNIT-002,2025-01-27,10:00,12:00,JKS-029,Setiabudi,Monitoring,Tindak Lanjut
+PAT-0142,UNIT-004,2025-08-15,20:00,22:00,JKS-020,Tebet,Patroli Preventif,Tindak Lanjut
+PAT-0143,UNIT-005,2025-09-19,14:00,16:00,JKS-011,Cilandak,Dialogis,Normal
+PAT-0144,UNIT-001,2025-02-23,06:00,08:00,JKS-023,Tebet,Patroli Preventif,Normal
+PAT-0145,UNIT-003,2025-03-11,10:00,12:00,JKS-005,Kebayoran Baru,Dialogis,Tindak Lanjut
+PAT-0146,UNIT-006,2025-10-26,10:00,12:00,JKS-026,Mampang Prapatan,Monitoring,Tindak Lanjut
+PAT-0147,UNIT-006,2025-05-22,10:00,12:00,JKS-019,Pancoran,Dialogis,Tindak Lanjut
+PAT-0148,UNIT-004,2025-12-06,14:00,16:00,JKS-010,Cilandak,Monitoring,Normal
+PAT-0149,UNIT-004,2025-09-15,06:00,08:00,JKS-031,Jagakarsa,Monitoring,Tindak Lanjut
+PAT-0150,UNIT-003,2025-01-18,06:00,08:00,JKS-031,Jagakarsa,Monitoring,Tindak Lanjut
+PAT-0151,UNIT-003,2025-10-30,14:00,16:00,JKS-031,Jagakarsa,Dialogis,Temuan Kerawanan
+PAT-0152,UNIT-006,2025-10-25,18:00,20:00,JKS-016,Pasar Minggu,Dialogis,Tidak Ada Kejadian
+PAT-0153,UNIT-005,2025-01-17,20:00,22:00,JKS-022,Tebet,Monitoring,Tindak Lanjut
+PAT-0154,UNIT-006,2025-06-13,06:00,08:00,JKS-023,Tebet,Dialogis,Tindak Lanjut
+PAT-0155,UNIT-001,2025-12-06,06:00,08:00,JKS-014,Pasar Minggu,Monitoring,Tindak Lanjut
+PAT-0156,UNIT-002,2025-08-08,06:00,08:00,JKS-026,Mampang Prapatan,Patroli Preventif,Tindak Lanjut
+PAT-0157,UNIT-001,2025-06-26,20:00,22:00,JKS-011,Cilandak,Patroli Preventif,Normal
+PAT-0158,UNIT-002,2025-01-31,20:00,22:00,JKS-008,Kebayoran Lama,Pengaturan,Tindak Lanjut
+PAT-0159,UNIT-005,2025-08-23,14:00,16:00,JKS-012,Cilandak,Dialogis,Temuan Kerawanan
+PAT-0160,UNIT-001,2025-07-29,06:00,08:00,JKS-010,Cilandak,Patroli Preventif,Tindak Lanjut
+PAT-0161,UNIT-003,2025-11-11,06:00,08:00,JKS-005,Kebayoran Baru,Patroli Preventif,Temuan Kerawanan
+PAT-0162,UNIT-001,2025-04-29,06:00,08:00,JKS-030,Jagakarsa,Patroli Preventif,Normal
+PAT-0163,UNIT-002,2025-03-31,10:00,12:00,JKS-024,Mampang Prapatan,Pengaturan,Tindak Lanjut
+PAT-0164,UNIT-004,2025-03-23,18:00,20:00,JKS-005,Kebayoran Baru,Pengaturan,Tindak Lanjut
+PAT-0165,UNIT-001,2025-07-05,20:00,22:00,JKS-003,Kebayoran Baru,Dialogis,Temuan Kerawanan
+PAT-0166,UNIT-003,2025-01-01,18:00,20:00,JKS-033,Jagakarsa,Patroli Preventif,Temuan Kerawanan
+PAT-0167,UNIT-001,2025-04-30,06:00,08:00,JKS-030,Jagakarsa,Patroli Preventif,Tidak Ada Kejadian
+PAT-0168,UNIT-001,2025-10-20,18:00,20:00,JKS-015,Pasar Minggu,Pengaturan,Normal
+PAT-0169,UNIT-001,2025-05-02,10:00,12:00,JKS-029,Setiabudi,Pengaturan,Normal
+PAT-0170,UNIT-002,2025-07-28,18:00,20:00,JKS-021,Tebet,Patroli Preventif,Tindak Lanjut
+PAT-0171,UNIT-001,2025-04-10,18:00,20:00,JKS-006,Kebayoran Lama,Dialogis,Temuan Kerawanan
+PAT-0172,UNIT-005,2025-02-21,18:00,20:00,JKS-018,Pancoran,Monitoring,Tindak Lanjut
+PAT-0173,UNIT-002,2025-03-25,14:00,16:00,JKS-019,Pancoran,Patroli Preventif,Temuan Kerawanan
+PAT-0174,UNIT-004,2025-09-01,20:00,22:00,JKS-028,Setiabudi,Pengaturan,Temuan Kerawanan
+PAT-0175,UNIT-001,2025-01-31,06:00,08:00,JKS-028,Setiabudi,Dialogis,Temuan Kerawanan
+PAT-0176,UNIT-005,2025-03-31,06:00,08:00,JKS-025,Mampang Prapatan,Dialogis,Tidak Ada Kejadian
+PAT-0177,UNIT-006,2025-09-11,18:00,20:00,JKS-024,Mampang Prapatan,Pengaturan,Tindak Lanjut
+PAT-0178,UNIT-006,2025-12-13,10:00,12:00,JKS-001,Kebayoran Baru,Dialogis,Tindak Lanjut
+PAT-0179,UNIT-001,2025-06-16,18:00,20:00,JKS-022,Tebet,Monitoring,Tidak Ada Kejadian
+PAT-0180,UNIT-002,2025-06-07,18:00,20:00,JKS-009,Cilandak,Pengaturan,Tindak Lanjut

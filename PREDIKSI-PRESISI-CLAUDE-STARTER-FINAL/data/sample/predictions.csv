@@ -1,0 +1,181 @@
+prediction_id,prediction_date,forecast_horizon,threat_type,grid_id,kecamatan,kelurahan,time_window,risk_score,confidence,dominant_factors,model_version,status,is_synthetic
+PRD-00001,2025-12-26,24h,CURAT,JKS-001,Kebayoran Baru,Senayan,18:00-23:59,76,75,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00002,2025-10-24,24h,CURANMOR,JKS-004,Kebayoran Baru,Cipete Utara,12:00-18:00,67,59,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00003,2025-12-02,24h,CURANMOR,JKS-008,Kebayoran Lama,Grogol Utara,12:00-18:00,89,95,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00004,2025-12-09,24h,CURANMOR,JKS-030,Jagakarsa,Jagakarsa,06:00-12:00,73,64,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00005,2025-12-10,24h,CURANMOR,JKS-002,Kebayoran Baru,Gunung,06:00-12:00,68,76,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00006,2025-12-01,24h,CURAT,JKS-023,Tebet,Manggarai,00:00-06:00,73,70,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00007,2025-12-10,24h,CURAS,JKS-026,Mampang Prapatan,Tegal Parang,18:00-23:59,79,78,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00008,2025-11-06,24h,CURANMOR,JKS-022,Tebet,Menteng Dalam,18:00-23:59,51,51,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00009,2025-12-08,24h,CURANMOR,JKS-019,Pancoran,Kalibata,18:00-23:59,53,61,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00010,2025-12-12,24h,CURANMOR,JKS-019,Pancoran,Kalibata,18:00-23:59,51,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00011,2025-10-20,24h,CURANMOR,JKS-008,Kebayoran Lama,Grogol Utara,18:00-23:59,75,81,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00012,2025-12-12,24h,CURAT,JKS-011,Cilandak,Lebak Bulus,12:00-18:00,47,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00013,2025-10-13,24h,CURANMOR,JKS-019,Pancoran,Kalibata,00:00-06:00,72,81,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00014,2025-11-29,24h,CURANMOR,JKS-006,Kebayoran Lama,Pondok Pinang,12:00-18:00,54,53,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00015,2025-12-31,24h,CURANMOR,JKS-013,Pasar Minggu,Pejaten Barat,18:00-23:59,81,80,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00016,2025-12-07,24h,CURANMOR,JKS-013,Pasar Minggu,Pejaten Barat,18:00-23:59,56,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00017,2025-11-23,24h,CURANMOR,JKS-009,Cilandak,Cipete Selatan,00:00-06:00,63,68,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00018,2025-12-09,24h,CURANMOR,JKS-018,Pancoran,Duren Tiga,00:00-06:00,54,59,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00019,2025-11-04,24h,CURANMOR,JKS-010,Cilandak,Gandaria Selatan,18:00-23:59,65,59,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00020,2025-10-14,24h,CURAS,JKS-003,Kebayoran Baru,Kramat Pela,18:00-23:59,81,81,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00021,2025-12-11,24h,CURANMOR,JKS-003,Kebayoran Baru,Kramat Pela,12:00-18:00,84,80,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00022,2025-10-16,24h,CURAT,JKS-031,Jagakarsa,Ciganjur,12:00-18:00,64,55,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00023,2025-11-21,24h,CURANMOR,JKS-022,Tebet,Menteng Dalam,18:00-23:59,88,77,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00024,2025-11-26,24h,CURAT,JKS-019,Pancoran,Kalibata,18:00-23:59,46,51,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00025,2025-12-25,24h,CURAT,JKS-019,Pancoran,Kalibata,18:00-23:59,57,54,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00026,2025-11-25,24h,CURANMOR,JKS-002,Kebayoran Baru,Gunung,18:00-23:59,58,60,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00027,2025-12-20,24h,CURANMOR,JKS-018,Pancoran,Duren Tiga,18:00-23:59,72,68,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00028,2025-10-11,24h,CURANMOR,JKS-009,Cilandak,Cipete Selatan,18:00-23:59,72,80,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00029,2025-11-10,24h,CURANMOR,JKS-001,Kebayoran Baru,Senayan,12:00-18:00,82,87,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00030,2025-11-12,24h,CURANMOR,JKS-026,Mampang Prapatan,Tegal Parang,00:00-06:00,62,71,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00031,2025-12-26,24h,CURANMOR,JKS-024,Mampang Prapatan,Mampang Prapatan,12:00-18:00,83,71,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00032,2025-11-08,24h,CURAS,JKS-010,Cilandak,Gandaria Selatan,18:00-23:59,51,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00033,2025-11-03,24h,CURANMOR,JKS-023,Tebet,Manggarai,18:00-23:59,95,86,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00034,2025-11-17,24h,CURAS,JKS-007,Kebayoran Lama,Kebayoran Lama Utara,12:00-18:00,68,69,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00035,2025-10-24,24h,CURAT,JKS-015,Pasar Minggu,Ragunan,12:00-18:00,95,84,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00036,2025-12-13,24h,CURANMOR,JKS-004,Kebayoran Baru,Cipete Utara,06:00-12:00,48,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00037,2025-10-23,24h,CURANMOR,JKS-021,Tebet,Tebet Timur,12:00-18:00,71,62,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00038,2025-12-26,24h,CURAT,JKS-017,Pancoran,Pancoran,18:00-23:59,48,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00039,2025-12-01,24h,CURANMOR,JKS-023,Tebet,Manggarai,00:00-06:00,58,58,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00040,2025-10-25,24h,CURAT,JKS-004,Kebayoran Baru,Cipete Utara,00:00-06:00,61,57,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00041,2025-12-01,24h,CURAT,JKS-004,Kebayoran Baru,Cipete Utara,12:00-18:00,53,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00042,2025-12-17,24h,CURANMOR,JKS-025,Mampang Prapatan,Bangka,18:00-23:59,64,59,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00043,2025-10-25,24h,CURANMOR,JKS-018,Pancoran,Duren Tiga,18:00-23:59,88,97,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00044,2025-11-07,24h,CURANMOR,JKS-029,Setiabudi,Menteng Atas,00:00-06:00,67,68,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00045,2025-10-18,24h,CURANMOR,JKS-001,Kebayoran Baru,Senayan,18:00-23:59,63,53,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00046,2025-10-22,24h,CURAT,JKS-017,Pancoran,Pancoran,00:00-06:00,82,91,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00047,2025-12-07,24h,CURAS,JKS-010,Cilandak,Gandaria Selatan,12:00-18:00,91,94,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00048,2025-10-29,24h,CURAS,JKS-027,Setiabudi,Karet Kuningan,18:00-23:59,84,87,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00049,2025-11-26,24h,CURANMOR,JKS-029,Setiabudi,Menteng Atas,18:00-23:59,89,91,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00050,2025-10-02,24h,CURANMOR,JKS-021,Tebet,Tebet Timur,18:00-23:59,60,54,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00051,2025-10-30,24h,CURAT,JKS-006,Kebayoran Lama,Pondok Pinang,06:00-12:00,91,83,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00052,2025-10-08,24h,CURAT,JKS-002,Kebayoran Baru,Gunung,18:00-23:59,50,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00053,2025-11-06,24h,CURANMOR,JKS-002,Kebayoran Baru,Gunung,00:00-06:00,56,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00054,2025-12-27,24h,CURAS,JKS-014,Pasar Minggu,Pejaten Timur,18:00-23:59,67,62,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00055,2025-11-06,24h,CURANMOR,JKS-015,Pasar Minggu,Ragunan,18:00-23:59,57,62,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00056,2025-10-20,24h,CURANMOR,JKS-016,Pasar Minggu,Jati Padang,18:00-23:59,66,73,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00057,2025-10-16,24h,CURAT,JKS-019,Pancoran,Kalibata,00:00-06:00,46,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00058,2025-11-09,24h,CURANMOR,JKS-028,Setiabudi,Kuningan Timur,06:00-12:00,60,57,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00059,2025-12-08,24h,CURAT,JKS-007,Kebayoran Lama,Kebayoran Lama Utara,12:00-18:00,74,68,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00060,2025-11-20,24h,CURAS,JKS-029,Setiabudi,Menteng Atas,18:00-23:59,73,63,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00061,2025-12-11,24h,CURANMOR,JKS-027,Setiabudi,Karet Kuningan,18:00-23:59,70,58,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00062,2025-12-28,24h,CURAT,JKS-033,Jagakarsa,Srengseng Sawah,18:00-23:59,78,79,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00063,2025-12-24,24h,CURANMOR,JKS-019,Pancoran,Kalibata,12:00-18:00,69,66,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00064,2025-10-24,24h,CURAT,JKS-024,Mampang Prapatan,Mampang Prapatan,00:00-06:00,90,81,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00065,2025-11-24,24h,CURAT,JKS-023,Tebet,Manggarai,12:00-18:00,49,51,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00066,2025-10-15,24h,CURANMOR,JKS-012,Cilandak,Cilandak Barat,12:00-18:00,92,88,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00067,2025-12-25,24h,CURAS,JKS-004,Kebayoran Baru,Cipete Utara,18:00-23:59,93,90,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00068,2025-10-19,24h,CURANMOR,JKS-030,Jagakarsa,Jagakarsa,12:00-18:00,67,63,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00069,2025-10-11,24h,CURAT,JKS-011,Cilandak,Lebak Bulus,12:00-18:00,53,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00070,2025-11-16,24h,CURANMOR,JKS-011,Cilandak,Lebak Bulus,12:00-18:00,76,81,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00071,2025-11-01,24h,CURANMOR,JKS-019,Pancoran,Kalibata,18:00-23:59,47,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00072,2025-12-07,24h,CURANMOR,JKS-018,Pancoran,Duren Tiga,18:00-23:59,88,90,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00073,2025-10-26,24h,CURANMOR,JKS-024,Mampang Prapatan,Mampang Prapatan,12:00-18:00,58,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00074,2025-10-07,24h,CURANMOR,JKS-025,Mampang Prapatan,Bangka,12:00-18:00,48,56,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00075,2025-11-11,24h,CURAS,JKS-020,Tebet,Tebet Barat,18:00-23:59,46,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00076,2025-12-17,24h,CURANMOR,JKS-019,Pancoran,Kalibata,18:00-23:59,76,75,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00077,2025-10-07,24h,CURANMOR,JKS-011,Cilandak,Lebak Bulus,06:00-12:00,69,65,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00078,2025-12-06,24h,CURANMOR,JKS-002,Kebayoran Baru,Gunung,18:00-23:59,58,59,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00079,2025-12-09,24h,CURAS,JKS-023,Tebet,Manggarai,18:00-23:59,93,98,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00080,2025-10-28,24h,CURANMOR,JKS-026,Mampang Prapatan,Tegal Parang,18:00-23:59,77,82,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00081,2025-11-07,24h,CURANMOR,JKS-005,Kebayoran Baru,Pulo,18:00-23:59,88,90,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00082,2025-11-17,24h,CURANMOR,JKS-022,Tebet,Menteng Dalam,18:00-23:59,76,81,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00083,2025-12-08,24h,CURAT,JKS-007,Kebayoran Lama,Kebayoran Lama Utara,18:00-23:59,74,78,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00084,2025-12-27,24h,CURANMOR,JKS-026,Mampang Prapatan,Tegal Parang,18:00-23:59,78,77,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00085,2025-12-07,24h,CURANMOR,JKS-004,Kebayoran Baru,Cipete Utara,18:00-23:59,62,60,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00086,2025-10-17,24h,CURAS,JKS-019,Pancoran,Kalibata,18:00-23:59,64,69,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00087,2025-12-28,24h,CURANMOR,JKS-009,Cilandak,Cipete Selatan,06:00-12:00,68,57,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00088,2025-10-24,24h,CURAS,JKS-033,Jagakarsa,Srengseng Sawah,18:00-23:59,82,88,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00089,2025-10-24,24h,CURAS,JKS-029,Setiabudi,Menteng Atas,12:00-18:00,56,58,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00090,2025-10-17,24h,CURAS,JKS-014,Pasar Minggu,Pejaten Timur,18:00-23:59,79,68,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00091,2025-10-01,24h,CURANMOR,JKS-007,Kebayoran Lama,Kebayoran Lama Utara,00:00-06:00,58,66,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00092,2025-12-22,24h,CURAS,JKS-003,Kebayoran Baru,Kramat Pela,18:00-23:59,68,66,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00093,2025-12-21,24h,CURANMOR,JKS-008,Kebayoran Lama,Grogol Utara,12:00-18:00,66,67,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00094,2025-12-29,24h,CURAT,JKS-012,Cilandak,Cilandak Barat,18:00-23:59,72,72,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00095,2025-11-04,24h,CURANMOR,JKS-015,Pasar Minggu,Ragunan,00:00-06:00,53,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00096,2025-11-07,24h,CURANMOR,JKS-020,Tebet,Tebet Barat,18:00-23:59,64,59,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00097,2025-12-12,24h,CURANMOR,JKS-020,Tebet,Tebet Barat,00:00-06:00,79,73,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00098,2025-12-10,24h,CURAS,JKS-019,Pancoran,Kalibata,06:00-12:00,69,73,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00099,2025-10-19,24h,CURAT,JKS-033,Jagakarsa,Srengseng Sawah,18:00-23:59,89,83,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00100,2025-10-23,24h,CURANMOR,JKS-005,Kebayoran Baru,Pulo,18:00-23:59,58,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00101,2025-12-28,24h,CURAS,JKS-030,Jagakarsa,Jagakarsa,18:00-23:59,76,84,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00102,2025-11-26,24h,CURANMOR,JKS-012,Cilandak,Cilandak Barat,18:00-23:59,65,53,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00103,2025-11-16,24h,CURAT,JKS-001,Kebayoran Baru,Senayan,18:00-23:59,54,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00104,2025-10-18,24h,CURANMOR,JKS-033,Jagakarsa,Srengseng Sawah,18:00-23:59,83,90,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00105,2025-11-18,24h,CURAS,JKS-018,Pancoran,Duren Tiga,00:00-06:00,94,98,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00106,2025-12-19,24h,CURAT,JKS-015,Pasar Minggu,Ragunan,00:00-06:00,78,87,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00107,2025-10-09,24h,CURANMOR,JKS-003,Kebayoran Baru,Kramat Pela,06:00-12:00,62,61,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00108,2025-11-04,24h,CURANMOR,JKS-031,Jagakarsa,Ciganjur,12:00-18:00,92,98,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00109,2025-11-26,24h,CURAT,JKS-020,Tebet,Tebet Barat,18:00-23:59,76,77,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00110,2025-12-10,24h,CURAS,JKS-020,Tebet,Tebet Barat,18:00-23:59,70,73,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00111,2025-12-16,24h,CURANMOR,JKS-028,Setiabudi,Kuningan Timur,18:00-23:59,95,89,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00112,2025-10-16,24h,CURAT,JKS-022,Tebet,Menteng Dalam,00:00-06:00,79,71,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00113,2025-10-27,24h,CURAT,JKS-021,Tebet,Tebet Timur,06:00-12:00,69,77,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00114,2025-12-24,24h,CURANMOR,JKS-014,Pasar Minggu,Pejaten Timur,12:00-18:00,73,75,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00115,2025-11-20,24h,CURAS,JKS-014,Pasar Minggu,Pejaten Timur,18:00-23:59,68,69,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00116,2025-12-30,24h,CURANMOR,JKS-001,Kebayoran Baru,Senayan,18:00-23:59,54,63,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00117,2025-11-12,24h,CURANMOR,JKS-012,Cilandak,Cilandak Barat,00:00-06:00,70,60,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00118,2025-11-08,24h,CURANMOR,JKS-008,Kebayoran Lama,Grogol Utara,18:00-23:59,94,82,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00119,2025-11-28,24h,CURAT,JKS-025,Mampang Prapatan,Bangka,18:00-23:59,63,66,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00120,2025-11-02,24h,CURAS,JKS-032,Jagakarsa,Lenteng Agung,18:00-23:59,49,52,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00121,2025-11-16,24h,CURAT,JKS-002,Kebayoran Baru,Gunung,18:00-23:59,49,53,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00122,2025-11-12,24h,CURAS,JKS-029,Setiabudi,Menteng Atas,12:00-18:00,46,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00123,2025-10-27,24h,CURANMOR,JKS-031,Jagakarsa,Ciganjur,18:00-23:59,63,62,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00124,2025-10-12,24h,CURANMOR,JKS-033,Jagakarsa,Srengseng Sawah,18:00-23:59,61,58,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00125,2025-10-25,24h,CURANMOR,JKS-019,Pancoran,Kalibata,18:00-23:59,58,54,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00126,2025-10-16,24h,CURAT,JKS-003,Kebayoran Baru,Kramat Pela,18:00-23:59,70,60,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00127,2025-11-07,24h,CURAT,JKS-015,Pasar Minggu,Ragunan,18:00-23:59,62,69,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00128,2025-11-22,24h,CURAS,JKS-018,Pancoran,Duren Tiga,18:00-23:59,81,71,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00129,2025-11-13,24h,CURANMOR,JKS-013,Pasar Minggu,Pejaten Barat,18:00-23:59,85,86,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00130,2025-10-18,24h,CURANMOR,JKS-010,Cilandak,Gandaria Selatan,18:00-23:59,84,77,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00131,2025-10-05,24h,CURAS,JKS-017,Pancoran,Pancoran,18:00-23:59,61,65,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00132,2025-12-02,24h,CURAT,JKS-008,Kebayoran Lama,Grogol Utara,06:00-12:00,47,53,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00133,2025-10-30,24h,CURANMOR,JKS-024,Mampang Prapatan,Mampang Prapatan,00:00-06:00,95,85,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00134,2025-11-12,24h,CURAT,JKS-014,Pasar Minggu,Pejaten Timur,18:00-23:59,86,95,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00135,2025-12-11,24h,CURANMOR,JKS-026,Mampang Prapatan,Tegal Parang,12:00-18:00,90,84,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00136,2025-10-18,24h,CURAS,JKS-007,Kebayoran Lama,Kebayoran Lama Utara,00:00-06:00,48,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00137,2025-10-31,24h,CURANMOR,JKS-015,Pasar Minggu,Ragunan,18:00-23:59,47,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00138,2025-11-07,24h,CURANMOR,JKS-021,Tebet,Tebet Timur,18:00-23:59,68,69,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00139,2025-12-29,24h,CURANMOR,JKS-021,Tebet,Tebet Timur,18:00-23:59,91,81,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00140,2025-12-14,24h,CURAS,JKS-003,Kebayoran Baru,Kramat Pela,06:00-12:00,60,60,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00141,2025-12-19,24h,CURAS,JKS-004,Kebayoran Baru,Cipete Utara,00:00-06:00,59,51,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00142,2025-11-27,24h,CURANMOR,JKS-024,Mampang Prapatan,Mampang Prapatan,18:00-23:59,81,73,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00143,2025-10-12,24h,CURANMOR,JKS-012,Cilandak,Cilandak Barat,06:00-12:00,88,87,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00144,2025-12-24,24h,CURANMOR,JKS-027,Setiabudi,Karet Kuningan,00:00-06:00,67,59,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00145,2025-12-06,24h,CURANMOR,JKS-028,Setiabudi,Kuningan Timur,18:00-23:59,80,89,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00146,2025-11-01,24h,CURANMOR,JKS-023,Tebet,Manggarai,00:00-06:00,49,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00147,2025-10-28,24h,CURANMOR,JKS-029,Setiabudi,Menteng Atas,12:00-18:00,68,69,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00148,2025-12-21,24h,CURANMOR,JKS-013,Pasar Minggu,Pejaten Barat,18:00-23:59,91,98,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00149,2025-10-06,24h,CURANMOR,JKS-031,Jagakarsa,Ciganjur,18:00-23:59,65,66,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00150,2025-11-17,24h,CURANMOR,JKS-024,Mampang Prapatan,Mampang Prapatan,12:00-18:00,52,51,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00151,2025-12-02,24h,CURAT,JKS-007,Kebayoran Lama,Kebayoran Lama Utara,18:00-23:59,59,57,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00152,2025-12-28,24h,CURANMOR,JKS-011,Cilandak,Lebak Bulus,06:00-12:00,94,91,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00153,2025-12-23,24h,CURANMOR,JKS-031,Jagakarsa,Ciganjur,06:00-12:00,56,60,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00154,2025-11-19,24h,CURANMOR,JKS-021,Tebet,Tebet Timur,18:00-23:59,62,59,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00155,2025-11-11,24h,CURANMOR,JKS-002,Kebayoran Baru,Gunung,18:00-23:59,46,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00156,2025-12-29,24h,CURAS,JKS-004,Kebayoran Baru,Cipete Utara,18:00-23:59,88,90,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00157,2025-11-09,24h,CURANMOR,JKS-001,Kebayoran Baru,Senayan,06:00-12:00,69,67,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00158,2025-11-20,24h,CURANMOR,JKS-031,Jagakarsa,Ciganjur,18:00-23:59,74,77,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00159,2025-12-20,24h,CURAT,JKS-020,Tebet,Tebet Barat,00:00-06:00,61,53,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00160,2025-12-09,24h,CURANMOR,JKS-015,Pasar Minggu,Ragunan,18:00-23:59,63,56,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00161,2025-10-17,24h,CURAS,JKS-003,Kebayoran Baru,Kramat Pela,12:00-18:00,84,79,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00162,2025-12-04,24h,CURANMOR,JKS-020,Tebet,Tebet Barat,18:00-23:59,72,80,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00163,2025-11-18,24h,CURANMOR,JKS-030,Jagakarsa,Jagakarsa,00:00-06:00,68,71,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00164,2025-10-08,24h,CURAT,JKS-018,Pancoran,Duren Tiga,00:00-06:00,70,62,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00165,2025-12-03,24h,CURANMOR,JKS-011,Cilandak,Lebak Bulus,18:00-23:59,84,82,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00166,2025-10-26,24h,CURANMOR,JKS-028,Setiabudi,Kuningan Timur,18:00-23:59,90,98,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00167,2025-10-17,24h,CURAT,JKS-030,Jagakarsa,Jagakarsa,18:00-23:59,94,87,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00168,2025-12-23,24h,CURANMOR,JKS-009,Cilandak,Cipete Selatan,18:00-23:59,56,55,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00169,2025-11-04,24h,CURAS,JKS-018,Pancoran,Duren Tiga,12:00-18:00,68,76,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00170,2025-12-05,24h,CURAT,JKS-026,Mampang Prapatan,Tegal Parang,18:00-23:59,73,71,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00171,2025-10-08,24h,CURANMOR,JKS-010,Cilandak,Gandaria Selatan,06:00-12:00,55,58,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00172,2025-11-05,24h,CURAT,JKS-031,Jagakarsa,Ciganjur,18:00-23:59,54,54,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Draft,True
+PRD-00173,2025-10-29,24h,CURAS,JKS-023,Tebet,Manggarai,12:00-18:00,89,97,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00174,2025-10-09,24h,CURANMOR,JKS-004,Kebayoran Baru,Cipete Utara,18:00-23:59,80,83,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00175,2025-11-15,24h,CURAS,JKS-002,Kebayoran Baru,Gunung,18:00-23:59,76,75,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00176,2025-12-23,24h,CURAS,JKS-001,Kebayoran Baru,Senayan,00:00-06:00,57,57,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00177,2025-11-26,24h,CURAT,JKS-026,Mampang Prapatan,Tegal Parang,12:00-18:00,91,83,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00178,2025-10-16,24h,CURAS,JKS-032,Jagakarsa,Lenteng Agung,18:00-23:59,55,53,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Validated,True
+PRD-00179,2025-11-17,24h,CURANMOR,JKS-024,Mampang Prapatan,Mampang Prapatan,18:00-23:59,89,77,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True
+PRD-00180,2025-10-30,24h,CURANMOR,JKS-032,Jagakarsa,Lenteng Agung,00:00-06:00,50,50,Historical hotspot; recent incidents; temporal pattern; nearby activity,dummy-v1,Published,True

@@ -1,0 +1,181 @@
+evaluation_id,prediction_id,evaluation_date,actual_event,actual_threat_type,actual_grid_id,actual_time_window,match_type,notes
+EVA-00001,PRD-00001,2025-12-27,True,CURAT,JKS-001,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00002,PRD-00002,2025-10-25,False,,,,False Positive,Synthetic evaluation record
+EVA-00003,PRD-00003,2025-12-03,False,,,,False Positive,Synthetic evaluation record
+EVA-00004,PRD-00004,2025-12-10,False,,,,False Positive,Synthetic evaluation record
+EVA-00005,PRD-00005,2025-12-11,False,,,,False Positive,Synthetic evaluation record
+EVA-00006,PRD-00006,2025-12-02,True,CURAT,JKS-023,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00007,PRD-00007,2025-12-11,False,,,,False Positive,Synthetic evaluation record
+EVA-00008,PRD-00008,2025-11-07,True,CURANMOR,JKS-022,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00009,PRD-00009,2025-12-09,True,CURANMOR,JKS-019,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00010,PRD-00010,2025-12-13,True,CURANMOR,JKS-019,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00011,PRD-00011,2025-10-21,True,CURANMOR,JKS-008,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00012,PRD-00012,2025-12-13,False,,,,False Positive,Synthetic evaluation record
+EVA-00013,PRD-00013,2025-10-14,True,CURANMOR,JKS-019,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00014,PRD-00014,2025-11-30,True,CURANMOR,JKS-006,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00015,PRD-00015,2026-01-01,True,CURANMOR,JKS-013,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00016,PRD-00016,2025-12-08,False,,,,False Positive,Synthetic evaluation record
+EVA-00017,PRD-00017,2025-11-24,False,,,,False Positive,Synthetic evaluation record
+EVA-00018,PRD-00018,2025-12-10,True,CURANMOR,JKS-018,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00019,PRD-00019,2025-11-05,False,,,,False Positive,Synthetic evaluation record
+EVA-00020,PRD-00020,2025-10-15,False,,,,False Positive,Synthetic evaluation record
+EVA-00021,PRD-00021,2025-12-12,False,,,,False Positive,Synthetic evaluation record
+EVA-00022,PRD-00022,2025-10-17,False,,,,False Positive,Synthetic evaluation record
+EVA-00023,PRD-00023,2025-11-22,True,CURANMOR,JKS-022,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00024,PRD-00024,2025-11-27,False,,,,False Positive,Synthetic evaluation record
+EVA-00025,PRD-00025,2025-12-26,False,,,,False Positive,Synthetic evaluation record
+EVA-00026,PRD-00026,2025-11-26,False,,,,False Positive,Synthetic evaluation record
+EVA-00027,PRD-00027,2025-12-21,False,,,,False Positive,Synthetic evaluation record
+EVA-00028,PRD-00028,2025-10-12,False,,,,False Positive,Synthetic evaluation record
+EVA-00029,PRD-00029,2025-11-11,False,,,,False Positive,Synthetic evaluation record
+EVA-00030,PRD-00030,2025-11-13,False,,,,False Positive,Synthetic evaluation record
+EVA-00031,PRD-00031,2025-12-27,True,CURANMOR,JKS-024,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00032,PRD-00032,2025-11-09,False,,,,False Positive,Synthetic evaluation record
+EVA-00033,PRD-00033,2025-11-04,False,,,,False Positive,Synthetic evaluation record
+EVA-00034,PRD-00034,2025-11-18,True,CURAS,JKS-007,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00035,PRD-00035,2025-10-25,True,CURAT,JKS-015,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00036,PRD-00036,2025-12-14,False,,,,False Positive,Synthetic evaluation record
+EVA-00037,PRD-00037,2025-10-24,False,,,,False Positive,Synthetic evaluation record
+EVA-00038,PRD-00038,2025-12-27,True,CURAT,JKS-017,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00039,PRD-00039,2025-12-02,True,CURANMOR,JKS-023,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00040,PRD-00040,2025-10-26,False,,,,False Positive,Synthetic evaluation record
+EVA-00041,PRD-00041,2025-12-02,False,,,,False Positive,Synthetic evaluation record
+EVA-00042,PRD-00042,2025-12-18,False,,,,False Positive,Synthetic evaluation record
+EVA-00043,PRD-00043,2025-10-26,False,,,,False Positive,Synthetic evaluation record
+EVA-00044,PRD-00044,2025-11-08,False,,,,False Positive,Synthetic evaluation record
+EVA-00045,PRD-00045,2025-10-19,True,CURANMOR,JKS-001,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00046,PRD-00046,2025-10-23,True,CURAT,JKS-017,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00047,PRD-00047,2025-12-08,False,,,,False Positive,Synthetic evaluation record
+EVA-00048,PRD-00048,2025-10-30,False,,,,False Positive,Synthetic evaluation record
+EVA-00049,PRD-00049,2025-11-27,True,CURANMOR,JKS-029,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00050,PRD-00050,2025-10-03,False,,,,False Positive,Synthetic evaluation record
+EVA-00051,PRD-00051,2025-10-31,True,CURAT,JKS-006,06:00-12:00,Hit,Synthetic evaluation record
+EVA-00052,PRD-00052,2025-10-09,False,,,,False Positive,Synthetic evaluation record
+EVA-00053,PRD-00053,2025-11-07,False,,,,False Positive,Synthetic evaluation record
+EVA-00054,PRD-00054,2025-12-28,False,,,,False Positive,Synthetic evaluation record
+EVA-00055,PRD-00055,2025-11-07,False,,,,False Positive,Synthetic evaluation record
+EVA-00056,PRD-00056,2025-10-21,False,,,,False Positive,Synthetic evaluation record
+EVA-00057,PRD-00057,2025-10-17,False,,,,False Positive,Synthetic evaluation record
+EVA-00058,PRD-00058,2025-11-10,False,,,,False Positive,Synthetic evaluation record
+EVA-00059,PRD-00059,2025-12-09,True,CURAT,JKS-007,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00060,PRD-00060,2025-11-21,True,CURAS,JKS-029,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00061,PRD-00061,2025-12-12,False,,,,False Positive,Synthetic evaluation record
+EVA-00062,PRD-00062,2025-12-29,True,CURAT,JKS-033,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00063,PRD-00063,2025-12-25,False,,,,False Positive,Synthetic evaluation record
+EVA-00064,PRD-00064,2025-10-25,True,CURAT,JKS-024,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00065,PRD-00065,2025-11-25,False,,,,False Positive,Synthetic evaluation record
+EVA-00066,PRD-00066,2025-10-16,True,CURANMOR,JKS-012,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00067,PRD-00067,2025-12-26,True,CURAS,JKS-004,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00068,PRD-00068,2025-10-20,False,,,,False Positive,Synthetic evaluation record
+EVA-00069,PRD-00069,2025-10-12,False,,,,False Positive,Synthetic evaluation record
+EVA-00070,PRD-00070,2025-11-17,True,CURANMOR,JKS-011,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00071,PRD-00071,2025-11-02,True,CURANMOR,JKS-019,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00072,PRD-00072,2025-12-08,True,CURANMOR,JKS-018,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00073,PRD-00073,2025-10-27,True,CURANMOR,JKS-024,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00074,PRD-00074,2025-10-08,False,,,,False Positive,Synthetic evaluation record
+EVA-00075,PRD-00075,2025-11-12,False,,,,False Positive,Synthetic evaluation record
+EVA-00076,PRD-00076,2025-12-18,True,CURANMOR,JKS-019,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00077,PRD-00077,2025-10-08,False,,,,False Positive,Synthetic evaluation record
+EVA-00078,PRD-00078,2025-12-07,True,CURANMOR,JKS-002,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00079,PRD-00079,2025-12-10,True,CURAS,JKS-023,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00080,PRD-00080,2025-10-29,True,CURANMOR,JKS-026,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00081,PRD-00081,2025-11-08,True,CURANMOR,JKS-005,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00082,PRD-00082,2025-11-18,False,,,,False Positive,Synthetic evaluation record
+EVA-00083,PRD-00083,2025-12-09,False,,,,False Positive,Synthetic evaluation record
+EVA-00084,PRD-00084,2025-12-28,True,CURANMOR,JKS-026,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00085,PRD-00085,2025-12-08,True,CURANMOR,JKS-004,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00086,PRD-00086,2025-10-18,False,,,,False Positive,Synthetic evaluation record
+EVA-00087,PRD-00087,2025-12-29,False,,,,False Positive,Synthetic evaluation record
+EVA-00088,PRD-00088,2025-10-25,False,,,,False Positive,Synthetic evaluation record
+EVA-00089,PRD-00089,2025-10-25,False,,,,False Positive,Synthetic evaluation record
+EVA-00090,PRD-00090,2025-10-18,False,,,,False Positive,Synthetic evaluation record
+EVA-00091,PRD-00091,2025-10-02,False,,,,False Positive,Synthetic evaluation record
+EVA-00092,PRD-00092,2025-12-23,True,CURAS,JKS-003,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00093,PRD-00093,2025-12-22,False,,,,False Positive,Synthetic evaluation record
+EVA-00094,PRD-00094,2025-12-30,False,,,,False Positive,Synthetic evaluation record
+EVA-00095,PRD-00095,2025-11-05,False,,,,False Positive,Synthetic evaluation record
+EVA-00096,PRD-00096,2025-11-08,False,,,,False Positive,Synthetic evaluation record
+EVA-00097,PRD-00097,2025-12-13,True,CURANMOR,JKS-020,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00098,PRD-00098,2025-12-11,True,CURAS,JKS-019,06:00-12:00,Hit,Synthetic evaluation record
+EVA-00099,PRD-00099,2025-10-20,True,CURAT,JKS-033,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00100,PRD-00100,2025-10-24,False,,,,False Positive,Synthetic evaluation record
+EVA-00101,PRD-00101,2025-12-29,True,CURAS,JKS-030,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00102,PRD-00102,2025-11-27,True,CURANMOR,JKS-012,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00103,PRD-00103,2025-11-17,True,CURAT,JKS-001,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00104,PRD-00104,2025-10-19,True,CURANMOR,JKS-033,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00105,PRD-00105,2025-11-19,False,,,,False Positive,Synthetic evaluation record
+EVA-00106,PRD-00106,2025-12-20,False,,,,False Positive,Synthetic evaluation record
+EVA-00107,PRD-00107,2025-10-10,False,,,,False Positive,Synthetic evaluation record
+EVA-00108,PRD-00108,2025-11-05,True,CURANMOR,JKS-031,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00109,PRD-00109,2025-11-27,False,,,,False Positive,Synthetic evaluation record
+EVA-00110,PRD-00110,2025-12-11,False,,,,False Positive,Synthetic evaluation record
+EVA-00111,PRD-00111,2025-12-17,True,CURANMOR,JKS-028,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00112,PRD-00112,2025-10-17,False,,,,False Positive,Synthetic evaluation record
+EVA-00113,PRD-00113,2025-10-28,False,,,,False Positive,Synthetic evaluation record
+EVA-00114,PRD-00114,2025-12-25,False,,,,False Positive,Synthetic evaluation record
+EVA-00115,PRD-00115,2025-11-21,False,,,,False Positive,Synthetic evaluation record
+EVA-00116,PRD-00116,2025-12-31,True,CURANMOR,JKS-001,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00117,PRD-00117,2025-11-13,False,,,,False Positive,Synthetic evaluation record
+EVA-00118,PRD-00118,2025-11-09,True,CURANMOR,JKS-008,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00119,PRD-00119,2025-11-29,False,,,,False Positive,Synthetic evaluation record
+EVA-00120,PRD-00120,2025-11-03,False,,,,False Positive,Synthetic evaluation record
+EVA-00121,PRD-00121,2025-11-17,False,,,,False Positive,Synthetic evaluation record
+EVA-00122,PRD-00122,2025-11-13,True,CURAS,JKS-029,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00123,PRD-00123,2025-10-28,False,,,,False Positive,Synthetic evaluation record
+EVA-00124,PRD-00124,2025-10-13,False,,,,False Positive,Synthetic evaluation record
+EVA-00125,PRD-00125,2025-10-26,False,,,,False Positive,Synthetic evaluation record
+EVA-00126,PRD-00126,2025-10-17,True,CURAT,JKS-003,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00127,PRD-00127,2025-11-08,False,,,,False Positive,Synthetic evaluation record
+EVA-00128,PRD-00128,2025-11-23,True,CURAS,JKS-018,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00129,PRD-00129,2025-11-14,True,CURANMOR,JKS-013,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00130,PRD-00130,2025-10-19,False,,,,False Positive,Synthetic evaluation record
+EVA-00131,PRD-00131,2025-10-06,True,CURAS,JKS-017,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00132,PRD-00132,2025-12-03,True,CURAT,JKS-008,06:00-12:00,Hit,Synthetic evaluation record
+EVA-00133,PRD-00133,2025-10-31,True,CURANMOR,JKS-024,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00134,PRD-00134,2025-11-13,False,,,,False Positive,Synthetic evaluation record
+EVA-00135,PRD-00135,2025-12-12,False,,,,False Positive,Synthetic evaluation record
+EVA-00136,PRD-00136,2025-10-19,False,,,,False Positive,Synthetic evaluation record
+EVA-00137,PRD-00137,2025-11-01,False,,,,False Positive,Synthetic evaluation record
+EVA-00138,PRD-00138,2025-11-08,True,CURANMOR,JKS-021,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00139,PRD-00139,2025-12-30,True,CURANMOR,JKS-021,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00140,PRD-00140,2025-12-15,False,,,,False Positive,Synthetic evaluation record
+EVA-00141,PRD-00141,2025-12-20,False,,,,False Positive,Synthetic evaluation record
+EVA-00142,PRD-00142,2025-11-28,True,CURANMOR,JKS-024,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00143,PRD-00143,2025-10-13,True,CURANMOR,JKS-012,06:00-12:00,Hit,Synthetic evaluation record
+EVA-00144,PRD-00144,2025-12-25,False,,,,False Positive,Synthetic evaluation record
+EVA-00145,PRD-00145,2025-12-07,False,,,,False Positive,Synthetic evaluation record
+EVA-00146,PRD-00146,2025-11-02,False,,,,False Positive,Synthetic evaluation record
+EVA-00147,PRD-00147,2025-10-29,True,CURANMOR,JKS-029,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00148,PRD-00148,2025-12-22,True,CURANMOR,JKS-013,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00149,PRD-00149,2025-10-07,False,,,,False Positive,Synthetic evaluation record
+EVA-00150,PRD-00150,2025-11-18,False,,,,False Positive,Synthetic evaluation record
+EVA-00151,PRD-00151,2025-12-03,False,,,,False Positive,Synthetic evaluation record
+EVA-00152,PRD-00152,2025-12-29,True,CURANMOR,JKS-011,06:00-12:00,Hit,Synthetic evaluation record
+EVA-00153,PRD-00153,2025-12-24,True,CURANMOR,JKS-031,06:00-12:00,Hit,Synthetic evaluation record
+EVA-00154,PRD-00154,2025-11-20,False,,,,False Positive,Synthetic evaluation record
+EVA-00155,PRD-00155,2025-11-12,True,CURANMOR,JKS-002,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00156,PRD-00156,2025-12-30,False,,,,False Positive,Synthetic evaluation record
+EVA-00157,PRD-00157,2025-11-10,False,,,,False Positive,Synthetic evaluation record
+EVA-00158,PRD-00158,2025-11-21,True,CURANMOR,JKS-031,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00159,PRD-00159,2025-12-21,False,,,,False Positive,Synthetic evaluation record
+EVA-00160,PRD-00160,2025-12-10,False,,,,False Positive,Synthetic evaluation record
+EVA-00161,PRD-00161,2025-10-18,False,,,,False Positive,Synthetic evaluation record
+EVA-00162,PRD-00162,2025-12-05,False,,,,False Positive,Synthetic evaluation record
+EVA-00163,PRD-00163,2025-11-19,True,CURANMOR,JKS-030,00:00-06:00,Hit,Synthetic evaluation record
+EVA-00164,PRD-00164,2025-10-09,False,,,,False Positive,Synthetic evaluation record
+EVA-00165,PRD-00165,2025-12-04,False,,,,False Positive,Synthetic evaluation record
+EVA-00166,PRD-00166,2025-10-27,True,CURANMOR,JKS-028,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00167,PRD-00167,2025-10-18,True,CURAT,JKS-030,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00168,PRD-00168,2025-12-24,False,,,,False Positive,Synthetic evaluation record
+EVA-00169,PRD-00169,2025-11-05,True,CURAS,JKS-018,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00170,PRD-00170,2025-12-06,True,CURAT,JKS-026,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00171,PRD-00171,2025-10-09,False,,,,False Positive,Synthetic evaluation record
+EVA-00172,PRD-00172,2025-11-06,False,,,,False Positive,Synthetic evaluation record
+EVA-00173,PRD-00173,2025-10-30,True,CURAS,JKS-023,12:00-18:00,Hit,Synthetic evaluation record
+EVA-00174,PRD-00174,2025-10-10,False,,,,False Positive,Synthetic evaluation record
+EVA-00175,PRD-00175,2025-11-16,False,,,,False Positive,Synthetic evaluation record
+EVA-00176,PRD-00176,2025-12-24,False,,,,False Positive,Synthetic evaluation record
+EVA-00177,PRD-00177,2025-11-27,False,,,,False Positive,Synthetic evaluation record
+EVA-00178,PRD-00178,2025-10-17,True,CURAS,JKS-032,18:00-23:59,Hit,Synthetic evaluation record
+EVA-00179,PRD-00179,2025-11-18,False,,,,False Positive,Synthetic evaluation record
+EVA-00180,PRD-00180,2025-10-31,False,,,,False Positive,Synthetic evaluation record

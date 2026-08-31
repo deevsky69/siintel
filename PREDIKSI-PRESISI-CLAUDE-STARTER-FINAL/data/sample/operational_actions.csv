@@ -1,0 +1,4 @@
+action_id,decision_id,unit_id,grid_id,kecamatan,start_at,end_at,status,result
+ACT-0001,DEC-0001,UNIT-001,JKS-001,Kebayoran Baru,2025-10-03 18:00,2025-10-03 22:00,Completed,Patroli preventif sintetis.
+ACT-0002,DEC-0002,UNIT-002,JKS-020,Tebet,2025-10-07 19:00,2025-10-07 23:00,Active,Monitoring sintetis.
+ACT-0003,DEC-0003,UNIT-003,JKS-013,Pasar Minggu,2025-10-12 20:00,2025-10-13 00:00,Planned,Task sintetis untuk pengujian.
