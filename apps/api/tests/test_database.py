@@ -15,7 +15,7 @@ from alembic.script import ScriptDirectory
 
 from prediksi_presisi_api import db
 from prediksi_presisi_api.config import Settings
-from prediksi_presisi_api.db import Base, DatabaseNotConfiguredError
+from prediksi_presisi_api.db import DatabaseNotConfiguredError
 
 API_ROOT = Path(__file__).resolve().parents[1]
 MIGRATIONS_DIR = API_ROOT.parent.parent / "database" / "migrations"
@@ -50,11 +50,6 @@ def test_engine_is_built_from_settings_without_connecting(
     assert engine.url.database == "example"
 
     db.get_engine.cache_clear()
-
-
-def test_no_tables_defined_yet() -> None:
-    # Entitas dibuat mulai TASK 011; baseline hanya mengaktifkan ekstensi.
-    assert Base.metadata.tables == {}
 
 
 def test_migrations_have_single_head() -> None:

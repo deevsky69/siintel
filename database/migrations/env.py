@@ -11,6 +11,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from prediksi_presisi_api import models  # noqa: F401  (mendaftarkan tabel ke Base.metadata)
 from prediksi_presisi_api.config import get_settings
 from prediksi_presisi_api.db import Base
 
@@ -19,7 +20,6 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Model belum ada — entitas dibuat mulai TASK 011.
 target_metadata = Base.metadata
 
 
