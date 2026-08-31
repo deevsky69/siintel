@@ -50,6 +50,27 @@ SQLAlchemy 2.x + Alembic + GeoAlchemy2 · MapLibre GL JS · Python ecosystem unt
 
 Rincian dan alasannya: `docs/01` §10.
 
+## Menjalankan (skeleton — TASK 001)
+
+Prasyarat: Node ≥22 (dengan Corepack), Python ≥3.12, dan [`uv`](https://docs.astral.sh/uv/).
+
+```bash
+# sekali saja
+corepack enable pnpm          # atau jalankan pnpm lewat: corepack pnpm <perintah>
+
+# frontend (http://localhost:3000)
+pnpm install
+pnpm dev
+
+# backend (http://localhost:8000)
+cd apps/api
+uv sync
+uv run uvicorn prediksi_presisi_api.main:app --reload --port 8000
+```
+
+Salin `.env.example` menjadi `.env` untuk pengembangan lokal. Belum ada database, autentikasi,
+maupun endpoint domain — semuanya dibangun pada PHASE 2 dan seterusnya.
+
 ## Cara kerja
 
 - Satu task = satu perubahan terukur, mengikuti TASK-ID pada `docs/08`.
