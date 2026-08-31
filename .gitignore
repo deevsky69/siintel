@@ -1,0 +1,38 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Data resmi / sensitif — hanya data/sample yang boleh di-commit
+data/raw/*
+data/import/*
+data/processed/*
+!data/**/.gitkeep
+
+# JavaScript / TypeScript
+node_modules/
+.next/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Database lokal
+*.sqlite
+*.db
+
+# Artefak build & test
+playwright-report/
+test-results/

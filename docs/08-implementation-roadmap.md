@@ -28,10 +28,17 @@ Tujuan:
 Output:
 ```text
 docs/implementation-notes/
-└── 000-specification-audit.md
+├── 000-specification-audit.md          # temuan audit
+├── 000b-specification-decision-log.md  # jawaban gate + decision log
+└── 000c-specification-lock.md          # status kunci spesifikasi + blocker
 ```
 
-**STOP setelah selesai.**
+**STATUS: SELESAI.** Keputusan teknis sudah diambil dan dokumen `docs/01`–`docs/07` diperbarui.
+Butir yang masih menunggu keputusan pengguna terdaftar pada `000c-specification-lock.md` —
+butir tersebut memblokir task tertentu, bukan seluruh roadmap.
+
+**Penomoran fase:** dokumen ini adalah penomoran kanonik (selaras dengan CLAUDE.md §38).
+`docs/01` §16 memakai tahapan konseptual Phase 0–8 dengan tabel pemetaan ke PHASE di sini.
 
 ---
 
@@ -136,6 +143,11 @@ role_permissions
 audit_logs
 ```
 
+Catatan hasil PHASE 0:
+- `users` memuat `password_hash`, `polsek`, `function`, `last_login_at`, `must_change_password` (docs/02 §17);
+- `role_permissions` memuat kolom `scope` (`ALL`/`OWN_JURISDICTION`/`OWN_FUNCTION`);
+- `audit_logs.result` memakai enum `SUCCESS`/`DENIED`/`FAILED` dan bersifat append-only.
+
 ## TASK 016 — Database Constraints & Index
 
 Tambahkan:
@@ -147,6 +159,11 @@ Tambahkan:
 - query indexes yang dibutuhkan.
 
 **Jangan membuat index secara membabi buta.**
+
+Constraint yang **sengaja ditunda** (docs/06 §3): hubungan `risk_score` dengan bobot faktor, dan batas
+`risk_class` terhadap `risk_score` — keduanya menunggu bobot/threshold disetujui (U-01, U-02).
+Constraint bersyarat `prediction_actual` (HIT/FALSE_POSITIVE wajib `prediction_id`;
+FALSE_NEGATIVE wajib `actual_incident_id`) **dipasang** pada task ini.
 
 ---
 
@@ -182,12 +199,72 @@ Load:
 - operational actions;
 - prediction actual.
 
-Acceptance:
-Dashboard nantinya dapat berjalan tanpa data resmi.
+## TASK 024 — Seed Public & Administration Data
+
+Load:
+- users (password hash dibuat saat seed, tidak pernah ada di CSV);
+- role_permissions (+ kolom `scope`);
+- citizen reports;
+- public alerts;
+- community feedback;
+- audit logs.
+
+Task ini ditambahkan karena keenam tabel tersebut tidak tercakup TASK 020–023,
+padahal tabelnya dibuat pada TASK 015 dan datanya tersedia di `data/sample/`.
+
+---
+
+## ACCEPTANCE CRITERIA PHASE 3 — KUALITAS DATA DUMMY
+
+Dasar: CLAUDE.md §17 (dummy data wajib punya FK valid, tanggal masuk akal, relasi valid).
+Perbaikan dilakukan pada **generator/seed script** (`scripts/seed/`, `scripts/validation/`), bukan dengan menyunting CSV satu per satu.
+
+Seed **gagal (fail-fast)** bila salah satu tidak terpenuhi — tidak boleh ada koersi diam-diam:
+
+| # | Kriteria | Temuan audit yang ditutup |
+|---|---|---|
+| A-1 | 0 orphan foreign key. `commander_decisions.decision_by` harus menunjuk user yang ada (dataset memakai `USER-DEMO-PIMPINAN` yang tidak terdaftar pada 63/63 baris). | S-01 |
+| A-2 | Setiap `grid_id` pada CSV terpetakan ke `locations.location_id`. | C-02 |
+| A-3 | Untuk setiap baris `risk_scores`: `risk_score = round(Σ(bobot × faktor))` memakai bobot dari `config/risk/`. Dataset saat ini menyimpang pada 1.822 dari 1.848 baris. | S-04 |
+| A-4 | `predictions.forecast_horizon` mencakup kelima horizon `6H,12H,24H,3D,7D` (dataset saat ini hanya `24h`). | S-06 |
+| A-5 | `dominant_factors` berbentuk `jsonb` per baris dengan `source` (`RULE`/`MODEL`); tidak boleh satu kalimat identik untuk seluruh prediksi (saat ini identik pada 180/180). | S-07 |
+| A-6 | Setiap prediksi memiliki `risk_scores` pendamping pada lokasi/ancaman/jendela yang sama untuk tanggal penilaian sebelumnya (koherensi demo, bukan FK). | S-05 |
+| A-7 | `prediction_actual` hanya mengevaluasi prediksi `PUBLISHED`/`VALIDATED`, dan **memuat baris `FALSE_NEGATIVE`** sehingga recall dapat dihitung. | S-08, S-09 |
+| A-8 | Setiap keputusan `APPROVED`/`MODIFIED` memiliki `operational_actions` (saat ini 3 action untuk 33 keputusan approved). | S-10 |
+| A-9 | Setiap baris `audit_logs` memakai pasangan `action`/`resource_type` yang sah, dan pelakunya benar-benar memiliki permission tersebut. Dataset saat ini memuat ±190 baris `SUCCESS` untuk aksi yang rolenya tidak berwenang. | S-02, S-03 |
+| A-10 | `audit_logs` memuat minimal satu kasus `DENIED` per role agar pengujian RBAC punya data. | S-03 |
+| A-11 | Seluruh timestamp ternormalisasi ke `timestamptz`; importer menerima format `T` maupun spasi. | S-14 |
+| A-12 | Enum tersimpan mengikuti pemetaan `config/taxonomy/` (docs/02 §22). | C-13 |
+
+**Waktu data demo (`TECHNICAL DECISION`, SDL-16).** Dataset berhenti 2025-12-31.
+Tanggal historis **tidak digeser**, karena akan merusak split training 2023–2024 / validasi Jan–Sep 2025 / holdout Okt–Des 2025 (`docs/01` §8).
+Sebagai gantinya aplikasi memakai **waktu acuan** (`DEMO_REFERENCE_TIME`); bila diisi, "24 jam terakhir" dan "warning aktif" dihitung relatif terhadapnya.
+
+Acceptance akhir Phase 3: dashboard dapat berjalan tanpa data resmi.
 
 ---
 
 # PHASE 4 — BACKEND API
+
+## URUTAN EKSEKUSI PHASE 4 ↔ PHASE 5
+
+`TECHNICAL DECISION` (SDL-10). Nomor task **tidak berubah**, tetapi urutan pengerjaannya:
+
+```text
+030  API foundation
+ ↓
+050  Authentication
+051  Role & permission
+052  Authorization middleware
+053  Audit logging
+ ↓
+031 … 040  API domain
+```
+
+Alasan: PHASE 4 mensyaratkan setiap endpoint memiliki authorization, sedangkan mekanismenya baru dibuat pada PHASE 5.
+CLAUDE.md §21 mewajibkan endpoint sensitif memiliki authorization sejak awal, sehingga API domain tidak boleh lahir tanpa middleware.
+Dengan urutan ini, setiap API domain sejak awal dapat diuji untuk kasus **allowed / denied / unauthenticated** (CLAUDE.md §30).
+CHECKPOINT C tetap utuh karena memang menggabungkan API + Authentication + RBAC.
 
 ## TASK 030 — API Foundation
 
@@ -249,12 +326,20 @@ Polsek
 Administrator
 ```
 
+Gunakan katalog permission `resource:action` dan matriks pada `docs/03` §2–§3.
+Pemberian permission per role masih `PROPOSED` — jangan diperlakukan sebagai kewenangan resmi
+sampai pertanyaan P-1…P-7 (`docs/03` §4) dijawab pemilik proyek.
+
 ## TASK 052 — Authorization Middleware
+
+Middleware memeriksa permission **dan** `scope` (jurisdiksi/fungsi) sebelum handler dijalankan.
+Resource di luar scope dijawab `404`, bukan `403` (docs/05 §1).
 
 Test:
 - allowed;
 - denied;
-- unauthenticated.
+- unauthenticated;
+- out-of-scope.
 
 ## TASK 053 — Audit Logging
 
@@ -405,6 +490,13 @@ false negative
 ```
 
 Simpan `model_version`.
+
+False negative memakai baris `prediction_actual` dengan `match_type = FALSE_NEGATIVE`
+(`prediction_id` NULL, `actual_incident_id` terisi) — docs/02 §15, CLAUDE.md §26.
+
+**BLOCKER (U-03):** aturan pencocokan spasial/temporal antara kejadian aktual dan prediksi belum
+ditetapkan. Sampai ditetapkan, hasil evaluasi ditandai `PROPOSED` dan tidak boleh disajikan
+sebagai validasi model.
 
 ---
 

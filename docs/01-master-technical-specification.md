@@ -293,18 +293,29 @@ External data must be added only when source, legality, licensing, and usefulnes
 
 # 7. DATA PIPELINE
 
-Target pipeline:
+Terdapat **dua** pipeline yang sebelumnya tertulis sebagai satu rangkaian sehingga menimbulkan
+penyebutan tahap yang tidak konsisten antar dokumen. Keduanya kini dipisah.
 
-RAW
-→ CLEAN
-→ VALIDATE
-→ ANONYMIZE
+## 7.1 Pipeline ingestion (canonical — CLAUDE.md §18)
+
+data/raw
+→ VALIDATION
+→ MAPPING
+→ ANONYMIZATION
 → GEO / GRID
+→ data/processed
+→ DATABASE
+
+Pembersihan (*cleaning*) adalah bagian dari tahap VALIDATION/MAPPING, bukan tahap tersendiri.
+Format file sumber resmi tidak harus sama dengan canonical schema — gunakan ETL/mapping adapter.
+
+## 7.2 Pipeline analitik (berjalan setelah data ada di database)
+
+DATABASE
 → FEATURE ENGINEERING
 → ANALYSIS
 → MODEL
 → PREDICTION
-→ VALIDATION
 → EVALUATION
 
 Data quality checks should cover:
@@ -395,10 +406,28 @@ Analytics/ML:
 Python ecosystem
 
 Map:
-MapLibre GL JS or approved GIS alternative
+MapLibre GL JS
 
 Version control:
 Git
+
+## 10.1 Confirmed toolchain (`TECHNICAL DECISION`)
+
+The stack above is confirmed as-is. Items that the source documents left open are decided as follows:
+
+| Concern | Decision |
+|---|---|
+| ORM / migration | SQLAlchemy 2.x + Alembic + GeoAlchemy2 |
+| Python package manager | `uv` |
+| TypeScript workspace | pnpm workspaces |
+| Type sharing Python ↔ TypeScript | Frontend types are **generated** from the backend OpenAPI document; never hand-written twice |
+| Authentication | JWT access token + refresh token in `httpOnly` cookie; Argon2id password hashing |
+| Testing | pytest + httpx (API), Vitest + Testing Library (web), Playwright (E2E) |
+
+**Map tiles — decided by the project owner (2026-08-31): hybrid.** Development uses a locally hosted tile
+server from `infra/docker`; the production environment and its tile source remain open until PHASE 16.
+Tile and style URLs are always read from the environment — never hard-coded — so the production target can
+change without touching source code.
 
 Conceptual flow:
 
@@ -515,8 +544,12 @@ Initial API areas:
 /api/evaluation
 /api/executive-brief
 
-Exact endpoints, schemas, authentication, pagination, filtering, and error contracts
-must be defined in docs/05-api-design.md before large-scale implementation.
+Exact endpoints, schemas, authentication, pagination, filtering, and error contracts are defined in
+`docs/05-api-design.md`, which is now the authoritative API document. Two changes made there:
+
+- `/api/map` is split into `current-risk` (from `risk_scores`) and `predictive-heatmap` (from `predictions`),
+  because those are two different layers — see `docs/04`;
+- `/api/executive-brief` is **not** defined until the source of its content is decided (§19.2).
 
 ---
 
@@ -539,9 +572,40 @@ LOGIN
 
 Each slice must be runnable and testable.
 
+## 15.1 How this is reconciled with the roadmap (`TECHNICAL DECISION`)
+
+`docs/08` is organised by layer (database → API → UI), which reads as the opposite of "vertical slices".
+The reconciliation is:
+
+- The **phase order and gates** of `docs/08` are authoritative (CLAUDE.md §38–§39). Phases are not reordered.
+- The vertical-slice intent is satisfied by the **CHECKPOINT rule**: a checkpoint may only be declared when its
+  slice actually runs end-to-end, not when its files exist.
+- Within PHASE 4/5 the execution order *is* adjusted so authorization exists before domain APIs
+  (see "URUTAN EKSEKUSI" in `docs/08`).
+
+The intent of this section stands: a feature counts as done when it is runnable and testable end-to-end,
+not when its layer is complete.
+
 ---
 
 # 16. DEVELOPMENT PHASES
+
+> **Penomoran.** Bagian ini adalah **tahapan konseptual**. Penomoran fase operasional yang mengikat
+> adalah `docs/08-implementation-roadmap.md` (selaras dengan CLAUDE.md §38). Gunakan tabel pemetaan
+> di bawah bila sebuah instruksi menyebut "Phase X".
+
+| Tahap konseptual (dokumen ini) | PHASE pada `docs/08` |
+|---|---|
+| Phase 0 — Foundation | PHASE 0–1 |
+| Phase 1 — Backend foundation | PHASE 2, 4, 5 |
+| Phase 2 — Core dashboard | PHASE 6–7 |
+| Phase 3 — GIS | PHASE 8 |
+| Phase 4 — Analytics | PHASE 9 |
+| Phase 5 — Risk & prediction | PHASE 10 |
+| Phase 6 — Warning & recommendation | PHASE 11–13 |
+| Phase 7 — Evaluation | PHASE 15 |
+| Phase 8 — Delivery | PHASE 16 |
+| *(tidak ada padanan di sini)* | PHASE 14 — Operation Center |
 
 ## Phase 0 — Foundation
 - repository
@@ -641,27 +705,44 @@ Never silently expand scope.
 
 ---
 
-# 19. OPEN ITEMS BEFORE FULL IMPLEMENTATION
+# 19. OPEN ITEMS — STATUS AFTER PHASE 0
 
-The following must be finalized from the project owner/data owner:
+Status setelah audit TASK 000 dan penyelesaian keputusan teknis.
+Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 
-- final field names and data types
-- exact data dictionary
-- final risk formula/weights
-- early warning thresholds
-- prediction target definition
-- grid size
-- exact GIS boundaries
-- final role-permission matrix
-- exact operational workflows
-- final API contracts
-- final UI screens
-- model evaluation methodology
-- deployment environment
-- data retention policy
-- approved external data sources
+## 19.1 Sudah ditetapkan sebagai keputusan teknis (`TECHNICAL DECISION`)
 
-These are intentionally not invented in this specification.
+| Item | Ditetapkan di |
+|---|---|
+| Nama field dan tipe data | `docs/02` |
+| Data dictionary | `docs/02` |
+| Kontrak API (bentuk, error, pagination, auth, permission per endpoint) | `docs/05` |
+| Katalog permission dan model scope | `docs/03` §2 |
+| Struktur repository, toolchain, migration | `docs/07`, `docs/06` §1 |
+| Representasi false negative untuk evaluasi | `docs/02` §15, `docs/06` §3 |
+| Penanganan waktu, timezone, dan waktu acuan demo | `docs/02` K-3, `docs/08` PHASE 3 |
+
+## 19.2 Masih menunggu pemilik proyek / data owner (`NOT SPECIFIED`)
+
+Butir berikut **tidak diinvensi** dan memblokir task tertentu:
+
+| Item | Memblokir |
+|---|---|
+| Bobot risk score final (U-02) | TASK 102, constraint bobot |
+| Threshold early warning & batas kelas risiko (U-01) | TASK 110 |
+| Definisi target prediksi & aturan pencocokan evaluasi (U-03) | TASK 100–104, 150–151 |
+| Ukuran grid & batas GIS resmi (U-04) | TASK 011, 080–084 |
+| Matriks role-permission resmi + kewenangan approve/publish (U-06, U-10) | TASK 051, 111, 130 |
+| Kebijakan kredensial (panjang/rotasi password, MFA, SSO) (U-05) | TASK 050 |
+| Alur operasional resmi & state machine (U-08) | TASK 110–142 |
+| Taksonomi final (U-16) | TASK 011, 020 |
+| Sumber konten Executive Brief (U-11) | modul MVP #12 |
+| Identitas pelapor, bukti, dan status LAPOR PRESISI (U-13) | PHASE 17 |
+| Lingkungan produksi & sumber tile produksi (sisa U-15 — pengembangan sudah diputuskan: tile lokal) | PHASE 16 |
+| Retensi & klasifikasi data (U-14) | TASK 162–163 |
+| Sumber data eksternal yang disetujui (U-19) | fase analytics/ML |
+| SLA, volume data, jumlah pengguna (U-17) | TASK 164 |
+| UI screens final | PHASE 6–7 |
 
 ---
 
