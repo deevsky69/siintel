@@ -9,6 +9,9 @@ Isi paket berada langsung di **root repository** (`siintel`).
 ├── README.md
 ├── .gitignore
 ├── .env.example
+├── package.json                  # entrypoint perintah lintas aplikasi
+├── pnpm-workspace.yaml
+├── .github/workflows/ci.yml
 │
 ├── docs/
 │   ├── 01-master-technical-specification.md
@@ -59,6 +62,7 @@ Isi paket berada langsung di **root repository** (`siintel`).
 │   ├── raw/                      # data mentah; tidak di-commit
 │   ├── import/                   # siap mapping/import; tidak di-commit
 │   ├── processed/                # hasil ETL/clean/anonymization; tidak di-commit
+│   ├── tiles/                    # .mbtiles untuk tile server lokal; tidak di-commit
 │   └── sample/                   # DATA DUMMY (satu-satunya yang di-commit)
 │
 ├── scripts/
@@ -67,10 +71,10 @@ Isi paket berada langsung di **root repository** (`siintel`).
 │   ├── validation/
 │   └── development/
 │
-├── tests/
+├── tests/                        # test lintas aplikasi
 │   ├── unit/
 │   ├── integration/
-│   └── e2e/
+│   └── e2e/                      # Playwright (TASK 165)
 │
 ├── infra/
 │   └── docker/                   # postgres+postgis, tile server pengembangan
@@ -95,7 +99,30 @@ Isi paket berada langsung di **root repository** (`siintel`).
 | Package manager Python | `uv` |
 | Workspace TypeScript | pnpm workspaces |
 | Peta | MapLibre GL JS (sumber tile: lihat `.env.example`) |
-| Test | pytest + httpx (API), Vitest + Testing Library (web), Playwright (E2E) |
+| Lint + format Python | **Ruff** — satu alat menggantikan black + isort + flake8 |
+| Typecheck Python | **mypy** (`strict`) — padanan `tsc --noEmit` di sisi web |
+| Lint + format TypeScript/React/CSS | **Biome** — satu alat menggantikan ESLint + Prettier |
+| Test | pytest + httpx (API), Vitest + Testing Library (web), Playwright (E2E, dipasang saat TASK 165) |
+| CI | GitHub Actions (`.github/workflows/ci.yml`) — lint, typecheck, test, build untuk kedua sisi |
+
+**Kenapa Ruff dan Biome.** Keduanya menggabungkan lint dan format dalam satu binary, sehingga hanya ada
+satu konfigurasi dan satu perintah per sisi. Konsekuensi yang diterima: Biome tidak memiliki aturan
+khusus Next.js seperti `eslint-config-next`. Bila kelak muncul kesalahan khas Next.js yang lolos,
+`eslint-config-next` dapat ditambahkan berdampingan tanpa membongkar apa pun.
+
+**Playwright ditunda.** Memasang browser Playwright menambah unduhan besar tanpa manfaat selama belum
+ada UI yang layak diuji end-to-end. Dipasang pada TASK 165.
+
+### Perintah tunggal dari root
+
+```bash
+pnpm lint        # Biome (web) + Ruff (api)
+pnpm typecheck   # tsc (web) + mypy (api)
+pnpm test        # Vitest (web) + pytest (api)
+pnpm verify      # ketiganya berurutan
+pnpm db:up       # PostGIS via docker compose
+pnpm gis:up      # PostGIS + tile server lokal (profile gis)
+```
 
 **Berbagi tipe antara Python dan TypeScript**: backend menghasilkan OpenAPI; tipe TS di `packages/shared/types` **digenerate** dari OpenAPI. Tipe tidak ditulis dua kali di dua bahasa — itu sumber kebenaran ganda yang pasti menyimpang.
 
@@ -119,6 +146,9 @@ Isi paket berada langsung di **root repository** (`siintel`).
 12. Setiap evaluation menunjuk prediction yang dievaluasi, **atau** kejadian aktual yang tidak diprediksi (false negative).
 13. `packages/shared/types` berisi artefak generate — jangan diedit manual.
 14. Dokumen sumber (PDF) disimpan di `docs/source/`, referensi visual di `design/`.
+15. Unit/integration test diletakkan berdampingan dengan aplikasinya — `apps/api/tests/` dan
+    `apps/web/src/**/*.test.tsx`. Direktori `tests/` di root untuk test lintas aplikasi dan E2E.
+16. Berkas tile peta (`data/tiles/`) tidak di-commit; ukurannya besar dan bukan source code.
 
 ---
 

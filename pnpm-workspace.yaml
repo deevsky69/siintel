@@ -1,3 +1,7 @@
 packages:
   - apps/web
   - packages/*
+
+# esbuild (dependensi Vitest) memerlukan build script untuk menyiapkan binary-nya.
+allowBuilds:
+  esbuild: true

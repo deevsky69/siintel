@@ -9,7 +9,29 @@
   },
   "scripts": {
     "dev": "pnpm --filter @prediksi-presisi/web dev",
+    "dev:api": "cd apps/api && uv run uvicorn prediksi_presisi_api.main:app --reload --port 8000",
     "build": "pnpm --filter @prediksi-presisi/web build",
-    "typecheck": "pnpm -r --if-present typecheck"
+
+    "lint": "pnpm lint:web && pnpm lint:api",
+    "lint:web": "pnpm --filter @prediksi-presisi/web lint",
+    "lint:api": "cd apps/api && uv run ruff check . && uv run ruff format --check .",
+
+    "format": "pnpm format:web && pnpm format:api",
+    "format:web": "pnpm --filter @prediksi-presisi/web format",
+    "format:api": "cd apps/api && uv run ruff check --fix . && uv run ruff format .",
+
+    "typecheck": "pnpm typecheck:web && pnpm typecheck:api",
+    "typecheck:web": "pnpm --filter @prediksi-presisi/web typecheck",
+    "typecheck:api": "cd apps/api && uv run mypy",
+
+    "test": "pnpm test:web && pnpm test:api",
+    "test:web": "pnpm --filter @prediksi-presisi/web test",
+    "test:api": "cd apps/api && uv run pytest",
+
+    "verify": "pnpm lint && pnpm typecheck && pnpm test",
+
+    "db:up": "docker compose -f infra/docker/docker-compose.yml up -d db",
+    "db:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "gis:up": "docker compose -f infra/docker/docker-compose.yml --profile gis up -d"
   }
 }

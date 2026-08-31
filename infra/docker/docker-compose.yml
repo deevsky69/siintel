@@ -1,0 +1,46 @@
+name: prediksi-presisi
+
+# Layanan pengembangan lokal.
+# - `db`         : PostgreSQL + PostGIS (dipakai mulai TASK 010)
+# - `tileserver` : sumber tile peta lokal sesuai keputusan B-1 opsi C.
+#                  Berada di profile `gis` agar tidak ikut jalan sebelum berkasnya tersedia.
+#
+# Jalankan:  docker compose -f infra/docker/docker-compose.yml up -d db
+# Dengan peta:  docker compose -f infra/docker/docker-compose.yml --profile gis up -d
+
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    container_name: predpol-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-predpol}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-predpol}
+      POSTGRES_DB: ${POSTGRES_DB:-prediksi_presisi}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-predpol} -d ${POSTGRES_DB:-prediksi_presisi}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  tileserver:
+    profiles: ["gis"]
+    image: maptiler/tileserver-gl:latest
+    container_name: predpol-tileserver
+    restart: unless-stopped
+    ports:
+      - "${TILESERVER_PORT:-8080}:8080"
+    volumes:
+      # Letakkan berkas .mbtiles wilayah Jakarta di data/tiles/ (tidak di-commit).
+      - ../../data/tiles:/data:ro
+
+volumes:
+  db-data:

@@ -11,7 +11,9 @@ Thumbs.db
 data/raw/*
 data/import/*
 data/processed/*
+data/tiles/*
 !data/**/.gitkeep
+!data/tiles/README.md
 
 # JavaScript / TypeScript
 node_modules/

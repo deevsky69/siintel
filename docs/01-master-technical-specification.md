@@ -422,7 +422,10 @@ The stack above is confirmed as-is. Items that the source documents left open ar
 | TypeScript workspace | pnpm workspaces |
 | Type sharing Python ↔ TypeScript | Frontend types are **generated** from the backend OpenAPI document; never hand-written twice |
 | Authentication | JWT access token + refresh token in `httpOnly` cookie; Argon2id password hashing |
-| Testing | pytest + httpx (API), Vitest + Testing Library (web), Playwright (E2E) |
+| Lint + format | Ruff (Python) and Biome (TypeScript/CSS) — one tool per side, lint and format combined |
+| Type checking | mypy `strict` (API) and `tsc --noEmit` (web) |
+| Testing | pytest + httpx (API), Vitest + Testing Library (web), Playwright (E2E, installed at TASK 165) |
+| CI | GitHub Actions — lint, typecheck, test, build on both sides |
 
 **Map tiles — decided by the project owner (2026-08-31): hybrid.** Development uses a locally hosted tile
 server from `infra/docker`; the production environment and its tile source remain open until PHASE 16.

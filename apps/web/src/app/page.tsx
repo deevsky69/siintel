@@ -6,8 +6,7 @@ export default function Home() {
         Skeleton aplikasi web (TASK 001). Belum ada fitur bisnis.
       </p>
       <p className="text-sm opacity-80">
-        API base URL:{" "}
-        <code>{process.env.NEXT_PUBLIC_API_BASE_URL ?? "belum dikonfigurasi"}</code>
+        API base URL: <code>{process.env.NEXT_PUBLIC_API_BASE_URL ?? "belum dikonfigurasi"}</code>
       </p>
     </main>
   );
