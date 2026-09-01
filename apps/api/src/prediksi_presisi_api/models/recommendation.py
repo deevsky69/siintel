@@ -21,6 +21,7 @@ from ..db import Base
 from .base import TimestampMixin, uuid_pk
 
 if TYPE_CHECKING:
+    from .commander_decision import CommanderDecision
     from .early_warning import EarlyWarning
     from .prediction import Prediction
 
@@ -56,6 +57,7 @@ class Recommendation(TimestampMixin, Base):
 
     prediction: Mapped[Prediction] = relationship(back_populates="recommendations")
     warning: Mapped[EarlyWarning | None] = relationship(back_populates="recommendations")
+    decisions: Mapped[list[CommanderDecision]] = relationship(back_populates="recommendation")
 
     __table_args__ = (
         Index("ix_recommendations_status", "status"),

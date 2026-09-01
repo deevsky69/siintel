@@ -12,6 +12,7 @@ from ..db import Base
 from .base import TimestampMixin, uuid_pk
 
 if TYPE_CHECKING:
+    from .operational_action import OperationalAction
     from .patrol_activity import PatrolActivity
 
 
@@ -31,6 +32,7 @@ class PoliceUnit(TimestampMixin, Base):
     status: Mapped[str] = mapped_column(String(50), nullable=False)
 
     patrol_activities: Mapped[list[PatrolActivity]] = relationship(back_populates="unit")
+    operational_actions: Mapped[list[OperationalAction]] = relationship(back_populates="unit")
 
     __table_args__ = (
         Index("ix_police_units_function", "function"),

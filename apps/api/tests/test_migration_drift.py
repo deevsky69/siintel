@@ -46,6 +46,10 @@ EXPECTED_TABLES = {
     "predictions",
     "early_warnings",
     "recommendations",
+    # TASK 014 — operasional
+    "commander_decisions",
+    "operational_actions",
+    "prediction_actual",
 }
 
 

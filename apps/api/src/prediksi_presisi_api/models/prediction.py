@@ -33,6 +33,7 @@ from .base import TimestampMixin, uuid_pk
 if TYPE_CHECKING:
     from .early_warning import EarlyWarning
     from .location import Location
+    from .prediction_actual import PredictionActual
     from .recommendation import Recommendation
     from .risk_score import RiskScore
 
@@ -86,6 +87,7 @@ class Prediction(TimestampMixin, Base):
     baseline_risk_score: Mapped[RiskScore | None] = relationship()
     early_warnings: Mapped[list[EarlyWarning]] = relationship(back_populates="prediction")
     recommendations: Mapped[list[Recommendation]] = relationship(back_populates="prediction")
+    evaluations: Mapped[list[PredictionActual]] = relationship(back_populates="prediction")
 
     __table_args__ = (
         UniqueConstraint(

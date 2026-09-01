@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from .crime_incident import CrimeIncident
     from .early_warning import EarlyWarning
     from .intelligence_report import IntelligenceReport
+    from .operational_action import OperationalAction
     from .patrol_activity import PatrolActivity
     from .prediction import Prediction
     from .risk_score import RiskScore
@@ -66,6 +67,9 @@ class Location(TimestampMixin, Base):
     risk_scores: Mapped[list[RiskScore]] = relationship(back_populates="location")
     predictions: Mapped[list[Prediction]] = relationship(back_populates="location")
     early_warnings: Mapped[list[EarlyWarning]] = relationship(back_populates="location")
+    operational_actions: Mapped[list[OperationalAction]] = relationship(
+        back_populates="location", foreign_keys="OperationalAction.location_id"
+    )
 
     __table_args__ = (
         Index("ix_locations_polsek", "polsek"),

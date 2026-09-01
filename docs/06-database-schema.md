@@ -161,7 +161,22 @@ CHECK (
 )
 ```
 
-`operational_actions` hanya boleh menunjuk keputusan `APPROVED`/`MODIFIED` — ditegakkan di service layer dan diuji (constraint lintas tabel tidak dipaksakan di database agar tetap sederhana).
+### Trigger — invarian human-in-the-loop
+
+`operational_actions` hanya boleh menunjuk keputusan `APPROVED`/`MODIFIED`.
+
+Aturan ini **ditegakkan di database** lewat trigger
+`trg_operational_actions_require_approved_decision` (migration `0006`), bukan hanya di
+lapisan aplikasi seperti rencana semula.
+
+Alasan perubahan: ini invarian inti produk — jaminan bahwa AI tidak pernah langsung
+memerintahkan tindakan operasional (CLAUDE.md §13). Aturan sepenting itu tidak boleh bergantung
+pada satu jalur kode; script seed, perbaikan data manual, atau endpoint baru bisa melewatinya.
+CHECK constraint tidak dapat dipakai karena tidak boleh merujuk tabel lain, sehingga trigger
+adalah satu-satunya cara deklaratif di PostgreSQL.
+
+Trigger ini adalah **pengecualian yang disengaja** terhadap prinsip "business rule berada di
+service layer". Aturan bisnis lain tetap di service layer.
 
 ### Constraint yang SENGAJA DITUNDA
 

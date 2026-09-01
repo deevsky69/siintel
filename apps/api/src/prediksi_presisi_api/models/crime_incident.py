@@ -19,6 +19,7 @@ from .base import TimestampMixin, uuid_pk
 
 if TYPE_CHECKING:
     from .location import Location
+    from .prediction_actual import PredictionActual
 
 
 class CrimeIncident(TimestampMixin, Base):
@@ -53,6 +54,7 @@ class CrimeIncident(TimestampMixin, Base):
     status: Mapped[str | None] = mapped_column(String(50))
 
     location: Mapped[Location] = relationship(back_populates="crime_incidents")
+    evaluations: Mapped[list[PredictionActual]] = relationship(back_populates="actual_incident")
 
     __table_args__ = (
         Index("ix_crime_incidents_occurred_at", "occurred_at"),

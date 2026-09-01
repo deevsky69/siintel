@@ -13,7 +13,7 @@ import os
 from collections.abc import Iterator
 
 import pytest
-from sqlalchemy import Engine, create_engine, text
+from sqlalchemy import Connection, Engine, create_engine, text
 from sqlalchemy.exc import DatabaseError
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
@@ -41,7 +41,36 @@ CORE_TABLES = {
     "predictions",
     "early_warnings",
     "recommendations",
+    "commander_decisions",
+    "operational_actions",
+    "prediction_actual",
 }
+
+_ORIGINAL_RECOMMENDATION = "Usulan asli sistem: penguatan patroli preventif."
+
+_SAMPLE_RECOMMENDATION = text("""
+    INSERT INTO recommendations
+        (code, prediction_id, recommended_function, recommendation_text, priority, status)
+    VALUES
+        ('REC-OPS', :prediction_id, 'SAMAPTA', :text, 'MEDIUM', 'PENDING_REVIEW')
+    RETURNING recommendation_id
+""")
+
+_SAMPLE_USER = text("""
+    WITH new_role AS (
+        INSERT INTO roles (code, role_name, level) VALUES ('ROLE-OPS', 'Pimpinan Uji', 1)
+        RETURNING role_id
+    )
+    INSERT INTO users (code, username, password_hash, role_id, status)
+    SELECT 'USER-OPS', 'uji.pimpinan', 'argon2-hash-uji', role_id, 'ACTIVE' FROM new_role
+    RETURNING user_id
+""")
+
+_SAMPLE_UNIT = text("""
+    INSERT INTO police_units (code, function, unit_name, jurisdiction, status)
+    VALUES ('UNIT-OPS', 'SAMAPTA', 'Unit Uji', 'Polsek Tebet', 'ACTIVE')
+    RETURNING unit_id
+""")
 
 _SAMPLE_PREDICTION = text("""
     INSERT INTO predictions
@@ -101,7 +130,7 @@ def test_migrations_are_applied(engine: Engine) -> None:
     with engine.connect() as connection:
         revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
-    assert revision == "0005", "database belum di-migrate: jalankan `pnpm db:migrate`"
+    assert revision == "0006", "database belum di-migrate: jalankan `pnpm db:migrate`"
 
 
 def test_postgis_and_pgcrypto_are_installed(engine: Engine) -> None:
@@ -346,6 +375,153 @@ def test_acknowledging_a_warning_requires_an_actor(engine: Engine) -> None:
                     UPDATE early_warnings
                     SET status = 'ACKNOWLEDGED', acknowledged_at = now()
                     WHERE code = 'WRN-IT'
+                """)
+            )
+
+        connection.rollback()
+
+
+def _decision_chain(connection: Connection, decision: str, modified_text: str | None = None) -> str:
+    """Menyiapkan location → prediction → recommendation → user → keputusan komandan."""
+    location_id = connection.execute(_SAMPLE_LOCATION).scalar_one()
+    prediction_id = connection.execute(
+        _SAMPLE_PREDICTION, {"location_id": location_id}
+    ).scalar_one()
+    recommendation_id = connection.execute(
+        _SAMPLE_RECOMMENDATION,
+        {"prediction_id": prediction_id, "text": _ORIGINAL_RECOMMENDATION},
+    ).scalar_one()
+    user_id = connection.execute(_SAMPLE_USER).scalar_one()
+
+    decision_id = connection.execute(
+        text("""
+            INSERT INTO commander_decisions
+                (code, recommendation_id, decision_by, decision, reason, modified_text)
+            VALUES
+                ('DEC-OPS', :recommendation_id, :user_id, :decision, 'alasan uji', :modified_text)
+            RETURNING decision_id
+        """),
+        {
+            "recommendation_id": recommendation_id,
+            "user_id": user_id,
+            "decision": decision,
+            "modified_text": modified_text,
+        },
+    ).scalar_one()
+    return str(decision_id)
+
+
+def _insert_action(connection: Connection, decision_id: str) -> None:
+    location_id = connection.execute(
+        text("SELECT location_id FROM locations WHERE code = 'LOC-IT'")
+    ).scalar_one()
+    unit_id = connection.execute(_SAMPLE_UNIT).scalar_one()
+    connection.execute(
+        text("""
+            INSERT INTO operational_actions
+                (code, decision_id, unit_id, location_id, start_at, status)
+            VALUES
+                ('ACT-OPS', :decision_id, :unit_id, :location_id, now(), 'PLANNED')
+        """),
+        {"decision_id": decision_id, "unit_id": unit_id, "location_id": location_id},
+    )
+
+
+def test_action_can_be_created_from_an_approved_decision(engine: Engine) -> None:
+    with engine.begin() as connection:
+        decision_id = _decision_chain(connection, "APPROVED")
+
+        _insert_action(connection, decision_id)
+
+        status = connection.execute(
+            text("SELECT status FROM operational_actions WHERE code = 'ACT-OPS'")
+        ).scalar_one()
+        assert status == "PLANNED"
+
+        connection.rollback()
+
+
+def test_action_cannot_be_created_from_a_rejected_decision(engine: Engine) -> None:
+    """Invarian inti produk: AI tidak pernah langsung memerintahkan tindakan."""
+    with engine.begin() as connection:
+        decision_id = _decision_chain(connection, "REJECTED")
+
+        with pytest.raises(DatabaseError):
+            _insert_action(connection, decision_id)
+
+        connection.rollback()
+
+
+def test_modified_decision_requires_new_text(engine: Engine) -> None:
+    with engine.begin() as connection:
+        with pytest.raises(DatabaseError):
+            _decision_chain(connection, "MODIFIED", modified_text=None)
+
+        connection.rollback()
+
+
+def test_modified_decision_preserves_the_original_recommendation(engine: Engine) -> None:
+    """Jejak usulan AI dan keputusan manusia harus keduanya utuh (U-07)."""
+    with engine.begin() as connection:
+        _decision_chain(connection, "MODIFIED", modified_text="Versi komandan: tambah 1 unit.")
+
+        original, modified = connection.execute(
+            text("""
+                SELECT r.recommendation_text, d.modified_text
+                FROM recommendations r
+                JOIN commander_decisions d ON d.recommendation_id = r.recommendation_id
+                WHERE r.code = 'REC-OPS'
+            """)
+        ).one()
+
+        assert original == _ORIGINAL_RECOMMENDATION
+        assert modified == "Versi komandan: tambah 1 unit."
+
+        connection.rollback()
+
+
+def test_false_negative_can_be_recorded_without_a_prediction(engine: Engine) -> None:
+    """Tanpa ini recall tidak dapat dihitung (CLAUDE.md §26)."""
+    with engine.begin() as connection:
+        location_id = connection.execute(_SAMPLE_LOCATION).scalar_one()
+        incident_id = connection.execute(
+            text("""
+                INSERT INTO crime_incidents
+                    (code, incident_type, occurred_at, incident_date, incident_time, location_id)
+                VALUES
+                    ('INC-FN', 'CURANMOR', now(), current_date, '02:15', :location_id)
+                RETURNING incident_id
+            """),
+            {"location_id": location_id},
+        ).scalar_one()
+
+        connection.execute(
+            text("""
+                INSERT INTO prediction_actual
+                    (code, evaluation_date, actual_incident_id, actual_event, match_type)
+                VALUES
+                    ('EVA-FN', current_date, :incident_id, true, 'FALSE_NEGATIVE')
+            """),
+            {"incident_id": incident_id},
+        )
+
+        prediction_id = connection.execute(
+            text("SELECT prediction_id FROM prediction_actual WHERE code = 'EVA-FN'")
+        ).scalar_one()
+        assert prediction_id is None
+
+        connection.rollback()
+
+
+def test_hit_without_prediction_is_rejected(engine: Engine) -> None:
+    with engine.begin() as connection:
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO prediction_actual
+                        (code, evaluation_date, actual_event, match_type)
+                    VALUES
+                        ('EVA-BAD', current_date, true, 'HIT')
                 """)
             )
 

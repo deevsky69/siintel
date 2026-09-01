@@ -15,14 +15,17 @@ terdaftar pada `Base.metadata` saat Alembic membandingkan schema.
 
 from .audit_log import AuditLog
 from .citizen_report import CitizenReport
+from .commander_decision import CommanderDecision
 from .community_feedback import CommunityFeedback
 from .crime_incident import CrimeIncident
 from .early_warning import EarlyWarning
 from .intelligence_report import IntelligenceReport
 from .location import Location
+from .operational_action import OperationalAction
 from .patrol_activity import PatrolActivity
 from .police_unit import PoliceUnit
 from .prediction import Prediction
+from .prediction_actual import PredictionActual
 from .public_alert import PublicAlert
 from .rbac import Permission, Role, RolePermission, User
 from .recommendation import Recommendation
@@ -31,15 +34,18 @@ from .risk_score import RiskScore
 __all__ = [
     "AuditLog",
     "CitizenReport",
+    "CommanderDecision",
     "CommunityFeedback",
     "CrimeIncident",
     "EarlyWarning",
     "IntelligenceReport",
     "Location",
+    "OperationalAction",
     "PatrolActivity",
     "Permission",
     "PoliceUnit",
     "Prediction",
+    "PredictionActual",
     "PublicAlert",
     "Recommendation",
     "RiskScore",
