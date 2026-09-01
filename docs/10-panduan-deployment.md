@@ -401,6 +401,12 @@ Dijalankan **satu kali** setelah menyala pertama, dan diulang hanya bila databas
 predpol exec api alembic upgrade head
 ```
 
+> Seluruh perintah pada bab ini juga tersedia sebagai script pnpm, yang sudah
+> membawa `--env-file` dan kedua berkas compose: `pnpm prod:migrate`,
+> `pnpm prod:seed`, `pnpm prod:password -- demo.pimpinan`, `pnpm prod:users`,
+> `pnpm prod:up`, `pnpm prod:ps`, `pnpm prod:logs`. Pakai yang mana pun yang
+> lebih nyaman — keduanya menjalankan hal yang persis sama.
+
 Perintah ini membuat 20 tabel, ekstensi PostGIS, seluruh constraint, index, dan trigger.
 Aman diulang: migration yang sudah diterapkan akan dilewati.
 
@@ -442,10 +448,11 @@ mana pun.
 
 > ### ⚠ WAJIB SEBELUM DIBUKA KE PUBLIK
 >
-> Password uji **`PaparanTaskap#2026`** yang dipakai pada database pengembangan
-> **HARUS DIGANTI** dan tidak boleh dipakai di server ini. Nilai itu sudah pernah
-> dituliskan dalam percakapan kerja, jadi harus dianggap sudah bocor.
-> Gunakan nilai baru yang berbeda untuk setiap akun.
+> Password uji **`Paparan#Sespimma2026`** dipakai pada database **pengembangan** untuk
+> akun `demo.pimpinan`, `demo.polsek`, dan `demo.analyst`. Nilai itu sudah tertulis
+> dalam percakapan kerja, jadi harus dianggap **sudah bocor**: jangan pernah dipakai
+> di server ini, dan gantilah juga di database pengembangan bila mesinnya dapat
+> dijangkau dari luar. Gunakan nilai baru yang berbeda untuk setiap akun.
 
 ### 7.2 Menetapkan password
 
