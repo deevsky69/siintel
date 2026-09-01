@@ -1,0 +1,58 @@
+# ---------------------------------------------------------------------------
+# JALUR B — PINTU MASUK DENGAN REVERSE PROXY SENDIRI (Caddy).
+#
+# BUKAN jalur yang dipakai server demo saat ini. Server demo sudah menjalankan
+# coolify-proxy (Traefik) yang memegang port 80 dan 443, sehingga menjalankan
+# berkas ini di sana hanya akan menghasilkan container yang gagal menyala
+# ("bind: address already in use"). Gunakan docker-compose.coolify.yml.
+#
+# Berkas ini disediakan untuk keadaan yang berbeda:
+#   - server bersih tanpa Coolify;
+#   - pemindahan aplikasi ke server lain;
+#   - kebutuhan menjalankan demo tanpa bergantung pada perangkat lunak pihak lain.
+#
+# Dipakai bersama berkas dasar:
+#
+#   docker compose --env-file .env.production \
+#     -f infra/docker/docker-compose.prod.yml \
+#     -f infra/docker/docker-compose.caddy.yml up -d
+#
+# Caddy dipilih daripada nginx karena HTTPS Let's Encrypt diterbitkan dan diperbarui
+# sendiri tanpa certbot, tanpa cron, dan tanpa berkas konfigurasi terpisah — lihat
+# infra/docker/Caddyfile yang panjangnya di bawah 40 baris efektif.
+# ---------------------------------------------------------------------------
+
+services:
+  proxy:
+    image: caddy:2-alpine
+    container_name: predpol-prod-proxy
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    depends_on:
+      - web
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN belum diisi di .env.production}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL belum diisi di .env.production}
+    ports:
+      # PERIKSA DULU port ini benar-benar bebas:  sudo ss -lntp | grep -E ':80 |:443 '
+      # 80 tetap dibuka karena Let's Encrypt memakainya untuk memverifikasi domain.
+      - "80:80"
+      - "443:443"
+      # HTTP/3 (QUIC).
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Sertifikat disimpan di volume. Tanpa ini, setiap `down`/`up` akan meminta
+      # sertifikat baru ke Let's Encrypt dan cepat menabrak batas penerbitan.
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - internal
+
+volumes:
+  caddy-data:
+  caddy-config:

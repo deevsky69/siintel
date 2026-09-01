@@ -18,7 +18,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-predpol}
       POSTGRES_DB: ${POSTGRES_DB:-prediksi_presisi}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      # Hanya dari mesin ini. Server ini punya IP publik dan kredensial pengembangan
+      # tertulis di `.env.example`; tanpa `127.0.0.1` database terbuka ke internet.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:

@@ -1,0 +1,82 @@
+# ---------------------------------------------------------------------------
+# PREDIKSI PRESISI — reverse proxy produksi (Caddy 2) — JALUR B
+#
+# BUKAN yang dipakai server demo. Server demo sudah menjalankan coolify-proxy
+# (Traefik v3.6) yang memegang port 80/443, dan perutean di sana diatur lewat label
+# pada infra/docker/docker-compose.coolify.yml. Berkas ini dipakai hanya bila
+# aplikasi dijalankan di server bersih tanpa Coolify. Lihat docs/10 §2.
+#
+# Tugas berkas ini hanya tiga:
+#   1. memegang sertifikat HTTPS (diterbitkan dan diperbarui otomatis oleh Let's Encrypt);
+#   2. meneruskan permintaan ke container `web`;
+#   3. memasang header keamanan yang hanya bisa dipasang oleh pemegang sertifikat.
+#
+# Nama domain TIDAK ditulis di sini. Nilainya dibaca dari environment variable DOMAIN
+# yang berasal dari .env.production, sehingga berkas ini aman untuk di-commit.
+#
+# Container `api` sengaja TIDAK dipetakan ke internet: aplikasi web memanggil backend
+# dari sisi server Next.js (apps/web/src/lib/api.ts), jadi backend cukup dijangkau
+# lewat jaringan internal compose.
+# ---------------------------------------------------------------------------
+
+{
+	# Alamat surel untuk pemberitahuan Let's Encrypt (kedaluwarsa sertifikat, dsb.).
+	email {$ACME_EMAIL}
+
+	# Caddy mengalihkan HTTP ke HTTPS secara otomatis; tidak perlu blok tambahan.
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		# HSTS hanya benar dipasang di sini — di tempat sertifikat berada.
+		# Aplikasi API sengaja tidak memasangnya (lihat api/middleware.py).
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		Cross-Origin-Opener-Policy "same-origin"
+
+		# Jangan umumkan perangkat lunak server.
+		-Server
+	}
+
+	# Batas ukuran badan permintaan. Aplikasi ini tidak menerima unggahan berkas;
+	# batas kecil menutup satu kelas penyalahgunaan tanpa mengorbankan apa pun.
+	request_body {
+		max_size 2MB
+	}
+
+	reverse_proxy web:3000 {
+		# Header ini yang membuat Next.js tahu permintaan aslinya HTTPS.
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}
+
+# ---------------------------------------------------------------------------
+# CATATAN — bila kelak aplikasi Android LAPOR PRESISI (Tahap F) perlu memanggil API
+# secara langsung, backend dapat dibuka pada subdomain terpisah dengan menambahkan
+# blok di bawah ini DAN membuat A record untuk api.<domain>. Selama itu belum
+# diperlukan, biarkan tetap sebagai komentar: permukaan serang yang tidak dibuka
+# adalah permukaan serang yang tidak perlu dijaga.
+#
+# api.{$DOMAIN} {
+# 	encode zstd gzip
+# 	header {
+# 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+# 		X-Content-Type-Options "nosniff"
+# 		Referrer-Policy "no-referrer"
+# 		-Server
+# 	}
+# 	reverse_proxy api:8000
+# }
+# ---------------------------------------------------------------------------

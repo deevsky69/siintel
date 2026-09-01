@@ -2,7 +2,7 @@
   "name": "prediksi-presisi",
   "version": "0.1.0",
   "private": true,
-  "description": "PREDIKSI PRESISI \u2014 predictive policing & spatial intelligence (monorepo root)",
+  "description": "PREDIKSI PRESISI — predictive policing & spatial intelligence (monorepo root)",
   "packageManager": "pnpm@11.24.0",
   "engines": {
     "node": ">=22"
@@ -39,6 +39,17 @@
     "seed:regenerate": "cd apps/api && uv run python -m prediksi_presisi_api.seeding regenerate",
     "seed:operational": "cd apps/api && uv run python -m prediksi_presisi_api.seeding operational",
     "user:password": "cd apps/api && uv run python -m prediksi_presisi_api.cli set-password",
-    "user:list": "cd apps/api && uv run python -m prediksi_presisi_api.cli list-users"
+    "user:list": "cd apps/api && uv run python -m prediksi_presisi_api.cli list-users",
+    "prod:config": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml config",
+    "prod:build": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml build",
+    "prod:up": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml up -d",
+    "prod:down": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml down",
+    "prod:ps": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml ps",
+    "prod:logs": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml logs -f",
+    "prod:migrate": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api alembic upgrade head",
+    "prod:seed": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.seeding all",
+    "prod:password": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.cli set-password",
+    "prod:users": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.cli list-users",
+    "prod:caddy:up": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.caddy.yml up -d"
   }
 }

@@ -1,0 +1,137 @@
+name: prediksi-presisi-prod
+
+# ---------------------------------------------------------------------------
+# PREDIKSI PRESISI — susunan produksi, BERKAS DASAR (Tahap E / TASK D-1).
+#
+# Berkas ini SENGAJA tidak memuat reverse proxy dan tidak mem-publish satu port pun
+# ke host. Sendirian, susunan ini berjalan tetapi belum dapat dijangkau dari luar.
+# Pintu masuknya dipilih lewat satu berkas tambahan:
+#
+#   JALUR A — server demo ini (Coolify + Traefik sudah terpasang):
+#     -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml
+#
+#   JALUR B — server bersih tanpa reverse proxy lain:
+#     -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.caddy.yml
+#
+# Mengapa dipisah: server demo sudah menjalankan coolify-proxy (Traefik v3.6) yang
+# memegang port 80, 443, dan 8080. Layanan apa pun yang mencoba mengikat port yang
+# sama TIDAK AKAN PERNAH menyala. Pemisahan ini membuat kekeliruan itu mustahil
+# terjadi karena kelalaian.
+#
+#     Internet ──▶ reverse proxy (Traefik/Caddy) ──▶ web ──▶ api ──▶ db
+#
+# Web memanggil API dari sisi SERVER Next.js (apps/web/src/lib/api.ts), sehingga
+# backend tidak perlu — dan tidak boleh — terbuka ke publik.
+#
+# Tidak ada satu pun nilai rahasia di berkas ini. Semuanya dibaca dari
+# .env.production di akar repository, yang tidak di-commit.
+#
+# Panduan lengkap: docs/10-panduan-deployment.md
+# ---------------------------------------------------------------------------
+
+# Log dibatasi agar demo yang dibiarkan hidup berhari-hari tidak memenuhi disk server.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  # ---------------------------------------------------------------- database
+  db:
+    image: postgis/postgis:17-3.5
+    container_name: predpol-prod-db
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER belum diisi di .env.production}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD belum diisi di .env.production}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB belum diisi di .env.production}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+      TZ: ${APP_TIMEZONE:-Asia/Jakarta}
+    # Tidak ada `ports:`. Database hanya dijangkau dari dalam jaringan `internal`.
+    # (Berbeda dari container pengembangan `predpol-db` yang membuka 5432 ke host —
+    #  lihat catatan keamanan pada docs/10 §12.)
+    # Untuk backup, gunakan `docker compose exec db pg_dump ...` (docs/10 §9).
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - internal
+
+  # --------------------------------------------------------------------- api
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    image: prediksi-presisi/api:${IMAGE_TAG:-latest}
+    container_name: predpol-prod-api
+    restart: unless-stopped
+    logging: *logging
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # APP_ENV=production membuat /docs dan /openapi.json dimatikan (main.py) dan
+      # membuat JWT_SECRET yang kosong MENGGAGALKAN start — itu memang disengaja.
+      APP_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET belum diisi di .env.production (minimal 32 byte)}
+      JWT_ACCESS_TOKEN_TTL_MINUTES: ${JWT_ACCESS_TOKEN_TTL_MINUTES:-15}
+      JWT_REFRESH_TOKEN_TTL_DAYS: ${JWT_REFRESH_TOKEN_TTL_DAYS:-7}
+      # Permintaan peramban tidak pernah menyentuh API secara langsung, tetapi daftar
+      # origin tetap dipersempit ke domain resmi agar tidak ada celah yang terbuka
+      # hanya karena tidak diisi.
+      CORS_ALLOWED_ORIGINS: https://${DOMAIN:?DOMAIN belum diisi di .env.production}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Jakarta}
+      DEMO_REFERENCE_TIME: ${DEMO_REFERENCE_TIME:-}
+    # `expose` menyatakan port yang dapat dijangkau SESAMA container di jaringan
+    # `internal`. Ini bukan `ports:` — tidak ada satu pun port yang dibuka ke host.
+    expose:
+      - "8000"
+    # API sengaja TIDAK diberi label reverse proxy. Backend tidak punya rute publik
+    # sama sekali; itu keputusan arsitektur, bukan kelalaian konfigurasi.
+    # (Bila kelak LAPOR PRESISI membutuhkannya, lihat blok berkomentar pada
+    #  docker-compose.coolify.yml.)
+    networks:
+      - internal
+
+  # --------------------------------------------------------------------- web
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+    image: prediksi-presisi/web:${IMAGE_TAG:-latest}
+    container_name: predpol-prod-web
+    restart: unless-stopped
+    logging: *logging
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      # Nama `api` diselesaikan oleh DNS internal compose.
+      API_BASE_URL: http://api:8000
+      TZ: ${APP_TIMEZONE:-Asia/Jakarta}
+    expose:
+      - "3000"
+    # Rute publik ditambahkan oleh salah satu berkas pelengkap (lihat kepala berkas).
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  db-data:

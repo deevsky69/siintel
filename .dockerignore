@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------------------
+# Berkas yang TIDAK dikirim ke daemon Docker saat build.
+#
+# Konteks build kedua image (apps/api/Dockerfile dan apps/web/Dockerfile) adalah akar
+# repository ini, sehingga satu berkas .dockerignore di akar berlaku untuk keduanya.
+#
+# Dua alasan berkas ini penting:
+#   1. Keamanan — .env dan data mentah tidak boleh ikut masuk ke dalam image.
+#   2. Kecepatan — tanpa ini, .git, node_modules, dan .venv (ratusan MB) dikirim ulang
+#      ke daemon pada setiap build.
+# ---------------------------------------------------------------------------
+
+# --- Rahasia: jangan pernah masuk ke image ---
+.env
+.env.*
+
+# --- Riwayat dan berkas kerja ---
+.git
+.gitignore
+.github
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# --- Dependensi yang dipasang ulang di dalam image ---
+node_modules
+**/node_modules
+.venv
+**/.venv
+
+# --- Artefak build dan cache ---
+**/.next
+**/dist
+**/build
+**/coverage
+**/*.tsbuildinfo
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+playwright-report
+test-results
+
+# --- Data resmi/sensitif. Hanya data/sample yang dipakai image API ---
+data/raw
+data/import
+data/processed
+data/tiles
+
+# --- Tidak dibutuhkan aplikasi yang berjalan ---
+docs
+design
+ml
+tests
+scripts
+apps/mobile
+infra
+README.md

@@ -6,6 +6,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+!.env.production.example
 
 # Data resmi / sensitif — hanya data/sample yang boleh di-commit
 data/raw/*

@@ -1,0 +1,100 @@
+# ---------------------------------------------------------------------------
+# JALUR A — PINTU MASUK LEWAT COOLIFY (Traefik) YANG SUDAH TERPASANG DI SERVER INI.
+#
+# INI JALUR YANG DIPAKAI UNTUK DEMO. Dipakai bersama berkas dasar:
+#
+#   docker compose --env-file .env.production \
+#     -f infra/docker/docker-compose.prod.yml \
+#     -f infra/docker/docker-compose.coolify.yml up -d
+#
+# ---------------------------------------------------------------------------
+# FAKTA SERVER YANG MENDASARI BERKAS INI (diperiksa langsung, bukan dugaan):
+#
+#   docker network ls
+#     -> nama network milik proxy: `coolify` (bridge, attachable)
+#
+#   docker inspect coolify-proxy
+#     -> image      : traefik:v3.6
+#     -> port host  : 80, 443, 8080, 443/udp  (SUDAH DIPAKAI — jangan diikat lagi)
+#     -> entrypoint : `http` (:80) dan `https` (:443, dengan HTTP/3)
+#     -> provider   : --providers.docker=true --providers.docker.exposedbydefault=false
+#                     artinya container HARUS memasang label `traefik.enable=true`
+#                     agar dikenali; tanpa label, container tidak dirutekan.
+#     -> sertifikat : --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+#                     artinya nama resolver yang benar adalah `letsencrypt`,
+#                     dan tantangan ACME berjalan lewat entrypoint `http`.
+#
+# Karena itu: TIDAK ADA konfigurasi certbot/acme milik kita sendiri. Menerbitkan
+# sertifikat untuk domain yang sama dari dua tempat akan saling menggagalkan.
+# Penerbitan dan pembaruan sertifikat sepenuhnya milik Traefik-nya Coolify.
+# ---------------------------------------------------------------------------
+
+services:
+  web:
+    networks:
+      # `internal` tetap diperlukan untuk menjangkau `api`.
+      - internal
+      # `coolify` adalah tempat Traefik dapat melihat dan menjangkau container ini.
+      - coolify
+    labels:
+      traefik.enable: "true"
+      # Traefik harus tahu lewat network mana container ini dihubungi, karena
+      # container berada di dua network sekaligus.
+      traefik.docker.network: coolify
+
+      # ---- HTTP (:80) — hanya untuk mengalihkan ke HTTPS dan melayani tantangan ACME
+      traefik.http.routers.predpol-web-http.entrypoints: http
+      traefik.http.routers.predpol-web-http.rule: Host(`${DOMAIN:?DOMAIN belum diisi di .env.production}`)
+      traefik.http.routers.predpol-web-http.middlewares: predpol-https-redirect
+      traefik.http.middlewares.predpol-https-redirect.redirectscheme.scheme: https
+      traefik.http.middlewares.predpol-https-redirect.redirectscheme.permanent: "true"
+
+      # ---- HTTPS (:443) — rute sebenarnya
+      traefik.http.routers.predpol-web.entrypoints: https
+      traefik.http.routers.predpol-web.rule: Host(`${DOMAIN}`)
+      traefik.http.routers.predpol-web.tls: "true"
+      traefik.http.routers.predpol-web.tls.certresolver: letsencrypt
+      traefik.http.routers.predpol-web.service: predpol-web
+      traefik.http.routers.predpol-web.middlewares: predpol-security-headers
+      traefik.http.services.predpol-web.loadbalancer.server.port: "3000"
+
+      # ---- Header keamanan.
+      # HSTS hanya benar dipasang di lapisan yang memegang sertifikat. Aplikasi API
+      # sengaja tidak memasangnya (apps/api/src/prediksi_presisi_api/api/middleware.py).
+      traefik.http.middlewares.predpol-security-headers.headers.stsSeconds: "31536000"
+      traefik.http.middlewares.predpol-security-headers.headers.stsIncludeSubdomains: "true"
+      traefik.http.middlewares.predpol-security-headers.headers.contentTypeNosniff: "true"
+      traefik.http.middlewares.predpol-security-headers.headers.frameDeny: "true"
+      traefik.http.middlewares.predpol-security-headers.headers.referrerPolicy: "no-referrer"
+      traefik.http.middlewares.predpol-security-headers.headers.permissionsPolicy: "geolocation=(), microphone=(), camera=()"
+      traefik.http.middlewares.predpol-security-headers.headers.customResponseHeaders.Cross-Origin-Opener-Policy: "same-origin"
+
+  # `api` sengaja tidak diubah di sini: tidak ikut ke network `coolify` dan tidak
+  # diberi label Traefik. Backend tetap tanpa rute publik.
+  #
+  # CATATAN — bila kelak LAPOR PRESISI (Tahap F) perlu memanggil API langsung dari
+  # perangkat Android, backend dapat dibuka pada subdomain terpisah dengan menyalin
+  # blok di bawah ini ke dalam `services:` DAN membuat A record api.<domain>.
+  # Selama belum diperlukan, biarkan tetap komentar: permukaan serang yang tidak
+  # dibuka adalah permukaan serang yang tidak perlu dijaga.
+  #
+  # api:
+  #   networks:
+  #     - internal
+  #     - coolify
+  #   labels:
+  #     traefik.enable: "true"
+  #     traefik.docker.network: coolify
+  #     traefik.http.routers.predpol-api.entrypoints: https
+  #     traefik.http.routers.predpol-api.rule: Host(`api.${DOMAIN}`)
+  #     traefik.http.routers.predpol-api.tls: "true"
+  #     traefik.http.routers.predpol-api.tls.certresolver: letsencrypt
+  #     traefik.http.routers.predpol-api.service: predpol-api
+  #     traefik.http.services.predpol-api.loadbalancer.server.port: "8000"
+
+networks:
+  # Network ini SUDAH ADA dan dimiliki Coolify. `external: true` berarti compose
+  # hanya menyambung ke sana — tidak membuat, tidak mengubah, dan tidak menghapusnya.
+  coolify:
+    external: true
+    name: coolify
