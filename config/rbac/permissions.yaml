@@ -170,10 +170,21 @@ roles:
   # Sampai diputuskan, permission ini tidak diberikan: menahan lebih aman daripada
   # melebarkan diam-diam.
 
+  # KOREKSI 1 September 2026 — hanya `audit:read` yang bermasalah di sini.
+  #
+  # Sempat pula saya naikkan `public_alert:read` dan `community_feedback:read` menjadi
+  # ALL dengan alasan tabelnya tidak punya kolom lokasi. Itu keliru: keduanya punya
+  # jalur ke wilayah lewat dua lompatan —
+  #   public_alerts.warning_id  -> early_warnings.location_id -> locations.polsek
+  #   community_feedback.report_id -> citizen_reports.location_id -> locations.polsek
+  # dan endpoint-nya memang sudah menegakkannya. Menaikkannya ke ALL justru melebarkan
+  # kewenangan atas nama "koreksi". Dikembalikan.
   Polsek:
     ALL:
       - location:read
     OWN_JURISDICTION:
+      - public_alert:read
+      - community_feedback:read
       - dashboard:read
       - crime:read
       - crime:write
@@ -187,15 +198,22 @@ roles:
       - prediction:read
       - warning:read
       - warning:acknowledge
-      - public_alert:read
       - recommendation:read
       - commander_decision:read
       - operation:read
       - citizen_report:read
       - citizen_report:write
-      - community_feedback:read
       - evaluation:read
-      - audit:read
+
+  # BELUM DIPUTUSKAN — `audit:read` dicabut sementara dari peran Polsek.
+  #
+  # `audit_logs` tidak punya kolom lokasi, sehingga OWN_JURISDICTION mustahil ditegakkan.
+  # Menaikkannya menjadi ALL berarti petugas Polsek membaca seluruh jejak audit
+  # se-Polres — termasuk keputusan Pimpinan dan penolakan otorisasi akun lain. Itu
+  # pelebaran kewenangan, keputusan pemilik proyek, bukan koreksi teknis (CLAUDE.md §2C).
+  #
+  # Perlakuan yang sama diberikan pada peran Fungsi; keduanya menunggu satu jawaban:
+  # siapa yang boleh membaca audit trail, dan sejauh mana.
 
   Administrator:
     ALL:
