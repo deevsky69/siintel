@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# PRATINJAU LEWAT SSH — dipakai sebelum port 80/443 terbuka di router.
+#
+# Berkas ini membuka `web` HANYA pada 127.0.0.1 mesin server. Tidak ada yang
+# terbuka ke jaringan maupun ke internet; satu-satunya cara menjangkaunya adalah
+# terowongan SSH milik Anda sendiri.
+#
+# Di server:
+#
+#   docker compose --env-file .env.production \
+#     -f infra/docker/docker-compose.prod.yml \
+#     -f infra/docker/docker-compose.coolify.yml \
+#     -f infra/docker/docker-compose.preview.yml up -d
+#
+# Di komputer Anda:
+#
+#   ssh -p 8999 -L 3000:127.0.0.1:3000 kim@111.68.123.134
+#
+# lalu buka http://localhost:3000
+#
+# Setelah port 80/443 terbuka dan domain hidup, jalankan `up -d` TANPA berkas ini
+# supaya lubang pratinjau tertutup kembali.
+# ---------------------------------------------------------------------------
+
+services:
+  web:
+    ports:
+      # Sengaja `127.0.0.1`: tanpa itu port ini terbuka ke seluruh jaringan, dan
+      # Docker mem-publish port dengan melewati ufw sehingga firewall tidak menahannya.
+      - "127.0.0.1:3000:3000"

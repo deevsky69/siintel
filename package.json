@@ -50,6 +50,8 @@
     "prod:seed": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.seeding all",
     "prod:password": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.cli set-password",
     "prod:users": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.cli list-users",
-    "prod:caddy:up": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.caddy.yml up -d"
+    "prod:caddy:up": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.caddy.yml up -d",
+    "prod:preview": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.preview.yml up -d",
+    "prod:preview:off": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml up -d --force-recreate web"
   }
 }

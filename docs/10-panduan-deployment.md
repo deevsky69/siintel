@@ -181,6 +181,78 @@ memakai sebagian sumber daya server ini.
 
 ## 3. MENGARAHKAN DOMAIN KE SERVER
 
+### 3.0 Keadaan jaringan server ini — diperiksa 1 September 2026
+
+| Hal | Nilai |
+|---|---|
+| Alamat IP publik | `111.68.123.134` |
+| Alamat mesin di jaringan lokal | `10.3.3.87` (privat, di belakang NAT) |
+| Domain | `siintel.awansurya.com` → A record → `111.68.123.134` ✅ |
+| Port publik yang sudah diteruskan | **8999 → SSH** |
+| Port 80 dan 443 dari internet | ❌ **belum diteruskan** |
+
+Diuji dari luar (dua layanan pengambil URL independen, dengan kontrol yang terbukti
+menjawab 200): `http://siintel.awansurya.com` dan `:8999` sama-sama gagal tersambung,
+sementara Traefik jelas mendengarkan di 80 dan 443 pada mesin ini. Sebuah server uji
+sementara di port 8999 juga tidak terjangkau dari luar — konsisten dengan 8999 yang
+memang diteruskan ke SSH (port 22), bukan ke HTTP.
+
+> **ufw bukan penyebabnya.** Docker memasang aturan iptables-nya sendiri pada rantai
+> `DOCKER`, yang dilewati **sebelum** rantai `INPUT` tempat ufw bekerja. Port yang
+> dipublish container karena itu **tidak** tertahan ufw. Konsekuensi lain dari sifat
+> ini: mengandalkan ufw untuk menutup port container adalah keliru — satu-satunya
+> pengaman yang benar adalah mengikat port ke `127.0.0.1` di berkas compose (§12).
+
+### 3.1 Yang harus dilakukan agar domain hidup
+
+Satu langkah, di **router / perangkat NAT**, bukan di server:
+
+| Protokol | Port publik | Tujuan |
+|---|---|---|
+| TCP | 80 | `10.3.3.87:80` |
+| TCP | 443 | `10.3.3.87:443` |
+
+Port 80 **wajib** ikut dibuka meskipun situsnya nanti hanya diakses lewat HTTPS:
+Let's Encrypt memverifikasi kepemilikan domain lewat `http://siintel.awansurya.com/.well-known/acme-challenge/…`
+pada port 80. Tanpa itu sertifikat tidak akan pernah terbit dan peramban akan
+menampilkan peringatan keamanan di depan penguji.
+
+### 3.2 Bila ISP memblokir port 80/443
+
+Sebagian penyedia internet menutup port 80 dan 443 masuk pada langganan non-bisnis.
+Bila permintaan port forwarding sudah dipasang tetapi tetap tidak terjangkau, dua jalan:
+
+1. **Minta ISP membuka 80/443** — paling lurus, dan hasilnya `https://siintel.awansurya.com`
+   tanpa nomor port.
+2. **Cloudflare Tunnel** — tidak memerlukan satu pun port masuk, bekerja meski di belakang
+   CGNAT, dan tetap memberi HTTPS yang sah. Perlu akun Cloudflare dan token tunnel.
+
+Memakai port tidak lazim (misalnya `:8443`) **tidak** disarankan: Let's Encrypt tidak dapat
+menerbitkan sertifikat lewat port selain 80/443 tanpa tantangan DNS, sehingga peramban
+akan menampilkan peringatan.
+
+### 3.3 Melihat aplikasi sebelum port terbuka
+
+Tidak perlu menunggu router. Jalankan di server:
+
+```bash
+pnpm prod:preview
+```
+
+Berkas `infra/docker/docker-compose.preview.yml` membuka `web` **hanya pada 127.0.0.1**
+server — tidak ke jaringan, tidak ke internet. Lalu dari komputer Anda:
+
+```bash
+ssh -p 8999 -L 3000:127.0.0.1:3000 kim@111.68.123.134
+```
+
+dan buka `http://localhost:3000`. Setelah domain hidup, tutup lubang pratinjau:
+
+```bash
+pnpm prod:preview:off
+```
+
+
 Lakukan ini **lebih dahulu**, sebelum menjalankan aplikasi. Penerbitan sertifikat akan gagal
 bila domain belum menunjuk ke server, dan kegagalan berulang dapat menabrak batas penerbitan
 Let's Encrypt.
@@ -447,6 +519,11 @@ tersimpan di repository, dan tidak ada password bawaan yang diam-diam terbawa ke
 mana pun.
 
 > ### ⚠ WAJIB SEBELUM DIBUKA KE PUBLIK
+>
+> **Password produksi sudah ditetapkan acak** dan tersimpan di
+> `~/siintel-demo-passwords.txt` pada server (mode 600, hanya dapat dibaca pemiliknya).
+> Nilainya tidak pernah ditampilkan di percakapan kerja maupun masuk repository.
+> Tetap ganti sebelum paparan resmi bila berkas itu pernah disalin ke tempat lain.
 >
 > Password uji **`Paparan#Sespimma2026`** dipakai pada database **pengembangan** untuk
 > akun `demo.pimpinan`, `demo.polsek`, dan `demo.analyst`. Nilai itu sudah tertulis
