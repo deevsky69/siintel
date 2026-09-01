@@ -147,16 +147,24 @@ mentah dan menyatakannya terbuka lewat `basis`.
 
 ### 2.5 Analitik
 
-| Method | Path | Permission |
-|---|---|---|
-| GET | `/analytics/trend` | `analytics:read` |
-| GET | `/analytics/time-pattern` | `analytics:read` |
-| GET | `/analytics/spatial-pattern` | `analytics:read` |
-| GET | `/analytics/location-profile/{location_id}` | `analytics:read` |
-| GET | `/analytics/crime-pattern-dna` | `analytics:read` |
-| GET | `/analytics/export` | `analytics:export` |
+| Method | Path | Permission | Status |
+|---|---|---|---|
+| GET | `/analytics/crime-pattern-dna` | `analytics:read` | ✅ **ADA** |
+| GET | `/analytics/trend` | `analytics:read` | belum |
+| GET | `/analytics/time-pattern` | `analytics:read` | belum — sebagian tercakup dimensi WHEN pada DNA |
+| GET | `/analytics/spatial-pattern` | `analytics:read` | belum — sebagian tercakup dimensi WHERE pada DNA |
+| GET | `/analytics/location-profile/{location_id}` | `analytics:read` | belum |
+| GET | `/analytics/export` | `analytics:export` | belum |
 
-Setiap respons analitik menyertakan `source` (rentang data & jumlah baris) agar dapat ditelusuri kembali ke data sumber (TASK 090–094).
+Setiap respons analitik menyertakan `source` (rentang data & jumlah baris) agar dapat ditelusuri
+kembali ke data sumber (TASK 090–094).
+
+**Catatan path (TASK 090).** Implementasi Crime Pattern DNA sempat dibangun pada `/patterns/dna`
+— nama yang saya sebut keliru pada instruksi, bukan yang tertulis di kontrak ini. Kode
+disesuaikan ke kontrak, bukan sebaliknya: pengelompokan di bawah `/analytics` sejalan dengan
+permission yang dipakainya (`analytics:read`), dan kontrak di sini tidak sedang keliru.
+Ini berbeda dari perubahan `/map/area/{kecamatan}` pada §2.4, yang mengubah kontrak justru
+karena premis kontraknya yang terbukti tidak tepat setelah dibangun.
 
 ### 2.6 Risiko & Prediksi
 
