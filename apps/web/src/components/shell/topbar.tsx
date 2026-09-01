@@ -25,6 +25,17 @@ export function Topbar({ name, roleName }: { name: string; roleName: string }) {
       </div>
 
       <div className="ml-auto flex items-center gap-5">
+        {/* Modul penggunaan disajikan sebagai halaman berdiri sendiri di `public/`,
+            bukan di dalam shell aplikasi: ia punya tata letak dan gaya cetaknya
+            sendiri. Middleware tetap melindunginya seperti halaman lain. */}
+        <a
+          href="/modul.html"
+          target="_blank"
+          rel="noopener"
+          className="rounded border border-base-700 px-2.5 py-1.5 font-heading text-[10px] uppercase tracking-wider text-ink-muted transition hover:border-accent/40 hover:text-accent"
+        >
+          Modul
+        </a>
         <Clock />
         <div className="flex items-center gap-2.5 border-l border-base-800 pl-5">
           <div className="text-right leading-tight">

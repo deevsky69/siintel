@@ -84,6 +84,9 @@ WORKDIR /app
 # Keluaran standalone sudah memuat node_modules seperlunya — pnpm tidak dibutuhkan lagi.
 COPY --from=builder --chown=node:node /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=node:node /app/apps/web/.next/static ./apps/web/.next/static
+# `public/` TIDAK ikut ke dalam keluaran standalone dan harus disalin sendiri;
+# tanpa baris ini `/modul.html` menjawab 404 di produksi meski ada di repository.
+COPY --from=builder --chown=node:node /app/apps/web/public ./apps/web/public
 
 USER node
 

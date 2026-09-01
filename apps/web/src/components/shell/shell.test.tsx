@@ -39,6 +39,15 @@ describe("shell aplikasi", () => {
     expect(screen.getByText("Pimpinan")).toBeDefined();
   });
 
+  it("menautkan modul penggunaan dari bilah atas", () => {
+    // Modul adalah halaman berdiri sendiri di `public/`, bukan rute aplikasi; tautannya
+    // mudah hilang saat topbar disunting, dan hilangnya tidak menggagalkan apa pun.
+    render(<Topbar name="demo.pimpinan" roleName="Pimpinan" />);
+
+    const link = screen.getByRole("link", { name: /modul/i });
+    expect(link.getAttribute("href")).toBe("/modul.html");
+  });
+
   it("menyediakan jalan keluar dari sesi", () => {
     render(<Topbar name="demo.pimpinan" roleName="Pimpinan" />);
 

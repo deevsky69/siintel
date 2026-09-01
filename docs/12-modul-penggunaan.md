@@ -3,6 +3,10 @@
 Sistem Deteksi Dini Kerawanan Kamtibmas berbasis *Predictive Policing*
 Polres Metro Jakarta Selatan
 
+> **Versi halaman.** Modul ini juga disajikan di dalam aplikasi pada `/modul.html`
+> (tautan **Modul** di bilah atas), dengan tata letak siap cetak. Berkasnya ada di
+> `apps/web/public/modul.html`; dokumen inilah acuannya bila keduanya berbeda.
+>
 > **Status prototipe.** Seluruh angka pada aplikasi ini berasal dari **data sintetis**,
 > dan bobot maupun ambangnya berstatus `DEMO / PROPOSED` — belum ditetapkan sebagai
 > ketentuan resmi. Modul ini menjelaskan cara kerja sistem, bukan menyatakan bahwa
