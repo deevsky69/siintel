@@ -45,14 +45,16 @@ Dua dari tujuh success criteria menyangkut aplikasi secara langsung:
 ## 4. JALUR KRITIS
 
 Nomor task tetap mengikuti `docs/08`. Urutannya yang berubah.
+Status per **1 September 2026** ditulis di kolom terakhir; **SELESAI** berarti sudah
+diverifikasi terhadap data nyata lewat HTTP, bukan sekadar kodenya ada.
 
-### Tahap A — Aplikasi terlihat (prioritas utama pemilik proyek)
+### Tahap A ✅ SELESAI — Aplikasi terlihat (prioritas utama pemilik proyek)
 | Task | Isi |
 |---|---|
 | 061 | Design system: tema command-center gelap, tipografi, kartu, badge, tabel, panel |
 | 060 | Shell aplikasi: sidebar 9 menu, topbar, jam WIB, identitas pengguna |
 
-### Tahap B — Aplikasi hidup di atas data nyata
+### Tahap B ✅ SELESAI — Aplikasi hidup di atas data nyata
 | Task | Isi |
 |---|---|
 | 030 | Fondasi API: konfigurasi, error handling, validasi, logging |
@@ -62,7 +64,7 @@ Nomor task tetap mengikuti `docs/08`. Urutannya yang berubah.
 | 040 | API evaluasi |
 | 070 | Executive Dashboard sesuai `design/gambaran-website.png` |
 
-### Tahap C — Peta dan rantai keputusan
+### Tahap C ✅ SELESAI, penyempurnaan berjalan — Peta dan rantai keputusan
 | Task | Isi |
 |---|---|
 | 080–084 | Peta wilayah, historical heatmap, layer risiko, layer prediktif, klik grid → WHAT/WHERE/WHEN/RISK/CONFIDENCE/WHY |
@@ -70,18 +72,24 @@ Nomor task tetap mengikuti `docs/08`. Urutannya yang berubah.
 | 121 | Tampilan rekomendasi per fungsi |
 | 130 | Review & Approval — rantai human-in-the-loop |
 
-### Tahap D — Validasi (success criteria #06)
+Penyempurnaan yang masih berjalan pada tahap ini: memindahkan peta ke endpoint
+`/map/*` yang sudah tersedia (agar agregasi dan kelas risiko tetap milik backend),
+memperkaya panel rincian wilayah dengan riwayat kejadian dan peringatan aktif, serta
+menyambungkan tombol acknowledge/resolve pada Warning Center.
+
+
+### Tahap D ✅ SELESAI — Validasi (success criteria #06)
 | Task | Isi |
 |---|---|
 | 150, 151 | Prediction vs Actual dan metrik precision/recall/FP/FN |
 
-### Tahap E — Demo dapat diakses
+### Tahap E ⏳ MENUNGGU NAMA DOMAIN — Demo dapat diakses
 | Task | Isi |
 |---|---|
-| D-1 | Build produksi, Docker Compose, reverse proxy, HTTPS, domain |
-| D-2 | Panduan menjalankan dan menghentikan demo |
+| D-1 | Build produksi, Docker Compose, reverse proxy, HTTPS, domain — **berkas siap**, lihat `docs/10-panduan-deployment.md`. Server ini sudah menjalankan Coolify, jadi TLS dan domain ditangani proxy-nya; yang tersisa hanyalah nama domain dari pemilik proyek |
+| D-2 | Panduan menjalankan dan menghentikan demo — **selesai**, `docs/10` §9 |
 
-### Tahap F — Android (paling akhir)
+### Tahap F ⏸ BELUM DIMULAI — Android (paling akhir)
 | Task | Isi |
 |---|---|
 | 170–175 | LAPOR PRESISI |
@@ -112,4 +120,8 @@ dipertanggungjawabkan (CLAUDE.md §11, §20, §27).
 | Rantai prediction → warning → recommendation → decision → action | Human-in-the-loop yang benar-benar terpasang |
 | Trigger database menolak tindakan tanpa persetujuan | Governance yang ditegakkan mesin, bukan sekadar janji |
 | precision 0,397 · recall 0,400 dari 241 baris evaluasi | Success criteria #06 sudah punya dasar data |
-| 189 test, CI lint/typecheck/test/migrate | Bukti kualitas yang dapat ditunjukkan |
+| 243 test API + 76 test web, CI lint/typecheck/test/migrate | Bukti kualitas yang dapat ditunjukkan |
+| Lima layar (dashboard, peta, peringatan, evaluasi, keputusan) hidup di atas API | Angka di layar berasal dari database, bukan dari kode |
+| Peta sembilan kecamatan: hover dan klik membuka potensi ancaman wilayah | Permintaan langsung pemilik proyek; layar utama paparan |
+| Keputusan komandan dapat dibuat sungguhan, usulan asli tidak tertimpa | Human-in-the-loop yang dapat diperagakan hidup, bukan diceritakan |
+| Cakupan wilayah ditegakkan di query — Polsek melihat 13 dari 84 rekomendasi | RBAC yang dapat dibuktikan di depan penguji |

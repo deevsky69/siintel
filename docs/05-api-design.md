@@ -129,9 +129,20 @@ Audit: `VIEW_SENSITIVE_DATA` untuk detail kejadian, `IMPORT_DATA` untuk impor.
 | GET | `/map/historical-heatmap` | `map:read` | Agregasi historis per grid |
 | GET | `/map/current-risk` | `map:read`, `risk_score:read` | Layer risiko berjalan |
 | GET | `/map/predictive-heatmap` | `map:read`, `prediction:read` | Layer prediktif; parameter `horizon` |
-| GET | `/map/grid/{location_id}` | `map:read` | Detail grid: WHAT/WHERE/WHEN/RISK/CONFIDENCE/WHY (TASK 084) |
+| GET | `/map/area/{kecamatan}` | `map:read` | Rincian wilayah: ancaman berperingkat, jam rawan, riwayat kejadian, peringatan aktif, prediksi + WHY |
+| GET | `/map/grid/{location_id}` | `map:read` | Detail satu sel grid — **belum dibuat** |
 
 `/map/current-risk` dan `/map/predictive-heatmap` dipisah karena keduanya layer berbeda (docs/04).
+
+**Perubahan setelah implementasi (TASK 082–084):** satuan rincian yang benar-benar dipakai
+layar adalah **kecamatan**, bukan sel grid. Pengguna bertanya "apa ancaman di Tebet",
+bukan "apa ancaman di sel GRD-017"; satu sel juga terlalu sempit untuk membawa riwayat
+yang bermakna. `/map/grid/{location_id}` tetap dicantumkan untuk kebutuhan analitik lanjutan.
+
+`/map/predictive-heatmap` **tidak membawa `risk_class` sama sekali.** `predictions` tidak
+menyimpan kelas, dan memberinya kelas berarti menerapkan ambang `config/risk/warning-thresholds.yaml`
+yang masih berstatus `DEMO / PROPOSED` (U-01). Layer prediktif karena itu menyajikan skor
+mentah dan menyatakannya terbuka lewat `basis`.
 
 ### 2.5 Analitik
 
@@ -186,6 +197,17 @@ Audit: `ACK_WARNING`, `RESOLVE_WARNING`, `PUBLISH_PUBLIC_ALERT` (resource sesuai
 `TECHNICAL DECISION`: keputusan dibuat lewat **satu** endpoint `POST /recommendations/{id}/decisions` dengan body `{ "decision": "APPROVED" | "MODIFIED" | "REJECTED", "reason": "...", "modified_text": "..." }`, menggantikan tiga endpoint aksi terpisah (`/approve`, `/modify`, `/reject`).
 Alasan: keputusan adalah **entitas** (`commander_decisions`), bukan tiga aksi berbeda; satu endpoint membuat validasi, audit, dan aturan transisi berada di satu tempat. `modified_text` wajib ketika `decision = MODIFIED`.
 Audit: `APPROVE_RECOMMENDATION` / `MODIFY_RECOMMENDATION` / `REJECT_RECOMMENDATION`, resource `recommendation`.
+
+**Setelah implementasi (TASK 130):** rekomendasi yang sudah diputus **tidak dapat diputus
+ulang** — permintaan kedua dijawab `409 CONFLICT`. Memutus dua kali mengaburkan siapa yang
+memutuskan apa; perubahan pendirian adalah keputusan baru atas rekomendasi baru, bukan
+penimpaan. `MODIFIED` tanpa `modified_text` dijawab `422 BUSINESS_RULE_VIOLATION`, dan
+`recommendations.recommendation_text` **tidak pernah** ditimpa (U-07): respons membawa
+`original_recommendation` bersama `modified_text` agar layar dapat menyandingkannya.
+Rekomendasi di luar cakupan wilayah pengguna dijawab `404`, bukan `403`.
+
+`GET /recommendations/{id}/decisions` belum dibuat; riwayat diambil lewat
+`GET /commander-decisions`, yang sudah menegakkan cakupan wilayah dan fungsi.
 
 ### 2.9 Operasi
 
