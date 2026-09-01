@@ -37,6 +37,8 @@
     "seed": "cd apps/api && uv run python -m prediksi_presisi_api.seeding all",
     "seed:analytics": "cd apps/api && uv run python -m prediksi_presisi_api.seeding analytics",
     "seed:regenerate": "cd apps/api && uv run python -m prediksi_presisi_api.seeding regenerate",
-    "seed:operational": "cd apps/api && uv run python -m prediksi_presisi_api.seeding operational"
+    "seed:operational": "cd apps/api && uv run python -m prediksi_presisi_api.seeding operational",
+    "user:password": "cd apps/api && uv run python -m prediksi_presisi_api.cli set-password",
+    "user:list": "cd apps/api && uv run python -m prediksi_presisi_api.cli list-users"
   }
 }
