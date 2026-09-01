@@ -120,6 +120,15 @@ roles:
       - audit:read
       - config:read
 
+  # KOREKSI 1 September 2026 — cakupan disesuaikan dengan yang benar-benar dapat
+  # ditegakkan. Sebelumnya `crime:read` dan sembilan permission lain dinyatakan
+  # OWN_FUNCTION, padahal `crime_incidents` dan `intelligence_reports` tidak memiliki
+  # kolom fungsi sama sekali: akun Fungsi tetap melihat seluruh 1200 kejadian.
+  # Kewenangan yang dideklarasikan tetapi tidak dapat ditegakkan memberi rasa aman
+  # yang keliru, dan itu lebih berbahaya daripada tidak dideklarasikan.
+  #
+  # Aturannya kini: OWN_FUNCTION hanya untuk data yang punya jalur ke sebuah fungsi.
+  # Dijaga oleh `test_rbac_scope_is_enforceable`.
   Fungsi:
     ALL:
       - location:read
@@ -128,22 +137,38 @@ roles:
       - prediction:read
       - warning:read
       - public_alert:read
-    OWN_FUNCTION:
+      # Berikut ini TIDAK punya dimensi fungsi pada model datanya. Sebuah kejadian
+      # curanmor bukan "milik" Reskrim, dan tren wilayah bukan milik satu fungsi.
       - dashboard:read
       - crime:read
       - crime:write
-      - intelligence:read
-      - intelligence:write
-      - patrol:read
-      - patrol:write
-      - police_unit:read
       - analytics:read
+      - evaluation:read
+    OWN_FUNCTION:
+      # Seluruhnya punya jalur ke fungsi:
+      #   recommendations.recommended_function
+      #   commander_decisions -> recommendations.recommended_function
+      #   operational_actions -> police_units.function
+      #   patrol_activity     -> police_units.function
+      #   police_units.function
       - recommendation:read
       - commander_decision:read
       - operation:read
-      - citizen_report:read
-      - evaluation:read
-      - audit:read
+      - patrol:read
+      - patrol:write
+      - police_unit:read
+
+  # BELUM DIPUTUSKAN — dicabut sementara dari peran Fungsi.
+  #
+  #   intelligence:read, intelligence:write, citizen_report:read, audit:read
+  #
+  # `intelligence_reports`, `citizen_reports`, dan `audit_logs` tidak punya kolom
+  # fungsi, sehingga OWN_FUNCTION mustahil ditegakkan. Menaikkannya menjadi ALL
+  # berarti setiap petugas fungsi membaca seluruh laporan intelijen dan seluruh jejak
+  # audit — termasuk keputusan Pimpinan. Itu pelebaran kewenangan, bukan koreksi
+  # teknis, dan merupakan keputusan pemilik proyek (CLAUDE.md §2C).
+  # Sampai diputuskan, permission ini tidak diberikan: menahan lebih aman daripada
+  # melebarkan diam-diam.
 
   Polsek:
     ALL:

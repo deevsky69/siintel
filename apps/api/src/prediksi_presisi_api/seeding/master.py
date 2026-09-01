@@ -14,6 +14,7 @@ pada `docs/03` §2 (43 permission + scope).
 
 from __future__ import annotations
 
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -47,20 +48,30 @@ class SeedSummary:
 
     inserted: dict[str, int] = field(default_factory=dict)
     skipped: dict[str, int] = field(default_factory=dict)
+    #: Perubahan yang bukan sekadar penambahan baris — misalnya cakupan yang diperbarui
+    #: atau kewenangan yang dicabut. Ditampilkan supaya tidak terjadi diam-diam.
+    notes: dict[str, str] = field(default_factory=dict)
 
     def record(self, table: str, inserted: int, skipped: int) -> None:
         self.inserted[table] = inserted
         self.skipped[table] = skipped
 
+    def note(self, table: str, message: str) -> None:
+        self.notes[table] = message
+
     def merge(self, other: SeedSummary) -> None:
         self.inserted.update(other.inserted)
         self.skipped.update(other.skipped)
+        self.notes.update(other.notes)
 
     def as_lines(self) -> list[str]:
-        return [
-            f"  {table:<20} +{self.inserted[table]:<6} (sudah ada: {self.skipped[table]})"
-            for table in sorted(self.inserted)
-        ]
+        lines = []
+        for table in sorted(self.inserted):
+            line = f"  {table:<20} +{self.inserted[table]:<6} (sudah ada: {self.skipped[table]})"
+            if table in self.notes:
+                line += f"  [{self.notes[table]}]"
+            lines.append(line)
+        return lines
 
 
 def _existing_codes(session: Session, model: Any, column: Any) -> set[str]:
@@ -188,7 +199,21 @@ def seed_permissions(session: Session, summary: SeedSummary, path: Path | None =
 
 
 def seed_role_permissions(session: Session, summary: SeedSummary, path: Path | None = None) -> None:
-    """Memberikan permission ke role beserta scope-nya (docs/03 §3, masih PROPOSED)."""
+    """Menyelaraskan `role_permissions` dengan `config/rbac/permissions.yaml`.
+
+    **Menyelaraskan**, bukan sekadar menambah. Versi sebelumnya hanya menyisipkan
+    pemberian baru dan melewati yang sudah ada, sehingga berkas konfigurasi — yang
+    dinyatakan sebagai sumber kebenaran RBAC — tidak dapat mencabut apa pun maupun
+    mengubah cakupan. Sebuah kewenangan yang dihapus dari berkas akan tetap hidup di
+    basis data selamanya, dan tidak ada yang menyadarinya.
+
+    Karena itu di sini ada tiga tindakan: menyisipkan yang belum ada, **memperbarui**
+    cakupan yang berubah, dan **mencabut** pemberian yang tidak lagi tercantum.
+
+    Pencabutan aman dilakukan otomatis karena `role_permissions` adalah tabel turunan
+    dari berkas konfigurasi, bukan data yang dimasukkan pengguna. Yang dicabut ikut
+    dilaporkan pada ringkasan agar perubahannya terlihat, bukan terjadi diam-diam.
+    """
     matrix = _load_rbac(path)["roles"]
 
     session.flush()
@@ -197,11 +222,14 @@ def seed_role_permissions(session: Session, summary: SeedSummary, path: Path | N
         f"{permission.resource}:{permission.action}": permission
         for permission in session.scalars(select(Permission)).all()
     }
-    existing = {
-        (grant.role_id, grant.permission_id)
+    current = {
+        (grant.role_id, grant.permission_id): grant
         for grant in session.scalars(select(RolePermission)).all()
     }
+
+    declared: set[tuple[uuid.UUID, uuid.UUID]] = set()
     inserted = 0
+    updated = 0
 
     for role_name, scopes in matrix.items():
         role = roles.get(role_name)
@@ -219,20 +247,37 @@ def seed_role_permissions(session: Session, summary: SeedSummary, path: Path | N
                     message = f"config/rbac: permission '{entry}' tidak ada di katalog"
                     raise SeedError(message)
 
-                if (role.role_id, permission.permission_id) in existing:
-                    continue
+                key = (role.role_id, permission.permission_id)
+                declared.add(key)
 
-                session.add(
-                    RolePermission(
-                        role_id=role.role_id,
-                        permission_id=permission.permission_id,
-                        scope=scope,
+                grant = current.get(key)
+                if grant is None:
+                    session.add(
+                        RolePermission(
+                            role_id=role.role_id,
+                            permission_id=permission.permission_id,
+                            scope=scope,
+                        )
                     )
-                )
-                existing.add((role.role_id, permission.permission_id))
-                inserted += 1
+                    inserted += 1
+                elif grant.scope != scope:
+                    # Cakupan yang berubah lebih berbahaya daripada yang hilang: baris
+                    # tetap ada, tetapi menegakkan batas yang berbeda dari dokumennya.
+                    grant.scope = scope
+                    updated += 1
 
-    summary.record("role_permissions", inserted, 0)
+    revoked = 0
+    for key, grant in current.items():
+        if key not in declared:
+            session.delete(grant)
+            revoked += 1
+
+    summary.record("role_permissions", inserted, len(current) - revoked)
+    if updated or revoked:
+        summary.note(
+            "role_permissions",
+            f"cakupan diperbarui: {updated}, pemberian dicabut: {revoked}",
+        )
 
 
 def seed_users(session: Session, taxonomy: Taxonomy, summary: SeedSummary) -> None:

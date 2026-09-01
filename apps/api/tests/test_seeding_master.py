@@ -11,7 +11,7 @@ import os
 from collections.abc import Iterator
 
 import pytest
-from sqlalchemy import create_engine, func, select
+from sqlalchemy import create_engine, func, select, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.models import Permission, Role, RolePermission, User
@@ -72,26 +72,28 @@ def test_master_seed_is_idempotent(session: Session) -> None:
 
 
 def test_seeding_never_creates_a_usable_password(session: Session) -> None:
-    """Seed tidak pernah menghasilkan kredensial yang dapat dipakai masuk.
+    """Akun yang **dibuat seed** selalu terkunci dan wajib mengganti password.
 
-    Yang diuji perilaku seed, bukan keadaan database saat ini: setelah operator
-    menetapkan password lewat `pnpm user:password`, sebagian akun memang sudah aktif —
-    dan itu justru alur yang benar (TASK 050).
+    Yang diuji perilaku seed, bukan isi tabel. Versi sebelumnya memeriksa apakah masih
+    ada akun bertanda terkunci di dalam database — dan gagal begitu operator menetapkan
+    password bagi seluruh akun lewat `pnpm prod:password`, padahal itu justru alur yang
+    benar (TASK 050). Test yang mengunci keadaan basis data akan patah tepat ketika
+    sistem mulai dipakai sungguhan.
+
+    Karena itu tabel `users` dikosongkan lebih dulu di dalam transaksi yang dibatalkan
+    setelahnya, sehingga yang diperiksa benar-benar baris yang baru dibuat seed.
     """
+    session.execute(text("TRUNCATE users CASCADE"))
     seed_master_data(session)
     session.flush()
 
     assert LOCKED_PASSWORD == "!"  # noqa: S105 — penanda akun terkunci, bukan kata sandi
     assert not verify_password("apa pun", LOCKED_PASSWORD)
 
-    # Akun yang masih memakai penanda terkunci wajib diminta mengganti password.
-    locked = [
-        user
-        for user in session.scalars(select(User)).all()
-        if user.password_hash == LOCKED_PASSWORD
-    ]
-    assert locked, "seluruh akun demo sudah diberi kredensial — periksa apakah itu disengaja"
-    assert all(user.must_change_password for user in locked)
+    created = session.scalars(select(User)).all()
+    assert created, "seed tidak membuat satu pun akun"
+    assert all(user.password_hash == LOCKED_PASSWORD for user in created)
+    assert all(user.must_change_password for user in created)
 
 
 def test_scope_attributes_are_present_for_limited_roles(session: Session) -> None:
