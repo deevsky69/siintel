@@ -226,7 +226,12 @@ cookie `Secure` dibuang peramban pada sambungan tidak terenkripsi. Menurunkan ta
 `Secure` demi demo berarti mengirim kredensial dalam keadaan terbuka — tidak pantas
 untuk sistem yang membawa data kamtibmas, bahkan pada prototipe.
 
-### 3.2 Mengapa sertifikat sah belum terbit, dan cara mendapatkannya
+### 3.2 Sertifikat lewat DNS-01 — bila tetap memakai penerusan port
+
+> **Baca §3.2b lebih dulu.** Bila Anda memilih Cloudflare Tunnel, seluruh bagian ini
+> tidak perlu dikerjakan: sertifikat disediakan Cloudflare, dan nomor port hilang dari
+> alamat. Bagian ini tetap disimpan untuk keadaan ketika lalu lintas tidak boleh
+> melewati pihak ketiga.
 
 Let's Encrypt **selalu** menghubungi port **80** (tantangan HTTP-01) atau port **443**
 (TLS-ALPN-01) pada domain yang diverifikasi. Nomor port itu tidak dapat diubah, dan
@@ -301,16 +306,145 @@ baru yang ditambahkan, dan menghapusnya mengembalikan keadaan semula.
 
 Setelah itu `https://siintel.awansurya.com:8998` terbuka tanpa peringatan.
 
-#### Alternatif bila perpanjangan manual terasa merepotkan
+---
 
-Pindahkan pengelolaan DNS `awansurya.com` ke **Cloudflare** (gratis, record tetap sama).
-acme.sh punya plugin Cloudflare, sehingga perpanjangan berjalan sendiri lewat cron yang
-sudah dipasang saat instalasi. Domainnya tetap terdaftar di DomaiNesia — yang berpindah
-hanya nameserver-nya.
+### 3.2b CLOUDFLARE TUNNEL — jalur yang dianjurkan untuk paparan
 
-Cloudflare juga membuka pilihan **Cloudflare Tunnel**, yang menghilangkan nomor port
-dari alamat sekaligus (`https://siintel.awansurya.com` tanpa `:8998`) tanpa memerlukan
-port masuk apa pun.
+Pemetaan port tidak lazim meninggalkan dua gangguan yang keduanya terasa saat paparan:
+alamat harus selalu ditulis `:8998`, dan peramban menyambut penguji dengan peringatan
+keamanan. Cloudflare Tunnel menghapus keduanya sekaligus.
+
+`cloudflared` membuka sambungan **keluar** ke jaringan Cloudflare, lalu lalu lintas
+masuk mengalir balik lewat sambungan itu. Tidak ada port masuk yang dibutuhkan sama
+sekali — pemetaan 8997/8998 menjadi tidak relevan, dan alamatnya menjadi
+`https://siintel.awansurya.com` tanpa nomor port.
+
+> **Ini menggantikan pekerjaan DNS-01 pada §3.2.** Sertifikat disediakan Cloudflare di
+> tepi jaringan, jadi `scripts/pasang-sertifikat.sh` tidak perlu dijalankan dan record
+> TXT `_acme-challenge.siintel` boleh dihapus. Jangan menjalankan keduanya bersamaan.
+
+#### ⚠ Satu keputusan yang harus diambil sadar, bukan sekadar diikuti
+
+Pada jalur ini, **TLS berakhir di Cloudflare**, bukan di server ini. Artinya lalu lintas
+aplikasi — termasuk kredensial saat masuk — melewati infrastruktur pihak ketiga di luar
+Polri dalam keadaan dapat dibaca oleh penyedia layanan tersebut.
+
+| Keadaan | Pertimbangan |
+|---|---|
+| **Prototipe sekarang** | Data seluruhnya sintetis, tidak ada identitas nyata. Risikonya rendah |
+| **Bila kelak memakai data nyata** | Ini menjadi persoalan klasifikasi dan kedaulatan data. **REQUIRES HUMAN / POLICY APPROVAL** — tidak dapat diputuskan secara teknis |
+
+Bila jawabannya tidak boleh, jalan keluarnya adalah meminta ISP membuka port 80/443
+apa adanya, lalu memakai `pnpm prod:up:tls` (§3.2). Susunan compose sengaja memisahkan
+pintu masuk ke berkas tersendiri agar penggantian ini tidak membongkar aplikasi.
+
+#### Langkah
+
+**1. Daftarkan `awansurya.com` di Cloudflare**
+
+Buat akun (paket gratis memadai), tambahkan situs `awansurya.com`, dan biarkan
+Cloudflare memindai record DNS yang ada.
+
+> ### ⚠ PERIKSA HASIL PEMINDAIAN SEBELUM MELANJUTKAN
+>
+> Mengganti nameserver memindahkan **seluruh** `awansurya.com`, bukan hanya subdomain
+> ini. Record yang tidak ikut tersalin akan mati begitu nameserver berpindah — dan yang
+> paling sering terlewat justru yang paling terasa: **MX** (email masuk) dan **TXT**
+> untuk SPF/DKIM (email keluar dianggap spam).
+>
+> Bandingkan daftar di Cloudflare dengan daftar di panel DomaiNesia **baris demi baris**,
+> dan tambahkan sendiri yang belum ada. Lakukan ini sebelum langkah 2, bukan sesudahnya.
+
+**2. Ganti nameserver di DomaiNesia**
+
+Cloudflare memberi dua nameserver. Pasang keduanya di panel DomaiNesia menggantikan
+`ns1/ns2.domainesia.net`. Aktivasi biasanya beberapa menit sampai beberapa jam.
+
+**3. Buat tunnel**
+
+Di dasbor Cloudflare: **Zero Trust → Networks → Tunnels → Create a tunnel** →
+pilih **Cloudflared** → beri nama, misalnya `siintel-jaksel`.
+
+Cloudflare menampilkan perintah instalasi yang memuat **token**. Ambil **hanya token**
+itu — bagian panjang setelah `--token`.
+
+> Token ini rahasia: pemegangnya dapat menyambungkan terowongan atas nama Anda.
+> **Jangan pernah mengirimkannya lewat percakapan, chat, atau email.** Tempelkan
+> langsung di server.
+
+**4. Simpan token di server**
+
+Sunting `.env.production` di server, isi barisnya:
+
+```bash
+CLOUDFLARE_TUNNEL_TOKEN=<tempel token di sini>
+```
+
+**5. Tentukan tujuan terowongan**
+
+Masih di halaman tunnel, buka tab **Public Hostname** → **Add a public hostname**:
+
+| Kolom | Isi |
+|---|---|
+| Subdomain | `siintel` |
+| Domain | `awansurya.com` |
+| Type | `HTTP` |
+| URL | `coolify-proxy:80` |
+
+Cloudflare akan membuat sendiri record DNS untuk `siintel.awansurya.com`. Bila sudah ada
+record A lama yang menunjuk `111.68.123.134`, **hapus** — record itu tidak lagi dipakai.
+
+> Tujuannya `coolify-proxy:80`, bukan `web:3000`, supaya lalu lintas tetap melewati
+> Traefik dan memakai header keamanan yang sama seperti jalur lain.
+
+**6. Nyalakan**
+
+```bash
+pnpm prod:up:tunnel
+```
+
+Periksa sambungannya:
+
+```bash
+pnpm prod:tunnel:logs
+```
+
+Baris yang dicari berbunyi `Registered tunnel connection` — biasanya empat sambungan ke
+pusat data Cloudflare terdekat.
+
+**7. Tegakkan HTTPS di sisi Cloudflare**
+
+Pengalihan HTTP→HTTPS milik Traefik **dimatikan** pada jalur ini (bila menyala, ia akan
+memantulkan permintaan ke `:8998` dan terowongan menjadi tidak berguna). Penegakannya
+berpindah ke Cloudflare:
+
+**SSL/TLS → Edge Certificates → Always Use HTTPS: On**
+
+**8. Buka dan pastikan**
+
+```
+https://siintel.awansurya.com
+```
+
+Tanpa nomor port, tanpa peringatan sertifikat.
+
+#### Setelah terowongan bekerja
+
+- **Cabut penerusan port 8997 dan 8998 di router.** Membiarkannya berarti aplikasi tetap
+  dapat dijangkau lewat jalur bersertifikat tidak sah — jalur itu akan membingungkan
+  siapa pun yang menemukannya, dan tidak ada lagi gunanya.
+- `PUBLIC_HTTPS_PORT` di `.env.production` menjadi tidak terpakai.
+- Record TXT `_acme-challenge.siintel` boleh dihapus.
+
+#### Bila terowongan bermasalah
+
+| Gejala | Sebab yang paling mungkin |
+|---|---|
+| Log berhenti di `Unauthorized` | Token salah tersalin — pastikan hanya bagian setelah `--token`, tanpa spasi |
+| `error="dial tcp: lookup coolify-proxy"` | Container `cloudflared` tidak berada di network `coolify` |
+| Cloudflare menjawab **502** | Traefik menerima permintaan tetapi tidak ada router yang cocok — periksa `DOMAIN` di `.env.production` |
+| Cloudflare menjawab **1033** | Terowongan tidak tersambung; periksa `pnpm prod:tunnel:logs` |
+| Halaman berputar-putar mengalihkan | `docker-compose.cloudflare.yml` tidak ikut disertakan, sehingga pengalihan ke `:8998` masih menyala |
 
 ### 3.3 Melihat aplikasi tanpa peringatan sertifikat
 

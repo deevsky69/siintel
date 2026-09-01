@@ -1,0 +1,83 @@
+# ---------------------------------------------------------------------------
+# CLOUDFLARE TUNNEL — jalur masuk tanpa satu pun port terbuka.
+#
+# MENGAPA INI DIPILIH UNTUK SERVER INI
+#
+#   Server berbagi satu alamat IP publik, sehingga port 80 dan 443 tidak dapat
+#   dialihkan ke sini; yang tersedia hanya 8997 → 80 dan 8998 → 443. Akibatnya:
+#
+#     - alamat harus selalu ditulis lengkap dengan `:8998`, dan
+#     - Let's Encrypt tidak dapat memverifikasi domain lewat HTTP-01/TLS-ALPN-01.
+#
+#   Cloudflare Tunnel menghilangkan keduanya sekaligus. `cloudflared` membuka
+#   sambungan **keluar** menuju jaringan Cloudflare, lalu lalu lintas masuk mengalir
+#   balik lewat sambungan itu. Tidak ada port masuk yang dibutuhkan, dan alamatnya
+#   menjadi `https://siintel.awansurya.com` — bersih, tanpa nomor port.
+#
+#   Sertifikat ditangani Cloudflare di tepi jaringan. Karena itu berkas ini
+#   MENGGANTIKAN pekerjaan DNS-01 pada `scripts/pasang-sertifikat.sh`; keduanya
+#   tidak perlu dijalankan bersamaan.
+#
+# JALUR LALU LINTASNYA
+#
+#   Peramban --HTTPS--> Cloudflare --terowongan--> cloudflared --HTTP--> coolify-proxy
+#                                                                              |
+#                                                                              v
+#                                                                             web
+#
+#   Ruas terakhir memakai HTTP biasa, dan itu memang benar: ia berjalan di dalam
+#   jaringan Docker mesin ini, dan ruas yang menyeberangi internet sudah terenkripsi
+#   dua kali (HTTPS ke Cloudflare, lalu terowongan ke cloudflared).
+#
+#   Cookie sesi bertanda `Secure` tetap diterima peramban, karena yang dilihat
+#   peramban adalah sambungan HTTPS ke Cloudflare.
+#
+#   Lalu lintas tetap melewati Traefik, bukan langsung ke `web`, supaya header
+#   keamanan yang sama tetap terpasang lewat jalur mana pun aplikasi diakses.
+#
+# PENGALIHAN HTTP→HTTPS DIMATIKAN DI SINI
+#
+#   Pada jalur terowongan, permintaan tiba di Traefik sebagai HTTP biasa. Bila
+#   pengalihan tetap menyala, Traefik akan memantulkannya ke `:8998` dan terowongan
+#   menjadi tidak berguna. Yang menegakkan HTTPS pada jalur ini adalah Cloudflare
+#   (aktifkan **Always Use HTTPS** di dasbornya), bukan Traefik.
+#
+# CARA MEMAKAI
+#
+#   1. Isi `CLOUDFLARE_TUNNEL_TOKEN` di `.env.production` (lihat docs/10 §3.2).
+#   2. pnpm prod:up:tunnel
+#
+# ---------------------------------------------------------------------------
+
+services:
+  cloudflared:
+    # `latest` dipakai dengan sadar: cloudflared berbicara protokol milik Cloudflare
+    # ke tepi jaringannya, dan versi lama ditolak setelah beberapa waktu. Menyematkan
+    # versi tetap di sini berarti terowongan berhenti bekerja tanpa peringatan pada
+    # suatu hari. Sematkan versi tertentu hanya bila Anda ikut memantau rilisnya.
+    image: cloudflare/cloudflared:latest
+    container_name: predpol-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN belum diisi di .env.production}
+      TUNNEL_METRICS: 0.0.0.0:2000
+    networks:
+      # Berada di network `coolify` agar dapat menjangkau `coolify-proxy` lewat namanya.
+      - coolify
+    healthcheck:
+      test: ["CMD", "cloudflared", "--version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web:
+    labels:
+      # Menimpa `predpol-https-redirect` dari docker-compose.coolify.yml.
+      # Header keamanan tetap dipasang; hanya pengalihannya yang dilepas.
+      traefik.http.routers.predpol-web-http.middlewares: predpol-security-headers

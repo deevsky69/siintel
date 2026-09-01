@@ -53,6 +53,8 @@
     "prod:caddy:up": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.caddy.yml up -d",
     "prod:preview": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.preview.yml up -d",
     "prod:preview:off": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml up -d --force-recreate web",
-    "prod:up:tls": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.letsencrypt.yml up -d"
+    "prod:up:tls": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.letsencrypt.yml up -d",
+    "prod:up:tunnel": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.cloudflare.yml up -d",
+    "prod:tunnel:logs": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.cloudflare.yml logs -f cloudflared"
   }
 }
