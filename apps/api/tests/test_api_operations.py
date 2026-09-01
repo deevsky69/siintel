@@ -27,6 +27,7 @@ from prediksi_presisi_api.models import (
     CommanderDecision,
     OperationalAction,
     PoliceUnit,
+    Recommendation,
     Role,
     User,
 )
@@ -94,18 +95,39 @@ def _auth(client: TestClient, user: User) -> dict[str, str]:
 
 
 def _decision_without_action(session: Session, decision: str) -> CommanderDecision:
-    row = session.scalar(
-        select(CommanderDecision)
+    """Membuat keputusan yang belum ditindaklanjuti, alih-alih mencarinya di data awal.
+
+    Versi sebelumnya mencari baris yang kebetulan tersedia — dan patah begitu keputusan
+    terakhir yang menganggur dipakai orang lain. Test yang bergantung pada isi basis data
+    akan gagal karena sistem dipakai, bukan karena perilakunya berubah.
+
+    Barisnya dibuat di dalam transaksi yang dibatalkan setelah test, sehingga tidak
+    menghabiskan apa pun.
+    """
+    recommendation = session.scalar(
+        select(Recommendation)
         .outerjoin(
-            OperationalAction,
-            OperationalAction.decision_id == CommanderDecision.decision_id,
+            CommanderDecision,
+            CommanderDecision.recommendation_id == Recommendation.recommendation_id,
         )
-        .where(CommanderDecision.decision == decision)
-        .where(OperationalAction.action_id.is_(None))
+        .where(CommanderDecision.decision_id.is_(None))
         .limit(1)
     )
-    assert row is not None, f"tidak ada keputusan {decision} yang belum ditindaklanjuti"
-    return row
+    assert recommendation is not None, "data awal tidak menyediakan rekomendasi tanpa keputusan"
+
+    decider = session.scalar(select(User).limit(1))
+    assert decider is not None
+
+    record = CommanderDecision(
+        code=f"DEC-UJI-{uuid.uuid4().hex[:6]}",
+        recommendation_id=recommendation.recommendation_id,
+        decision_by=decider.user_id,
+        decision=decision,
+        modified_text="Disesuaikan untuk pengujian." if decision == "MODIFIED" else None,
+    )
+    session.add(record)
+    session.flush()
+    return record
 
 
 def _unit(session: Session) -> PoliceUnit:
@@ -216,7 +238,12 @@ def test_result_is_refused_when_it_would_have_no_duration(
     )
 
     assert response.status_code == 422
-    assert "end_at" in response.json()["error"]["message"]
+    message = response.json()["error"]["message"]
+    assert "waktu selesai" in message.lower()
+    # Pesan disajikan dalam WIB, sama seperti seluruh antarmuka. Menyebut UTC membuat
+    # petugas yang baru mengetik pukul 10.00 membaca 03.00 dan mengira sistemnya keliru.
+    assert "WIB" in message
+    assert "UTC" not in message
 
     session.expire_all()
     stored = session.scalar(select(OperationalAction).where(OperationalAction.code == code))

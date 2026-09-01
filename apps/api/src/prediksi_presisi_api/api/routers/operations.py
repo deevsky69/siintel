@@ -20,7 +20,7 @@ dapat ditindaklanjuti; yang menjamin aturannya tetap database (CLAUDE.md §13).
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query, status
@@ -47,6 +47,9 @@ from ..deps import (
 )
 from ..errors import ApiError
 from ..pagination import PageParams, page_params, paginate
+
+#: Zona waktu penyajian. `APP_TIMEZONE` pada konfigurasi memakai nama yang sama.
+WIB = timezone(timedelta(hours=7))
 
 router = APIRouter(tags=["operasi"])
 
@@ -83,6 +86,18 @@ class ResultRequest(BaseModel):
             "penugasan tidak dikarang."
         ),
     )
+
+
+def _wib(moment: datetime) -> datetime:
+    """Waktu dalam WIB untuk pesan yang dibaca petugas.
+
+    Seluruh antarmuka berbahasa WIB. Pesan kesalahan yang menyebut UTC membuat petugas
+    yang baru saja mengetik pukul 10.00 membaca "03.00" dan mengira sistemnya keliru —
+    kesalahan yang seharusnya menuntun malah membingungkan.
+
+    Penyimpanan tetap UTC (`timestamptz`); yang berpindah hanya penyajiannya.
+    """
+    return moment.astimezone(WIB)
 
 
 def _scoped(query: Select[Any], polsek: str | None, function: str | None) -> Select[Any]:
@@ -354,8 +369,9 @@ def record_result(
         # selesainya, bukan mengarang durasi agar constraint-nya lolos.
         raise ApiError(
             status.HTTP_422_UNPROCESSABLE_ENTITY,
-            f"Waktu selesai harus setelah waktu mulai ({action.start_at:%d %b %Y %H:%M} UTC). "
-            f"Sertakan `end_at` pada permintaan.",
+            f"Waktu selesai harus setelah waktu mulai "
+            f"({_wib(action.start_at):%d %b %Y %H:%M} WIB). "
+            f"Sertakan waktu selesai pada permintaan.",
         )
 
     action.status = new_status

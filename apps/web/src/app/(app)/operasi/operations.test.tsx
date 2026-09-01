@@ -4,8 +4,8 @@ import {
   effectiveOrder,
   type OperationRow,
   type PendingDecisionRow,
+  type PoliceUnitRow,
   splitByProgress,
-  unitOptions,
   wibIso,
 } from "@/lib/operations";
 import { OperationBoard } from "./operation-board";
@@ -69,6 +69,24 @@ const finished: OperationRow = {
   modified_text: null,
 };
 
+/** Bentuknya mengikuti `/police-units` apa adanya, termasuk satuan berstatus Standby. */
+const UNITS: PoliceUnitRow[] = [
+  {
+    code: "UNIT-003",
+    unit_name: "Unit Patroli Charlie",
+    function: "SAMAPTA",
+    jurisdiction: "Polsek Pasar Minggu",
+    status: "STANDBY",
+  },
+  {
+    code: "UNIT-004",
+    unit_name: "Unit Pembinaan Wilayah",
+    function: "BINMAS",
+    jurisdiction: "Polres Metro Jakarta Selatan",
+    status: "ACTIVE",
+  },
+];
+
 /**
  * Kueri dibatasi pada satu panel: perintah yang sama memang muncul di kartu daftar dan
  * di panel rincian, dan yang diuji adalah letaknya — pola yang sama dengan
@@ -91,7 +109,8 @@ function board(props: Partial<Parameters<typeof OperationBoard>[0]> = {}) {
       withResult={[finished]}
       selectedDecision={queued}
       selectedAction={null}
-      units={[{ code: "UNIT-003", name: "Unit Patroli Charlie", function: "SAMAPTA" }]}
+      units={UNITS}
+      unitScopeBasis="Pengguna yang dibatasi wilayah menerima satuan di polseknya, ditambah satuan tingkat Polres."
       canWrite
       {...props}
     />,
@@ -131,20 +150,6 @@ describe("pembagian tindakan", () => {
     const cancelled = { ...running, code: "ACT-0099", status: "CANCELLED" };
 
     expect(splitByProgress([cancelled]).withResult).toHaveLength(1);
-  });
-});
-
-describe("daftar satuan", () => {
-  it("dikumpulkan unik dari tindakan yang pernah tercatat", () => {
-    // Belum ada endpoint data induk satuan; daftar tidak boleh ditanam di kode.
-    expect(unitOptions([running, finished, running])).toEqual([
-      { code: "UNIT-003", name: "Unit Patroli Charlie", function: "SAMAPTA" },
-      { code: "UNIT-005", name: "Unit Monitoring Wilayah", function: "INTELKAM" },
-    ]);
-  });
-
-  it("kosong bila belum ada tindakan sama sekali", () => {
-    expect(unitOptions([])).toEqual([]);
   });
 });
 

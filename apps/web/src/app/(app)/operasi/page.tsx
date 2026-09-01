@@ -1,5 +1,10 @@
 import { getProfile } from "@/lib/decisions";
-import { getOperations, getPendingDecisions, splitByProgress, unitOptions } from "@/lib/operations";
+import {
+  getOperations,
+  getPendingDecisions,
+  getPoliceUnits,
+  splitByProgress,
+} from "@/lib/operations";
 import { OperationBoard } from "./operation-board";
 
 export const dynamic = "force-dynamic";
@@ -24,9 +29,10 @@ export default async function OperationPage({
   const params = await searchParams;
   const requested = typeof params.dipilih === "string" ? params.dipilih : null;
 
-  const [operations, pending, profile] = await Promise.all([
+  const [operations, pending, units, profile] = await Promise.all([
     getOperations(),
     getPendingDecisions(),
+    getPoliceUnits(),
     getProfile(),
   ]);
 
@@ -50,9 +56,10 @@ export default async function OperationPage({
       withResult={withResult}
       selectedDecision={fallbackDecision}
       selectedAction={fallbackAction}
-      // Satu-satunya sumber daftar satuan yang benar-benar ada: satuan yang pernah
-      // ditugaskan. Endpoint data induk satuan belum tersedia — lihat `unitOptions`.
-      units={unitOptions(operations.data)}
+      // Satu-satunya sumber daftar satuan adalah `/police-units`; backend yang menyaring
+      // menurut cakupan pengguna, dan alasannya dibawa apa adanya ke layar.
+      units={units.data}
+      unitScopeBasis={units.scope_basis}
       // Menyembunyikan formulir hanyalah kenyamanan; backend tetap yang menolak
       // (CLAUDE.md §21).
       canWrite={profile.permissions.includes("operation:write")}
