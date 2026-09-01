@@ -26,6 +26,7 @@ from .api.routers import (
     health,
     intelligence,
     map_view,
+    operations,
     warning_actions,
 )
 from .config import get_settings
@@ -70,6 +71,7 @@ def create_app() -> FastAPI:
     api.include_router(catalog.router)
     api.include_router(intelligence.router)
     api.include_router(decisions.router)
+    api.include_router(operations.router)
     api.include_router(warning_actions.router)
     api.include_router(map_view.router)
     api.include_router(dashboard.router)
