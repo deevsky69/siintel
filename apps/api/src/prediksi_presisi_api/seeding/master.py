@@ -52,6 +52,10 @@ class SeedSummary:
         self.inserted[table] = inserted
         self.skipped[table] = skipped
 
+    def merge(self, other: SeedSummary) -> None:
+        self.inserted.update(other.inserted)
+        self.skipped.update(other.skipped)
+
     def as_lines(self) -> list[str]:
         return [
             f"  {table:<20} +{self.inserted[table]:<6} (sudah ada: {self.skipped[table]})"
