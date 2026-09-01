@@ -111,6 +111,7 @@ Tidak ada endpoint tulis/hapus untuk `/audit-logs`.
 | Method | Path | Permission |
 |---|---|---|
 | GET | `/locations`, `/locations/{id}` | `location:read` |
+| GET | `/police-units` | `police_unit:read` |
 | POST/PATCH | `/locations`, `/locations/{id}` | `location:write` |
 | GET | `/crimes`, `/crimes/{id}` | `crime:read` |
 | POST/PATCH | `/crimes`, `/crimes/{id}` | `crime:write` |
@@ -208,6 +209,17 @@ Rekomendasi di luar cakupan wilayah pengguna dijawab `404`, bukan `403`.
 
 `GET /recommendations/{id}/decisions` belum dibuat; riwayat diambil lewat
 `GET /commander-decisions`, yang sudah menegakkan cakupan wilayah dan fungsi.
+
+> **`GET /police-units` (TASK 131).** `police_units.jurisdiction` berisi nama polsek **atau**
+> nama Polres untuk satuan yang bertugas lintas polsek. Menyaring dengan pencocokan tepat akan
+> menyembunyikan satuan tingkat Polres dari pengguna polsek — padahal satuan itu justru
+> bertugas di wilayahnya juga, dan menyembunyikannya membuat petugas mengira satuan itu tidak
+> ada. Karena itu satuan tingkat Polres dikenali dari datanya sendiri: `jurisdiction` yang
+> bukan salah satu polsek pada tabel `locations`. Tidak ada nama Polres yang ditanam di kode.
+> Aturannya dinyatakan pada `scope_basis` di respons, bukan disembunyikan.
+>
+> Pada data berjalan: Command Center 6 satuan, Polsek Tebet 4 (miliknya + tiga tingkat Polres),
+> Fungsi RESKRIM 1.
 
 ### 2.9 Operasi
 

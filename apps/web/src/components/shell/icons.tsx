@@ -66,6 +66,12 @@ const ICONS: Record<string, (props: IconProps) => React.ReactElement> = {
       <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" />
     </Svg>
   ),
+  operation: (p) => (
+    <Svg {...p}>
+      <path d="M12 3 5 5.8v6c0 4.2 2.9 7.6 7 9.2 4.1-1.6 7-5 7-9.2v-6L12 3Z" />
+      <path d="m9 12 2.2 2.2L15.5 10" />
+    </Svg>
+  ),
   evaluation: (p) => (
     <Svg {...p}>
       <path d="M4 7h9M4 12h6M4 17h9" />

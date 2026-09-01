@@ -225,3 +225,50 @@ def test_page_size_is_capped(client: TestClient, session: Session) -> None:
 
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+
+
+def test_police_units_are_listed_for_assignment(client: TestClient, session: Session) -> None:
+    centre = _make_user(session, "Command Center")
+
+    response = client.get("/api/v1/police-units", headers=_auth(client, centre))
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["data"], "tidak ada satuan yang dapat ditugaskan"
+    assert {"code", "unit_name", "function", "jurisdiction", "status"} <= set(body["data"][0])
+    # Cara penyaringan dinyatakan, bukan menjadi perilaku tersembunyi.
+    assert body["scope_basis"]
+
+
+def test_police_units_keep_polres_level_units_visible_to_a_polsek(
+    client: TestClient, session: Session
+) -> None:
+    """Satuan tingkat Polres tetap terlihat oleh pengguna polsek.
+
+    Menyaring dengan pencocokan tepat pada `jurisdiction` akan menyembunyikannya —
+    padahal satuan tingkat Polres justru bertugas melintasi seluruh polsek, termasuk
+    wilayah pengguna itu. Menyembunyikannya membuat petugas mengira satuan itu tidak ada.
+    """
+    polsek = session.scalar(select(Location.polsek).where(Location.polsek.is_not(None)).limit(1))
+    assert polsek is not None
+    officer = _make_user(session, "Polsek", polsek=str(polsek))
+    centre = _make_user(session, "Command Center")
+
+    scoped = client.get("/api/v1/police-units", headers=_auth(client, officer)).json()["data"]
+    everything = client.get("/api/v1/police-units", headers=_auth(client, centre)).json()["data"]
+
+    assert scoped, "pengguna polsek tidak menerima satu pun satuan"
+    assert len(scoped) < len(everything), "cakupan wilayah tidak ditegakkan"
+
+    known = set(
+        session.scalars(
+            select(Location.polsek).where(Location.polsek.is_not(None)).distinct()
+        ).all()
+    )
+    for unit in scoped:
+        # Entah satuan milik polseknya, entah satuan lintas polsek — tidak ada yang lain.
+        assert unit["jurisdiction"] == polsek or unit["jurisdiction"] not in known
+
+    assert any(unit["jurisdiction"] not in known for unit in scoped), (
+        "tidak ada satuan tingkat Polres yang lolos — penyaringan terlalu ketat"
+    )

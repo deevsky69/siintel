@@ -13,6 +13,9 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/peringatan", label: "Early Warning", icon: "warning" },
   { href: "/analitik", label: "Analytics", icon: "analytics" },
   { href: "/rekomendasi", label: "Recommendation", icon: "recommendation" },
+  // Ditempatkan setelah Recommendation dan sebelum Evaluation supaya urutan menu
+  // mengikuti rantai tertutup: keputusan → tindakan → hasil nyata → evaluasi.
+  { href: "/operasi", label: "Operations", icon: "operation" },
   { href: "/evaluasi", label: "Evaluation", icon: "evaluation" },
   { href: "/intelijen", label: "Intelligence", icon: "intelligence" },
   { href: "/admin", label: "Admin", icon: "admin" },
