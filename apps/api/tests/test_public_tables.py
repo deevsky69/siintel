@@ -10,21 +10,9 @@ from prediksi_presisi_api.db import Base
 
 PUBLIC_TABLES = {"citizen_reports", "public_alerts", "community_feedback"}
 
-# Diperbarui setiap kali sekelompok tabel baru dibuat (TASK 013–015).
-EXPECTED_TABLES = {
-    # TASK 011 — inti
-    "locations",
-    "police_units",
-    "crime_incidents",
-    "intelligence_reports",
-    "patrol_activity",
-    # TASK 012 — publik
-    *PUBLIC_TABLES,
-}
 
-
-def test_expected_tables_so_far() -> None:
-    assert set(Base.metadata.tables) == EXPECTED_TABLES
+def test_public_tables_are_registered() -> None:
+    assert set(Base.metadata.tables) >= PUBLIC_TABLES
 
 
 def test_citizen_report_location_is_optional() -> None:

@@ -1,13 +1,18 @@
 """Model ORM PREDIKSI PRESISI.
 
-Tabel inti (TASK 011) dan tabel publik (TASK 012).
-Tabel analitik, operasional, dan administrasi menyusul pada TASK 013–015
-mengikuti `docs/02-data-dictionary.md`.
+Urutan pembuatan tabel (lihat `docs/08` PHASE 2):
+
+- TASK 011 — inti: locations, police_units, crime_incidents, intelligence_reports, patrol_activity
+- TASK 012 — publik: citizen_reports, public_alerts, community_feedback
+- TASK 015 — administrasi: roles, users, permissions, role_permissions, audit_logs
+- TASK 013 — intelijen: risk_scores, predictions, early_warnings, recommendations
+- TASK 014 — operasional: commander_decisions, operational_actions, prediction_actual
 
 Modul ini diimpor oleh `database/migrations/env.py` supaya seluruh tabel
 terdaftar pada `Base.metadata` saat Alembic membandingkan schema.
 """
 
+from .audit_log import AuditLog
 from .citizen_report import CitizenReport
 from .community_feedback import CommunityFeedback
 from .crime_incident import CrimeIncident
@@ -16,14 +21,20 @@ from .location import Location
 from .patrol_activity import PatrolActivity
 from .police_unit import PoliceUnit
 from .public_alert import PublicAlert
+from .rbac import Permission, Role, RolePermission, User
 
 __all__ = [
+    "AuditLog",
     "CitizenReport",
     "CommunityFeedback",
     "CrimeIncident",
     "IntelligenceReport",
     "Location",
     "PatrolActivity",
+    "Permission",
     "PoliceUnit",
     "PublicAlert",
+    "Role",
+    "RolePermission",
+    "User",
 ]

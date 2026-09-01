@@ -32,7 +32,17 @@ CORE_TABLES = {
     "citizen_reports",
     "public_alerts",
     "community_feedback",
+    "roles",
+    "users",
+    "permissions",
+    "role_permissions",
+    "audit_logs",
 }
+
+_SAMPLE_ROLE = text("""
+    INSERT INTO roles (code, role_name, level) VALUES ('ROLE-IT', 'Uji Integrasi', 3)
+    RETURNING role_id
+""")
 
 _SAMPLE_REPORT = text("""
     INSERT INTO citizen_reports
@@ -64,7 +74,7 @@ def test_migrations_are_applied(engine: Engine) -> None:
     with engine.connect() as connection:
         revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
-    assert revision == "0003", "database belum di-migrate: jalankan `pnpm db:migrate`"
+    assert revision == "0004", "database belum di-migrate: jalankan `pnpm db:migrate`"
 
 
 def test_postgis_and_pgcrypto_are_installed(engine: Engine) -> None:
@@ -180,6 +190,95 @@ def test_public_alert_window_order_is_enforced(engine: Engine) -> None:
                          now(), now() - interval '1 hour', 'ACTIVE', 'Imbauan uji')
                 """)
             )
+
+        connection.rollback()
+
+
+def test_revoking_a_role_removes_its_permission_grants(engine: Engine) -> None:
+    with engine.begin() as connection:
+        role_id = connection.execute(_SAMPLE_ROLE).scalar_one()
+        permission_id = connection.execute(
+            text("""
+                INSERT INTO permissions (code, resource, action)
+                VALUES ('PERM-IT', 'crime', 'read')
+                RETURNING permission_id
+            """)
+        ).scalar_one()
+        connection.execute(
+            text("""
+                INSERT INTO role_permissions (role_id, permission_id, scope)
+                VALUES (:role_id, :permission_id, 'OWN_JURISDICTION')
+            """),
+            {"role_id": role_id, "permission_id": permission_id},
+        )
+
+        connection.execute(text("DELETE FROM roles WHERE code = 'ROLE-IT'"))
+
+        remaining = connection.execute(
+            text("SELECT count(*) FROM role_permissions WHERE role_id = :role_id"),
+            {"role_id": role_id},
+        ).scalar_one()
+        assert remaining == 0
+
+        connection.rollback()
+
+
+def test_invalid_scope_is_rejected(engine: Engine) -> None:
+    with engine.begin() as connection:
+        role_id = connection.execute(_SAMPLE_ROLE).scalar_one()
+        permission_id = connection.execute(
+            text("""
+                INSERT INTO permissions (code, resource, action)
+                VALUES ('PERM-IT2', 'crime', 'write')
+                RETURNING permission_id
+            """)
+        ).scalar_one()
+
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO role_permissions (role_id, permission_id, scope)
+                    VALUES (:role_id, :permission_id, 'SEMUA_WILAYAH')
+                """),
+                {"role_id": role_id, "permission_id": permission_id},
+            )
+
+        connection.rollback()
+
+
+def test_audit_log_accepts_denied_and_rejects_unknown_result(engine: Engine) -> None:
+    with engine.begin() as connection:
+        connection.execute(
+            text("""
+                INSERT INTO audit_logs (action, resource_type, resource_id, result)
+                VALUES ('APPROVE_RECOMMENDATION', 'recommendation', 'REC-0001', 'DENIED')
+            """)
+        )
+
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO audit_logs (action, resource_type, result)
+                    VALUES ('LOGIN', 'auth', 'BERHASIL')
+                """)
+            )
+
+        connection.rollback()
+
+
+def test_audit_log_allows_system_events_without_user(engine: Engine) -> None:
+    with engine.begin() as connection:
+        connection.execute(
+            text("""
+                INSERT INTO audit_logs (action, resource_type, result)
+                VALUES ('IMPORT_DATA', 'crime', 'SUCCESS')
+            """)
+        )
+
+        user_id = connection.execute(
+            text("SELECT user_id FROM audit_logs WHERE action = 'IMPORT_DATA'")
+        ).scalar_one()
+        assert user_id is None
 
         connection.rollback()
 

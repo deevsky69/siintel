@@ -80,6 +80,33 @@ berhasil.
 
 # PHASE 2 — DATABASE
 
+## URUTAN EKSEKUSI PHASE 2
+
+`TECHNICAL DECISION` (2026-09-01, atas persetujuan pemilik proyek untuk memperbaiki alur task).
+Nomor task **tidak berubah**, hanya urutan pengerjaannya:
+
+```text
+010  PostgreSQL/PostGIS + Alembic
+ ↓
+011  Tabel inti
+ ↓
+012  Tabel publik
+ ↓
+015  Tabel administrasi        ← dinaikkan
+ ↓
+013  Tabel intelijen
+ ↓
+014  Tabel operasional
+ ↓
+016  Constraint & index
+```
+
+Alasan: `early_warnings` (013) memerlukan FK ke `users` untuk `acknowledged_by`/`resolved_by`,
+dan `commander_decisions.decision_by`, `operational_actions.created_by`, serta `audit_logs.user_id`
+(014, 015) juga. Bila `users` dibuat terakhir, empat foreign key harus ditunda dan dipasang lewat
+migration susulan — pola yang sudah terlanjur terjadi pada `public_alerts.warning_id`.
+Dengan menaikkan TASK 015, seluruh FK dapat dipasang langsung.
+
 ## TASK 010 — PostgreSQL/PostGIS
 
 Tujuan:

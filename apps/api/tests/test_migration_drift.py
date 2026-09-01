@@ -22,6 +22,31 @@ from prediksi_presisi_api.db import Base
 API_ROOT = Path(__file__).resolve().parents[1]
 ALL_TABLES = sorted(Base.metadata.tables)
 
+#: Daftar tabel yang sudah dibuat, diperbarui setiap kelompok tabel baru selesai.
+#: Berfungsi sebagai pengingat: menambah model tanpa memperbarui daftar ini akan gagal.
+EXPECTED_TABLES = {
+    # TASK 011 — inti
+    "locations",
+    "police_units",
+    "crime_incidents",
+    "intelligence_reports",
+    "patrol_activity",
+    # TASK 012 — publik
+    "citizen_reports",
+    "public_alerts",
+    "community_feedback",
+    # TASK 015 — administrasi
+    "roles",
+    "users",
+    "permissions",
+    "role_permissions",
+    "audit_logs",
+}
+
+
+def test_expected_tables_so_far() -> None:
+    assert set(Base.metadata.tables) == EXPECTED_TABLES
+
 
 @lru_cache
 def _offline_sql() -> str:
