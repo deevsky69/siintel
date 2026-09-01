@@ -99,7 +99,15 @@ Tanggal historis **tidak digeser** (akan merusak split ML `docs/01` §8); dipaka
 
 Sesuai `CLAUDE.md` §2C/§2D dan §35, butir berikut **tidak** diputuskan sendiri.
 
-### 3.0 B-1 — KEPUTUSAN PENGGUNA: OPSI C (hybrid)
+### 3.0 B-1 — SELESAI, DAN AKHIRNYA TIDAK DIPERLUKAN
+
+**Pembaruan 2026-09-01.** Aplikasi acuan yang ditunjuk pemilik proyek tidak memakai tile basemap
+sama sekali — petanya digambar dari data wilayah. Karena tampilan mengikuti acuan itu, PREDIKSI
+PRESISI juga tidak memerlukan tile server. **B-1 tidak lagi memblokir apa pun**, dan
+ketergantungan pada internet saat paparan hilang. Keputusan opsi C di bawah tetap dicatat sebagai
+riwayat.
+
+### 3.0.1 Keputusan sebelumnya — opsi C (hybrid)
 
 Ditetapkan pemilik proyek pada 2026-08-31. Status: **FINAL untuk pengembangan, target produksi masih terbuka.**
 

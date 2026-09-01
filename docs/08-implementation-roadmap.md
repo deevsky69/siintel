@@ -1,6 +1,12 @@
 # IMPLEMENTATION ROADMAP — PREDIKSI PRESISI
 
-Dokumen ini menjadi urutan pengerjaan proyek bersama Claude.
+> **PENTING — urutan pengerjaan kini diatur `docs/09-rencana-menuju-paparan.md`.**
+>
+> Dokumen ini tetap menjadi sumber **nomor dan isi TASK**, tetapi urutannya digantikan rencana
+> jalur kritis menuju paparan Taskap Sespimma 2026. Sebagian task ditunda dan disajikan sebagai
+> roadmap saat paparan; daftarnya ada di `docs/09` §5.
+
+Dokumen ini menjadi daftar task dan acceptance criteria proyek.
 
 ## Prinsip
 
