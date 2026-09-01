@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { safeNextPath } from "@/lib/navigation";
 
 /**
  * Formulir masuk.
@@ -31,7 +32,8 @@ export function LoginForm() {
     });
 
     if (response.ok) {
-      router.replace(params.get("lanjut") || "/");
+      // Hanya lintasan relatif satu origin yang diterima — lihat lib/navigation.ts.
+      router.replace(safeNextPath(params.get("lanjut")));
       router.refresh();
       return;
     }
