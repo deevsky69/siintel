@@ -66,5 +66,16 @@ jobs:
       - name: Migration is reversible
         run: uv run alembic downgrade base && uv run alembic upgrade head
 
+      # Sebagian besar test berjalan di atas data nyata, bukan fixture buatan — itu
+      # yang membuatnya membuktikan sesuatu (CLAUDE.md §20). Tanpa langkah ini seluruh
+      # test API gagal di database kosong. Langkah ini juga menguji `seeding all` itu
+      # sendiri, yang dipakai runbook deployment untuk mengisi database produksi.
+      - name: Seed data contoh
+        run: uv run python -m prediksi_presisi_api.seeding all
+        env:
+          JWT_SECRET: ci-hanya-untuk-pengujian-minimal-tiga-puluh-dua-bytes
+
       # Menjalankan unit test dan integration test terhadap PostGIS sungguhan.
       - run: uv run pytest
+        env:
+          JWT_SECRET: ci-hanya-untuk-pengujian-minimal-tiga-puluh-dua-bytes

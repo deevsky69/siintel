@@ -172,4 +172,10 @@ def seed_crime_data(session: Session, taxonomy: Taxonomy | None = None) -> SeedS
     seed_intelligence_reports(session, resolved, summary)
     seed_patrol_activity(session, summary)
 
+    # Session dibuat dengan `autoflush=False`, sehingga baris terakhir kelompok ini
+    # tidak akan terlihat oleh query kelompok berikutnya bila tidak di-flush di sini.
+    # Itulah yang membuat `seeding all` gagal di database kosong sementara menjalankan
+    # perintah satu per satu berhasil: setiap perintah punya transaksinya sendiri.
+    session.flush()
+
     return summary

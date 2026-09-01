@@ -256,4 +256,10 @@ def seed_analytics_data(session: Session, taxonomy: Taxonomy | None = None) -> S
     session.flush()
     seed_recommendations(session, resolved, summary)
 
+    # Session dibuat dengan `autoflush=False`, sehingga baris terakhir kelompok ini
+    # tidak akan terlihat oleh query kelompok berikutnya bila tidak di-flush di sini.
+    # Itulah yang membuat `seeding all` gagal di database kosong sementara menjalankan
+    # perintah satu per satu berhasil: setiap perintah punya transaksinya sendiri.
+    session.flush()
+
     return summary
