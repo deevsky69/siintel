@@ -542,7 +542,7 @@ Bila dibiarkan kosong, aplikasi memakai waktu server yang sebenarnya, sehingga s
 dalam rentang data:
 
 ```text
-DEMO_REFERENCE_TIME=2025-12-30T09:00:00
+DEMO_REFERENCE_TIME=2025-12-31T21:00:00+07:00
 ```
 
 Aplikasi menyatakan terbuka di antarmuka bahwa waktu acuan sedang dipakai — ini transparansi
