@@ -1,7 +1,7 @@
 # TASK 011 — CORE TABLES
 
-Tanggal: 2026-08-31
-Status: **SELESAI SEBAGIAN — migration belum dijalankan terhadap database sungguhan (akses Docker).**
+Tanggal: 2026-08-31 (dituntaskan 2026-09-01)
+Status: **SELESAI — terverifikasi terhadap PostgreSQL 17.5 + PostGIS 3.5.2.**
 
 Tabel yang diimplementasikan (`docs/08` TASK 011):
 `locations`, `police_units`, `crime_incidents`, `intelligence_reports`, `patrol_activity`.
@@ -10,35 +10,51 @@ Tabel yang diimplementasikan (`docs/08` TASK 011):
 |---|---|
 | Model ORM sesuai `docs/02` §1–§5 | **Ya** |
 | Migration tersedia (`0002`) | **Ya** |
-| Constraint & index sesuai `docs/06` §3–§4 | **Ya** |
-| Migration cocok dengan model | **Ya** — diuji otomatis (lihat §4) |
-| Migration dijalankan terhadap database hidup | **Belum** — grup `docker` masih kosong |
+| Constraint & index sesuai `docs/06` §3–§4 | **Ya** — diperiksa langsung di database (§4) |
+| Migration cocok dengan model | **Ya** — diuji otomatis, termasuk uji mutasi |
+| Migration dijalankan terhadap database hidup | **Ya** — termasuk siklus downgrade/upgrade |
 
 ---
 
-## 1. PENGHALANG YANG TERSISA (sama seperti TASK 010)
+## 1. VERIFIKASI TERHADAP DATABASE SUNGGUHAN
+
+Akses Docker tersedia sejak 2026-09-01, sehingga acceptance TASK 010 dan 011 dituntaskan bersamaan.
+Hasil pemeriksaan langsung pada `\d locations`:
 
 ```text
-$ grep ^docker /etc/group
-docker:x:988:           ← masih kosong
+location_id | uuid                     | not null | gen_random_uuid()
+geom        | geometry(Point,4326)     | not null |
+grid_size_m | integer                  | not null |
+created_at  | timestamp with time zone | not null | now()
 
-$ id kim
-uid=1000(kim) gid=1000(kim) groups=1000(kim),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),101(lxd)
+Indexes:
+  pk_locations           PRIMARY KEY, btree (location_id)
+  ix_locations_geom      gist (geom)              ← index spasial, satu saja (tidak ganda)
+  ix_locations_kecamatan btree (kecamatan)
+  ix_locations_polsek    btree (polsek)
+  uq_locations_code      UNIQUE CONSTRAINT
+  uq_locations_grid_id   UNIQUE CONSTRAINT
+
+Referenced by:
+  crime_incidents      FOREIGN KEY (location_id) ... ON DELETE RESTRICT
+  intelligence_reports FOREIGN KEY (location_id) ... ON DELETE RESTRICT
+  patrol_activity      FOREIGN KEY (location_id) ... ON DELETE RESTRICT
 ```
 
-`id kim` membaca database grup sistem (bukan kredensial proses sesi ini), jadi ini bukan efek
-"sesi lama". Perintah `usermod` benar-benar belum berlaku untuk user `kim`.
+Uji perilaku (dalam transaksi, di-rollback sehingga database tetap kosong):
 
-```bash
-sudo usermod -aG docker kim && getent group docker    # harus menampilkan: docker:x:988:kim
-# lalu logout/login dan mulai ulang sesi Claude Code
-```
+| # | Uji | Hasil |
+|---|---|---|
+| 1 | `INSERT` tanpa primary key | `gen_random_uuid()` mengisi `location_id` |
+| 2 | Geometri `ST_SetSRID(ST_MakePoint(...), 4326)` | tersimpan `POINT(106.855133 -6.230653)`, SRID 4326 |
+| 3 | Join `crime_incidents → locations` | mengembalikan kecamatan/kelurahan lewat join (bukan kolom duplikat) |
+| 4 | `DELETE` lokasi yang masih dirujuk | **ditolak** oleh `fk_crime_incidents_location ... RESTRICT` |
+| 5 | `confidence = 150` | **ditolak** oleh `ck_intelligence_reports_confidence_range` |
+| 6 | `INSERT` tanpa `geom` | **ditolak** oleh NOT NULL |
+| 7 | `ST_DWithin` radius 100 m | menemukan lokasi, jarak 9,1 m |
+| 8 | Setelah `ROLLBACK` | `locations` dan `crime_incidents` kembali 0 baris |
 
-Setelah itu:
-
-```bash
-pnpm db:up && pnpm db:migrate && pnpm db:current      # menuntaskan acceptance TASK 010 dan 011
-```
+Butir 4–6 memang **diharapkan gagal**; kegagalannya justru bukti constraint bekerja.
 
 ---
 
@@ -100,9 +116,23 @@ Perubahan itu langsung dikembalikan, lalu seluruh 20 test lulus kembali. Jadi
 `test_migration_matches_model_columns` memang membandingkan nama kolom **dan** nullability antara
 migration dan model, bukan sekadar lulus tanpa memeriksa apa pun.
 
-**Belum dijalankan:** `pnpm db:up`, `pnpm db:migrate` terhadap PostgreSQL sungguhan.
-Artinya perilaku khas PostgreSQL/PostGIS — pembuatan tipe `geometry`, index GIST, dan
-`gen_random_uuid()` — belum diuji di database nyata.
+Terhadap database sungguhan (§1): migration naik, turun, dan naik lagi dari kondisi kosong;
+seluruh constraint dan index terbentuk sesuai desain.
+
+**Integration test ditambahkan** (`apps/api/tests/test_integration_database.py`): 7 test yang
+memeriksa revisi Alembic, ekstensi, tabel, kolom geometri, default UUID, FK RESTRICT, dan CHECK
+terhadap database nyata. Test ini **dilewati otomatis** bila `DATABASE_URL` kosong, sehingga
+`pytest` tetap hijau di mesin tanpa database:
+
+```text
+tanpa DATABASE_URL  → 20 lulus, 7 dilewati
+dengan DATABASE_URL → 27 lulus
+```
+
+CI diperbarui: job `api` kini menjalankan service `postgis/postgis:17-3.5`, melakukan
+`upgrade head`, menguji reversibilitas (`downgrade base` lalu `upgrade head`), lalu menjalankan
+seluruh test termasuk integration test. Dengan begitu celah "migration tidak pernah menyentuh
+database nyata" tidak dapat terulang tanpa ketahuan.
 
 ---
 
@@ -110,8 +140,5 @@ Artinya perilaku khas PostgreSQL/PostGIS — pembuatan tipe `geometry`, index GI
 
 **TASK 012 — Public Tables**: `citizen_reports`, `public_alerts`, `community_feedback`.
 
-Sebelum itu, dua hal yang sebaiknya dibereskan:
-
-1. akses Docker (§1) agar acceptance TASK 010–011 dapat dituntaskan;
-2. keputusan **B-3 taksonomi** — tidak memblokir, tetapi menentukan isi `config/taxonomy/`
-   yang dibutuhkan saat seed (PHASE 3).
+Catatan: keputusan **B-3 taksonomi** tidak memblokir TASK 012, tetapi menentukan isi
+`config/taxonomy/` yang dibutuhkan saat seed (PHASE 3).

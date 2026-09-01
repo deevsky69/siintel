@@ -28,11 +28,27 @@ jobs:
       - run: pnpm build
 
   api:
-    name: API — lint, typecheck, test
+    name: API — lint, typecheck, test, migrate
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/api
+    services:
+      db:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: predpol
+          POSTGRES_PASSWORD: predpol
+          POSTGRES_DB: prediksi_presisi
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U predpol -d prediksi_presisi"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://predpol:predpol@localhost:5432/prediksi_presisi
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -43,8 +59,12 @@ jobs:
       - run: uv run ruff check . ../../database/migrations
       - run: uv run ruff format --check . ../../database/migrations
       - run: uv run mypy
+
+      # Migration harus reproducible dari database kosong (CLAUDE.md §20).
+      - name: Migrate from empty database
+        run: uv run alembic upgrade head
+      - name: Migration is reversible
+        run: uv run alembic downgrade base && uv run alembic upgrade head
+
+      # Menjalankan unit test dan integration test terhadap PostGIS sungguhan.
       - run: uv run pytest
-      - name: Migration chain is linear and renders SQL
-        run: uv run alembic upgrade head --sql
-        env:
-          DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/ci

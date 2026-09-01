@@ -1,49 +1,34 @@
 # TASK 010 — POSTGRESQL / POSTGIS
 
-Tanggal: 2026-08-31
-Status: **SELESAI SEBAGIAN — satu acceptance criterion belum dapat diverifikasi (akses Docker).**
+Tanggal: 2026-08-31 (dituntaskan 2026-09-01)
+Status: **SELESAI — seluruh acceptance terverifikasi terhadap database sungguhan.**
 
 Acceptance dari `docs/08`:
 
 | Kriteria | Hasil |
 |---|---|
-| Database dapat dibuat | **Belum diverifikasi** — daemon Docker tidak dapat diakses dari sesi ini |
-| Migration dapat dijalankan dari kondisi kosong | **Belum diverifikasi terhadap database hidup.** Terverifikasi dalam mode offline: Alembic merender seluruh SQL dari kondisi kosong sampai `head` |
+| Database dapat dibuat | **Ya** — `pnpm db:up` menjalankan PostgreSQL 17.5 + PostGIS 3.5.2 |
+| Migration dapat dijalankan dari kondisi kosong | **Ya** — `upgrade head` → `downgrade base` → `upgrade head` berhasil |
 | Sistem migration tersedia | **Ya** — Alembic terpasang dan berfungsi |
-| PostGIS | **Ya** — baseline `0001` mengaktifkan `postgis` dan `pgcrypto` |
+| PostGIS | **Ya** — `postgis 3.5.2` dan `pgcrypto 1.3` aktif di database |
 
 ---
 
-## 1. PENGHALANG YANG TERSISA
+## 1. PENGHALANG YANG SEMPAT ADA (SUDAH SELESAI)
 
-Perintah `usermod` belum berlaku:
+Selama TASK 010–011 dikerjakan, user belum tergabung di grup `docker` sehingga migration hanya
+dapat diverifikasi lewat render SQL. Pemilik proyek menjalankan `sudo usermod -aG docker kim`
+pada 2026-09-01 dan sejak itu verifikasi penuh dapat dilakukan.
 
-```text
-$ getent group docker
-docker:x:988:            ← daftar anggota kosong
+Catatan untuk lingkungan baru: sesi yang sudah berjalan tidak otomatis membawa grup baru;
+gunakan `sg docker -c "..."`, atau logout/login.
 
-$ id
-uid=1000(kim) gid=1000(kim) groups=1000(kim),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),101(lxd)
-                                                                    ← tidak ada grup docker
-```
+Jalur alternatif yang sempat ditelusuri dan **tidak** memadai (dicatat agar tidak diulang):
 
-Daemon Docker sendiri `active`, socket-nya `srw-rw---- root:docker`. Perbaikan (butuh hak sistem,
-tidak dijalankan tanpa persetujuan):
-
-```bash
-sudo usermod -aG docker $USER
-# lalu logout/login, dan mulai ulang sesi Claude Code agar prosesnya membawa grup baru
-```
-
-Alternatif tanpa Docker: sediakan PostgreSQL 16/17 dengan PostGIS lalu sesuaikan `DATABASE_URL`.
-`sg docker`/`newgrp` tidak menolong karena keanggotaan grup memang belum ada, dan `sudo` di mesin
-ini meminta password sehingga tidak dapat dijalankan dari sesi non-interaktif.
-
-Setelah akses tersedia, satu perintah menyelesaikan sisa acceptance:
-
-```bash
-pnpm db:up && pnpm db:migrate && pnpm db:current
-```
+| Jalur | Kendala |
+|---|---|
+| Docker rootless | `newuidmap`/`newgidmap` (paket `uidmap`) tidak terpasang, dan `kernel.apparmor_restrict_unprivileged_userns=1` |
+| PostgreSQL user-space (`pgserver` dari PyPI) | Hanya membawa PostgreSQL 16.2 + `plpgsql` + `vector`; **tanpa PostGIS dan pgcrypto** |
 
 ---
 
@@ -99,7 +84,16 @@ biome check (web)                               → 10 berkas bersih
 vitest (web)                                    → 2 test lulus
 ```
 
-**Belum dijalankan:** `pnpm db:up`, `pnpm db:migrate` terhadap database sungguhan.
+**Dijalankan terhadap database sungguhan (2026-09-01):**
+
+```text
+pnpm db:up                  → PostgreSQL 17.5 (Debian), container predpol-db healthy
+alembic upgrade head        → 0001, lalu 0002
+select extname, extversion  → postgis 3.5.2, pgcrypto 1.3, plpgsql 1.0 (+ topology, tiger)
+select version_num          → 0002
+alembic downgrade base      → kedua migration turun bersih
+alembic upgrade head        → naik lagi dari kosong; 5 tabel inti kembali terbentuk
+```
 
 ---
 
