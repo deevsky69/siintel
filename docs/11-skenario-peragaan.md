@@ -16,15 +16,22 @@ Dua success criteria yang harus terjawab:
 | Hal | Nilai |
 |---|---|
 | Alamat | `https://<domain>` (lihat `docs/10` §5.5) |
-| Akun utama | `demo.pimpinan` — satu-satunya peran yang boleh memutuskan |
+| Akun utama | `demo.pimpinan` — satu-satunya peran yang boleh **memutuskan rekomendasi** |
+| Akun tindak lanjut | `demo.commandcenter` — satu-satunya peran yang boleh **menerima dan menyelesaikan peringatan** |
 | Akun pembanding | `demo.polsek` — dibatasi Polsek Tebet |
 | Waktu acuan | `DEMO_REFERENCE_TIME` wajib diisi, jika tidak seluruh panel "24 jam terakhir" kosong |
 
 > **Ganti password kedua akun sebelum paparan.** Nilai yang dipakai selama pengembangan
 > harus dianggap bocor (`docs/10` §7.1).
 
-Siapkan **dua jendela peramban**: satu masuk sebagai Pimpinan, satu sebagai Polsek.
-Peragaan cakupan kewenangan jauh lebih meyakinkan bila keduanya terlihat berdampingan.
+Siapkan **tiga jendela peramban**: Pimpinan, Command Center, dan Polsek. Peragaan
+cakupan kewenangan jauh lebih meyakinkan bila terlihat berdampingan.
+
+> **Pimpinan sengaja tidak dapat menerima atau menyelesaikan peringatan.** Itu bukan
+> kelalaian: `warning:acknowledge` dan `warning:resolve` dimiliki Command Center, dan
+> `acknowledge` juga oleh Polsek. Kapolres memutuskan rekomendasi; yang menangani
+> peringatan harian adalah Command Center. Bila pembagian ini tidak sesuai SOP yang
+> berlaku, itu **keputusan pemilik proyek**, bukan perubahan teknis (docs/03, P-1..P-7).
 
 ---
 
@@ -76,6 +83,21 @@ Yang layak ditunjuk:
 
 ---
 
+## 3b. TINDAK LANJUT PERINGATAN — pindah ke jendela Command Center
+
+Pada peringatan berstatus `ACTIVE`, tekan **Terima Peringatan**.
+
+**Klaim:** peringatan bukan sekadar tampilan; ia berpindah status, mencatat pelakunya,
+dan meninggalkan jejak audit.
+
+Yang layak ditunjuk:
+
+- Kembali ke jendela Pimpinan, panel yang sama berbunyi **"tidak memiliki kewenangan"**
+  — pembagian tugas ditegakkan mesin, bukan disepakati lisan.
+- Menekan tombol yang sama dua kali dijawab penolakan, bukan diterima diam-diam.
+
+---
+
 ## 4. KEPUTUSAN PIMPINAN — **INI PUNCAK PERAGAAN**
 
 Buka `/rekomendasi`. Pilih satu rekomendasi yang **menunggu keputusan**.
@@ -108,6 +130,7 @@ Pindah ke jendela `demo.polsek`, buka layar yang sama.
 | Layar | Pimpinan | Polsek |
 |---|---|---|
 | `/peta` | 9 kecamatan | 1 kecamatan (Tebet); delapan lainnya tertulis "tidak ada data" |
+| Rincian `?wilayah=Cilandak` | terbuka penuh | "tidak dapat ditampilkan untuk kewenangan Anda" — bukan melompat diam-diam ke Tebet |
 | `/map/area/Pasar Minggu` | 200 | **404** — bukan 403 |
 | `/rekomendasi` | 84 rekomendasi | 13 |
 | Riwayat keputusan | 64 baris | 9 |
@@ -165,7 +188,7 @@ tampak selesai seluruhnya.
 | Apakah datanya asli? | Tidak. Data sintetis yang koheren. Data resmi tidak pernah dimasukkan ke repository |
 | Siapa yang boleh menyetujui? | Saat ini hanya peran Pimpinan. Kewenangan resmi dan pendelegasiannya masih menunggu keputusan (docs/03, P-1..P-7) |
 | Apakah keputusan bisa dianulir? | Belum bisa, dan itu disengaja. Aturannya menunggu SOP |
-| Berapa besar sistemnya? | 20 tabel, 7 migration, 43 permission, 6 peran, ±4.400 baris data, 245 test API dan 80 test web |
+| Berapa besar sistemnya? | 20 tabel, 7 migration, 43 permission, 6 peran, ±4.400 baris data, 246 test API dan 107 test web |
 
 ---
 
@@ -176,3 +199,5 @@ tampak selesai seluruhnya.
 - [ ] Satu rekomendasi **sengaja disisakan** berstatus menunggu keputusan untuk diperagakan
 - [ ] Dua jendela peramban sudah masuk sebagai Pimpinan dan Polsek
 - [ ] Sertifikat HTTPS sudah terbit (`docs/10` §5.4)
+- [ ] Satu peringatan **berstatus ACTIVE** disisakan untuk diperagakan tindak lanjutnya
+- [ ] Peta dibuka sekali pada tiap peran untuk memastikan tidak ada layar kosong
