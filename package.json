@@ -2,7 +2,7 @@
   "name": "prediksi-presisi",
   "version": "0.1.0",
   "private": true,
-  "description": "PREDIKSI PRESISI — predictive policing & spatial intelligence (monorepo root)",
+  "description": "PREDIKSI PRESISI \u2014 predictive policing & spatial intelligence (monorepo root)",
   "packageManager": "pnpm@11.24.0",
   "engines": {
     "node": ">=22"
@@ -11,33 +11,27 @@
     "dev": "pnpm --filter @prediksi-presisi/web dev",
     "dev:api": "cd apps/api && uv run uvicorn prediksi_presisi_api.main:app --reload --port 8000",
     "build": "pnpm --filter @prediksi-presisi/web build",
-
     "lint": "pnpm lint:web && pnpm lint:api",
     "lint:web": "pnpm --filter @prediksi-presisi/web lint",
     "lint:api": "cd apps/api && uv run ruff check . ../../database/migrations && uv run ruff format --check . ../../database/migrations",
-
     "format": "pnpm format:web && pnpm format:api",
     "format:web": "pnpm --filter @prediksi-presisi/web format",
     "format:api": "cd apps/api && uv run ruff check --fix . ../../database/migrations && uv run ruff format . ../../database/migrations",
-
     "typecheck": "pnpm typecheck:web && pnpm typecheck:api",
     "typecheck:web": "pnpm --filter @prediksi-presisi/web typecheck",
     "typecheck:api": "cd apps/api && uv run mypy",
-
     "test": "pnpm test:web && pnpm test:api",
     "test:web": "pnpm --filter @prediksi-presisi/web test",
     "test:api": "cd apps/api && uv run pytest",
-
     "verify": "pnpm lint && pnpm typecheck && pnpm test",
-
     "db:up": "docker compose -f infra/docker/docker-compose.yml up -d db",
     "db:down": "docker compose -f infra/docker/docker-compose.yml down",
     "gis:up": "docker compose -f infra/docker/docker-compose.yml --profile gis up -d",
-
     "db:migrate": "cd apps/api && uv run alembic upgrade head",
     "db:rollback": "cd apps/api && uv run alembic downgrade -1",
     "db:current": "cd apps/api && uv run alembic current",
     "db:history": "cd apps/api && uv run alembic history",
-    "db:sql": "cd apps/api && uv run alembic upgrade head --sql"
+    "db:sql": "cd apps/api && uv run alembic upgrade head --sql",
+    "seed:master": "cd apps/api && uv run python -m prediksi_presisi_api.seeding master"
   }
 }

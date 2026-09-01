@@ -1,0 +1,203 @@
+# KATALOG PERMISSION & MATRIKS ROLE — PREDIKSI PRESISI
+#
+# Katalog `resource:action` = TECHNICAL DECISION (docs/03 §2).
+# Pemberian permission per role = PROPOSED — menunggu jawaban P-1…P-7 (docs/03 §4).
+#
+# Berkas ini, bukan `data/sample/permissions.csv`, yang menjadi sumber seed RBAC.
+# Dataset dummy lama hanya memuat 12 permission tanpa `scope`, sehingga tidak lagi
+# mencerminkan model otorisasi yang dipakai (docs/03 §5).
+#
+# scope: ALL | OWN_JURISDICTION | OWN_FUNCTION
+
+version: proposed-2026-09-01
+
+permissions:
+  dashboard: [read]
+  location: [read, write]
+  crime: [read, write, export]
+  intelligence: [read, write]
+  patrol: [read, write]
+  police_unit: [read, write]
+  map: [read]
+  analytics: [read, export]
+  risk_score: [read, run]
+  prediction: [read, run, publish]
+  warning: [read, acknowledge, resolve]
+  public_alert: [read, publish]
+  recommendation: [read, write]
+  commander_decision: [read, approve]
+  operation: [read, write]
+  citizen_report: [read, write]
+  community_feedback: [read]
+  evaluation: [read, run]
+  user: [read, manage]
+  role: [read, manage]
+  audit: [read]          # sengaja tanpa write/delete — audit bersifat append-only
+  config: [read, manage]
+
+roles:
+  Pimpinan:
+    ALL:
+      - dashboard:read
+      - location:read
+      - crime:read
+      - intelligence:read
+      - patrol:read
+      - police_unit:read
+      - map:read
+      - analytics:read
+      - risk_score:read
+      - prediction:read
+      - warning:read
+      - public_alert:read
+      - recommendation:read
+      - commander_decision:read
+      - commander_decision:approve
+      - operation:read
+      - citizen_report:read
+      - community_feedback:read
+      - evaluation:read
+      - audit:read
+      - config:read
+
+  Command Center:
+    ALL:
+      - dashboard:read
+      - location:read
+      - crime:read
+      - intelligence:read
+      - patrol:read
+      - patrol:write
+      - police_unit:read
+      - map:read
+      - analytics:read
+      - risk_score:read
+      - prediction:read
+      - warning:read
+      - warning:acknowledge
+      - warning:resolve
+      - public_alert:read
+      - recommendation:read
+      - recommendation:write
+      - commander_decision:read
+      - operation:read
+      - operation:write
+      - citizen_report:read
+      - citizen_report:write
+      - community_feedback:read
+      - evaluation:read
+      - audit:read
+      - config:read
+
+  Analyst:
+    ALL:
+      - dashboard:read
+      - location:read
+      - crime:read
+      - crime:write
+      - crime:export
+      - intelligence:read
+      - patrol:read
+      - police_unit:read
+      - map:read
+      - analytics:read
+      - analytics:export
+      - risk_score:read
+      - risk_score:run
+      - prediction:read
+      - prediction:run
+      - prediction:publish
+      - warning:read
+      - public_alert:read
+      - recommendation:read
+      - recommendation:write
+      - commander_decision:read
+      - operation:read
+      - citizen_report:read
+      - community_feedback:read
+      - evaluation:read
+      - evaluation:run
+      - audit:read
+      - config:read
+
+  Fungsi:
+    ALL:
+      - location:read
+      - map:read
+      - risk_score:read
+      - prediction:read
+      - warning:read
+      - public_alert:read
+    OWN_FUNCTION:
+      - dashboard:read
+      - crime:read
+      - crime:write
+      - intelligence:read
+      - intelligence:write
+      - patrol:read
+      - patrol:write
+      - police_unit:read
+      - analytics:read
+      - recommendation:read
+      - commander_decision:read
+      - operation:read
+      - citizen_report:read
+      - evaluation:read
+      - audit:read
+
+  Polsek:
+    ALL:
+      - location:read
+    OWN_JURISDICTION:
+      - dashboard:read
+      - crime:read
+      - crime:write
+      - intelligence:read
+      - patrol:read
+      - patrol:write
+      - police_unit:read
+      - map:read
+      - analytics:read
+      - risk_score:read
+      - prediction:read
+      - warning:read
+      - warning:acknowledge
+      - public_alert:read
+      - recommendation:read
+      - commander_decision:read
+      - operation:read
+      - citizen_report:read
+      - citizen_report:write
+      - community_feedback:read
+      - evaluation:read
+      - audit:read
+
+  Administrator:
+    ALL:
+      - dashboard:read
+      - location:read
+      - location:write
+      - crime:read
+      - intelligence:read
+      - patrol:read
+      - police_unit:read
+      - police_unit:write
+      - map:read
+      - analytics:read
+      - risk_score:read
+      - prediction:read
+      - warning:read
+      - public_alert:read
+      - recommendation:read
+      - commander_decision:read
+      - operation:read
+      - citizen_report:read
+      - community_feedback:read
+      - evaluation:read
+      - user:read
+      - user:manage
+      - role:read
+      - role:manage
+      - audit:read
+      - config:read
+      - config:manage

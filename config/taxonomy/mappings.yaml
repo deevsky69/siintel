@@ -1,0 +1,163 @@
+# PEMETAAN NILAI TAKSONOMI — PREDIKSI PRESISI
+#
+# Status: PROPOSED — REQUIRES USER APPROVAL (U-16 / keputusan B-3).
+#
+# Dataset dummy memakai istilah Bahasa Indonesia, sementara nilai yang DISIMPAN di database
+# memakai UPPER_SNAKE berbahasa Inggris (docs/02 K-7). Berkas ini memetakan keduanya.
+#
+# Label untuk pengguna tetap Bahasa Indonesia dan diambil dari `labels` di bawah,
+# sehingga tampilan tidak berubah meskipun nilai tersimpan berbahasa Inggris.
+#
+# Nomenklatur kedinasan (Polsek, Samapta, Curanmor, dst.) TIDAK diterjemahkan.
+#
+# Mengubah berkas ini tidak memerlukan migration: kolom taksonomi bertipe teks,
+# justru karena daftar nilainya belum final.
+
+version: proposed-2026-09-01
+
+mappings:
+  incident_type:
+    CURANMOR: CURANMOR
+    CURAT: CURAT
+    CURAS: CURAS
+    TAWURAN: TAWURAN
+    KEJAHATAN_JALANAN: KEJAHATAN_JALANAN
+
+  status_crime:
+    Dilaporkan: REPORTED
+    Penyelidikan: PRELIMINARY_INVESTIGATION
+    Penyidikan: INVESTIGATION
+    Selesai: CLOSED
+
+  status_intelligence:
+    Baru: NEW
+    Diverifikasi: VERIFIED
+    Ditindaklanjuti: FOLLOWED_UP
+    Selesai: CLOSED
+
+  status_citizen_report:
+    Diterima: RECEIVED
+    Diverifikasi: VERIFIED
+    Diteruskan: FORWARDED
+    Ditangani: IN_PROGRESS
+    Selesai: CLOSED
+
+  status_community_feedback:
+    Baru: NEW
+    Ditinjau: REVIEWED
+    Selesai: CLOSED
+
+  status_prediction:
+    Draft: DRAFT
+    Published: PUBLISHED
+    Validated: VALIDATED
+
+  status_warning:
+    Active: ACTIVE
+    Acknowledged: ACKNOWLEDGED
+    Resolved: RESOLVED
+
+  status_recommendation:
+    Pending Review: PENDING_REVIEW
+    Approved: APPROVED
+    Modified: MODIFIED
+    Rejected: REJECTED
+
+  status_action:
+    Planned: PLANNED
+    Active: ACTIVE
+    Completed: COMPLETED
+    Cancelled: CANCELLED
+    Dibatalkan: CANCELLED
+
+  status_unit:
+    Aktif: ACTIVE
+    Standby: STANDBY
+    Nonaktif: INACTIVE
+
+  status_user:
+    Aktif: ACTIVE
+    Nonaktif: INACTIVE
+
+  status_public_alert:
+    Active: ACTIVE
+    Resolved: RESOLVED
+    Expired: EXPIRED
+
+  risk_class:
+    Low: LOW
+    Moderate: MODERATE
+    High: HIGH
+    Critical: CRITICAL
+
+  severity:
+    Low: LOW
+    Watch: WATCH
+    Warning: WARNING
+    Critical: CRITICAL
+
+  priority:
+    Rendah: LOW
+    Sedang: MEDIUM
+    Tinggi: HIGH
+    Mendesak: URGENT
+
+  decision:
+    Approved: APPROVED
+    Modified: MODIFIED
+    Rejected: REJECTED
+
+  match_type:
+    Hit: HIT
+    False Positive: FALSE_POSITIVE
+    False Negative: FALSE_NEGATIVE
+
+  impact:
+    Rendah: LOW
+    Sedang: MEDIUM
+    Tinggi: HIGH
+    Kritis: CRITICAL
+
+  function:
+    Samapta: SAMAPTA
+    Binmas: BINMAS
+    Intelkam: INTELKAM
+    Reskrim: RESKRIM
+    Lantas: LANTAS
+
+  feedback_type:
+    Keluhan: COMPLAINT
+    Informasi: INFORMATION
+    Koreksi: CORRECTION
+    Apresiasi: APPRECIATION
+
+# Label Bahasa Indonesia untuk tampilan. Dipakai frontend, bukan database.
+labels:
+  status_crime:
+    REPORTED: Dilaporkan
+    PRELIMINARY_INVESTIGATION: Penyelidikan
+    INVESTIGATION: Penyidikan
+    CLOSED: Selesai
+  risk_class:
+    LOW: Rendah
+    MODERATE: Sedang
+    HIGH: Tinggi
+    CRITICAL: Kritis
+  severity:
+    LOW: Rendah
+    WATCH: Waspada
+    WARNING: Peringatan
+    CRITICAL: Kritis
+  priority:
+    LOW: Rendah
+    MEDIUM: Sedang
+    HIGH: Tinggi
+    URGENT: Mendesak
+  decision:
+    APPROVED: Disetujui
+    MODIFIED: Dimodifikasi
+    REJECTED: Ditolak
+  match_type:
+    HIT: Tepat
+    FALSE_POSITIVE: Salah Prediksi
+    FALSE_NEGATIVE: Tidak Terprediksi

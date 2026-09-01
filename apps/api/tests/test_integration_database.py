@@ -629,7 +629,7 @@ def test_revoking_a_role_removes_its_permission_grants(engine: Engine) -> None:
         permission_id = connection.execute(
             text("""
                 INSERT INTO permissions (code, resource, action)
-                VALUES ('PERM-IT', 'crime', 'read')
+                VALUES ('PERM-IT', 'uji_resource', 'read')
                 RETURNING permission_id
             """)
         ).scalar_one()
@@ -658,7 +658,7 @@ def test_invalid_scope_is_rejected(engine: Engine) -> None:
         permission_id = connection.execute(
             text("""
                 INSERT INTO permissions (code, resource, action)
-                VALUES ('PERM-IT2', 'crime', 'write')
+                VALUES ('PERM-IT2', 'uji_resource', 'write')
                 RETURNING permission_id
             """)
         ).scalar_one()

@@ -82,6 +82,7 @@ Isi paket berada langsung di **root repository** (`siintel`).
 └── config/
     ├── risk/                     # bobot risk score, threshold warning
     ├── model/                    # konfigurasi model
+    ├── rbac/                     # katalog permission & matriks role
     └── taxonomy/                 # pemetaan nilai & label Bahasa Indonesia
 ```
 
@@ -149,6 +150,11 @@ pnpm gis:up      # PostGIS + tile server lokal (profile gis)
 15. Unit/integration test diletakkan berdampingan dengan aplikasinya — `apps/api/tests/` dan
     `apps/web/src/**/*.test.tsx`. Direktori `tests/` di root untuk test lintas aplikasi dan E2E.
 16. Berkas tile peta (`data/tiles/`) tidak di-commit; ukurannya besar dan bukan source code.
+17. Kode seed berada di dalam paket API (`apps/api/src/prediksi_presisi_api/seeding/`) agar ikut
+    tercakup lint, typecheck, dan test. `scripts/seed/` menyimpan dokumentasi dan script pembantu
+    di luar paket; perintahnya dijalankan lewat `pnpm seed:*`.
+18. Nilai taksonomi dan katalog permission berada di `config/`, bukan di kode maupun ENUM database,
+    karena keduanya masih menunggu keputusan pemilik proyek (U-16, P-1…P-7).
 
 ---
 
