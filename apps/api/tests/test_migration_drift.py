@@ -41,6 +41,11 @@ EXPECTED_TABLES = {
     "permissions",
     "role_permissions",
     "audit_logs",
+    # TASK 013 — intelijen
+    "risk_scores",
+    "predictions",
+    "early_warnings",
+    "recommendations",
 }
 
 
@@ -84,7 +89,19 @@ def _columns_from_sql(table: str) -> dict[str, bool]:
 
 
 def _constraints_from_sql(table: str) -> set[str]:
-    return set(re.findall(r"CONSTRAINT (\w+)", _create_table_body(table)))
+    """Constraint dari CREATE TABLE **dan** dari ALTER TABLE ... ADD CONSTRAINT.
+
+    Constraint yang dipasang belakangan (mis. FK yang menunggu tabel acuannya dibuat)
+    hanya muncul sebagai ALTER TABLE, sehingga keduanya perlu dibaca.
+    """
+    inline = set(re.findall(r"CONSTRAINT (\w+)", _create_table_body(table)))
+    altered = set(
+        re.findall(
+            rf"ALTER TABLE {table} ADD CONSTRAINT (\w+)",
+            _offline_sql(),
+        )
+    )
+    return inline | altered
 
 
 def _indexes_from_sql(table: str) -> set[str]:

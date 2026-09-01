@@ -19,8 +19,11 @@ from .base import TimestampMixin, uuid_pk
 if TYPE_CHECKING:
     from .citizen_report import CitizenReport
     from .crime_incident import CrimeIncident
+    from .early_warning import EarlyWarning
     from .intelligence_report import IntelligenceReport
     from .patrol_activity import PatrolActivity
+    from .prediction import Prediction
+    from .risk_score import RiskScore
 
 
 class Location(TimestampMixin, Base):
@@ -60,6 +63,9 @@ class Location(TimestampMixin, Base):
     intelligence_reports: Mapped[list[IntelligenceReport]] = relationship(back_populates="location")
     patrol_activities: Mapped[list[PatrolActivity]] = relationship(back_populates="location")
     citizen_reports: Mapped[list[CitizenReport]] = relationship(back_populates="location")
+    risk_scores: Mapped[list[RiskScore]] = relationship(back_populates="location")
+    predictions: Mapped[list[Prediction]] = relationship(back_populates="location")
+    early_warnings: Mapped[list[EarlyWarning]] = relationship(back_populates="location")
 
     __table_args__ = (
         Index("ix_locations_polsek", "polsek"),

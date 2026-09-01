@@ -3,21 +3,25 @@
 Sengaja **tidak** menyimpan `location_id`: alert publik memakai `area_text` agar grid internal
 dan detail sensitif tidak terekspos ke luar (docs/02 §7, CLAUDE.md §24).
 
-`warning_id` menunjuk `early_warnings` yang dibuat pada TASK 013; foreign key-nya
-ditambahkan pada migration TASK 013, bukan di sini (lihat catatan pada migration 0003).
+`warning_id` menunjuk `early_warnings`. Kolomnya dibuat pada TASK 012, foreign key-nya
+dipasang pada migration TASK 013 setelah tabel `early_warnings` ada.
 """
 
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, DateTime, Index, String, Text
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..db import Base
 from .base import TimestampMixin, uuid_pk
+
+if TYPE_CHECKING:
+    from .early_warning import EarlyWarning
 
 
 class PublicAlert(TimestampMixin, Base):
@@ -29,8 +33,10 @@ class PublicAlert(TimestampMixin, Base):
     code: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
 
     #: Peringatan internal yang menjadi dasar. Nullable — imbauan dapat terbit tanpa warning.
-    #: FK ditambahkan pada TASK 013 setelah tabel `early_warnings` ada.
-    warning_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
+    warning_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("early_warnings.warning_id", ondelete="RESTRICT"),
+    )
 
     severity: Mapped[str] = mapped_column(String(50), nullable=False)
     threat_type: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -45,6 +51,8 @@ class PublicAlert(TimestampMixin, Base):
 
     status: Mapped[str] = mapped_column(String(50), nullable=False)
     public_message: Mapped[str] = mapped_column(Text, nullable=False)
+
+    warning: Mapped[EarlyWarning | None] = relationship(back_populates="public_alerts")
 
     __table_args__ = (
         CheckConstraint(

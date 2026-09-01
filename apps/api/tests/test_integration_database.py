@@ -37,7 +37,34 @@ CORE_TABLES = {
     "permissions",
     "role_permissions",
     "audit_logs",
+    "risk_scores",
+    "predictions",
+    "early_warnings",
+    "recommendations",
 }
+
+_SAMPLE_PREDICTION = text("""
+    INSERT INTO predictions
+        (code, prediction_date, forecast_horizon, threat_type, location_id,
+         window_start, window_end, risk_score, confidence, dominant_factors,
+         model_version, status)
+    VALUES
+        ('PRD-IT', current_date, '24H', 'CURANMOR', :location_id,
+         now(), now() + interval '6 hours', 76, 75,
+         '[{"factor": "historical_hotspot", "contribution": 0.4, "source": "RULE"}]'::jsonb,
+         'dummy-v1', 'PUBLISHED')
+    RETURNING prediction_id
+""")
+
+_SAMPLE_WARNING = text("""
+    INSERT INTO early_warnings
+        (code, prediction_id, severity, threat_type, location_id,
+         window_start, window_end, risk_score, status)
+    VALUES
+        ('WRN-IT', :prediction_id, 'WARNING', 'CURANMOR', :location_id,
+         now(), now() + interval '6 hours', 76, 'ACTIVE')
+    RETURNING warning_id
+""")
 
 _SAMPLE_ROLE = text("""
     INSERT INTO roles (code, role_name, level) VALUES ('ROLE-IT', 'Uji Integrasi', 3)
@@ -74,7 +101,7 @@ def test_migrations_are_applied(engine: Engine) -> None:
     with engine.connect() as connection:
         revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
-    assert revision == "0004", "database belum di-migrate: jalankan `pnpm db:migrate`"
+    assert revision == "0005", "database belum di-migrate: jalankan `pnpm db:migrate`"
 
 
 def test_postgis_and_pgcrypto_are_installed(engine: Engine) -> None:
@@ -188,6 +215,137 @@ def test_public_alert_window_order_is_enforced(engine: Engine) -> None:
                     VALUES
                         ('PAL-IT', 'WARNING', 'CURAT', 'Kebayoran Baru',
                          now(), now() - interval '1 hour', 'ACTIVE', 'Imbauan uji')
+                """)
+            )
+
+        connection.rollback()
+
+
+def test_intelligence_chain_can_be_created_end_to_end(engine: Engine) -> None:
+    """Prediction → early warning → recommendation → public alert, seperti docs/04."""
+    with engine.begin() as connection:
+        location_id = connection.execute(_SAMPLE_LOCATION).scalar_one()
+        prediction_id = connection.execute(
+            _SAMPLE_PREDICTION, {"location_id": location_id}
+        ).scalar_one()
+        warning_id = connection.execute(
+            _SAMPLE_WARNING, {"prediction_id": prediction_id, "location_id": location_id}
+        ).scalar_one()
+        connection.execute(
+            text("""
+                INSERT INTO recommendations
+                    (code, prediction_id, warning_id, recommended_function,
+                     recommendation_text, priority, status)
+                VALUES
+                    ('REC-IT', :prediction_id, :warning_id, 'SAMAPTA',
+                     'Pertimbangkan penguatan kegiatan preventif.', 'MEDIUM', 'PENDING_REVIEW')
+            """),
+            {"prediction_id": prediction_id, "warning_id": warning_id},
+        )
+        connection.execute(
+            text("""
+                INSERT INTO public_alerts
+                    (code, warning_id, severity, threat_type, area_text, status, public_message)
+                VALUES
+                    ('PAL-IT2', :warning_id, 'WARNING', 'CURANMOR', 'Kebayoran Baru',
+                     'ACTIVE', 'Imbauan kewaspadaan umum.')
+            """),
+            {"warning_id": warning_id},
+        )
+
+        linked = connection.execute(
+            text("""
+                SELECT p.code, w.code, r.code, a.code
+                FROM predictions p
+                JOIN early_warnings w ON w.prediction_id = p.prediction_id
+                JOIN recommendations r ON r.warning_id = w.warning_id
+                JOIN public_alerts a ON a.warning_id = w.warning_id
+                WHERE p.code = 'PRD-IT'
+            """)
+        ).one()
+        assert linked == ("PRD-IT", "WRN-IT", "REC-IT", "PAL-IT2")
+
+        connection.rollback()
+
+
+def test_public_alert_cannot_reference_unknown_warning(engine: Engine) -> None:
+    # Utang FK dari TASK 012 sudah dilunasi pada migration 0005.
+    with engine.begin() as connection:
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO public_alerts
+                        (code, warning_id, severity, threat_type, area_text,
+                         status, public_message)
+                    VALUES
+                        ('PAL-IT3', gen_random_uuid(), 'WARNING', 'CURAT', 'Tebet',
+                         'ACTIVE', 'Imbauan uji')
+                """)
+            )
+
+        connection.rollback()
+
+
+def test_unknown_forecast_horizon_is_rejected(engine: Engine) -> None:
+    with engine.begin() as connection:
+        location_id = connection.execute(_SAMPLE_LOCATION).scalar_one()
+
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO predictions
+                        (code, prediction_date, forecast_horizon, threat_type, location_id,
+                         window_start, window_end, risk_score, confidence, dominant_factors,
+                         model_version, status)
+                    VALUES
+                        ('PRD-IT2', current_date, '48H', 'CURAT', :location_id,
+                         now(), now() + interval '6 hours', 50, 50, '[]'::jsonb,
+                         'dummy-v1', 'DRAFT')
+                """),
+                {"location_id": location_id},
+            )
+
+        connection.rollback()
+
+
+def test_prediction_without_explanation_is_rejected(engine: Engine) -> None:
+    # CLAUDE.md §27: prediksi tanpa WHY tidak boleh tersimpan.
+    with engine.begin() as connection:
+        location_id = connection.execute(_SAMPLE_LOCATION).scalar_one()
+
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO predictions
+                        (code, prediction_date, forecast_horizon, threat_type, location_id,
+                         window_start, window_end, risk_score, confidence,
+                         model_version, status)
+                    VALUES
+                        ('PRD-IT3', current_date, '24H', 'CURAT', :location_id,
+                         now(), now() + interval '6 hours', 50, 50, 'dummy-v1', 'DRAFT')
+                """),
+                {"location_id": location_id},
+            )
+
+        connection.rollback()
+
+
+def test_acknowledging_a_warning_requires_an_actor(engine: Engine) -> None:
+    with engine.begin() as connection:
+        location_id = connection.execute(_SAMPLE_LOCATION).scalar_one()
+        prediction_id = connection.execute(
+            _SAMPLE_PREDICTION, {"location_id": location_id}
+        ).scalar_one()
+        connection.execute(
+            _SAMPLE_WARNING, {"prediction_id": prediction_id, "location_id": location_id}
+        )
+
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    UPDATE early_warnings
+                    SET status = 'ACKNOWLEDGED', acknowledged_at = now()
+                    WHERE code = 'WRN-IT'
                 """)
             )
 

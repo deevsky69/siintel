@@ -170,7 +170,7 @@ CHECK (
 | `risk_score = round(Σ(bobot × faktor))` | Bobot belum ditetapkan (U-02). Memasang constraint sekarang berarti mengunci angka yang belum disetujui (CLAUDE.md §11). Dipasang setelah bobot disetujui. |
 | Batas `risk_class` terhadap `risk_score` | Threshold belum ditetapkan (U-01). Sampai itu, `risk_class` divalidasi terhadap daftar nilai saja. |
 | Geometri poligon per grid | Ukuran grid & sumber batas belum ditetapkan (U-04). |
-| `public_alerts.warning_id → early_warnings` | Tabel `early_warnings` baru dibuat pada TASK 013. Kolomnya sudah ada sejak TASK 012; FK dipasang pada migration TASK 013. Sampai saat itu keterkaitan alert publik dengan peringatan internal **belum** ditegakkan database. |
+| ~~`public_alerts.warning_id → early_warnings`~~ | **Lunas** pada migration `0005` (TASK 013), setelah tabel `early_warnings` ada. |
 
 ---
 

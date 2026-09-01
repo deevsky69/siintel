@@ -54,12 +54,16 @@ def test_public_alert_does_not_expose_internal_location() -> None:
     assert "area_text" in columns
 
 
-def test_public_alert_warning_link_is_optional_and_not_yet_constrained() -> None:
-    # FK ke early_warnings ditambahkan pada TASK 013 setelah tabelnya ada.
+def test_public_alert_warning_link_is_optional_but_constrained() -> None:
+    # Kolom dibuat pada TASK 012; FK dipasang pada TASK 013 setelah early_warnings ada.
+    # Nullable karena imbauan publik dapat terbit tanpa peringatan internal.
     column = Base.metadata.tables["public_alerts"].c.warning_id
 
     assert column.nullable is True
-    assert list(column.foreign_keys) == []
+    foreign_keys = list(column.foreign_keys)
+    assert len(foreign_keys) == 1
+    assert foreign_keys[0].column.table.name == "early_warnings"
+    assert foreign_keys[0].ondelete == "RESTRICT"
 
 
 def test_public_alert_window_order_is_constrained() -> None:
