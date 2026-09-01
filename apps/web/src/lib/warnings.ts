@@ -1,4 +1,4 @@
-import { apiGet } from "./api";
+import { apiGet, apiPost } from "./api";
 import type { RiskClass } from "./risk";
 
 /**
@@ -157,3 +157,64 @@ export const getPredictions = () => apiGet<Page<PredictionDetail>>("/predictions
 export function indexPredictions(rows: PredictionDetail[]): Map<string, PredictionDetail> {
   return new Map(rows.map((row) => [row.code, row]));
 }
+
+/* ------------------------------------------------------------------------- *
+ * Tindak lanjut peringatan (acknowledge / resolve)
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Dua transisi status yang disediakan backend.
+ *
+ * Sumber kebenarannya `apps/api/.../routers/warning_actions.py`; yang ditulis ulang di
+ * sini hanya cukup untuk memutuskan tombol mana yang pantas ditawarkan.
+ */
+export const WARNING_ACTIONS = ["acknowledge", "resolve"] as const;
+export type WarningAction = (typeof WARNING_ACTIONS)[number];
+
+/** Permission yang diperiksa backend untuk tiap transisi. */
+export const ACTION_PERMISSIONS: Record<WarningAction, string> = {
+  acknowledge: "warning:acknowledge",
+  resolve: "warning:resolve",
+};
+
+/**
+ * Status asal yang masih sah bagi tiap transisi — cerminan `ACKNOWLEDGEABLE_FROM` dan
+ * `RESOLVABLE_FROM` pada backend.
+ *
+ * Salinan ini **bukan** pengaman: backend tetap menjawab 409 atas transisi yang tidak sah
+ * (CLAUDE.md §21). Gunanya hanya agar layar tidak menawarkan tombol yang sudah pasti
+ * ditolak. `ACTIVE` ikut boleh di-resolve karena kewajiban menerima lebih dahulu adalah
+ * aturan SOP yang belum ditetapkan — lihat docstring `warning_actions.py`.
+ */
+const ALLOWED_FROM: Record<WarningAction, readonly string[]> = {
+  acknowledge: ["ACTIVE"],
+  resolve: ["ACTIVE", "ACKNOWLEDGED"],
+};
+
+/** Apakah sebuah transisi masih mungkin dari status saat ini. */
+export function allowsTransition(status: string, action: WarningAction): boolean {
+  return ALLOWED_FROM[action].includes(status);
+}
+
+/**
+ * Bentuk respons kedua endpoint transisi (`_serialize` pada `warning_actions.py`).
+ *
+ * Hanya dipakai untuk memastikan panggilan berhasil; isi layar tetap dimuat ulang dari
+ * `/warnings` setelah `revalidatePath`, bukan ditambal dari respons ini.
+ */
+export type WarningTransition = {
+  code: string;
+  status: string;
+  acknowledged_at: string | null;
+  resolved_at: string | null;
+};
+
+/**
+ * Mengirim transisi status peringatan.
+ *
+ * Kedua endpoint tidak menerima badan permintaan; objek kosong dikirim semata karena
+ * `apiPost` selalu mengirim badan, dan FastAPI mengabaikannya (diperiksa: kode yang tidak
+ * ada tetap dijawab 404, bukan 400).
+ */
+export const submitWarningAction = (code: string, action: WarningAction) =>
+  apiPost<WarningTransition>(`/warnings/${encodeURIComponent(code)}/${action}`, {});

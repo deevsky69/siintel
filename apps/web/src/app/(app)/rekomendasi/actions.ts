@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api";
 import { DECISIONS, type Decision, submitDecision } from "@/lib/decisions";
+import type { DecisionState } from "./decision-state";
 
 /**
  * Server action keputusan komandan.
@@ -11,11 +12,13 @@ import { DECISIONS, type Decision, submitDecision } from "@/lib/decisions";
  * Validasi di sini **bukan** pengaman: backend yang memutuskan boleh-tidaknya
  * (CLAUDE.md §21). Yang dikerjakan di sini hanya mengubah kegagalan menjadi kalimat
  * yang dapat ditindaklanjuti pejabat, bukan kode kesalahan.
+ *
+ * Berkas `"use server"` **hanya boleh mengekspor fungsi async**. Mengekspor nilai
+ * atau tipe dari sini membuat Next menolak seluruh modul — dan penolakannya baru
+ * terjadi ketika action dipanggil, bukan saat halaman dirender, sehingga lolos dari
+ * `next build` maupun test. Karena itu keadaan awal dan tipenya tinggal di
+ * `decision-state.ts`.
  */
-
-export type DecisionState = { error: string | null; done: string | null };
-
-export const IDLE: DecisionState = { error: null, done: null };
 
 export async function decide(_previous: DecisionState, form: FormData): Promise<DecisionState> {
   const code = String(form.get("code") ?? "");

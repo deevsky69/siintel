@@ -1,61 +1,31 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Panel } from "@/components/panel";
-import type { DistrictShape } from "@/lib/geo";
-import { KECAMATAN_SHAPES, MAP_VIEWBOX, polygonPoints, toPercent } from "@/lib/geo";
-import type { DistrictIntel, MapData } from "@/lib/map-data";
-import { RISK_HEX, RISK_LABELS, riskClassOf } from "@/lib/risk";
+import type { AreaDetail, MapData } from "@/lib/map-data";
+import type { MapLayer } from "./area";
+import { MAP_LAYERS, mapHref } from "./area";
 import { DistrictDetail } from "./district-detail";
 import { RiskLegend } from "./legend";
+import { MapCanvas } from "./map-canvas";
 
 /**
- * Peta risiko kecamatan — digambar sebagai SVG, tanpa tile server dan tanpa pustaka peta.
+ * Halaman peta: bidang gambar, pemilih layer, legenda, dan panel rincian wilayah.
  *
- * Warna tiap wilayah berasal dari skor risiko yang dikirim API; wilayah tanpa data dibiarkan
- * abu-abu dan menyatakan "tidak ada data", bukan diberi angka nol. Bentuk wilayah adalah
- * perkiraan (lihat `lib/geo.ts`), sehingga hal itu dinyatakan terbuka di layar.
+ * Wilayah terpilih **dan** layer adalah parameter alamat (`/peta?wilayah=Tebet&layer=…`),
+ * bukan keadaan di dalam komponen: rinciannya diambil di server dan tautannya dapat
+ * dibagikan saat paparan. Hanya penyorotan yang berjalan di peramban — lihat `MapCanvas`.
  */
-
-/** Warna wilayah tanpa data — sewarna garis panel, jelas berbeda dari tangga risiko. */
-const NO_DATA_FILL = "#132339";
-
-function label(district: DistrictIntel | undefined): string {
-  if (!district || district.riskScore === null) return "tidak ada data";
-  return `${district.riskScore}/100 · ${RISK_LABELS[riskClassOf(district.riskScore)]}`;
-}
-
-function ariaLabel(shape: DistrictShape, district: DistrictIntel | undefined): string {
-  if (!district || district.riskScore === null) {
-    return `${shape.kecamatan} — tidak ada data risiko`;
-  }
-  const risk = riskClassOf(district.riskScore);
-  return `${shape.kecamatan} — skor risiko ${district.riskScore} dari 100, kelas ${RISK_LABELS[risk]}`;
-}
-
-export function RiskMap({ data }: { data: MapData }) {
-  const byName = useMemo(
-    () => new Map(data.districts.map((district) => [district.kecamatan, district])),
-    [data.districts],
-  );
-
-  // Pilihan awal jatuh ke wilayah berisiko tertinggi yang memang punya data, supaya panel
-  // rincian langsung berisi sesuatu dan tidak membuka paparan dengan layar kosong.
-  const initial = useMemo(() => {
-    const scored = data.districts.filter((district) => district.riskScore !== null);
-    return scored.reduce<DistrictIntel | null>(
-      (best, district) =>
-        best === null || (district.riskScore ?? 0) > (best.riskScore ?? 0) ? district : best,
-      null,
-    );
-  }, [data.districts]);
-
-  const [selected, setSelected] = useState<string | null>(initial?.kecamatan ?? null);
-  /** Wilayah yang sedang disentuh tetikus **atau** sedang menerima fokus papan ketik. */
-  const [active, setActive] = useState<string | null>(null);
-
-  const hovered = active === null ? undefined : byName.get(active);
-  const hoveredShape = KECAMATAN_SHAPES.find((shape) => shape.kecamatan === active);
+export function RiskMap({
+  data,
+  selected,
+  detail,
+  layer,
+}: {
+  data: MapData;
+  selected: string | null;
+  detail: AreaDetail | null;
+  layer: MapLayer;
+}) {
+  const district = data.districts.find((row) => row.kecamatan === selected) ?? null;
 
   return (
     <div className="grid grid-cols-12 gap-3">
@@ -69,112 +39,54 @@ export function RiskMap({ data }: { data: MapData }) {
           }
           bodyClassName="flex flex-col gap-3"
         >
-          <div className="relative">
-            {/* biome-ignore lint/a11y/useSemanticElements: peta adalah SVG; tidak ada
-                elemen HTML semantik yang dapat menggantikan wadah wilayah di dalamnya. */}
-            <svg
-              viewBox={`0 0 ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`}
-              role="group"
-              aria-label="Peta risiko kamtibmas per kecamatan"
-              className="mx-auto max-h-[62vh] w-full"
-            >
-              {KECAMATAN_SHAPES.map((shape) => {
-                const district = byName.get(shape.kecamatan);
-                const risk =
-                  district && district.riskScore !== null ? riskClassOf(district.riskScore) : null;
-                const isSelected = selected === shape.kecamatan;
-                const isActive = active === shape.kecamatan;
-
-                return (
-                  <g key={shape.kecamatan}>
-                    {/* biome-ignore lint/a11y/useSemanticElements: <button> tidak dapat
-                        berada di dalam <svg>. Wilayah tetap dapat difokus (tabIndex),
-                        punya label, dan menanggapi Enter/Spasi seperti tombol. */}
-                    <polygon
-                      points={polygonPoints(shape)}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={ariaLabel(shape, district)}
-                      aria-pressed={isSelected}
-                      className="cursor-pointer transition-[fill-opacity]"
-                      fill={risk ? RISK_HEX[risk] : NO_DATA_FILL}
-                      fillOpacity={isSelected ? 0.85 : isActive ? 0.68 : 0.45}
-                      stroke={isSelected ? "#22d3ee" : isActive ? "#67e8f9" : "#050b18"}
-                      strokeWidth={isSelected || isActive ? 6 : 3}
-                      strokeLinejoin="round"
-                      onClick={() => setSelected(shape.kecamatan)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          setSelected(shape.kecamatan);
-                        }
-                      }}
-                      onMouseEnter={() => setActive(shape.kecamatan)}
-                      onMouseLeave={() => setActive(null)}
-                      onFocus={() => setActive(shape.kecamatan)}
-                      onBlur={() => setActive(null)}
-                    />
-                    <text
-                      x={shape.label[0]}
-                      y={shape.label[1]}
-                      textAnchor="middle"
-                      pointerEvents="none"
-                      className="fill-ink font-heading"
-                      fontSize={26}
-                      fontWeight={600}
-                    >
-                      {shape.kecamatan}
-                    </text>
-                    <text
-                      x={shape.label[0]}
-                      y={shape.label[1] + 40}
-                      textAnchor="middle"
-                      pointerEvents="none"
-                      fontSize={34}
-                      fontWeight={700}
-                      fill={district?.riskScore === null || !district ? "#5b7796" : "#e6f0ff"}
-                    >
-                      {district?.riskScore ?? "—"}
-                    </text>
-                  </g>
-                );
-              })}
-            </svg>
-
-            {hoveredShape ? (
-              <div
-                // Tooltip hanya penguat visual: keterangan yang sama sudah ada pada
-                // `aria-label` tiap wilayah, sehingga pembaca layar tidak kehilangan apa pun.
-                aria-hidden="true"
-                className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[135%] whitespace-nowrap rounded border border-base-700 bg-base-950/95 px-2.5 py-1.5 shadow-panel"
-                style={toPercent(hoveredShape.label)}
+          <nav aria-label="Layer peta" className="flex flex-wrap items-center gap-2">
+            {MAP_LAYERS.map((option) => (
+              <Link
+                key={option.id}
+                href={mapHref(selected, option.id)}
+                scroll={false}
+                aria-current={layer === option.id ? "true" : undefined}
+                className={`rounded border px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors ${
+                  layer === option.id
+                    ? "border-accent/60 bg-accent/10 text-accent"
+                    : "border-base-800 text-ink-muted hover:text-ink"
+                }`}
               >
-                <p className="font-heading text-xs font-semibold text-ink">
-                  {hoveredShape.kecamatan}
-                </p>
-                <p className="font-mono text-[11px] text-ink-muted">{label(hovered)}</p>
-              </div>
-            ) : null}
-          </div>
+                {option.label}
+              </Link>
+            ))}
+            <span className="text-[10px] text-ink-faint">
+              {layer === "current"
+                ? data.assessmentDate
+                  ? `Penilaian ${data.assessmentDate}`
+                  : "Belum ada tanggal penilaian"
+                : `Horizon ${data.horizon}`}
+              {/* Versi bobot ikut tampil supaya pertanyaan "bobotnya dari mana"
+                  dapat dijawab dari layar, bukan dari ingatan (CLAUDE.md §25). */}
+              {layer === "current" && data.weightsVersion
+                ? ` · bobot ${data.weightsVersion}`
+                : null}
+            </span>
+          </nav>
 
-          <RiskLegend />
+          <MapCanvas districts={data.districts} layer={layer} selected={selected} />
+
+          <RiskLegend layer={layer} />
 
           <p className="text-[10px] leading-relaxed text-ink-faint">
             Bentuk wilayah pada peta ini adalah <strong>perkiraan</strong> yang diturunkan dari
-            koordinat titik lokasi, <strong>bukan batas administratif resmi</strong>. Warna
-            menunjukkan skor risiko tertinggi wilayah pada tanggal penilaian terakhir.
+            koordinat titik lokasi, <strong>bukan batas administratif resmi</strong>.
+          </p>
+
+          <p className="text-[10px] leading-relaxed text-ink-faint">
+            {layer === "current" ? data.currentRiskBasis : data.predictiveBasis}
           </p>
         </Panel>
       </div>
 
       <div className="col-span-12 xl:col-span-5">
         <Panel title="Potensi Ancaman Wilayah" className="h-full">
-          <DistrictDetail
-            district={selected ? (byName.get(selected) ?? null) : null}
-            horizon={data.horizon}
-            assessmentDate={data.assessmentDate}
-            weightsVersion={data.weightsVersion}
-          />
+          <DistrictDetail district={district} detail={detail} horizon={data.horizon} />
         </Panel>
       </div>
     </div>

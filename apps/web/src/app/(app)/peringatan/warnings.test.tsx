@@ -1,8 +1,30 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { formatWib, type PredictionDetail, type WarningDetail } from "@/lib/warnings";
+import { render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import {
+  allowsTransition,
+  formatWib,
+  type PredictionDetail,
+  type WarningAction,
+  type WarningDetail,
+} from "@/lib/warnings";
 import { ExplainabilityPanel } from "./explainability";
 import { WarningBoard, type WarningGroup } from "./warning-board";
+
+/**
+ * Formulir tindak lanjut memanggil server action; di sini yang diuji adalah papan
+ * peringatan — termasuk tombol mana yang **ditawarkan** kepada formulir itu.
+ */
+vi.mock("./follow-up-form", () => ({
+  FollowUpForm: ({ code, offers }: { code: string; offers: WarningAction[] }) => (
+    <div>
+      {offers.map((action) => (
+        <button key={action} type="button">
+          Tindak Lanjut {action} {code}
+        </button>
+      ))}
+    </div>
+  ),
+}));
 
 const active: WarningDetail = {
   code: "WRN-0053",
@@ -55,15 +77,46 @@ const prediction: PredictionDetail = {
   grid_id: "JKS-028",
 };
 
+const resolved: WarningDetail = {
+  ...active,
+  code: "WRN-0080",
+  status: "RESOLVED",
+};
+
 const groups: WarningGroup[] = [
   { status: "ACTIVE", rows: [active], total: 41 },
   { status: "ACKNOWLEDGED", rows: [acknowledged], total: 1 },
   { status: "RESOLVED", rows: [], total: 0 },
 ];
 
+/**
+ * Kueri dibatasi pada satu panel, bukan seluruh layar: teks yang sama memang muncul di
+ * kartu daftar dan di panel rincian, dan yang diuji adalah letaknya.
+ */
+function panel(title: string) {
+  const section = screen.getByRole("heading", { name: title }).closest("section");
+  if (!section) throw new Error(`panel "${title}" tidak ditemukan`);
+  return within(section);
+}
+
+const followUp = () => panel("Tindak Lanjut");
+
+function board(props: Partial<Parameters<typeof WarningBoard>[0]> = {}) {
+  return render(
+    <WarningBoard
+      groups={groups}
+      selected={active}
+      sourcePrediction={prediction}
+      canAcknowledge
+      canResolve
+      {...props}
+    />,
+  );
+}
+
 describe("papan peringatan", () => {
   it("mengelompokkan peringatan menurut status", () => {
-    render(<WarningBoard groups={groups} selected={active} sourcePrediction={prediction} />);
+    board();
 
     expect(screen.getByText(/Peringatan Aktif/i)).toBeDefined();
     expect(screen.getByText(/Peringatan Sudah Diterima/i)).toBeDefined();
@@ -71,7 +124,7 @@ describe("papan peringatan", () => {
   });
 
   it("menampilkan isi kartu peringatan sesuai data API", () => {
-    render(<WarningBoard groups={groups} selected={active} sourcePrediction={prediction} />);
+    board();
 
     const card = screen.getByRole("link", { name: /WRN-0053/ });
 
@@ -86,13 +139,13 @@ describe("papan peringatan", () => {
   });
 
   it("memakai label tingkat peringatan berbahasa Indonesia", () => {
-    render(<WarningBoard groups={groups} selected={active} sourcePrediction={prediction} />);
+    board();
 
     expect(screen.getByText("Waspada")).toBeDefined();
   });
 
   it("menyatakan keadaan kosong dengan kata, bukan angka nol", () => {
-    render(<WarningBoard groups={groups} selected={active} sourcePrediction={prediction} />);
+    board();
 
     expect(screen.getByText("Tidak ada peringatan berstatus Selesai.")).toBeDefined();
     expect(screen.getByText("tidak ada")).toBeDefined();
@@ -100,7 +153,7 @@ describe("papan peringatan", () => {
 
   it("menampilkan versi ambang dan menandainya belum final", () => {
     // CLAUDE.md §11: ambang DEMO/PROPOSED tidak boleh terbaca sebagai ketetapan.
-    render(<WarningBoard groups={groups} selected={active} sourcePrediction={prediction} />);
+    board();
 
     expect(screen.getByText("DEMO / PROPOSED")).toBeDefined();
     expect(screen.getAllByText("dummy-v1").length).toBeGreaterThan(0);
@@ -108,30 +161,87 @@ describe("papan peringatan", () => {
   });
 
   it("menandai peringatan yang sedang dipilih pada tautannya", () => {
-    render(<WarningBoard groups={groups} selected={active} sourcePrediction={prediction} />);
+    board();
 
     const link = screen.getByRole("link", { name: /WRN-0053/ });
     expect(link.getAttribute("aria-current")).toBe("true");
     expect(link.getAttribute("href")).toBe("/peringatan?dipilih=WRN-0053");
   });
 
-  it("menyatakan bahwa tombol tindak lanjut belum berfungsi", () => {
-    // Tombol yang tampak berfungsi padahal tidak akan menjadikan halaman ini mockup.
-    render(<WarningBoard groups={groups} selected={active} sourcePrediction={prediction} />);
+  it("menyatakan peringatan mana yang sedang ditindaklanjuti", () => {
+    board();
 
-    const acknowledge = screen.getByRole("button", { name: /terima peringatan/i });
-    const resolve = screen.getByRole("button", { name: /nyatakan selesai/i });
-
-    expect(acknowledge.hasAttribute("disabled")).toBe(true);
-    expect(resolve.hasAttribute("disabled")).toBe(true);
-    expect(screen.getByText(/menunggu TASK 111/i)).toBeDefined();
+    expect(followUp().getByText("WRN-0053")).toBeDefined();
+    expect(followUp().getByText("Aktif")).toBeDefined();
   });
 
   it("menyatakan peringatan bukan perintah operasional", () => {
     // CLAUDE.md §13.
-    render(<WarningBoard groups={groups} selected={active} sourcePrediction={prediction} />);
+    board();
 
     expect(screen.getByText(/hanya lahir setelah keputusan pejabat berwenang/i)).toBeDefined();
+  });
+});
+
+describe("kesahan transisi peringatan", () => {
+  // Cerminan `ACKNOWLEDGEABLE_FROM` dan `RESOLVABLE_FROM` pada `warning_actions.py`.
+  it("hanya mengizinkan acknowledge dari status aktif", () => {
+    expect(allowsTransition("ACTIVE", "acknowledge")).toBe(true);
+    expect(allowsTransition("ACKNOWLEDGED", "acknowledge")).toBe(false);
+    expect(allowsTransition("RESOLVED", "acknowledge")).toBe(false);
+  });
+
+  it("mengizinkan resolve dari status aktif maupun sudah diterima", () => {
+    expect(allowsTransition("ACTIVE", "resolve")).toBe(true);
+    expect(allowsTransition("ACKNOWLEDGED", "resolve")).toBe(true);
+    expect(allowsTransition("RESOLVED", "resolve")).toBe(false);
+  });
+});
+
+describe("panel tindak lanjut", () => {
+  it("menawarkan kedua tindak lanjut atas peringatan aktif bagi peran berwenang penuh", () => {
+    board();
+
+    expect(followUp().getByRole("button", { name: /acknowledge WRN-0053/ })).toBeDefined();
+    expect(followUp().getByRole("button", { name: /resolve WRN-0053/ })).toBeDefined();
+  });
+
+  it("tidak menawarkan penutupan bagi peran tanpa kewenangan itu", () => {
+    // Role Polsek memiliki `warning:acknowledge` tetapi tidak `warning:resolve`.
+    board({ canResolve: false });
+
+    expect(followUp().getByRole("button", { name: /acknowledge WRN-0053/ })).toBeDefined();
+    expect(followUp().queryByRole("button", { name: /resolve/ })).toBeNull();
+  });
+
+  it("tidak menawarkan penerimaan ulang atas peringatan yang sudah diterima", () => {
+    // Menerima ulang akan dijawab 409; tombolnya tidak pantas ditawarkan.
+    board({ selected: acknowledged });
+
+    expect(followUp().queryByRole("button", { name: /acknowledge/ })).toBeNull();
+    expect(followUp().getByRole("button", { name: /resolve WRN-0017/ })).toBeDefined();
+  });
+
+  it("tidak menawarkan tindak lanjut apa pun atas peringatan berstatus akhir", () => {
+    board({ selected: resolved });
+
+    expect(followUp().queryByRole("button", { name: /Tindak Lanjut/ })).toBeNull();
+    expect(followUp().getByText(/sudah berstatus akhir/i)).toBeDefined();
+  });
+
+  it("menyembunyikan tombol bagi peran tanpa kewenangan, sambil menyebut backend yang menolak", () => {
+    // CLAUDE.md §21: menyembunyikan tombol bukan pengganti pemeriksaan di backend.
+    board({ canAcknowledge: false, canResolve: false });
+
+    expect(followUp().queryByRole("button", { name: /Tindak Lanjut/ })).toBeNull();
+    expect(followUp().getByText(/tidak memiliki kewenangan/i)).toBeDefined();
+    expect(followUp().getByText(/backend yang menolaknya/i)).toBeDefined();
+  });
+
+  it("menyatakan keadaan kosong bila tidak ada peringatan yang dipilih", () => {
+    board({ selected: null });
+
+    expect(followUp().getByText(/Tidak ada peringatan yang dipilih/i)).toBeDefined();
   });
 });
 

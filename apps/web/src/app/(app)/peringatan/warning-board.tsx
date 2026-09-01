@@ -4,16 +4,20 @@ import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
 import { RISK_TEXT, type RiskClass } from "@/lib/risk";
 import {
+  allowsTransition,
   formatWib,
   type PredictionDetail,
   SEVERITY_LABELS,
   STATUS_HINTS,
   STATUS_LABELS,
   severityRiskClass,
+  WARNING_ACTIONS,
+  type WarningAction,
   type WarningDetail,
   type WarningStatus,
 } from "@/lib/warnings";
 import { ExplainabilityPanel } from "./explainability";
+import { FollowUpForm } from "./follow-up-form";
 
 /**
  * Kelas badge ditulis utuh, bukan dirangkai dari potongan, supaya Tailwind benar-benar
@@ -148,39 +152,61 @@ function GroupPanel({ group, selectedCode }: { group: WarningGroup; selectedCode
 /**
  * Tindak lanjut peringatan.
  *
- * Tombol sengaja dinonaktifkan: endpoint acknowledge/resolve belum ada. Tombol yang
- * tampak berfungsi padahal tidak akan menjadikan halaman ini mockup, dan itu bertentangan
- * dengan success criteria #05 Taskap.
+ * Tombol hanya ditawarkan bila dua syarat terpenuhi sekaligus: transisinya masih sah
+ * menurut status peringatan, dan pengguna memiliki kewenangannya. Keduanya sekadar
+ * kenyamanan — backend tetap yang menolak, dengan 409 untuk transisi tidak sah dan 403
+ * untuk kewenangan yang tidak dimiliki (CLAUDE.md §21). Yang dihindari di sini adalah
+ * menawarkan tombol yang sudah pasti ditolak.
  */
-function FollowUpPanel({ warning }: { warning: WarningDetail | null }) {
+function FollowUpPanel({
+  warning,
+  canAcknowledge,
+  canResolve,
+}: {
+  warning: WarningDetail | null;
+  canAcknowledge: boolean;
+  canResolve: boolean;
+}) {
+  if (!warning) {
+    return (
+      <Panel title="Tindak Lanjut">
+        <EmptyState label="Tidak ada peringatan yang dipilih." />
+      </Panel>
+    );
+  }
+
+  const permitted: Record<WarningAction, boolean> = {
+    acknowledge: canAcknowledge,
+    resolve: canResolve,
+  };
+
+  // Yang masih mungkin menurut status, terlepas dari kewenangan — dipakai untuk
+  // membedakan "peringatan sudah selesai" dari "Anda tidak berwenang".
+  const possible = WARNING_ACTIONS.filter((action) => allowsTransition(warning.status, action));
+  const offers = possible.filter((action) => permitted[action]);
+
   return (
     <Panel title="Tindak Lanjut">
-      <div className="flex gap-2">
-        <button
-          type="button"
-          disabled
-          className="flex-1 cursor-not-allowed rounded border border-base-800 bg-base-950/40 px-3 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-ink-faint"
-        >
-          Terima Peringatan
-        </button>
-        <button
-          type="button"
-          disabled
-          className="flex-1 cursor-not-allowed rounded border border-base-800 bg-base-950/40 px-3 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-ink-faint"
-        >
-          Nyatakan Selesai
-        </button>
-      </div>
-      <p className="mt-3 text-[10px] leading-relaxed text-ink-muted">
-        Kedua tombol belum berfungsi — endpoint perubahan status peringatan masih dikerjakan
-        (menunggu TASK 111). Status pada layar ini hanya menampilkan apa yang tercatat di backend.
+      <p className="mb-3 text-[10px] leading-relaxed text-ink-muted">
+        Peringatan terpilih <span className="font-mono text-ink">{warning.code}</span> berstatus{" "}
+        <span className="text-ink">{STATUS_LABELS[warning.status] ?? warning.status}</span>.
       </p>
-      {warning ? (
-        <p className="mt-2 text-[10px] leading-relaxed text-ink-muted">
-          Peringatan terpilih <span className="font-mono text-ink">{warning.code}</span> berstatus{" "}
-          <span className="text-ink">{STATUS_LABELS[warning.status] ?? warning.status}</span>.
+
+      {offers.length > 0 ? (
+        <FollowUpForm code={warning.code} offers={offers} />
+      ) : possible.length === 0 ? (
+        <p className="text-xs leading-relaxed text-ink-muted">
+          Peringatan ini sudah berstatus akhir, sehingga tidak ada tindak lanjut yang tersisa.
         </p>
-      ) : null}
+      ) : (
+        // Kewenangan disembunyikan, bukan dinonaktifkan diam-diam: pengguna diberi tahu
+        // alasannya agar tahu kepada siapa tindak lanjut ini harus dimintakan.
+        <p className="text-xs leading-relaxed text-ink-muted">
+          Akun Anda tidak memiliki kewenangan menindaklanjuti peringatan. Tombolnya tidak
+          ditampilkan, dan seandainya permintaan tetap dikirim, backend yang menolaknya.
+        </p>
+      )}
+
       {/* CLAUDE.md §13: peringatan bukan perintah operasional. */}
       <p className="mt-3 border-t border-base-800 pt-3 text-[10px] leading-relaxed text-ink-muted">
         Peringatan dini bukan perintah. Tindakan operasional hanya lahir setelah keputusan pejabat
@@ -199,10 +225,15 @@ export function WarningBoard({
   groups,
   selected,
   sourcePrediction,
+  canAcknowledge,
+  canResolve,
 }: {
   groups: WarningGroup[];
   selected: WarningDetail | null;
   sourcePrediction: PredictionDetail | null;
+  /** Kewenangan dari `/auth/me`; hanya menentukan tombol mana yang tampak. */
+  canAcknowledge: boolean;
+  canResolve: boolean;
 }) {
   const thresholds = [
     ...new Set(
@@ -234,7 +265,11 @@ export function WarningBoard({
 
         <div className="col-span-12 flex flex-col gap-3 xl:col-span-5">
           <ExplainabilityPanel warning={selected} prediction={sourcePrediction} />
-          <FollowUpPanel warning={selected} />
+          <FollowUpPanel
+            warning={selected}
+            canAcknowledge={canAcknowledge}
+            canResolve={canResolve}
+          />
         </div>
       </div>
     </div>

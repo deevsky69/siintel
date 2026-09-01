@@ -1,4 +1,8 @@
+// Profil pengguna berasal dari `/auth/me`; pemuatnya sudah ada di `lib/decisions.ts`
+// dan tidak digandakan di sini agar hanya ada satu bentuk `Profile`.
+import { getProfile } from "@/lib/decisions";
 import {
+  ACTION_PERMISSIONS,
   getPredictions,
   getWarningsByStatus,
   indexPredictions,
@@ -27,9 +31,10 @@ export default async function WarningCenterPage({
   const params = await searchParams;
   const requested = typeof params.dipilih === "string" ? params.dipilih : null;
 
-  const [pages, predictions] = await Promise.all([
+  const [pages, predictions, profile] = await Promise.all([
     Promise.all(WARNING_STATUSES.map((status) => getWarningsByStatus(status))),
     getPredictions(),
+    getProfile(),
   ]);
 
   const groups: WarningGroup[] = WARNING_STATUSES.map((status, index) => ({
@@ -47,5 +52,16 @@ export default async function WarningCenterPage({
     ? (indexPredictions(predictions.data).get(selected.prediction_code) ?? null)
     : null;
 
-  return <WarningBoard groups={groups} selected={selected} sourcePrediction={sourcePrediction} />;
+  return (
+    <WarningBoard
+      groups={groups}
+      selected={selected}
+      sourcePrediction={sourcePrediction}
+      // Menyembunyikan tombol hanyalah kenyamanan; backend tetap yang menolak.
+      // Catatan kewenangan: role Polsek memiliki `warning:acknowledge` tetapi tidak
+      // `warning:resolve`, sehingga kedua kewenangan diperiksa terpisah.
+      canAcknowledge={profile.permissions.includes(ACTION_PERMISSIONS.acknowledge)}
+      canResolve={profile.permissions.includes(ACTION_PERMISSIONS.resolve)}
+    />
+  );
 }

@@ -469,3 +469,35 @@ def test_resolve_requires_its_own_permission(client: TestClient, session: Sessio
 
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "FORBIDDEN"
+
+
+def test_map_carries_the_weights_version_that_produced_the_scores(
+    client: TestClient, session: Session
+) -> None:
+    """Ketertelusuran bobot (CLAUDE.md §25).
+
+    Skor risiko dihitung dengan bobot dari `config/risk/`, yang masih berstatus
+    `DEMO / PROPOSED`. Tanpa versinya ikut keluar, angka di layar tidak dapat
+    dikembalikan ke konfigurasi yang menghasilkannya — dan pertanyaan "bobotnya dari
+    mana" tidak dapat dijawab saat paparan.
+    """
+    leader = _make_user(session, "Pimpinan")
+    headers = _auth(client, leader)
+
+    expected = session.scalar(
+        select(RiskScore.weights_version).where(RiskScore.weights_version.is_not(None)).limit(1)
+    )
+    assert expected is not None, "data awal tidak memuat weights_version"
+
+    listed = client.get("/api/v1/map/current-risk", headers=headers)
+    assert listed.status_code == 200, listed.text
+    areas = listed.json()["areas"]
+    assert areas, "tidak ada wilayah yang dapat diperiksa"
+    assert all(area["weights_version"] == expected for area in areas)
+
+    detail = client.get(
+        f"/api/v1/map/area/{areas[0]['kecamatan']}",
+        headers=headers,
+    )
+    assert detail.status_code == 200, detail.text
+    assert detail.json()["weights_version"] == expected

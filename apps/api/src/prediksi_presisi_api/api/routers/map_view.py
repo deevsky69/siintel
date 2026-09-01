@@ -128,6 +128,18 @@ def _current_risk_rows(
     return list(session.execute(query).all())
 
 
+def _single_version(versions: set[str | None]) -> str | None:
+    """Satu versi bobot bila seragam; bila bercampur, dinyatakan apa adanya.
+
+    Menyembunyikan percampuran akan membuat satu angka tampak berasal dari satu
+    konfigurasi padahal tidak.
+    """
+    known = sorted(version for version in versions if version)
+    if not known:
+        return None
+    return known[0] if len(known) == 1 else " + ".join(known)
+
+
 def _aggregate_current_risk(rows: list[Any]) -> list[dict[str, Any]]:
     """Meringkas sel risiko menjadi satu baris per kecamatan."""
     areas: dict[str, dict[str, Any]] = {}
@@ -144,9 +156,14 @@ def _aggregate_current_risk(rows: list[Any]) -> list[dict[str, Any]]:
                 "grids": {},
                 "score_total": 0,
                 "threats": {},
+                # Versi bobot yang menghasilkan angka ini. Dikumpulkan sebagai himpunan
+                # karena satu kecamatan bisa saja memuat sel dari lebih dari satu versi —
+                # dan bila itu terjadi, layar harus menyatakannya, bukan memilih salah satu.
+                "weights_versions": set(),
             },
         )
 
+        area["weights_versions"].add(score.weights_version)
         area["cell_count"] += 1
         area["score_total"] += score.risk_score
         area["grids"][location.grid_id] = (float(location.latitude), float(location.longitude))
@@ -184,6 +201,9 @@ def _aggregate_current_risk(rows: list[Any]) -> list[dict[str, Any]]:
                 "average_risk_score": round(int(area["score_total"]) / cell_count),
                 "cell_count": cell_count,
                 "grid_count": len(grids),
+                # Ketertelusuran bobot (CLAUDE.md §25): tanpa ini skor di layar tidak
+                # dapat dikembalikan ke konfigurasi yang menghasilkannya.
+                "weights_version": _single_version(area["weights_versions"]),
                 "latitude": round(sum(point[0] for point in grids.values()) / len(grids), 6),
                 "longitude": round(sum(point[1] for point in grids.values()) / len(grids), 6),
                 "threats": sorted(
@@ -446,11 +466,13 @@ def area_detail(
 
     threats: list[dict[str, Any]] = []
     windows: list[dict[str, Any]] = []
+    weights_version: str | None = None
     if assessment_date is not None:
         rows = _current_risk_rows(session, polsek, assessment_date, kecamatan=kecamatan)
         aggregated = _aggregate_current_risk(rows)
         if aggregated:
             threats = aggregated[0]["threats"]
+            weights_version = aggregated[0]["weights_version"]
 
         # Jendela waktu paling rawan menurut sel risiko tanggal penilaian terakhir.
         by_window: dict[str | None, dict[str, Any]] = {}
@@ -471,6 +493,7 @@ def area_detail(
         "polsek": area[1],
         "grid_count": int(area[2]),
         "assessment_date": assessment_date,
+        "weights_version": weights_version,
         "threats": threats,
         "critical_time_window": windows[0]["time_window"] if windows else None,
         "time_windows": windows,

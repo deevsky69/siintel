@@ -2,7 +2,8 @@
 
 import { useActionState, useState } from "react";
 import type { Decision } from "@/lib/decisions";
-import { decide, IDLE } from "./actions";
+import { decide } from "./actions";
+import { IDLE } from "./decision-state";
 
 /**
  * Formulir keputusan pejabat.

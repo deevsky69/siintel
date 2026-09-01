@@ -5,8 +5,7 @@ import { RecommendationPanel } from "@/components/dashboard/recommendations";
 import { SituationOverview } from "@/components/dashboard/situation-overview";
 import { ScoreList } from "@/components/dashboard/threat-list";
 import { TrendChart } from "@/components/dashboard/trend-chart";
-import { EmptyState } from "@/components/data-state";
-import { Panel } from "@/components/panel";
+import { MapPanel } from "@/components/map/map-panel";
 import {
   getActiveWarnings,
   getOutlook,
@@ -14,6 +13,7 @@ import {
   getSummary,
   getTrends,
 } from "@/lib/dashboard";
+import { getMapData } from "@/lib/map-data";
 
 export const dynamic = "force-dynamic";
 
@@ -25,11 +25,12 @@ export const dynamic = "force-dynamic";
  * bukan mockup" pada success criteria Taskap.
  */
 export default async function DashboardPage() {
-  const [summary, trends, outlook, warnings] = await Promise.all([
+  const [summary, trends, outlook, warnings, map] = await Promise.all([
     getSummary(),
     getTrends(),
     getOutlook(),
     getActiveWarnings(),
+    getMapData(),
   ]);
 
   const topWarning = warnings.data[0] ?? null;
@@ -66,9 +67,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="col-span-12 xl:col-span-6">
-          <Panel title="Live Kamtibmas Map" className="h-full" bodyClassName="p-0">
-            <EmptyState label="Peta wilayah dibangun pada TASK 080–084" />
-          </Panel>
+          <MapPanel data={map} />
         </div>
 
         <div className="col-span-12 flex flex-col gap-3 xl:col-span-3">

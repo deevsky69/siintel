@@ -1,12 +1,19 @@
 import type { RiskClass } from "@/lib/risk";
 import { RISK_HEX, RISK_LABELS, riskClassOf } from "@/lib/risk";
+import type { MapLayer } from "./area";
+import { PREDICTIVE_HEX, predictiveOpacity } from "./area";
 
 /**
- * Legenda RISK LEVEL.
+ * Legenda peta.
  *
- * Rentang angka **diturunkan dari `riskClassOf`**, tidak ditulis ulang di sini: ambang
- * hanya boleh hidup di satu tempat (CLAUDE.md §12). Bila ambang resmi kelak menggantikan
- * ambang DEMO/PROPOSED, legenda ikut berubah tanpa penyuntingan.
+ * Layer risiko berjalan memakai tangga kelas: rentang angkanya **diturunkan dari
+ * `riskClassOf`**, tidak ditulis ulang di sini, supaya ambang hanya hidup di satu tempat
+ * (CLAUDE.md §12). Bila ambang resmi kelak menggantikan ambang DEMO / PROPOSED, legenda
+ * ikut berubah tanpa penyuntingan.
+ *
+ * Layer prediktif **tidak punya tangga kelas**: API tidak mengirim `risk_class` untuk
+ * prediksi karena ambangnya belum ditetapkan (U-01). Legendanya karena itu berupa skala
+ * menerus 0–100 dengan pernyataan terbuka bahwa yang ditampilkan adalah skor mentah.
  */
 export type RiskBand = { risk: RiskClass; min: number; max: number };
 
@@ -21,7 +28,10 @@ export function riskBands(): RiskBand[] {
   return bands;
 }
 
-export function RiskLegend() {
+/** Titik contoh skala prediktif — hanya penanda skala, bukan ambang kelas. */
+const PREDICTIVE_TICKS = [0, 25, 50, 75, 100] as const;
+
+function CurrentRiskLegend() {
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
       <span className="stat-label">Risk Level</span>
@@ -43,4 +53,29 @@ export function RiskLegend() {
       </span>
     </div>
   );
+}
+
+function PredictiveLegend() {
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+      <span className="stat-label">Skor Prediksi</span>
+      {PREDICTIVE_TICKS.map((tick) => (
+        <span key={tick} className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+          <span
+            aria-hidden="true"
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: PREDICTIVE_HEX, opacity: predictiveOpacity(tick) }}
+          />
+          <span className="font-mono">{tick}</span>
+        </span>
+      ))}
+      <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+        Skor mentah 0–100 · tanpa kelas risiko resmi
+      </span>
+    </div>
+  );
+}
+
+export function RiskLegend({ layer = "current" }: { layer?: MapLayer }) {
+  return layer === "predictive" ? <PredictiveLegend /> : <CurrentRiskLegend />;
 }
