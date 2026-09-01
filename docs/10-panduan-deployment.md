@@ -240,33 +240,77 @@ menunda sertifikat asli ketika portnya nanti dibuka.
 
 Tiga jalan, berurut dari yang paling dianjurkan:
 
-**1. Teruskan juga port 80 dan 443 apa adanya** — paling lurus dan paling rapi.
+**Jalur yang berlaku untuk server ini: DNS-01.**
 
-| Protokol | Port publik | Tujuan |
-|---|---|---|
-| TCP | 80 | `10.3.3.87:80` |
-| TCP | 443 | `10.3.3.87:443` |
+Server berbagi satu alamat IP publik dengan host lain, sehingga port 80 dan 443 pada
+IP itu tidak dapat dialihkan ke mesin ini. Karena nomor port pada HTTP-01 dan
+TLS-ALPN-01 tidak dapat diubah, keduanya gugur. Yang tersisa adalah **DNS-01**, dan
+DNS-01 justru tidak peduli pada port sama sekali: Let's Encrypt hanya membaca satu
+record TXT, tanpa satu pun sambungan masuk ke server.
 
-Lalu di server:
+Jadi jawabannya: **sertifikat Let's Encrypt tetap dapat diperoleh**, hanya jalannya
+berbeda dari bawaan Coolify.
+
+Nameserver `awansurya.com` adalah `ns1/ns2.domainesia.net`. acme.sh belum memiliki
+plugin otomatis untuk DomaiNesia, sehingga record TXT dipasang sendiri lewat panel
+dan perpanjangannya manual tiap 90 hari.
+
+#### Langkah
+
+**1. Minta nilai TXT** (di server):
 
 ```bash
-# Kosongkan PUBLIC_HTTPS_PORT lebih dulu di .env.production
-pnpm prod:up:tls
+~/.acme.sh/acme.sh --issue --dns -d siintel.awansurya.com \
+  --server letsencrypt --yes-I-know-dns-manual-mode-enough-go-ahead-please
 ```
 
-Hasilnya `https://siintel.awansurya.com` tanpa nomor port, sertifikat sah, dan
-pembaruan otomatis setiap 60 hari.
+Keluarannya menyebut nama dan nilai record.
 
-**2. Cloudflare Tunnel** — bila penyedia internet menutup port 80/443 masuk (umum pada
-langganan non-bisnis). Tunnel bekerja lewat sambungan **keluar**, sehingga tidak
-memerlukan satu pun port masuk, tetap memberi HTTPS sah, dan tetap menghasilkan alamat
-tanpa nomor port. Perlu akun Cloudflare dan domain `awansurya.com` dikelola Cloudflare.
+**2. Pasang record di panel DNS DomaiNesia:**
 
-**3. Sertifikat DNS-01 secara manual** — `certbot certonly --manual
---preferred-challenges dns` lalu memasang berkasnya ke Traefik lewat file provider.
-Berhasil pada port berapa pun, tetapi harus diperbarui sendiri tiap 90 hari dan
-menyentuh konfigurasi Traefik milik Coolify yang juga dipakai aplikasi lain. Jalan
-terakhir.
+| Kolom | Isi |
+|---|---|
+| Tipe | `TXT` |
+| Nama / Host | `_acme-challenge.siintel` |
+| Nilai | nilai dari langkah 1 |
+| TTL | terendah yang tersedia |
+
+> Kolom "Nama" diisi **tanpa** `.awansurya.com` — panel menambahkannya sendiri.
+> Nama lengkap yang harus terbentuk: `_acme-challenge.siintel.awansurya.com`.
+
+**3. Tunggu penyebaran, lalu periksa:**
+
+```bash
+dig +short TXT _acme-challenge.siintel.awansurya.com @8.8.8.8
+```
+
+Biasanya beberapa menit. Jangan lanjut sebelum nilainya muncul — verifikasi yang
+gagal terhitung pada batas Let's Encrypt.
+
+**4. Terbitkan dan pasang:**
+
+```bash
+bash scripts/pasang-sertifikat.sh
+```
+
+Skrip itu menyelesaikan verifikasi, memasang sertifikat lewat **file provider**
+Traefik (`/traefik/dynamic/`) yang memang sudah menyala pada proxy Coolify, lalu
+menunjukkan penerbit sertifikat yang benar-benar disajikan. Resolver ACME milik
+Coolify tidak disentuh, dan tidak ada berkas Coolify yang diubah — hanya tiga berkas
+baru yang ditambahkan, dan menghapusnya mengembalikan keadaan semula.
+
+Setelah itu `https://siintel.awansurya.com:8998` terbuka tanpa peringatan.
+
+#### Alternatif bila perpanjangan manual terasa merepotkan
+
+Pindahkan pengelolaan DNS `awansurya.com` ke **Cloudflare** (gratis, record tetap sama).
+acme.sh punya plugin Cloudflare, sehingga perpanjangan berjalan sendiri lewat cron yang
+sudah dipasang saat instalasi. Domainnya tetap terdaftar di DomaiNesia — yang berpindah
+hanya nameserver-nya.
+
+Cloudflare juga membuka pilihan **Cloudflare Tunnel**, yang menghilangkan nomor port
+dari alamat sekaligus (`https://siintel.awansurya.com` tanpa `:8998`) tanpa memerlukan
+port masuk apa pun.
 
 ### 3.3 Melihat aplikasi tanpa peringatan sertifikat
 
