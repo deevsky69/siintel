@@ -14,7 +14,13 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...models import EarlyWarning, Location, Prediction, Recommendation, RiskScore
-from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
+from ..deps import (
+    CurrentUser,
+    function_filter,
+    get_db,
+    jurisdiction_filter,
+    require_permission,
+)
 from ..pagination import PageParams, page_params, paginate
 
 router = APIRouter(tags=["intelijen"])
@@ -179,13 +185,22 @@ def list_recommendations(
     status: str | None = Query(None),
 ) -> dict[str, Any]:
     warning_alias = EarlyWarning
+    # Rekomendasi mewarisi wilayah dari prediksinya; tanpa join ke Location cakupan
+    # Polsek tidak dapat ditegakkan dan seluruh Jakarta Selatan ikut terbaca.
+    polsek = jurisdiction_filter(current, "recommendation:read")
+    function = function_filter(current, "recommendation:read")
 
     query = (
         select(Recommendation, Prediction.code, warning_alias.code)
         .join(Prediction, Prediction.prediction_id == Recommendation.prediction_id)
+        .join(Location, Location.location_id == Prediction.location_id)
         .outerjoin(warning_alias, warning_alias.warning_id == Recommendation.warning_id)
         .order_by(Recommendation.created_at.desc())
     )
+    if polsek:
+        query = query.where(Location.polsek == polsek)
+    if function:
+        query = query.where(Recommendation.recommended_function == function)
     if warning_code:
         query = query.where(warning_alias.code == warning_code)
     if status:

@@ -127,14 +127,33 @@ def session() -> Iterator[Session]:
     engine.dispose()
 
 
+#: Berkas sumber setiap tabel operasional beserta kolom kodenya.
+OPERATIONAL_SOURCES = (
+    ("commander_decisions.csv", "decision_id", CommanderDecision),
+    ("operational_actions.csv", "action_id", OperationalAction),
+    ("prediction_actual.csv", "evaluation_id", PredictionActual),
+)
+
+
 @requires_database
-def test_operational_seed_loads_expected_volumes(session: Session) -> None:
+def test_operational_seed_loads_every_row_of_its_source(session: Session) -> None:
+    """Seluruh baris berkas sumber termuat — tidak ada yang diam-diam terlewat.
+
+    Yang diperiksa adalah **baris yang berasal dari berkas sumber**, bukan jumlah seluruh
+    isi tabel. Versi sebelumnya membandingkan `COUNT(*)` dengan angka tetap, sehingga
+    gagal begitu aplikasi benar-benar dipakai: keputusan komandan yang dibuat lewat
+    `POST /recommendations/{code}/decisions` adalah baris baru yang **sah** — justru bukti
+    bahwa prototipe ini bekerja, bukan kerusakan data.
+    """
     seed_operational_data(session)
     session.flush()
 
-    assert session.scalar(select(func.count()).select_from(CommanderDecision)) == 63
-    assert session.scalar(select(func.count()).select_from(OperationalAction)) == 52
-    assert session.scalar(select(func.count()).select_from(PredictionActual)) == 241
+    for name, column, model in OPERATIONAL_SOURCES:
+        codes = {row[column] for row in src.read_rows(name)}
+        loaded = session.scalar(
+            select(func.count()).select_from(model).where(model.code.in_(codes))
+        )
+        assert loaded == len(codes), f"{name}: {loaded} dari {len(codes)} baris termuat"
 
 
 @requires_database

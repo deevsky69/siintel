@@ -17,7 +17,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import __version__
 from .api.errors import register_error_handlers
 from .api.middleware import RequestContextMiddleware, SecurityHeadersMiddleware
-from .api.routers import auth, catalog, dashboard, evaluation, health, intelligence
+from .api.routers import (
+    auth,
+    catalog,
+    dashboard,
+    decisions,
+    evaluation,
+    health,
+    intelligence,
+    map_view,
+    warning_actions,
+)
 from .config import get_settings
 
 API_PREFIX = "/api/v1"
@@ -59,6 +69,9 @@ def create_app() -> FastAPI:
     api.include_router(auth.router)
     api.include_router(catalog.router)
     api.include_router(intelligence.router)
+    api.include_router(decisions.router)
+    api.include_router(warning_actions.router)
+    api.include_router(map_view.router)
     api.include_router(dashboard.router)
     api.include_router(evaluation.router)
     app.include_router(api)
