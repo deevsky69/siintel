@@ -15,18 +15,22 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 | 2 | Executive Dashboard | ✅ **ADA** | `/` |
 | 3 | Live Crime Map | ⚠️ **SEBAGIAN** | Peta ada; layer **titik kejadian aktual** belum |
 | 4 | Historical Heatmap | ⚠️ **SEBAGIAN** | Riwayat tampil sebagai angka di panel rincian, belum sebagai layer peta |
-| 5 | Crime Pattern DNA | ❌ **BELUM** | Datanya lengkap (`modus`, `target_type`, `location_type`, jam) — analisisnya belum ada |
+| 5 | Crime Pattern DNA | ✅ **ADA** | `/pola` — kelima dimensi dari 1200 kejadian |
 | 6 | Predictive Heatmap | ✅ **ADA** | Layer prediktif pada `/peta` |
 | 7 | AI Prediction Center | ❌ **BELUM** | Halaman `/prediksi` masih berupa rencana |
 | 8 | Risk Scoring | ⚠️ **SEBAGIAN** | Skor ada dan terpakai; **menjalankannya** dari layar belum bisa |
 | 9 | Early Warning | ✅ **ADA** | `/peringatan` beserta terima/selesaikan |
 | 10 | AI Recommendation | ✅ **ADA** | `/rekomendasi` |
 | 11 | Commander Decision / Approval | ✅ **ADA** | Setujui / Modifikasi / Tolak, usulan asli tidak tertimpa |
-| 12 | Community Intelligence & manajemen laporan masyarakat | ❌ **BELUM** | `citizen_reports` **0 baris**, tanpa endpoint, tanpa layar |
+| 12 | Community Intelligence & manajemen laporan masyarakat | ⚠️ **SEBAGIAN** | `/masyarakat` — 150 laporan terbaca; **triase (aksi tulis) belum ada** |
 | 13 | Prediction vs Actual | ✅ **ADA** | `/evaluasi`, precision 0,397 · recall 0,400 |
-| 14 | Executive Brief | ❌ **BELUM** | Disebut §3, §8 no. 8, dan §9 no. 14 — tiga kali |
+| 14 | Executive Brief | ✅ **ADA** | `/brief`, siap cetak |
 
-**Skor: 8 dari 14 lengkap, 3 sebagian, 3 belum.**
+**Skor per 1 September 2026: 10 dari 14 lengkap, 3 sebagian, 1 belum.**
+
+Naik dari 8/3/3 pada pemeriksaan pertama hari ini. Yang tersisa belum sama sekali
+hanya **#7 AI Prediction Center** — ia memerlukan endpoint `prediction:run` dan
+`prediction:publish`, dan itu bukan sekadar layar.
 
 ---
 
@@ -36,16 +40,16 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 |---|---|
 | Executive Dashboard | ✅ |
 | Live Kamtibmas Map | ⚠️ layer kejadian & laporan masyarakat belum; layer unit patroli belum |
-| Crime Analytics | ❌ `/analitik` masih rencana |
-| Crime Pattern DNA | ❌ |
+| Crime Analytics | ⚠️ sebagian tercakup Crime Pattern DNA; `/analitik` masih rencana |
+| Crime Pattern DNA | ✅ |
 | AI Prediction Center | ❌ |
 | Risk Scoring Engine | ⚠️ skor ada, mesin penjalannya belum |
 | Early Warning Center | ✅ |
 | AI Recommendation | ✅ |
 | Commander Decision | ✅ |
-| Operation Center | 🔄 **sedang dikerjakan** — API selesai, layar menyusul |
+| Operation Center | ✅ `/operasi` |
 | Prediction vs Actual | ✅ |
-| Executive Brief | ❌ |
+| Executive Brief | ✅ |
 
 ---
 
@@ -54,13 +58,13 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 | # | Keluaran | Status |
 |---|---|---|
 | 1 | Peta kerawanan historis dan predictive heatmap | ⚠️ prediktif ada, historis belum sebagai layer |
-| 2 | Crime Pattern DNA | ❌ |
+| 2 | Crime Pattern DNA | ✅ |
 | 3 | Kamtibmas Risk Score per wilayah dan time-window | ✅ |
 | 4 | Early warning dan alert operasional tervalidasi | ✅ |
 | 5 | AI recommendation lintas fungsi | ✅ |
-| 6 | **Community signal dashboard** | ❌ |
+| 6 | **Community signal dashboard** | ✅ |
 | 7 | Prediction vs actual | ✅ |
-| 8 | **Executive brief harian atau per shift** | ❌ |
+| 8 | **Executive brief harian atau per shift** | ✅ harian; batas shift menunggu aturan organisasi |
 
 ---
 
@@ -122,13 +126,23 @@ mekanisme akun dan kebijakan perlindungan data*.
 
 ## 6. YANG DIKERJAKAN, BERURUT MENURUT NILAI
 
+### Sudah dikerjakan 1 September 2026
+
+| Pekerjaan | Hasil |
+|---|---|
+| Executive Brief | `/brief` — kalimat dari template, angka dari basis data |
+| Crime Pattern DNA | `/pola` — tanpa penandaan "signifikan"; kerapuhan sampel dinyatakan lewat aritmetikanya |
+| Community Intelligence | `/masyarakat` — 150 laporan, tanpa identitas pelapor, belum memengaruhi risk score |
+| Operation Center | `/operasi` — menutup lengan umpan balik |
+
+### Masih tersisa
+
 | Urutan | Pekerjaan | Alasan |
 |---|---|---|
-| 1 | **Executive Brief** | Disebut spesifikasi **tiga kali** (§3, §8, §9) dan satu-satunya keluaran yang ditujukan langsung kepada pimpinan. Seluruh datanya sudah ada — tidak perlu data baru |
-| 2 | **Crime Pattern DNA** | Satu-satunya modul dengan nilai akademik khas Taskap, dan datanya sudah lengkap: `modus`, `target_type`, `location_type`, jam, dan pengulangan per grid |
-| 3 | **Community Intelligence** | Melengkapi kaki ketiga arsitektur (data internal + AI + masyarakat). Perlu seed TASK 024 lebih dulu |
-| 4 | Layer kejadian & historis pada peta | Melengkapi MVP #3 dan #4 |
-| 5 | AI Prediction Center | Perlu endpoint `prediction:run` dan `prediction:publish` |
+| 1 | Triase laporan masyarakat (aksi tulis) | Melengkapi MVP #12; statusnya sudah ada, penyuntingannya belum |
+| 2 | Layer kejadian & historis pada peta | Melengkapi MVP #3 dan #4 |
+| 3 | AI Prediction Center | MVP #7 — perlu endpoint `prediction:run` dan `prediction:publish` |
+| 4 | Near-repeat pada Crime Pattern DNA | docs/01 §5.4 menyebutnya; definisi jendela jarak dan waktu **menunggu keputusan pemilik proyek** |
 
 **LAPOR PRESISI** (spesifikasi §4 — panic button, info sekitar, status laporan, community
 watch) tetap Tahap F sesuai ketentuan pemilik proyek: Android paling akhir.
