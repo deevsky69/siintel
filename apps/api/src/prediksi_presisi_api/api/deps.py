@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass
+from typing import Any
 
 from fastapi import Depends, Request, status
 from sqlalchemy import select
@@ -83,11 +84,14 @@ def get_current_user(
     return CurrentUser(user=user, permissions=load_effective_permissions(session, user))
 
 
-def require_permission(permission: str) -> object:
+def require_permission(permission: str) -> Any:
     """Menghasilkan dependency yang mensyaratkan satu `resource:action`.
 
     Penolakan dicatat ke audit dengan `result = DENIED` sebelum kesalahan dilempar,
     sehingga percobaan akses tanpa kewenangan meninggalkan jejak.
+
+    Mengembalikan `Any` karena hasilnya adalah penanda `Depends` yang dipasang pada
+    default argumen bertipe `CurrentUser` — idiom FastAPI.
     """
     resource, _, action = permission.partition(":")
 

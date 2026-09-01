@@ -15,6 +15,7 @@ from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.models import Permission, Role, RolePermission, User
+from prediksi_presisi_api.security.passwords import verify_password
 from prediksi_presisi_api.seeding.master import LOCKED_PASSWORD, seed_master_data
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
@@ -70,14 +71,27 @@ def test_master_seed_is_idempotent(session: Session) -> None:
     assert sum(second.inserted.values()) == 0
 
 
-def test_demo_accounts_cannot_be_used_to_log_in(session: Session) -> None:
-    """Akun demo dikunci; kredensial nyata baru diberikan pada TASK 050."""
+def test_seeding_never_creates_a_usable_password(session: Session) -> None:
+    """Seed tidak pernah menghasilkan kredensial yang dapat dipakai masuk.
+
+    Yang diuji perilaku seed, bukan keadaan database saat ini: setelah operator
+    menetapkan password lewat `pnpm user:password`, sebagian akun memang sudah aktif —
+    dan itu justru alur yang benar (TASK 050).
+    """
     seed_master_data(session)
     session.flush()
 
-    for user in session.scalars(select(User)).all():
-        assert user.password_hash == LOCKED_PASSWORD
-        assert user.must_change_password is True
+    assert LOCKED_PASSWORD == "!"  # noqa: S105 — penanda akun terkunci, bukan kata sandi
+    assert not verify_password("apa pun", LOCKED_PASSWORD)
+
+    # Akun yang masih memakai penanda terkunci wajib diminta mengganti password.
+    locked = [
+        user
+        for user in session.scalars(select(User)).all()
+        if user.password_hash == LOCKED_PASSWORD
+    ]
+    assert locked, "seluruh akun demo sudah diberi kredensial — periksa apakah itu disengaja"
+    assert all(user.must_change_password for user in locked)
 
 
 def test_scope_attributes_are_present_for_limited_roles(session: Session) -> None:

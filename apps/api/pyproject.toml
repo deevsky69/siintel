@@ -69,6 +69,7 @@ extend-immutable-calls = [
   "fastapi.Body",
   "fastapi.Header",
   "fastapi.Cookie",
+  "prediksi_presisi_api.api.deps.require_permission",
 ]
 
 [tool.ruff.lint.per-file-ignores]

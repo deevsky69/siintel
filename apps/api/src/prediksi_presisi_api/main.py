@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import __version__
 from .api.errors import register_error_handlers
 from .api.middleware import RequestContextMiddleware, SecurityHeadersMiddleware
-from .api.routers import auth, health
+from .api.routers import auth, catalog, dashboard, evaluation, health, intelligence
 from .config import get_settings
 
 API_PREFIX = "/api/v1"
@@ -57,6 +57,10 @@ def create_app() -> FastAPI:
     api = APIRouter(prefix=API_PREFIX)
     api.include_router(health.router)
     api.include_router(auth.router)
+    api.include_router(catalog.router)
+    api.include_router(intelligence.router)
+    api.include_router(dashboard.router)
+    api.include_router(evaluation.router)
     app.include_router(api)
 
     return app
