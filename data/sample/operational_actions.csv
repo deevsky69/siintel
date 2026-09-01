@@ -1,4 +1,53 @@
-action_id,decision_id,unit_id,grid_id,kecamatan,start_at,end_at,status,result
-ACT-0001,DEC-0001,UNIT-001,JKS-001,Kebayoran Baru,2025-10-03 18:00,2025-10-03 22:00,Completed,Patroli preventif sintetis.
-ACT-0002,DEC-0002,UNIT-002,JKS-020,Tebet,2025-10-07 19:00,2025-10-07 23:00,Active,Monitoring sintetis.
-ACT-0003,DEC-0003,UNIT-003,JKS-013,Pasar Minggu,2025-10-12 20:00,2025-10-13 00:00,Planned,Task sintetis untuk pengujian.
+action_id,decision_id,unit_id,grid_id,kecamatan,created_by,start_at,end_at,status,result
+ACT-0001,DEC-0003,UNIT-005,JKS-030,Jagakarsa,USER-002,2025-12-12T06:00+07:00,2025-12-12T12:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0002,DEC-0004,UNIT-006,JKS-023,Tebet,USER-002,2025-12-01T00:00+07:00,2025-12-01T06:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0003,DEC-0005,UNIT-005,JKS-026,Mampang Prapatan,USER-002,2025-12-10T18:00+07:00,2025-12-11T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0004,DEC-0009,UNIT-005,JKS-003,Kebayoran Baru,USER-002,2025-10-21T18:00+07:00,2025-10-22T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0005,DEC-0010,UNIT-004,JKS-003,Kebayoran Baru,USER-002,2025-12-11T12:00+07:00,2025-12-11T18:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0006,DEC-0012,UNIT-005,JKS-018,Pancoran,USER-002,2025-12-20T18:00+07:00,2025-12-21T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0007,DEC-0013,UNIT-006,JKS-009,Cilandak,USER-002,2025-10-12T18:00+07:00,2025-10-13T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0008,DEC-0017,UNIT-002,JKS-015,Pasar Minggu,USER-002,2025-10-31T12:00+07:00,2025-10-31T18:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0009,DEC-0018,UNIT-005,JKS-021,Tebet,USER-002,2025-10-23T12:00+07:00,2025-10-23T18:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0010,DEC-0019,UNIT-005,JKS-018,Pancoran,USER-002,2025-10-26T18:00+07:00,2025-10-27T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0011,DEC-0020,UNIT-002,JKS-017,Pancoran,USER-002,2025-10-22T00:00+07:00,2025-10-22T06:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0012,DEC-0021,UNIT-004,JKS-010,Cilandak,USER-002,2025-12-07T12:00+07:00,2025-12-07T18:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0013,DEC-0029,UNIT-001,JKS-024,Mampang Prapatan,USER-002,2025-10-27T00:00+07:00,2025-10-27T06:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0014,DEC-0030,UNIT-006,JKS-012,Cilandak,USER-002,2025-10-15T12:00+07:00,2025-10-15T18:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0015,DEC-0031,UNIT-003,JKS-004,Kebayoran Baru,USER-002,2025-12-25T18:00+07:00,2025-12-26T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0016,DEC-0032,UNIT-001,JKS-011,Cilandak,USER-002,2025-11-23T12:00+07:00,2025-11-23T18:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0017,DEC-0033,UNIT-002,JKS-018,Pancoran,USER-002,2025-12-07T18:00+07:00,2025-12-08T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0018,DEC-0038,UNIT-006,JKS-022,Tebet,USER-002,2025-11-17T18:00+07:00,2025-11-18T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0019,DEC-0039,UNIT-006,JKS-007,Kebayoran Lama,USER-002,2025-12-09T18:00+07:00,2025-12-10T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0020,DEC-0042,UNIT-006,JKS-014,Pasar Minggu,USER-002,2025-10-24T18:00+07:00,2025-10-25T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0021,DEC-0043,UNIT-003,JKS-012,Cilandak,USER-002,2026-01-01T18:00+07:00,2026-01-02T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0022,DEC-0044,UNIT-001,JKS-020,Tebet,USER-002,2025-12-12T00:00+07:00,2025-12-12T06:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0023,DEC-0045,UNIT-005,JKS-033,Jagakarsa,USER-002,2025-10-22T18:00+07:00,2025-10-23T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0024,DEC-0047,UNIT-005,JKS-033,Jagakarsa,USER-002,2025-10-21T18:00+07:00,2025-10-22T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0025,DEC-0048,UNIT-001,JKS-018,Pancoran,USER-002,2025-11-25T00:00+07:00,2025-11-25T06:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0026,DEC-0049,UNIT-002,JKS-015,Pasar Minggu,USER-002,2025-12-19T00:00+07:00,2025-12-19T06:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0027,DEC-0050,UNIT-003,JKS-031,Jagakarsa,USER-002,2025-11-05T12:00+07:00,2025-11-05T18:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0028,DEC-0051,UNIT-006,JKS-020,Tebet,USER-002,2025-11-29T18:00+07:00,2025-11-30T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0029,DEC-0053,UNIT-002,JKS-028,Setiabudi,USER-002,2025-12-16T18:00+07:00,2025-12-17T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0030,DEC-0054,UNIT-005,JKS-022,Tebet,USER-002,2025-10-16T00:00+07:00,2025-10-16T06:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0031,DEC-0056,UNIT-001,JKS-012,Cilandak,USER-002,2025-11-12T00:00+07:00,2025-11-12T06:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0032,DEC-0057,UNIT-006,JKS-008,Kebayoran Lama,USER-002,2025-11-09T18:00+07:00,2025-11-10T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0033,DEC-0059,UNIT-003,JKS-018,Pancoran,USER-002,2025-11-23T18:00+07:00,2025-11-24T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0034,DEC-0060,UNIT-001,JKS-013,Pasar Minggu,USER-002,2025-11-16T18:00+07:00,2025-11-17T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0035,DEC-0061,UNIT-002,JKS-010,Cilandak,USER-002,2025-10-25T18:00+07:00,2025-10-26T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0036,DEC-0063,UNIT-003,JKS-014,Pasar Minggu,USER-002,2025-11-15T18:00+07:00,2025-11-16T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0037,DEC-0064,UNIT-006,JKS-026,Mampang Prapatan,USER-002,2025-12-18T12:00+07:00,2025-12-18T18:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0038,DEC-0065,UNIT-005,JKS-021,Tebet,USER-002,2026-01-01T18:00+07:00,2026-01-02T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0039,DEC-0066,UNIT-003,JKS-024,Mampang Prapatan,USER-002,2025-11-27T18:00+07:00,2025-11-28T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0040,DEC-0069,UNIT-001,JKS-013,Pasar Minggu,USER-002,2025-12-22T18:00+07:00,2025-12-23T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0041,DEC-0070,UNIT-002,JKS-011,Cilandak,USER-002,2025-12-28T06:00+07:00,2025-12-28T12:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0042,DEC-0071,UNIT-003,JKS-004,Kebayoran Baru,USER-002,2025-12-29T18:00+07:00,2025-12-30T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0043,DEC-0072,UNIT-006,JKS-031,Jagakarsa,USER-002,2025-11-21T18:00+07:00,2025-11-22T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0044,DEC-0074,UNIT-006,JKS-020,Tebet,USER-002,2025-12-04T18:00+07:00,2025-12-05T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0045,DEC-0075,UNIT-003,JKS-018,Pancoran,USER-002,2025-10-11T00:00+07:00,2025-10-11T06:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0046,DEC-0077,UNIT-004,JKS-028,Setiabudi,USER-002,2025-10-26T18:00+07:00,2025-10-27T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0047,DEC-0078,UNIT-002,JKS-030,Jagakarsa,USER-002,2025-10-17T18:00+07:00,2025-10-18T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0048,DEC-0079,UNIT-003,JKS-026,Mampang Prapatan,USER-002,2025-12-12T18:00+07:00,2025-12-13T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."
+ACT-0049,DEC-0080,UNIT-005,JKS-023,Tebet,USER-002,2025-10-30T12:00+07:00,2025-10-30T18:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0050,DEC-0081,UNIT-005,JKS-004,Kebayoran Baru,USER-002,2025-10-12T18:00+07:00,2025-10-13T00:00+07:00,Completed,Kegiatan preventif terlaksana; situasi terkendali.
+ACT-0051,DEC-0082,UNIT-006,JKS-002,Kebayoran Baru,USER-002,2025-11-22T18:00+07:00,2025-11-23T00:00+07:00,Active,Penugasan sedang berjalan.
+ACT-0052,DEC-0084,UNIT-006,JKS-024,Mampang Prapatan,USER-002,2025-11-20T18:00+07:00,2025-11-21T00:00+07:00,Planned,"Penugasan dijadwalkan, menunggu pelaksanaan."

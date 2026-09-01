@@ -327,3 +327,193 @@ def _write(path: Path, rows: list[dict[str, Any]]) -> None:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
+
+
+# ======================================================================================
+# TASK 023 — data operasional
+# ======================================================================================
+
+#: Pejabat yang memutuskan pada dataset dummy. Berkas sumber memuat 'USER-DEMO-PIMPINAN'
+#: yang tidak ada di users.csv (temuan A-1), sehingga seluruh 63 keputusan gagal di-seed.
+DECIDER_CODE = "USER-001"
+
+#: Petugas yang membuat penugasan operasional (Command Center pada dataset dummy).
+ACTION_CREATOR_CODE = "USER-002"
+
+#: Jenis ancaman yang benar-benar diprediksi sistem. Kejadian di luar daftar ini tidak
+#: dihitung sebagai false negative — memasukkannya berarti menghukum model atas ancaman
+#: yang memang tidak pernah masuk cakupannya. Aturan cakupan ini PROPOSED (U-03).
+EVALUATED_THREATS = ("CURANMOR", "CURAT", "CURAS")
+
+#: Keputusan yang mengizinkan tindakan operasional lahir (CLAUDE.md §13).
+DECISIONS_ALLOWING_ACTION = ("Approved", "Modified")
+
+_ACTION_STATUS_CYCLE = ("Completed", "Completed", "Active", "Planned")
+
+_ACTION_RESULTS = {
+    "Completed": "Kegiatan preventif terlaksana; situasi terkendali.",
+    "Active": "Penugasan sedang berjalan.",
+    "Planned": "Penugasan dijadwalkan, menunggu pelaksanaan.",
+}
+
+
+def _bin_for(hour: int) -> str:
+    for label, (start, end) in WINDOW_BOUNDS.items():
+        if start <= hour < end:
+            return label
+    return "18:00-23:59"
+
+
+def regenerate_operational(directory: Path | None = None) -> dict[str, int]:
+    """Menulis ulang commander_decisions, operational_actions, dan prediction_actual.
+
+    Menutup tiga temuan audit:
+
+    - **A-1** `decision_by` menunjuk pengguna yang tidak ada (63/63 baris);
+    - **A-8** hanya 3 tindakan untuk 52 keputusan yang menyetujui — dan 2 di antaranya
+      justru lahir dari keputusan `Rejected`, yang berarti tindakan operasional pernah
+      dibuat tanpa persetujuan;
+    - **A-7** evaluasi menyentuh prediksi `Draft` dan tidak memuat satu pun
+      `False Negative`, sehingga recall tidak dapat dihitung sama sekali.
+    """
+    target_dir = directory or SAMPLE_DATA_DIR
+
+    def read(name: str) -> list[dict[str, str]]:
+        with (target_dir / name).open(encoding="utf-8", newline="") as handle:
+            return list(csv.DictReader(handle))
+
+    decisions = read("commander_decisions.csv")
+    recommendations = read("recommendations.csv")
+    predictions = read("predictions.csv")
+    incidents = read("crime_incidents.csv")
+    evaluations = read("prediction_actual.csv")
+    units = read("police_units.csv")
+
+    prediction_by_code = {row["prediction_id"]: row for row in predictions}
+    recommendation_by_code = {row["recommendation_id"]: row for row in recommendations}
+    units_by_function: dict[str, list[str]] = {}
+    for unit in units:
+        units_by_function.setdefault(unit["function"].upper(), []).append(unit["unit_id"])
+
+    # ---- A-1: keputusan menunjuk pengguna yang benar-benar ada -----------------------
+    for row in decisions:
+        row["decision_by"] = DECIDER_CODE
+        if row["decision"] == "Modified":
+            # CHECK database mensyaratkan isi baru bila keputusannya MODIFIED (U-07).
+            row["modified_text"] = (
+                "Disesuaikan komandan: fokuskan kegiatan pada jam puncak dan tambah satu unit."
+            )
+        else:
+            row["modified_text"] = ""
+
+    # ---- A-8: tindakan hanya lahir dari keputusan yang menyetujui ---------------------
+    actions: list[dict[str, Any]] = []
+    for index, decision in enumerate(
+        sorted(
+            (row for row in decisions if row["decision"] in DECISIONS_ALLOWING_ACTION),
+            key=lambda row: row["decision_id"],
+        )
+    ):
+        recommendation = recommendation_by_code.get(decision["recommendation_id"])
+        if recommendation is None:
+            message = f"commander_decisions.csv:{decision['decision_id']}: rekomendasi tidak ada"
+            raise SeedError(message)
+
+        prediction = prediction_by_code.get(recommendation["prediction_id"])
+        if prediction is None:
+            message = (
+                f"recommendations.csv:{recommendation['recommendation_id']}: prediksi tidak ada"
+            )
+            raise SeedError(message)
+
+        function = recommendation["recommended_function"].upper()
+        candidates = units_by_function.get(function) or units_by_function["SAMAPTA"]
+        status = _ACTION_STATUS_CYCLE[index % len(_ACTION_STATUS_CYCLE)]
+
+        actions.append(
+            {
+                "action_id": f"ACT-{index + 1:04d}",
+                "decision_id": decision["decision_id"],
+                "unit_id": candidates[index % len(candidates)],
+                "grid_id": prediction["grid_id"],
+                "kecamatan": prediction["kecamatan"],
+                "created_by": ACTION_CREATOR_CODE,
+                "start_at": prediction["window_start"],
+                "end_at": prediction["window_end"],
+                "status": status,
+                "result": _ACTION_RESULTS[status],
+            }
+        )
+
+    # ---- A-7: evaluasi hanya atas prediksi terbit, dan memuat false negative ----------
+    evaluable = {
+        code
+        for code, row in prediction_by_code.items()
+        if row["status"] in {"Published", "Validated"}
+    }
+    kept = [row for row in evaluations if row["prediction_id"] in evaluable]
+    dropped = len(evaluations) - len(kept)
+
+    for row in kept:
+        row["actual_incident_id"] = ""
+        prediction = prediction_by_code[row["prediction_id"]]
+        row["actual_window_start"] = prediction["window_start"]
+        row["actual_window_end"] = prediction["window_end"]
+
+    predicted_cells = {
+        (row["grid_id"], row["threat_type"], row["time_window"], row["prediction_date"])
+        for row in predictions
+    }
+    period = sorted(row["prediction_date"] for row in predictions)
+    first_day, last_day = period[0], period[-1]
+
+    # Nomor baru diambil dari nomor tertinggi yang sudah ada, bukan dari jumlah baris:
+    # kode lama memiliki celah karena sebagian baris dibuang, sehingga menghitung dari
+    # jumlah baris akan menabrak kode yang sudah terpakai.
+    used_numbers = [int(row["evaluation_id"].split("-")[-1]) for row in kept]
+    next_number = max(used_numbers, default=0) + 1
+    false_negatives = 0
+    for incident in incidents:
+        if not first_day <= incident["incident_date"] <= last_day:
+            continue
+        if incident["incident_type"] not in EVALUATED_THREATS:
+            continue
+
+        window = _bin_for(int(incident["incident_time"].split(":")[0]))
+        cell = (incident["grid_id"], incident["incident_type"], window, incident["incident_date"])
+        if cell in predicted_cells:
+            continue
+
+        day = date.fromisoformat(incident["incident_date"])
+        start, end = _window_bounds(day, window)
+
+        kept.append(
+            {
+                "evaluation_id": f"EVA-{next_number:05d}",
+                "prediction_id": "",
+                "evaluation_date": incident["incident_date"],
+                "actual_event": "True",
+                "actual_threat_type": incident["incident_type"],
+                "actual_grid_id": incident["grid_id"],
+                "actual_time_window": window,
+                "actual_window_start": _iso(start),
+                "actual_window_end": _iso(end),
+                "match_type": "False Negative",
+                "actual_incident_id": incident["incident_id"],
+                "notes": "Kejadian nyata pada sel tanpa prediksi terbit.",
+            }
+        )
+        next_number += 1
+        false_negatives += 1
+
+    _write(target_dir / "commander_decisions.csv", decisions)
+    _write(target_dir / "operational_actions.csv", actions)
+    _write(target_dir / "prediction_actual.csv", kept)
+
+    return {
+        "commander_decisions": len(decisions),
+        "operational_actions": len(actions),
+        "prediction_actual": len(kept),
+        "evaluations_dropped_draft": dropped,
+        "false_negatives_added": false_negatives,
+    }
