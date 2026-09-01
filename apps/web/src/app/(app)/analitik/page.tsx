@@ -16,7 +16,10 @@ export default function AnalyticsPage() {
         },
       ]}
       ready={[
-        { label: "1.200 kejadian dengan waktu, jenis, dan lokasi grid" },
+        {
+          label: "Crime Pattern DNA — where, when, how, target, repeat per jenis gangguan",
+          href: "/pola",
+        },
         {
           label: "2.019 sel risiko per kecamatan, jenis ancaman, dan jendela waktu",
           href: "/peta",

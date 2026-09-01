@@ -19,7 +19,9 @@ from .api.errors import register_error_handlers
 from .api.middleware import RequestContextMiddleware, SecurityHeadersMiddleware
 from .api.routers import (
     auth,
+    brief,
     catalog,
+    community,
     dashboard,
     decisions,
     evaluation,
@@ -27,6 +29,7 @@ from .api.routers import (
     intelligence,
     map_view,
     operations,
+    patterns,
     warning_actions,
 )
 from .config import get_settings
@@ -69,6 +72,7 @@ def create_app() -> FastAPI:
     api.include_router(health.router)
     api.include_router(auth.router)
     api.include_router(catalog.router)
+    api.include_router(community.router)
     api.include_router(intelligence.router)
     api.include_router(decisions.router)
     api.include_router(operations.router)
@@ -76,6 +80,8 @@ def create_app() -> FastAPI:
     api.include_router(map_view.router)
     api.include_router(dashboard.router)
     api.include_router(evaluation.router)
+    api.include_router(patterns.router)
+    api.include_router(brief.router)
     app.include_router(api)
 
     return app

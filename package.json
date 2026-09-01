@@ -55,6 +55,7 @@
     "prod:preview:off": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml up -d --force-recreate web",
     "prod:up:tls": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.letsencrypt.yml up -d",
     "prod:up:tunnel": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.cloudflare.yml up -d",
-    "prod:tunnel:logs": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.cloudflare.yml logs -f cloudflared"
+    "prod:tunnel:logs": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.cloudflare.yml logs -f cloudflared",
+    "seed:public": "cd apps/api && uv run python -m prediksi_presisi_api.seeding public"
   }
 }

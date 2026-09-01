@@ -84,6 +84,28 @@ const ICONS: Record<string, (props: IconProps) => React.ReactElement> = {
       <circle cx="12" cy="12" r="3.2" />
     </Svg>
   ),
+  brief: (p) => (
+    <Svg {...p}>
+      <path d="M6 3h9l4 4v14H6z" />
+      <path d="M15 3v4h4" />
+      <path d="M9 12h6M9 16h4" />
+    </Svg>
+  ),
+  pattern: (p) => (
+    <Svg {...p}>
+      <path d="M6 4v6a3 3 0 0 0 6 0V4" />
+      <path d="M12 20v-6a3 3 0 0 1 6 0v6" />
+      <path d="M6.5 8h5M12.5 16h5" />
+    </Svg>
+  ),
+  community: (p) => (
+    <Svg {...p}>
+      <circle cx="9" cy="9" r="3" />
+      <path d="M3.5 20a5.5 5.5 0 0 1 11 0" />
+      <path d="M16 6.5a3 3 0 0 1 0 5.8" />
+      <path d="M17.5 20a5.5 5.5 0 0 0-2-4.2" />
+    </Svg>
+  ),
   admin: (p) => (
     <Svg {...p}>
       <circle cx="12" cy="12" r="3" />
