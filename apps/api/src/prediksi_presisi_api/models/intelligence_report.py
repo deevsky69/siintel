@@ -47,11 +47,11 @@ class IntelligenceReport(TimestampMixin, Base):
     __table_args__ = (
         CheckConstraint(
             "confidence IS NULL OR (confidence BETWEEN 0 AND 100)",
-            name="ck_intelligence_reports_confidence_range",
+            name="confidence_range",
         ),
         CheckConstraint(
             "urgency IS NULL OR (urgency BETWEEN 0 AND 100)",
-            name="ck_intelligence_reports_urgency_range",
+            name="urgency_range",
         ),
         Index("ix_intelligence_reports_report_date", "report_date"),
         Index("ix_intelligence_reports_location", "location_id"),

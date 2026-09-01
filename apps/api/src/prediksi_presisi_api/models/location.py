@@ -17,6 +17,7 @@ from ..db import Base
 from .base import TimestampMixin, uuid_pk
 
 if TYPE_CHECKING:
+    from .citizen_report import CitizenReport
     from .crime_incident import CrimeIncident
     from .intelligence_report import IntelligenceReport
     from .patrol_activity import PatrolActivity
@@ -58,6 +59,7 @@ class Location(TimestampMixin, Base):
     crime_incidents: Mapped[list[CrimeIncident]] = relationship(back_populates="location")
     intelligence_reports: Mapped[list[IntelligenceReport]] = relationship(back_populates="location")
     patrol_activities: Mapped[list[PatrolActivity]] = relationship(back_populates="location")
+    citizen_reports: Mapped[list[CitizenReport]] = relationship(back_populates="location")
 
     __table_args__ = (
         Index("ix_locations_polsek", "polsek"),

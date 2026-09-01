@@ -29,7 +29,19 @@ CORE_TABLES = {
     "crime_incidents",
     "intelligence_reports",
     "patrol_activity",
+    "citizen_reports",
+    "public_alerts",
+    "community_feedback",
 }
+
+_SAMPLE_REPORT = text("""
+    INSERT INTO citizen_reports
+        (code, reported_at, category, latitude, longitude, geom, status)
+    VALUES
+        ('RPT-IT', now(), 'Kerawanan Lingkungan', -6.226806, 106.798560,
+         ST_SetSRID(ST_MakePoint(106.798560, -6.226806), 4326), 'RECEIVED')
+    RETURNING report_id
+""")
 
 _SAMPLE_LOCATION = text("""
     INSERT INTO locations
@@ -52,7 +64,7 @@ def test_migrations_are_applied(engine: Engine) -> None:
     with engine.connect() as connection:
         revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
-    assert revision == "0002", "database belum di-migrate: jalankan `pnpm db:migrate`"
+    assert revision == "0003", "database belum di-migrate: jalankan `pnpm db:migrate`"
 
 
 def test_postgis_and_pgcrypto_are_installed(engine: Engine) -> None:
@@ -122,6 +134,52 @@ def test_foreign_key_restrict_is_enforced(engine: Engine) -> None:
 
         with pytest.raises(DatabaseError):
             connection.execute(text("DELETE FROM locations WHERE code = 'LOC-IT'"))
+
+        connection.rollback()
+
+
+def test_citizen_report_can_be_created_without_location(engine: Engine) -> None:
+    # Laporan masuk dengan koordinat bebas; location_id baru diisi setelah geo-processing.
+    with engine.begin() as connection:
+        report_id = connection.execute(_SAMPLE_REPORT).scalar_one()
+
+        assert report_id is not None
+        location_id = connection.execute(
+            text("SELECT location_id FROM citizen_reports WHERE code = 'RPT-IT'")
+        ).scalar_one()
+        assert location_id is None
+
+        connection.rollback()
+
+
+def test_community_feedback_requires_existing_report(engine: Engine) -> None:
+    with engine.begin() as connection:
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO community_feedback
+                        (code, report_id, feedback_type, submitted_at, status)
+                    VALUES
+                        ('FDB-IT', gen_random_uuid(), 'Koreksi', now(), 'NEW')
+                """)
+            )
+
+        connection.rollback()
+
+
+def test_public_alert_window_order_is_enforced(engine: Engine) -> None:
+    with engine.begin() as connection:
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO public_alerts
+                        (code, severity, threat_type, area_text, window_start, window_end,
+                         status, public_message)
+                    VALUES
+                        ('PAL-IT', 'WARNING', 'CURAT', 'Kebayoran Baru',
+                         now(), now() - interval '1 hour', 'ACTIVE', 'Imbauan uji')
+                """)
+            )
 
         connection.rollback()
 

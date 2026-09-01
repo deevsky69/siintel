@@ -12,14 +12,27 @@ from __future__ import annotations
 from collections.abc import Iterator
 from functools import lru_cache
 
-from sqlalchemy import Engine, create_engine
+from sqlalchemy import Engine, MetaData, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from .config import get_settings
 
+#: Nama constraint dibuat deterministik agar model dan migration tidak pernah
+#: memakai nama berbeda untuk objek yang sama, dan agar `alembic revision --autogenerate`
+#: menghasilkan nama yang konsisten.
+NAMING_CONVENTION = {
+    "pk": "pk_%(table_name)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "ix": "ix_%(table_name)s_%(column_0_N_name)s",
+}
+
 
 class Base(DeclarativeBase):
     """Base class seluruh model ORM."""
+
+    metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 
 class DatabaseNotConfiguredError(RuntimeError):

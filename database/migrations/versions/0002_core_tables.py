@@ -95,7 +95,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["location_id"],
             ["locations.location_id"],
-            name="fk_crime_incidents_location",
+            name="fk_crime_incidents_location_id",
             ondelete="RESTRICT",
         ),
     )
@@ -126,16 +126,16 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["location_id"],
             ["locations.location_id"],
-            name="fk_intelligence_reports_location",
+            name="fk_intelligence_reports_location_id",
             ondelete="RESTRICT",
         ),
         sa.CheckConstraint(
             "confidence IS NULL OR (confidence BETWEEN 0 AND 100)",
-            name="ck_intelligence_reports_confidence_range",
+            name="confidence_range",
         ),
         sa.CheckConstraint(
             "urgency IS NULL OR (urgency BETWEEN 0 AND 100)",
-            name="ck_intelligence_reports_urgency_range",
+            name="urgency_range",
         ),
     )
     op.create_index("ix_intelligence_reports_report_date", "intelligence_reports", ["report_date"])
@@ -159,13 +159,13 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["unit_id"],
             ["police_units.unit_id"],
-            name="fk_patrol_activity_unit",
+            name="fk_patrol_activity_unit_id",
             ondelete="RESTRICT",
         ),
         sa.ForeignKeyConstraint(
             ["location_id"],
             ["locations.location_id"],
-            name="fk_patrol_activity_location",
+            name="fk_patrol_activity_location_id",
             ondelete="RESTRICT",
         ),
     )

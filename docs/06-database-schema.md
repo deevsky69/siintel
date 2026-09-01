@@ -15,6 +15,27 @@ Definisi field: `docs/02-data-dictionary.md`. Relasi: `docs/04-erd.md`.
 | Geospasial | GeoAlchemy2 (`geometry(Point,4326)`) |
 | Migration | Alembic — **satu-satunya** cara mengubah schema (CLAUDE.md §20) |
 | Ekstensi wajib | `postgis`, `pgcrypto` (untuk `gen_random_uuid()`) |
+| Penamaan constraint | Naming convention pada `Base.metadata` (lihat §1.2) |
+
+### 1.2 Naming convention
+
+`TECHNICAL DECISION` — nama constraint dibuat deterministik agar model dan migration tidak pernah
+memakai nama berbeda untuk objek yang sama, dan agar `alembic revision --autogenerate` konsisten:
+
+```python
+{
+    "pk": "pk_%(table_name)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "ix": "ix_%(table_name)s_%(column_0_N_name)s",
+}
+```
+
+Karena `ck` **menyusun** nama dari `constraint_name`, `CheckConstraint` ditulis dengan nama pendek
+(`name="confidence_range"`) baik di model maupun di migration; prefix `ck_<tabel>_` ditambahkan
+otomatis. Menulis nama lengkap akan menghasilkan prefix ganda.
+Nama index ditulis eksplisit karena sebagian index gabungan tidak mengikuti pola kolom.
 
 Migration harus reproducible dari database kosong. Tidak ada perubahan manual pada database sebagai bagian workflow normal.
 
@@ -149,6 +170,7 @@ CHECK (
 | `risk_score = round(Σ(bobot × faktor))` | Bobot belum ditetapkan (U-02). Memasang constraint sekarang berarti mengunci angka yang belum disetujui (CLAUDE.md §11). Dipasang setelah bobot disetujui. |
 | Batas `risk_class` terhadap `risk_score` | Threshold belum ditetapkan (U-01). Sampai itu, `risk_class` divalidasi terhadap daftar nilai saja. |
 | Geometri poligon per grid | Ukuran grid & sumber batas belum ditetapkan (U-04). |
+| `public_alerts.warning_id → early_warnings` | Tabel `early_warnings` baru dibuat pada TASK 013. Kolomnya sudah ada sejak TASK 012; FK dipasang pada migration TASK 013. Sampai saat itu keterkaitan alert publik dengan peringatan internal **belum** ditegakkan database. |
 
 ---
 
