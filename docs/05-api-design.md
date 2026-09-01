@@ -215,10 +215,35 @@ Rekomendasi di luar cakupan wilayah pengguna dijawab `404`, bukan `403`.
 |---|---|---|
 | GET | `/operations`, `/operations/{id}` | `operation:read` |
 | POST | `/operations` | `operation:write` |
-| PATCH | `/operations/{id}` | `operation:write` |
-| POST | `/operations/{id}/result` | `operation:write` |
+| GET | `/operations/pending-decisions` | `operation:read` |
+| POST | `/operations/{code}/result` | `operation:write` |
+| PATCH | `/operations/{id}` | `operation:write` — **belum dibuat** |
 
-`POST /operations` menolak `decision_id` yang tidak berstatus `APPROVED`/`MODIFIED` → `422 BUSINESS_RULE_VIOLATION`.
+`POST /operations` menolak keputusan yang tidak berstatus `APPROVED`/`MODIFIED` → `422 BUSINESS_RULE_VIOLATION`.
+
+**Setelah implementasi (TASK 131):**
+
+Badan permintaan memakai **kode**, bukan UUID: `{decision_code, unit_code, start_at?, notes?}`.
+Seluruh API lain juga memakai kode pada permukaannya, dan kode dapat dibaca manusia saat paparan.
+
+`location_id` **tidak** diterima dari klien. Lokasi penugasan diambil dari prediksi yang
+mendasari rekomendasi, agar tindakan tetap dapat ditelusuri ke wilayah yang diprediksi dan tidak
+dapat diarahkan ke wilayah lain lewat permintaan.
+
+Satu keputusan menghasilkan **paling banyak satu** tindakan; permintaan kedua dijawab `409`.
+
+`POST /operations/{code}/result` menerima `{status, result, end_at?}` dengan `status` berupa
+`COMPLETED` atau `CANCELLED`. Bila `end_at` tidak lebih akhir daripada `start_at`, permintaan
+dijawab `422` — bukan diperbaiki diam-diam. Keadaan ini lazim saat demo karena jam acuan beku
+(SDL-16), dan menambahkan durasi karangan agar constraint lolos akan memasukkan angka palsu ke
+dalam data yang kelak dipakai evaluasi. Tindakan yang sudah berstatus akhir dijawab `409`.
+
+`GET /operations/pending-decisions` menampilkan keputusan `APPROVED`/`MODIFIED` yang belum
+memiliki tindakan — keadaan "sudah diputus tetapi tidak pernah dijalankan", yang sebelumnya
+tidak dapat dilihat dari mana pun.
+
+Audit: `CREATE_OPERATION`, `RECORD_OPERATION_RESULT` (termasuk `result = FAILED` untuk transisi
+yang ditolak), resource `operation`.
 Audit: `CREATE_OPERATIONAL_ACTION`, `UPDATE_OPERATIONAL_ACTION`.
 
 ### 2.10 Evaluasi

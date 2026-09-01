@@ -1,6 +1,6 @@
 # EVALUASI PERAN & KANAL MASYARAKAT — BAHAN KEPUTUSAN
 
-Status: **PROPOSED — memerlukan keputusan pemilik proyek** (CLAUDE.md §2C)
+Status: **DIPUTUSKAN 1 September 2026** — lihat §6
 Tanggal: 1 September 2026
 
 ---
@@ -192,3 +192,41 @@ Masyarakat **tidak** menjadi peran keenam — ia kanal terpisah tanpa akun (§3)
    b. Seed dan layar laporan masyarakat (TASK 024), termasuk kanal pengiriman publik;
    c. Layar laporan intelijen dan patroli;
    d. Layar audit trail.
+
+
+---
+
+## 6. KEPUTUSAN PEMILIK PROYEK — 1 September 2026
+
+| # | Pertanyaan | Keputusan |
+|---|---|---|
+| 1 | Gabungkan Analyst dan Command Center? | **TIDAK.** Enam peran dipertahankan |
+| 2 | Masyarakat sebagai kanal terpisah tanpa akun? | **YA** |
+| 3 | Koreksi cakupan Fungsi menurut §4.3 pilihan A? | **YA** |
+| 4 | Prioritas berikutnya | **(a)** layar tindakan operasional dan hasil nyata |
+
+### Yang sudah dikerjakan menyusul keputusan ini
+
+**Keputusan 3 — selesai.** Cakupan `OWN_FUNCTION` pada peran Fungsi dipersempit ke lima
+resource yang datanya benar-benar punya jalur menuju sebuah fungsi. `crime`, `dashboard`,
+`analytics`, dan `evaluation` dipindah ke `ALL`.
+
+`intelligence:read/write`, `citizen_report:read`, dan `audit:read` **dicabut sementara**,
+bukan dinaikkan ke `ALL`. Menaikkannya berarti setiap petugas fungsi membaca seluruh
+laporan intelijen dan seluruh jejak audit termasuk keputusan Pimpinan — itu pelebaran
+kewenangan, keputusan pemilik proyek, bukan koreksi teknis. **Ini pertanyaan terbuka
+berikutnya:** apakah peran Fungsi seharusnya memiliki keempat permission itu, dan dengan
+cakupan apa.
+
+Dua cacat lain ikut terungkap dan diperbaiki: seed RBAC hanya menyisipkan sehingga berkas
+konfigurasi tidak pernah dapat mencabut apa pun, dan sebuah test memeriksa isi tabel
+padahal seharusnya menguji perilaku seed.
+
+**Keputusan 1 — dampaknya.** Karena peran tetap enam, pemisahan Analyst dan Command
+Center dipertahankan. Perlu dicatat bahwa risiko "menilai pekerjaan sendiri" tetap ada di
+dalam peran Analyst sendiri, yang memegang `crime:write` dan `evaluation:run` sekaligus.
+Bila kelak ingin ditutup, garisnya bukan antara Analyst dan Command Center, melainkan
+antara yang mencatat `prediction_actual` dan yang menjalankan evaluasi.
+
+**Keputusan 4 — sedang dikerjakan.** API tindakan operasional dan hasil nyata sudah ada
+(TASK 131); layarnya menyusul.
