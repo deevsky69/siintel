@@ -1,0 +1,31 @@
+# BOBOT FAKTOR RISK SCORE — PREDIKSI PRESISI
+#
+# Status: DEMO / PROPOSED — REQUIRES USER APPROVAL (U-02).
+#
+# Angka di bawah **bukan** hasil penelitian dan **bukan** requirement.
+# Nilainya hanya diperlukan agar data dummy konsisten secara aritmetika:
+# tanpa bobot yang dinyatakan, hubungan antara faktor dan skor tidak dapat diperiksa
+# sama sekali (temuan audit S-04: 1.822 dari 1.848 baris tidak konsisten).
+#
+# CLAUDE.md §11 mengizinkan hal ini secara eksplisit:
+# "Jika dummy data memerlukan threshold, tandai sebagai DEMO / PROPOSED."
+#
+# Hubungan yang berlaku:
+#
+#     risk_score = round( Σ ( bobot_i × faktor_i ) )      dengan Σ bobot_i = 1
+#
+# Setiap baris `risk_scores` menyimpan `weights_version` sehingga skor lama tetap dapat
+# ditelusuri ke bobot yang dipakai saat itu, meskipun bobotnya kelak diganti.
+#
+# Constraint database untuk hubungan ini SENGAJA belum dipasang (docs/06 §3):
+# memasangnya sekarang berarti mengunci angka yang belum disetujui siapa pun.
+
+version: dummy-v1
+status: DEMO / PROPOSED
+
+weights:
+  historical_factor: 0.30 # kepadatan kejadian historis
+  recent_trend_factor: 0.25 # tren kejadian terkini
+  temporal_factor: 0.20 # kesesuaian dengan pola waktu
+  spatial_factor: 0.15 # konsentrasi spasial / near-repeat
+  context_factor: 0.10 # faktor kontekstual (kegiatan, POI, dsb.)

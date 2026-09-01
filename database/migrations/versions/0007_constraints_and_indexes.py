@@ -110,8 +110,10 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     for table in ("locations", "citizen_reports"):
-        op.drop_constraint(f"ck_{table}_latitude_range", table, type_="check")
-        op.drop_constraint(f"ck_{table}_longitude_range", table, type_="check")
+        # Nama pendek: naming convention yang menyusun prefix `ck_<tabel>_`.
+        # Menulis nama lengkap menghasilkan prefix ganda (ck_locations_ck_locations_...).
+        op.drop_constraint("latitude_range", table, type_="check")
+        op.drop_constraint("longitude_range", table, type_="check")
 
     op.execute(_DROP_UPDATED_AT_TRIGGERS)
     op.execute("DROP FUNCTION IF EXISTS set_updated_at()")

@@ -76,8 +76,18 @@ def parse_time(value: str, where: str) -> time:
 
 
 def parse_datetime(value: str, where: str) -> datetime:
-    """Menerima format `T` maupun spasi, lalu menormalkan ke UTC (docs/02 K-3)."""
+    """Menerima ISO ber-offset, format `T`, maupun spasi; hasilnya selalu UTC (docs/02 K-3)."""
     raw = value.strip()
+
+    try:
+        parsed = datetime.fromisoformat(raw)
+    except ValueError:
+        pass
+    else:
+        # Nilai tanpa offset dianggap waktu lokal Jakarta.
+        aware = parsed if parsed.tzinfo else parsed.replace(tzinfo=SOURCE_TIMEZONE)
+        return aware.astimezone(UTC)
+
     for fmt in _DATETIME_FORMATS:
         try:
             naive = datetime.strptime(raw, fmt)

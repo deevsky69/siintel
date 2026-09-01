@@ -1,0 +1,33 @@
+# THRESHOLD KELAS RISIKO & PERINGATAN DINI — PREDIKSI PRESISI
+#
+# Status: DEMO / PROPOSED — REQUIRES USER APPROVAL (U-01).
+#
+# Angka di bawah **bukan** requirement. Nilainya diambil dari ambang yang secara de facto
+# sudah tertanam di dataset dummy (temuan audit U-01), lalu dinyatakan secara terbuka di sini.
+#
+# Menuliskannya sebagai konfigurasi lebih jujur daripada membiarkannya tersembunyi di data:
+# ambang yang tidak tertulis tetap bekerja, tetapi tidak dapat ditinjau maupun diubah.
+#
+# Threshold TIDAK dipasang sebagai CHECK constraint (docs/06 §3) dan TIDAK di-hardcode
+# di kode mana pun (CLAUDE.md §12). Setiap peringatan menyimpan `threshold_version`.
+
+version: dummy-v1
+status: DEMO / PROPOSED
+
+# Kelas risiko berdasarkan risk_score 0–100.
+risk_classes:
+  - { class: LOW, min: 0, max: 44 }
+  - { class: MODERATE, min: 45, max: 69 }
+  - { class: HIGH, min: 70, max: 84 }
+  - { class: CRITICAL, min: 85, max: 100 }
+
+# Peringatan dini terbit bila risk_score prediksi mencapai `minimum_score`.
+early_warning:
+  minimum_score: 70
+  severities:
+    - { severity: WATCH, min: 60, max: 69 }
+    - { severity: WARNING, min: 70, max: 84 }
+    - { severity: CRITICAL, min: 85, max: 100 }
+
+# Catatan: level LOW dan WATCH tidak pernah muncul pada dataset dummy karena peringatan
+# hanya dibuat pada skor >= 70. Ini terlihat jelas hanya setelah ambangnya ditulis di sini.

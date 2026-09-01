@@ -34,6 +34,8 @@
     "db:sql": "cd apps/api && uv run alembic upgrade head --sql",
     "seed:master": "cd apps/api && uv run python -m prediksi_presisi_api.seeding master",
     "seed:crime": "cd apps/api && uv run python -m prediksi_presisi_api.seeding crime",
-    "seed": "cd apps/api && uv run python -m prediksi_presisi_api.seeding all"
+    "seed": "cd apps/api && uv run python -m prediksi_presisi_api.seeding all",
+    "seed:analytics": "cd apps/api && uv run python -m prediksi_presisi_api.seeding analytics",
+    "seed:regenerate": "cd apps/api && uv run python -m prediksi_presisi_api.seeding regenerate"
   }
 }

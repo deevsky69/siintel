@@ -3,6 +3,8 @@
 Perintah:
   master   Memuat locations, police_units, roles, permissions, role_permissions, users (TASK 020)
   crime    Memuat crime_incidents, intelligence_reports, patrol_activity (TASK 021)
+  analytics  Memuat risk_scores, predictions, early_warnings, recommendations (TASK 022)
+  regenerate Membangkitkan ulang data dummy analitik pada data/sample (TASK 022)
   all      Menjalankan seluruh perintah di atas secara berurutan
 
 Seluruh perintah berjalan dalam satu transaksi: bila ada satu baris yang melanggar
@@ -15,9 +17,11 @@ import argparse
 import sys
 
 from ..db import get_session_factory
+from .analytics import seed_analytics_data
 from .crime import seed_crime_data
 from .errors import SeedError
 from .master import SeedSummary, seed_master_data
+from .regenerate import regenerate
 from .taxonomy import load_taxonomy
 
 
@@ -26,9 +30,22 @@ def main(argv: list[str] | None = None) -> int:
         prog="seeding", description="Memuat data dummy PREDIKSI PRESISI"
     )
     parser.add_argument(
-        "command", choices=["master", "crime", "all"], help="kelompok data yang dimuat"
+        "command",
+        choices=["master", "crime", "analytics", "all", "regenerate"],
+        help="kelompok data yang dimuat",
     )
     arguments = parser.parse_args(argv)
+
+    if arguments.command == "regenerate":
+        try:
+            counts = regenerate()
+        except SeedError as error:
+            print(f"\nPEMBANGKITAN DIHENTIKAN: {error}", file=sys.stderr)
+            return 1
+        print("Data dummy analitik dibangkitkan ulang:")
+        for name, value in counts.items():
+            print(f"  {name:<22} {value}")
+        return 0
 
     taxonomy = load_taxonomy()
     print(f"Taksonomi: versi {taxonomy.version}")
@@ -40,6 +57,8 @@ def main(argv: list[str] | None = None) -> int:
                 summary.merge(seed_master_data(session, taxonomy))
             if arguments.command in {"crime", "all"}:
                 summary.merge(seed_crime_data(session, taxonomy))
+            if arguments.command in {"analytics", "all"}:
+                summary.merge(seed_analytics_data(session, taxonomy))
     except SeedError as error:
         print(f"\nSEED DIHENTIKAN: {error}", file=sys.stderr)
         return 1
