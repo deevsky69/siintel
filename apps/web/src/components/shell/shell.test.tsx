@@ -25,17 +25,24 @@ describe("shell aplikasi", () => {
   });
 
   it("menampilkan identitas sistem dan satuan wilayah", () => {
-    render(<Topbar />);
+    render(<Topbar name="demo.pimpinan" role="Pimpinan" />);
 
     expect(screen.getByText("PREDIKSI PRESISI")).toBeDefined();
     expect(screen.getByText(/polres metro jakarta selatan/i)).toBeDefined();
   });
 
-  it("menyatakan terbuka bahwa pengguna belum masuk", () => {
-    // Identitas palsu yang tampak nyata akan menyesatkan saat paparan.
-    render(<Topbar />);
+  it("menampilkan pengguna yang sedang masuk beserta perannya", () => {
+    // Identitas berasal dari /auth/me, bukan nilai yang ditanam di kode.
+    render(<Topbar name="demo.pimpinan" role="Pimpinan" />);
 
-    expect(screen.getByText(/belum masuk/i)).toBeDefined();
+    expect(screen.getByText("demo.pimpinan")).toBeDefined();
+    expect(screen.getByText("Pimpinan")).toBeDefined();
+  });
+
+  it("menyediakan jalan keluar dari sesi", () => {
+    render(<Topbar name="demo.pimpinan" role="Pimpinan" />);
+
+    expect(screen.getByRole("button", { name: /keluar/i })).toBeDefined();
   });
 
   it("panel memakai judul sebagai heading", () => {

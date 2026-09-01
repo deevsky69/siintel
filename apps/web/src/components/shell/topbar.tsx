@@ -1,12 +1,7 @@
 import { Clock } from "./clock";
 
-/**
- * Topbar: identitas sistem, satuan wilayah, jam WIB, dan pengguna aktif.
- *
- * Identitas pengguna masih placeholder sampai autentikasi hidup (TASK 050);
- * ditandai jelas agar tidak terbaca sebagai data nyata.
- */
-export function Topbar() {
+/** Topbar: identitas sistem, satuan wilayah, jam WIB, dan pengguna aktif. */
+export function Topbar({ name, role }: { name: string; role: string }) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-6 border-b border-base-800 bg-base-900/70 px-5">
       <div className="flex items-center gap-3">
@@ -33,10 +28,17 @@ export function Topbar() {
         <Clock />
         <div className="flex items-center gap-2.5 border-l border-base-800 pl-5">
           <div className="text-right leading-tight">
-            <div className="text-xs font-semibold text-ink">Pengguna Demo</div>
-            <div className="text-[10px] text-ink-muted">belum masuk — TASK 050</div>
+            <div className="text-xs font-semibold text-ink">{name}</div>
+            <div className="text-[10px] uppercase tracking-wider text-ink-muted">{role}</div>
           </div>
-          <div className="h-8 w-8 rounded-full border border-base-700 bg-base-800" />
+          <form action="/api/auth/logout" method="post">
+            <button
+              type="submit"
+              className="rounded border border-base-700 px-2.5 py-1.5 text-[10px] uppercase tracking-wider text-ink-muted transition hover:border-accent/40 hover:text-accent"
+            >
+              Keluar
+            </button>
+          </form>
         </div>
       </div>
     </header>
