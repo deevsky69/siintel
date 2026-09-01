@@ -13,6 +13,12 @@
 #   docker network ls
 #     -> nama network milik proxy: `coolify` (bridge, attachable)
 #
+# CATATAN PORT PUBLIK SERVER INI (1 September 2026):
+#   Router meneruskan 111.68.123.134:8997 → 80 dan :8998 → 443. Port 80 dan 443
+#   sendiri TIDAK diteruskan, sehingga Let's Encrypt tidak dapat memverifikasi
+#   domain (HTTP-01 selalu menghubungi port 80, TLS-ALPN-01 selalu port 443).
+#   Selama itu belum berubah, sertifikat sah tidak akan terbit. Lihat docs/10 §3.
+#
 #   docker inspect coolify-proxy
 #     -> image      : traefik:v3.6
 #     -> port host  : 80, 443, 8080, 443/udp  (SUDAH DIPAKAI — jangan diikat lagi)
@@ -48,12 +54,22 @@ services:
       traefik.http.routers.predpol-web-http.middlewares: predpol-https-redirect
       traefik.http.middlewares.predpol-https-redirect.redirectscheme.scheme: https
       traefik.http.middlewares.predpol-https-redirect.redirectscheme.permanent: "true"
+      # Port publik HTTPS. Wajib disebut bila router meneruskan port tidak lazim
+      # (di server ini 8997 → 80 dan 8998 → 443): tanpa ini pengalihan menunjuk
+      # port 443 yang tidak diteruskan, dan situs tampak mati padahal hidup.
+      # Kosongkan `PUBLIC_HTTPS_PORT` bila kelak 443 diteruskan apa adanya.
+      traefik.http.middlewares.predpol-https-redirect.redirectscheme.port: "${PUBLIC_HTTPS_PORT:-443}"
 
       # ---- HTTPS (:443) — rute sebenarnya
       traefik.http.routers.predpol-web.entrypoints: https
       traefik.http.routers.predpol-web.rule: Host(`${DOMAIN}`)
       traefik.http.routers.predpol-web.tls: "true"
-      traefik.http.routers.predpol-web.tls.certresolver: letsencrypt
+      # Penerbitan sertifikat SENGAJA tidak dipasang di sini — lihat
+      # `docker-compose.letsencrypt.yml`. Meminta sertifikat selagi port 80/443
+      # belum diteruskan bukan sekadar sia-sia: setiap percobaan gagal terhitung
+      # pada batas Let's Encrypt (5 kegagalan per host per jam), sehingga justru
+      # menunda sertifikat asli ketika portnya nanti dibuka.
+      # Tanpa resolver, Traefik menyajikan sertifikat bawaannya sendiri.
       traefik.http.routers.predpol-web.service: predpol-web
       traefik.http.routers.predpol-web.middlewares: predpol-security-headers
       traefik.http.services.predpol-web.loadbalancer.server.port: "3000"

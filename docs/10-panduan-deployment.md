@@ -188,52 +188,90 @@ memakai sebagian sumber daya server ini.
 | Alamat IP publik | `111.68.123.134` |
 | Alamat mesin di jaringan lokal | `10.3.3.87` (privat, di belakang NAT) |
 | Domain | `siintel.awansurya.com` → A record → `111.68.123.134` ✅ |
-| Port publik yang sudah diteruskan | **8999 → SSH** |
-| Port 80 dan 443 dari internet | ❌ **belum diteruskan** |
+| `111.68.123.134:8999` | → SSH (port 22) |
+| `111.68.123.134:8997` | → port **80** server ✅ terbukti tembus dari internet |
+| `111.68.123.134:8998` | → port **443** server ✅ terbukti tembus dari internet |
+| Port **80** dan **443** publik | ❌ **tidak** diteruskan |
 
-Diuji dari luar (dua layanan pengambil URL independen, dengan kontrol yang terbukti
-menjawab 200): `http://siintel.awansurya.com` dan `:8999` sama-sama gagal tersambung,
-sementara Traefik jelas mendengarkan di 80 dan 443 pada mesin ini. Sebuah server uji
-sementara di port 8999 juga tidak terjangkau dari luar — konsisten dengan 8999 yang
-memang diteruskan ke SSH (port 22), bukan ke HTTP.
+Ketiganya diuji dari luar jaringan, bukan diduga. Yang membuktikan port 8998 terbuka
+adalah jawaban `ERR_CERT_AUTHORITY_INVALID`: koneksi TLS **berhasil**, hanya
+sertifikatnya yang belum tepercaya — kesalahan itu mustahil muncul bila port tertutup.
 
-> **ufw bukan penyebabnya.** Docker memasang aturan iptables-nya sendiri pada rantai
+> **ufw bukan faktor di sini.** Docker memasang aturan iptables-nya sendiri pada rantai
 > `DOCKER`, yang dilewati **sebelum** rantai `INPUT` tempat ufw bekerja. Port yang
-> dipublish container karena itu **tidak** tertahan ufw. Konsekuensi lain dari sifat
-> ini: mengandalkan ufw untuk menutup port container adalah keliru — satu-satunya
-> pengaman yang benar adalah mengikat port ke `127.0.0.1` di berkas compose (§12).
+> dipublish container karena itu tidak tertahan ufw. Konsekuensi lain: mengandalkan ufw
+> untuk menutup port container adalah keliru — satu-satunya pengaman yang benar adalah
+> mengikat port ke `127.0.0.1` di berkas compose (§12).
 
-### 3.1 Yang harus dilakukan agar domain hidup
+### 3.1 Alamat demo yang berlaku sekarang
 
-Satu langkah, di **router / perangkat NAT**, bukan di server:
+```
+https://siintel.awansurya.com:8998
+```
+
+`http://siintel.awansurya.com:8997` ikut bekerja dan mengalihkan ke alamat di atas.
+Pengalihan itu **wajib menyebut nomor port** (`PUBLIC_HTTPS_PORT=8998` di
+`.env.production`); tanpa itu Traefik mengalihkan ke port 443 yang tidak diteruskan,
+dan situs tampak mati padahal hidup.
+
+> **Peramban akan menampilkan peringatan keamanan**, dan itu memang belum bisa
+> dihindari — lihat §3.2. Untuk melihat aplikasinya, lanjutkan lewat
+> "Advanced / Lanjutkan ke situs". Setelah itu seluruh aplikasi berfungsi penuh,
+> termasuk login: cookie sesi bertanda `Secure`, dan tanda itu terpenuhi karena
+> sambungannya benar-benar HTTPS meskipun sertifikatnya belum tepercaya.
+
+**HTTP polos bukan jalan keluar.** Menyajikan aplikasi di `http://…:8997` tanpa
+pengalihan memang menampilkan halaman, tetapi login akan gagal tanpa pesan apa pun:
+cookie `Secure` dibuang peramban pada sambungan tidak terenkripsi. Menurunkan tanda
+`Secure` demi demo berarti mengirim kredensial dalam keadaan terbuka — tidak pantas
+untuk sistem yang membawa data kamtibmas, bahkan pada prototipe.
+
+### 3.2 Mengapa sertifikat sah belum terbit, dan cara mendapatkannya
+
+Let's Encrypt **selalu** menghubungi port **80** (tantangan HTTP-01) atau port **443**
+(TLS-ALPN-01) pada domain yang diverifikasi. Nomor port itu tidak dapat diubah, dan
+meneruskan `8997 → 80` tidak menolong: yang dihubungi Let's Encrypt tetap port 80 di
+`111.68.123.134`, yang belum diteruskan ke mana pun.
+
+Karena itu `certresolver` **sengaja tidak dipasang** pada susunan berjalan. Meminta
+sertifikat selagi prasyaratnya belum ada bukan sekadar sia-sia: setiap kegagalan
+terhitung pada batas Let's Encrypt (5 kegagalan per host per jam), sehingga justru
+menunda sertifikat asli ketika portnya nanti dibuka.
+
+Tiga jalan, berurut dari yang paling dianjurkan:
+
+**1. Teruskan juga port 80 dan 443 apa adanya** — paling lurus dan paling rapi.
 
 | Protokol | Port publik | Tujuan |
 |---|---|---|
 | TCP | 80 | `10.3.3.87:80` |
 | TCP | 443 | `10.3.3.87:443` |
 
-Port 80 **wajib** ikut dibuka meskipun situsnya nanti hanya diakses lewat HTTPS:
-Let's Encrypt memverifikasi kepemilikan domain lewat `http://siintel.awansurya.com/.well-known/acme-challenge/…`
-pada port 80. Tanpa itu sertifikat tidak akan pernah terbit dan peramban akan
-menampilkan peringatan keamanan di depan penguji.
+Lalu di server:
 
-### 3.2 Bila ISP memblokir port 80/443
+```bash
+# Kosongkan PUBLIC_HTTPS_PORT lebih dulu di .env.production
+pnpm prod:up:tls
+```
 
-Sebagian penyedia internet menutup port 80 dan 443 masuk pada langganan non-bisnis.
-Bila permintaan port forwarding sudah dipasang tetapi tetap tidak terjangkau, dua jalan:
+Hasilnya `https://siintel.awansurya.com` tanpa nomor port, sertifikat sah, dan
+pembaruan otomatis setiap 60 hari.
 
-1. **Minta ISP membuka 80/443** — paling lurus, dan hasilnya `https://siintel.awansurya.com`
-   tanpa nomor port.
-2. **Cloudflare Tunnel** — tidak memerlukan satu pun port masuk, bekerja meski di belakang
-   CGNAT, dan tetap memberi HTTPS yang sah. Perlu akun Cloudflare dan token tunnel.
+**2. Cloudflare Tunnel** — bila penyedia internet menutup port 80/443 masuk (umum pada
+langganan non-bisnis). Tunnel bekerja lewat sambungan **keluar**, sehingga tidak
+memerlukan satu pun port masuk, tetap memberi HTTPS sah, dan tetap menghasilkan alamat
+tanpa nomor port. Perlu akun Cloudflare dan domain `awansurya.com` dikelola Cloudflare.
 
-Memakai port tidak lazim (misalnya `:8443`) **tidak** disarankan: Let's Encrypt tidak dapat
-menerbitkan sertifikat lewat port selain 80/443 tanpa tantangan DNS, sehingga peramban
-akan menampilkan peringatan.
+**3. Sertifikat DNS-01 secara manual** — `certbot certonly --manual
+--preferred-challenges dns` lalu memasang berkasnya ke Traefik lewat file provider.
+Berhasil pada port berapa pun, tetapi harus diperbarui sendiri tiap 90 hari dan
+menyentuh konfigurasi Traefik milik Coolify yang juga dipakai aplikasi lain. Jalan
+terakhir.
 
-### 3.3 Melihat aplikasi sebelum port terbuka
+### 3.3 Melihat aplikasi tanpa peringatan sertifikat
 
-Tidak perlu menunggu router. Jalankan di server:
+Selama sertifikat sah belum ada, tampilan paling bersih justru lewat terowongan SSH
+yang sudah Anda punya. Di server:
 
 ```bash
 pnpm prod:preview
@@ -246,43 +284,15 @@ server — tidak ke jaringan, tidak ke internet. Lalu dari komputer Anda:
 ssh -p 8999 -L 3000:127.0.0.1:3000 kim@111.68.123.134
 ```
 
-dan buka `http://localhost:3000`. Setelah domain hidup, tutup lubang pratinjau:
+dan buka `http://localhost:3000`. Tidak ada peringatan sertifikat, dan login tetap
+berfungsi karena peramban memperlakukan `localhost` sebagai asal tepercaya sehingga
+cookie `Secure` tetap diterima.
+
+Setelah sertifikat sah terpasang, tutup lubang pratinjau:
 
 ```bash
 pnpm prod:preview:off
 ```
-
-
-Lakukan ini **lebih dahulu**, sebelum menjalankan aplikasi. Penerbitan sertifikat akan gagal
-bila domain belum menunjuk ke server, dan kegagalan berulang dapat menabrak batas penerbitan
-Let's Encrypt.
-
-1. Cari alamat IP publik server:
-
-   ```bash
-   curl -s https://api.ipify.org; echo
-   ```
-
-2. Di panel penyedia domain, buat satu **A record**:
-
-   | Kolom | Isi |
-   |---|---|
-   | Type | `A` |
-   | Name / Host | `@` (artinya domain itu sendiri) |
-   | Value / Points to | alamat IP dari langkah 1 |
-   | TTL | biarkan default |
-
-3. Tunggu penyebaran DNS (biasanya 5–30 menit), lalu pastikan sudah benar:
-
-   ```bash
-   dig +short DOMAIN-ANDA
-   ```
-
-   Keluarannya harus persis alamat IP server. **Jangan lanjut sebelum cocok.**
-
-> Bila ingin `www.domain-anda` juga bekerja, tambahkan A record kedua dengan Name `www`,
-> lalu tambahkan nama itu ke aturan `Host(...)` pada `docker-compose.coolify.yml`
-> (JALUR A) atau ke `infra/docker/Caddyfile` (JALUR B).
 
 ---
 

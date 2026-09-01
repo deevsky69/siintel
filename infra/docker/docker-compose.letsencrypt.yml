@@ -1,0 +1,38 @@
+# ---------------------------------------------------------------------------
+# MENYALAKAN SERTIFIKAT LET'S ENCRYPT.
+#
+# PRASYARAT YANG TIDAK BISA DITAWAR — periksa dulu sebelum memakai berkas ini:
+#
+#   Port publik 80 DAN 443 harus diteruskan apa adanya ke server ini.
+#
+# Let's Encrypt selalu menghubungi port 80 (tantangan HTTP-01) atau port 443
+# (TLS-ALPN-01). Keduanya TIDAK dapat diarahkan ke port lain: meneruskan
+# 8997 → 80 tidak menolong, karena yang dihubungi Let's Encrypt tetap port 80.
+#
+# Memakai berkas ini sebelum prasyarat terpenuhi merugikan: setiap verifikasi
+# yang gagal terhitung pada batas 5 kegagalan per host per jam, sehingga
+# sertifikat asli justru lebih lama terbit ketika portnya akhirnya dibuka.
+#
+# Setelah port 80/443 diteruskan:
+#
+#   1. Kosongkan `PUBLIC_HTTPS_PORT` di `.env.production` (agar pengalihan
+#      HTTP→HTTPS tidak lagi menyisipkan nomor port).
+#   2. Jalankan:
+#
+#        pnpm prod:up:tls
+#
+#   3. Tunggu sekitar satu menit, lalu periksa:
+#
+#        openssl s_client -connect 127.0.0.1:443 -servername siintel.awansurya.com \
+#          </dev/null 2>/dev/null | openssl x509 -noout -issuer -dates
+#
+#      Penerbit harus berbunyi Let's Encrypt, bukan "TRAEFIK DEFAULT CERT".
+#
+# Nama resolver `letsencrypt` diambil dari konfigurasi Traefik milik Coolify yang
+# sudah berjalan — bukan tebakan, dan bukan resolver baru buatan kita.
+# ---------------------------------------------------------------------------
+
+services:
+  web:
+    labels:
+      traefik.http.routers.predpol-web.tls.certresolver: letsencrypt
