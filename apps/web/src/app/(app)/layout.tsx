@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      <Topbar name={profile.full_name ?? profile.username} role={profile.role} />
+      <Topbar name={profile.full_name ?? profile.username} roleName={profile.role} />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
         <main className="min-w-0 flex-1 overflow-auto p-4">{children}</main>

@@ -40,9 +40,18 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
   return body.access_token;
 }
 
-async function request<T>(path: string, accessToken: string): Promise<T> {
+type Payload = { method: string; body?: unknown };
+
+const READ: Payload = { method: "GET" };
+
+async function request<T>(path: string, accessToken: string, payload: Payload): Promise<T> {
   const response = await fetch(`${BASE_URL}/api/v1${path}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
+    method: payload.method,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      ...(payload.body === undefined ? {} : { "Content-Type": "application/json" }),
+    },
+    body: payload.body === undefined ? undefined : JSON.stringify(payload.body),
     cache: "no-store",
   });
 
@@ -60,21 +69,32 @@ async function request<T>(path: string, accessToken: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-/** Mengambil data dari API sebagai pengguna yang sedang masuk. */
-export async function apiGet<T>(path: string): Promise<T> {
+async function call<T>(path: string, payload: Payload): Promise<T> {
   const session = await readSession();
   if (!session) redirect("/masuk");
 
   try {
-    return await request<T>(path, session.accessToken);
+    return await request<T>(path, session.accessToken, payload);
   } catch (error) {
     const expired = error instanceof ApiError && error.status === 401;
     if (!expired || !session.refreshToken) throw error;
 
     const renewed = await refreshAccessToken(session.refreshToken);
     if (!renewed) redirect("/masuk");
-    return await request<T>(path, renewed);
+    return await request<T>(path, renewed, payload);
   }
 }
+
+/** Mengambil data dari API sebagai pengguna yang sedang masuk. */
+export const apiGet = <T>(path: string): Promise<T> => call<T>(path, READ);
+
+/**
+ * Mengirim perubahan ke API sebagai pengguna yang sedang masuk.
+ *
+ * Kewenangan tetap diperiksa backend; fungsi ini hanya meneruskan identitas pengguna.
+ * Menyembunyikan tombol di antarmuka bukan pengganti pemeriksaan itu (CLAUDE.md §21).
+ */
+export const apiPost = <T>(path: string, body: unknown): Promise<T> =>
+  call<T>(path, { method: "POST", body });
 
 export { BASE_URL, REFRESH_COOKIE };

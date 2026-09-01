@@ -25,7 +25,7 @@ describe("shell aplikasi", () => {
   });
 
   it("menampilkan identitas sistem dan satuan wilayah", () => {
-    render(<Topbar name="demo.pimpinan" role="Pimpinan" />);
+    render(<Topbar name="demo.pimpinan" roleName="Pimpinan" />);
 
     expect(screen.getByText("PREDIKSI PRESISI")).toBeDefined();
     expect(screen.getByText(/polres metro jakarta selatan/i)).toBeDefined();
@@ -33,14 +33,14 @@ describe("shell aplikasi", () => {
 
   it("menampilkan pengguna yang sedang masuk beserta perannya", () => {
     // Identitas berasal dari /auth/me, bukan nilai yang ditanam di kode.
-    render(<Topbar name="demo.pimpinan" role="Pimpinan" />);
+    render(<Topbar name="demo.pimpinan" roleName="Pimpinan" />);
 
     expect(screen.getByText("demo.pimpinan")).toBeDefined();
     expect(screen.getByText("Pimpinan")).toBeDefined();
   });
 
   it("menyediakan jalan keluar dari sesi", () => {
-    render(<Topbar name="demo.pimpinan" role="Pimpinan" />);
+    render(<Topbar name="demo.pimpinan" roleName="Pimpinan" />);
 
     expect(screen.getByRole("button", { name: /keluar/i })).toBeDefined();
   });
