@@ -1,9 +1,65 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  color-scheme: light dark;
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-base-950 font-sans text-ink antialiased;
+    /* Kilau halus di dua sudut agar latar tidak terasa datar, seperti pada referensi. */
+    background-image:
+      radial-gradient(1200px 600px at 15% -10%, rgba(34, 211, 238, 0.08), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, rgba(59, 130, 246, 0.07), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-heading tracking-wide;
+  }
 }
 
-body {
-  @apply antialiased;
+@layer components {
+  /* Panel: satuan tampilan utama dashboard. */
+  .panel {
+    @apply rounded-lg border border-base-800 bg-base-900/80 shadow-panel backdrop-blur-sm;
+  }
+
+  .panel-header {
+    @apply flex items-center justify-between gap-3 border-b border-base-800 px-4 py-2.5;
+  }
+
+  .panel-title {
+    @apply font-heading text-[13px] font-semibold uppercase tracking-[0.12em] text-ink;
+  }
+
+  .panel-action {
+    @apply font-sans text-[11px] uppercase tracking-wider text-accent hover:text-accent-soft;
+  }
+
+  .panel-body {
+    @apply p-4;
+  }
+
+  /* Label kecil di atas angka, dipakai berulang pada kartu KPI. */
+  .stat-label {
+    @apply text-[10px] font-medium uppercase tracking-[0.14em] text-ink-muted;
+  }
+
+  .stat-value {
+    @apply font-heading text-2xl font-bold leading-none text-ink;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider;
+  }
 }
