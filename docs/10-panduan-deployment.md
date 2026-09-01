@@ -72,7 +72,7 @@ server, bukan dugaan:
 coolify-proxy   traefik:v3.6   0.0.0.0:80->80, 0.0.0.0:443->443, 0.0.0.0:8080->8080, 443/udp
 coolify         coollabsio/coolify   0.0.0.0:8000->8080
 coolify-db, coolify-redis, coolify-sentinel, coolify-realtime
-predpol-db      postgis/postgis:17-3.5   0.0.0.0:5432->5432   ← database PENGEMBANGAN
+predpol-db      postgis/postgis:17-3.5   127.0.0.1:5432->5432 ← database PENGEMBANGAN
 ```
 
 ```text
@@ -659,8 +659,8 @@ Kerjakan berurutan pada **H-1**, bukan pada pagi hari paparan.
 - [ ] `.env.production` berizin `600` dan tidak muncul di `git status`
 - [ ] Halaman `https://DOMAIN-ANDA/docs` **tidak** dapat diakses (dimatikan saat `APP_ENV=production`)
 - [ ] `predpol ps` menunjukkan **tidak ada** port host yang dipublish oleh `db`, `api`, maupun `web`
-- [ ] Database **pengembangan** `predpol-db` yang membuka port 5432 ke `0.0.0.0` sudah
-      ditutup atau dibatasi (lihat §12)
+- [ ] Container `predpol-db` sudah dibuat ulang (`pnpm db:down && pnpm db:up`) agar
+      pengikatan `127.0.0.1` benar-benar berlaku (lihat §12)
 
 ### Data dan tampilan
 
@@ -690,14 +690,26 @@ Kerjakan berurutan pada **H-1**, bukan pada pagi hari paparan.
 
 ## 12. CATATAN KEAMANAN YANG BELUM SELESAI
 
-Dua hal ditemukan saat menyiapkan deployment ini dan **belum diperbaiki**, karena
-perbaikannya di luar berkas deployment:
+Dua hal ditemukan saat menyiapkan deployment ini:
 
-1. **Database pengembangan terbuka ke internet.** Container `predpol-db` dari
-   `infra/docker/docker-compose.yml` mempublikasikan `0.0.0.0:5432->5432`, dengan kredensial
-   bawaan `predpol/predpol` yang tertulis di `.env.example`. Selama server ini punya alamat
-   IP publik, siapa pun dapat mencobanya. Perbaikan yang disarankan: ubah pemetaan port
-   menjadi `127.0.0.1:5432:5432` pada compose pengembangan, atau tutup port 5432 di firewall.
+1. **Database pengembangan mempublikasikan port 5432 ke semua antarmuka.** Container
+   `predpol-db` dari `infra/docker/docker-compose.yml` mengikat `0.0.0.0:5432->5432`, dengan
+   kredensial bawaan `predpol/predpol` yang tertulis di `.env.example`.
+
+   **Seberapa parah — diperiksa, bukan diduga.** Alamat IPv4 global mesin ini adalah
+   `10.3.3.87`, yaitu alamat privat RFC1918 di belakang NAT, dan `ufw` berstatus aktif.
+   Jadi database ini **tidak** terjangkau langsung dari internet; yang dapat mencobanya
+   adalah host lain di jaringan lokal yang sama. Itu tetap lebih luas daripada yang
+   diperlukan, tetapi bukan keadaan darurat.
+
+   **Sudah diperbaiki di berkas**: pemetaan port kini `127.0.0.1:${POSTGRES_PORT:-5432}:5432`.
+   Perubahan itu baru berlaku ketika container dibuat ulang:
+
+   ```bash
+   pnpm db:down && pnpm db:up
+   ```
+
+   Data tersimpan di volume bernama `prediksi-presisi_db-data`, sehingga tidak hilang.
    **Ini bukan container produksi** — susunan produksi tidak membuka port database sama sekali.
 
 2. **Aplikasi Coolify terbuka pada port 8000** (`0.0.0.0:8000->8080`). Itu bawaan Coolify,
