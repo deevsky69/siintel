@@ -133,4 +133,5 @@ class RolePermission(Base):
             "scope IN ('ALL', 'OWN_JURISDICTION', 'OWN_FUNCTION')",
             name="scope_allowed",
         ),
+        Index("ix_role_permissions_permission", "permission_id"),
     )

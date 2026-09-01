@@ -63,4 +63,5 @@ class Recommendation(TimestampMixin, Base):
         Index("ix_recommendations_status", "status"),
         Index("ix_recommendations_prediction", "prediction_id"),
         Index("ix_recommendations_function", "recommended_function"),
+        Index("ix_recommendations_warning", "warning_id"),
     )

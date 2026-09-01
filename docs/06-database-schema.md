@@ -204,7 +204,35 @@ locations        GIST (geom)
 crime_incidents  GIST (geom) — jika kolom geom titik kejadian dipakai
 ```
 
-Index tambahan hanya ditambahkan bila ada query nyata yang membutuhkannya.
+### Aturan index kolom foreign key (TASK 016)
+
+**Setiap kolom foreign key memiliki index**, kecuali sudah menjadi kolom pertama index lain.
+
+PostgreSQL tidak membuat index otomatis untuk kolom FK. Tanpa index, setiap `DELETE`/`UPDATE`
+pada tabel induk memicu sequential scan pada tabel anak untuk memeriksa `RESTRICT`/`CASCADE`,
+dan jalur join ikut lambat. Peninjauan TASK 016 menemukan 10 kolom FK yang belum terindeks.
+
+Aturan ini **dijaga integration test** (`test_every_foreign_key_column_is_indexed`), sehingga
+tabel baru yang lupa membuat index FK akan langsung ketahuan.
+
+Index tambahan di luar aturan ini hanya ditambahkan bila ada query nyata yang membutuhkannya.
+
+---
+
+## 4.1 TRIGGER `updated_at`
+
+`onupdate` pada SQLAlchemy hanya berlaku untuk penulisan lewat ORM. Seed script, perbaikan data
+manual, dan SQL langsung melewatinya, sehingga `updated_at` berbohong — hal ini terbukti pada
+pemeriksaan TASK 016.
+
+Karena itu setiap tabel yang memiliki `updated_at` memasang trigger
+`trg_<tabel>_set_updated_at` yang memanggil fungsi `set_updated_at()` (migration `0007`).
+
+Tabel baru wajib memasang trigger yang sama; aturannya dijaga
+`test_every_table_with_updated_at_has_its_trigger`.
+
+Catatan: `set_updated_at()` memakai `now()`, yaitu waktu **awal transaksi**. Seluruh baris yang
+diperbarui dalam satu transaksi karenanya berbagi `updated_at` yang sama — ini disengaja.
 
 ---
 

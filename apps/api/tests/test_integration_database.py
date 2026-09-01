@@ -130,7 +130,7 @@ def test_migrations_are_applied(engine: Engine) -> None:
     with engine.connect() as connection:
         revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
-    assert revision == "0006", "database belum di-migrate: jalankan `pnpm db:migrate`"
+    assert revision == "0007", "database belum di-migrate: jalankan `pnpm db:migrate`"
 
 
 def test_postgis_and_pgcrypto_are_installed(engine: Engine) -> None:
@@ -522,6 +522,101 @@ def test_hit_without_prediction_is_rejected(engine: Engine) -> None:
                         (code, evaluation_date, actual_event, match_type)
                     VALUES
                         ('EVA-BAD', current_date, true, 'HIT')
+                """)
+            )
+
+        connection.rollback()
+
+
+def test_every_foreign_key_column_is_indexed(engine: Engine) -> None:
+    """Aturan TASK 016: kolom FK tanpa index membuat pemeriksaan RESTRICT/CASCADE
+    dan jalur join melakukan sequential scan. Test ini menjaga aturan itu untuk tabel baru.
+    """
+    with engine.connect() as connection:
+        unindexed = (
+            connection.execute(
+                text("""
+                SELECT c.conrelid::regclass::text || '.' || a.attname
+                FROM pg_constraint c
+                JOIN unnest(c.conkey) WITH ORDINALITY AS k(attnum, ord) ON true
+                JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = k.attnum
+                WHERE c.contype = 'f' AND k.ord = 1
+                  AND NOT EXISTS (
+                      SELECT 1 FROM pg_index i
+                      WHERE i.indrelid = c.conrelid AND i.indkey[0] = k.attnum
+                  )
+                ORDER BY 1
+            """)
+            )
+            .scalars()
+            .all()
+        )
+
+    assert unindexed == [], f"kolom FK tanpa index: {unindexed}"
+
+
+def test_every_table_with_updated_at_has_its_trigger(engine: Engine) -> None:
+    """Tanpa trigger, `updated_at` berbohong pada setiap penulisan di luar ORM."""
+    with engine.connect() as connection:
+        missing = (
+            connection.execute(
+                text("""
+                SELECT c.table_name
+                FROM information_schema.columns c
+                WHERE c.table_schema = 'public' AND c.column_name = 'updated_at'
+                  AND NOT EXISTS (
+                      SELECT 1 FROM pg_trigger t
+                      WHERE t.tgrelid = c.table_name::regclass
+                        AND t.tgname = 'trg_' || c.table_name || '_set_updated_at'
+                  )
+                ORDER BY 1
+            """)
+            )
+            .scalars()
+            .all()
+        )
+
+    assert missing == [], f"tabel tanpa trigger updated_at: {missing}"
+
+
+def test_updated_at_is_refreshed_by_plain_sql_update(engine: Engine) -> None:
+    with engine.begin() as connection:
+        connection.execute(
+            text("""
+                INSERT INTO locations
+                    (code, grid_id, polsek, kecamatan, grid_size_m, latitude, longitude,
+                     geom, updated_at)
+                VALUES
+                    ('LOC-UPD', 'JKS-UPD', 'Polsek Tebet', 'Tebet', 500, -6.23, 106.85,
+                     ST_SetSRID(ST_MakePoint(106.85, -6.23), 4326),
+                     timestamptz '2020-01-01 00:00+07')
+            """)
+        )
+        connection.execute(
+            text("UPDATE locations SET kecamatan = 'Tebet Baru' WHERE code = 'LOC-UPD'")
+        )
+
+        refreshed = connection.execute(
+            text("""
+                SELECT updated_at > timestamptz '2020-01-02'
+                FROM locations WHERE code = 'LOC-UPD'
+            """)
+        ).scalar_one()
+        assert refreshed is True
+
+        connection.rollback()
+
+
+def test_impossible_coordinates_are_rejected(engine: Engine) -> None:
+    with engine.begin() as connection:
+        with pytest.raises(DatabaseError):
+            connection.execute(
+                text("""
+                    INSERT INTO locations
+                        (code, grid_id, polsek, kecamatan, grid_size_m, latitude, longitude, geom)
+                    VALUES
+                        ('LOC-BAD', 'JKS-BAD', 'Polsek Tebet', 'Tebet', 500, 999, -999,
+                         ST_SetSRID(ST_MakePoint(106.85, -6.23), 4326))
                 """)
             )
 

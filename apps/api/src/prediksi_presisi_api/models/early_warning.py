@@ -111,4 +111,6 @@ class EarlyWarning(TimestampMixin, Base):
         Index("ix_early_warnings_status_created", "status", "created_at"),
         Index("ix_early_warnings_location", "location_id"),
         Index("ix_early_warnings_prediction", "prediction_id"),
+        Index("ix_early_warnings_acknowledged_by", "acknowledged_by"),
+        Index("ix_early_warnings_resolved_by", "resolved_by"),
     )

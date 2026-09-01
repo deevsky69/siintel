@@ -95,4 +95,6 @@ class PredictionActual(TimestampMixin, Base):
         Index("ix_prediction_actual_evaluation_date", "evaluation_date"),
         Index("ix_prediction_actual_match_type", "match_type"),
         Index("ix_prediction_actual_prediction", "prediction_id"),
+        Index("ix_prediction_actual_actual_incident", "actual_incident_id"),
+        Index("ix_prediction_actual_actual_location", "actual_location_id"),
     )

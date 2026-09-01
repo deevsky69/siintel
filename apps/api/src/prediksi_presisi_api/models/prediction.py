@@ -109,4 +109,5 @@ class Prediction(TimestampMixin, Base):
         Index("ix_predictions_prediction_date", "prediction_date"),
         Index("ix_predictions_location_window", "location_id", "window_start"),
         Index("ix_predictions_status", "status"),
+        Index("ix_predictions_baseline_risk_score", "baseline_risk_score_id"),
     )

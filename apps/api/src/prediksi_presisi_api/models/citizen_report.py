@@ -84,6 +84,8 @@ class CitizenReport(TimestampMixin, Base):
             "verification_score IS NULL OR (verification_score BETWEEN 0 AND 100)",
             name="verification_score_range",
         ),
+        CheckConstraint("latitude BETWEEN -90 AND 90", name="latitude_range"),
+        CheckConstraint("longitude BETWEEN -180 AND 180", name="longitude_range"),
         Index("ix_citizen_reports_reported_at", "reported_at"),
         Index("ix_citizen_reports_status", "status"),
         Index("ix_citizen_reports_location", "location_id"),

@@ -77,4 +77,6 @@ class OperationalAction(TimestampMixin, Base):
         Index("ix_operational_actions_unit", "unit_id"),
         Index("ix_operational_actions_status", "status"),
         Index("ix_operational_actions_start_at", "start_at"),
+        Index("ix_operational_actions_location", "location_id"),
+        Index("ix_operational_actions_created_by", "created_by"),
     )

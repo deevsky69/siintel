@@ -81,4 +81,5 @@ class CommanderDecision(TimestampMixin, Base):
         Index("ix_commander_decisions_recommendation", "recommendation_id"),
         Index("ix_commander_decisions_decision", "decision"),
         Index("ix_commander_decisions_decided_at", "decision_at"),
+        Index("ix_commander_decisions_decision_by", "decision_by"),
     )

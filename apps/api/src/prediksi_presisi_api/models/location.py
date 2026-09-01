@@ -10,7 +10,7 @@ import uuid
 from typing import TYPE_CHECKING
 
 from geoalchemy2 import Geometry
-from sqlalchemy import Index, Integer, Numeric, String
+from sqlalchemy import CheckConstraint, Index, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..db import Base
@@ -72,6 +72,8 @@ class Location(TimestampMixin, Base):
     )
 
     __table_args__ = (
+        CheckConstraint("latitude BETWEEN -90 AND 90", name="latitude_range"),
+        CheckConstraint("longitude BETWEEN -180 AND 180", name="longitude_range"),
         Index("ix_locations_polsek", "polsek"),
         Index("ix_locations_kecamatan", "kecamatan"),
         Index("ix_locations_geom", "geom", postgresql_using="gist"),
