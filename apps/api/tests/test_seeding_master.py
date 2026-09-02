@@ -48,13 +48,19 @@ def test_master_seed_loads_expected_volumes(session: Session) -> None:
     session.flush()
 
     counts = {
-        "locations": session.scalar(select(func.count()).select_from(Role)),
+        # Kuncinya sempat bernama "locations" padahal menghitung Role — nama yang
+        # keliru membuat kegagalannya sulit dibaca.
+        "roles": session.scalar(select(func.count()).select_from(Role)),
         "permissions": session.scalar(select(func.count()).select_from(Permission)),
         "users": session.scalar(select(func.count()).select_from(User)),
     }
 
-    assert counts["locations"] == 6  # 6 role
+    # Empat peran sejak Command Center dan Analyst dilebur ke Administrator
+    # (keputusan pemilik proyek, 1 September 2026).
+    assert counts["roles"] == 4
     assert counts["permissions"] == 43  # katalog docs/03 §2
+    # Enam akun tetap: dua di antaranya kini berperan Administrator. Akunnya tidak
+    # dihapus karena masih dirujuk keputusan dan tindakan operasional yang tercatat.
     assert counts["users"] == 6
 
 

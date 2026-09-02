@@ -139,7 +139,7 @@ def _unit(session: Session) -> PoliceUnit:
 def test_action_can_be_recorded_from_an_approving_decision(
     client: TestClient, session: Session
 ) -> None:
-    officer = _make_user(session, "Command Center")
+    officer = _make_user(session, "Administrator")
     decision = _decision_without_action(session, "APPROVED")
 
     response = client.post(
@@ -156,7 +156,7 @@ def test_action_cannot_be_recorded_from_a_rejected_decision(
     client: TestClient, session: Session
 ) -> None:
     """Aturan yang sama dijaga trigger database; API tidak boleh membuka jalan memutar."""
-    officer = _make_user(session, "Command Center")
+    officer = _make_user(session, "Administrator")
     rejected = session.scalar(
         select(CommanderDecision).where(CommanderDecision.decision == "REJECTED").limit(1)
     )
@@ -173,7 +173,7 @@ def test_action_cannot_be_recorded_from_a_rejected_decision(
 
 
 def test_one_decision_produces_at_most_one_action(client: TestClient, session: Session) -> None:
-    officer = _make_user(session, "Command Center")
+    officer = _make_user(session, "Administrator")
     decision = _decision_without_action(session, "APPROVED")
     headers = _auth(client, officer)
     payload = {"decision_code": decision.code, "unit_code": _unit(session).code}
@@ -220,7 +220,7 @@ def test_result_is_refused_when_it_would_have_no_duration(
     Waktu di sini disebut eksplisit, tidak mengandalkan jam acuan sedang beku — test
     yang bergantung pada keadaan lingkungan akan lulus atau gagal karena alasan lain.
     """
-    officer = _make_user(session, "Command Center")
+    officer = _make_user(session, "Administrator")
     decision = _decision_without_action(session, "APPROVED")
     headers = _auth(client, officer)
     created = client.post(
@@ -252,7 +252,7 @@ def test_result_is_refused_when_it_would_have_no_duration(
 
 
 def test_result_closes_the_loop(client: TestClient, session: Session) -> None:
-    officer = _make_user(session, "Command Center")
+    officer = _make_user(session, "Administrator")
     decision = _decision_without_action(session, "APPROVED")
     headers = _auth(client, officer)
     created = client.post(
@@ -292,7 +292,7 @@ def test_result_closes_the_loop(client: TestClient, session: Session) -> None:
 
 
 def test_a_finished_action_cannot_be_rewritten(client: TestClient, session: Session) -> None:
-    officer = _make_user(session, "Command Center")
+    officer = _make_user(session, "Administrator")
     decision = _decision_without_action(session, "APPROVED")
     headers = _auth(client, officer)
     code = client.post(
@@ -332,7 +332,7 @@ def test_a_finished_action_cannot_be_rewritten(client: TestClient, session: Sess
 def test_pending_decisions_only_lists_undone_approvals(
     client: TestClient, session: Session
 ) -> None:
-    officer = _make_user(session, "Command Center")
+    officer = _make_user(session, "Administrator")
 
     response = client.get("/api/v1/operations/pending-decisions", headers=_auth(client, officer))
 
@@ -354,7 +354,7 @@ def test_pending_decisions_only_lists_undone_approvals(
 
 def test_operations_are_scoped_by_jurisdiction(client: TestClient, session: Session) -> None:
     officer = _make_user(session, "Polsek", polsek="Polsek Tebet")
-    centre = _make_user(session, "Command Center")
+    centre = _make_user(session, "Administrator")
 
     scoped = client.get("/api/v1/operations?page_size=1", headers=_auth(client, officer))
     full = client.get("/api/v1/operations?page_size=1", headers=_auth(client, centre))
@@ -376,7 +376,7 @@ def test_operations_are_scoped_by_function(client: TestClient, session: Session)
     )
     assert unit_function is not None
     officer = _make_user(session, "Fungsi", function=str(unit_function))
-    centre = _make_user(session, "Command Center")
+    centre = _make_user(session, "Administrator")
 
     scoped = client.get("/api/v1/operations?page_size=1", headers=_auth(client, officer))
     full = client.get("/api/v1/operations?page_size=1", headers=_auth(client, centre))

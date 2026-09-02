@@ -224,7 +224,7 @@ def test_current_risk_needs_the_risk_score_permission_too(
 def test_predictive_heatmap_only_returns_the_requested_horizon(
     client: TestClient, session: Session
 ) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get(
         "/api/v1/map/predictive-heatmap?horizon=6H", headers=_auth(client, analyst)
@@ -243,7 +243,7 @@ def test_predictive_heatmap_only_returns_the_requested_horizon(
 def test_predictive_heatmap_rejects_an_unknown_horizon(
     client: TestClient, session: Session
 ) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get(
         "/api/v1/map/predictive-heatmap?horizon=99H", headers=_auth(client, analyst)
@@ -329,7 +329,7 @@ def test_unknown_area_is_not_found(client: TestClient, session: Session) -> None
 
 
 def test_acknowledge_records_who_received_the_warning(client: TestClient, session: Session) -> None:
-    operator = _make_user(session, "Command Center")
+    operator = _make_user(session, "Administrator")
     warning, _location = _a_warning(session, "ACTIVE")
 
     response = client.post(
@@ -359,7 +359,7 @@ def test_acknowledge_records_who_received_the_warning(client: TestClient, sessio
 
 
 def test_acknowledging_twice_is_a_conflict(client: TestClient, session: Session) -> None:
-    operator = _make_user(session, "Command Center")
+    operator = _make_user(session, "Administrator")
     warning, _location = _a_warning(session, "ACTIVE")
     headers = _auth(client, operator)
 
@@ -377,7 +377,7 @@ def test_acknowledging_twice_is_a_conflict(client: TestClient, session: Session)
 
 
 def test_resolve_records_the_actor(client: TestClient, session: Session) -> None:
-    operator = _make_user(session, "Command Center")
+    operator = _make_user(session, "Administrator")
     warning, _location = _a_warning(session, "ACKNOWLEDGED")
 
     response = client.post(
@@ -402,7 +402,7 @@ def test_resolve_records_the_actor(client: TestClient, session: Session) -> None
 
 
 def test_resolving_a_resolved_warning_is_a_conflict(client: TestClient, session: Session) -> None:
-    operator = _make_user(session, "Command Center")
+    operator = _make_user(session, "Administrator")
     warning, _location = _a_warning(session, "RESOLVED")
 
     response = client.post(

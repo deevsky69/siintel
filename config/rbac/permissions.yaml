@@ -60,66 +60,6 @@ roles:
       - audit:read
       - config:read
 
-  Command Center:
-    ALL:
-      - dashboard:read
-      - location:read
-      - crime:read
-      - intelligence:read
-      - patrol:read
-      - patrol:write
-      - police_unit:read
-      - map:read
-      - analytics:read
-      - risk_score:read
-      - prediction:read
-      - warning:read
-      - warning:acknowledge
-      - warning:resolve
-      - public_alert:read
-      - recommendation:read
-      - recommendation:write
-      - commander_decision:read
-      - operation:read
-      - operation:write
-      - citizen_report:read
-      - citizen_report:write
-      - community_feedback:read
-      - evaluation:read
-      - audit:read
-      - config:read
-
-  Analyst:
-    ALL:
-      - dashboard:read
-      - location:read
-      - crime:read
-      - crime:write
-      - crime:export
-      - intelligence:read
-      - patrol:read
-      - police_unit:read
-      - map:read
-      - analytics:read
-      - analytics:export
-      - risk_score:read
-      - risk_score:run
-      - prediction:read
-      - prediction:run
-      - prediction:publish
-      - warning:read
-      - public_alert:read
-      - recommendation:read
-      - recommendation:write
-      - commander_decision:read
-      - operation:read
-      - citizen_report:read
-      - community_feedback:read
-      - evaluation:read
-      - evaluation:run
-      - audit:read
-      - config:read
-
   # KOREKSI 1 September 2026 — cakupan disesuaikan dengan yang benar-benar dapat
   # ditegakkan. Sebelumnya `crime:read` dan sembilan permission lain dinyatakan
   # OWN_FUNCTION, padahal `crime_incidents` dan `intelligence_reports` tidak memiliki
@@ -215,32 +155,67 @@ roles:
   # Perlakuan yang sama diberikan pada peran Fungsi; keduanya menunggu satu jawaban:
   # siapa yang boleh membaca audit trail, dan sejauh mana.
 
+  # PENGGABUNGAN 1 September 2026 — keputusan pemilik proyek.
+  #
+  # Command Center dan Analyst dilebur ke dalam Administrator. Empat peran tersisa:
+  # Pimpinan, Administrator, Fungsi, Polsek.
+  #
+  # KONSEKUENSI YANG HARUS DISADARI, dan dinyatakan di sini supaya tidak hilang:
+  #
+  # Peran ini kini memegang 40 dari 43 permission. Ia menulis data kejadian
+  # (`crime:write`), menjalankan prediksi (`prediction:run`), mempublikasikannya
+  # (`prediction:publish`), mencatat hasil operasi (`operation:write`), DAN menjalankan
+  # evaluasi yang menilai ketepatan semuanya (`evaluation:run`).
+  #
+  # Artinya tidak ada lagi pemisahan antara yang menghasilkan angka dan yang menilai
+  # angka itu. Bila penguji bertanya "siapa yang memverifikasi precision dan recall",
+  # jawabannya kini "peran yang sama yang menghasilkannya".
+  #
+  # Yang TETAP terjaga: `commander_decision:approve` hanya milik Pimpinan, sehingga
+  # rantai human-in-the-loop — inti klaim Taskap — tidak berubah sama sekali.
+  #
+  # Bila kelak ingin memulihkan sebagian pemisahan tanpa menambah peran, jalan
+  # termurahnya adalah memindahkan `evaluation:run` ke Pimpinan: yang bergantung pada
+  # alat ukur adalah yang memerintahkan pengukurannya.
   Administrator:
     ALL:
       - dashboard:read
       - location:read
       - location:write
+      - crime:export
       - crime:read
+      - crime:write
       - intelligence:read
       - patrol:read
+      - patrol:write
       - police_unit:read
       - police_unit:write
       - map:read
+      - analytics:export
       - analytics:read
       - risk_score:read
+      - risk_score:run
+      - prediction:publish
       - prediction:read
+      - prediction:run
+      - warning:acknowledge
       - warning:read
+      - warning:resolve
       - public_alert:read
       - recommendation:read
+      - recommendation:write
       - commander_decision:read
       - operation:read
+      - operation:write
       - citizen_report:read
+      - citizen_report:write
       - community_feedback:read
       - evaluation:read
-      - user:read
+      - evaluation:run
       - user:manage
-      - role:read
+      - user:read
       - role:manage
+      - role:read
       - audit:read
-      - config:read
       - config:manage
+      - config:read

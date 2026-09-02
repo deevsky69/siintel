@@ -146,7 +146,7 @@ def test_missing_permission_is_denied_and_recorded(client: TestClient, session: 
 
 
 def test_predictions_always_carry_their_explanation(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get("/api/v1/predictions?page_size=5", headers=_auth(client, analyst))
 
@@ -158,7 +158,7 @@ def test_predictions_always_carry_their_explanation(client: TestClient, session:
 
 
 def test_prediction_filter_by_horizon(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get("/api/v1/predictions?horizon=6H", headers=_auth(client, analyst))
 
@@ -195,7 +195,7 @@ def test_dashboard_states_when_a_reference_clock_is_used(
 
 
 def test_evaluation_metrics_are_marked_as_proposed(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get("/api/v1/evaluation/metrics", headers=_auth(client, analyst))
 
@@ -228,7 +228,7 @@ def test_page_size_is_capped(client: TestClient, session: Session) -> None:
 
 
 def test_police_units_are_listed_for_assignment(client: TestClient, session: Session) -> None:
-    centre = _make_user(session, "Command Center")
+    centre = _make_user(session, "Administrator")
 
     response = client.get("/api/v1/police-units", headers=_auth(client, centre))
 
@@ -252,7 +252,7 @@ def test_police_units_keep_polres_level_units_visible_to_a_polsek(
     polsek = session.scalar(select(Location.polsek).where(Location.polsek.is_not(None)).limit(1))
     assert polsek is not None
     officer = _make_user(session, "Polsek", polsek=str(polsek))
-    centre = _make_user(session, "Command Center")
+    centre = _make_user(session, "Administrator")
 
     scoped = client.get("/api/v1/police-units", headers=_auth(client, officer)).json()["data"]
     everything = client.get("/api/v1/police-units", headers=_auth(client, centre)).json()["data"]

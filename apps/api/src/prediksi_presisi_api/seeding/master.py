@@ -159,6 +159,32 @@ def seed_roles(session: Session, summary: SeedSummary) -> None:
     summary.record("roles", inserted, len(existing))
 
 
+def retire_unused_roles(session: Session, summary: SeedSummary) -> None:
+    """Menghapus peran yang tidak lagi tercantum di `roles.csv`.
+
+    Diperlukan sejak penggabungan peran 1 September 2026. Tanpa langkah ini, Command
+    Center dan Analyst tetap hidup di basis data sebagai peran tanpa satu pun
+    permission — tampak ada di daftar, tetapi tidak berarti apa-apa.
+
+    Dipanggil **setelah** `seed_users`, bukan di dalam `seed_roles`, karena urutannya
+    mengikat: pengguna harus dipindahkan ke peran barunya lebih dulu. Foreign key
+    `users.role_id` bersifat RESTRICT, sehingga peran yang masih dipakai akan menolak
+    dihapus dengan tegas — bukan diam-diam membuat akun kehilangan kewenangannya.
+    """
+    declared = {
+        src.required_text(row, "role_id", "roles.csv") for row in src.read_rows("roles.csv")
+    }
+
+    session.flush()
+    removed = 0
+    for role in session.scalars(select(Role).where(Role.code.not_in(declared))).all():
+        session.delete(role)
+        removed += 1
+
+    if removed:
+        summary.note("roles", f"peran dihapus: {removed}")
+
+
 def _load_rbac(path: Path | None = None) -> dict[str, Any]:
     source = path or RBAC_FILE
     if not source.exists():
@@ -287,12 +313,24 @@ def seed_users(session: Session, taxonomy: Taxonomy, summary: SeedSummary) -> No
     session.flush()
     roles = {role.code: role for role in session.scalars(select(Role)).all()}
 
+    current = {user.code: user for user in session.scalars(select(User)).all()}
+    reassigned = 0
+
     for row in src.read_rows("users.csv"):
         code = src.required_text(row, "user_id", "users.csv")
+        role_code = src.required_text(row, "role_id", f"users.csv:{code}")
+
         if code in existing:
+            # Penugasan peran berasal dari berkas seed, jadi perubahannya diikuti.
+            # Password TIDAK disentuh: itu ditetapkan operator di server (TASK 050),
+            # dan menimpanya di sini akan mengunci akun yang sedang dipakai.
+            assigned = roles.get(role_code)
+            account = current.get(code)
+            if assigned is not None and account is not None and account.role_id != assigned.role_id:
+                account.role_id = assigned.role_id
+                reassigned += 1
             continue
 
-        role_code = src.required_text(row, "role_id", f"users.csv:{code}")
         role = roles.get(role_code)
         if role is None:
             message = f"users.csv:{code}: role '{role_code}' tidak ditemukan"
@@ -317,6 +355,8 @@ def seed_users(session: Session, taxonomy: Taxonomy, summary: SeedSummary) -> No
         inserted += 1
 
     summary.record("users", inserted, len(existing))
+    if reassigned:
+        summary.note("users", f"penugasan peran dipindahkan: {reassigned}")
 
 
 def seed_master_data(session: Session, taxonomy: Taxonomy | None = None) -> SeedSummary:
@@ -330,6 +370,8 @@ def seed_master_data(session: Session, taxonomy: Taxonomy | None = None) -> Seed
     seed_permissions(session, summary)
     seed_role_permissions(session, summary)
     seed_users(session, resolved, summary)
+    # Urutan mengikat: peran lama baru boleh dihapus setelah penggunanya dipindahkan.
+    retire_unused_roles(session, summary)
 
     # Session dibuat dengan `autoflush=False`, sehingga baris terakhir kelompok ini
     # tidak akan terlihat oleh query kelompok berikutnya bila tidak di-flush di sini.

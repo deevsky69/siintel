@@ -16,12 +16,27 @@
 version: proposed-2026-09-01
 
 mappings:
+  # Katalog ancaman — lihat docs/16-rancangan-risk-scoring.md §2.
+  # Lima yang pertama sudah punya data; lima sisanya ditambahkan pada rancangan
+  # risk scoring dan belum memiliki kejadian tercatat.
   incident_type:
+    # Kelompok A — dinilai dari pola historis
     CURANMOR: CURANMOR
     CURAT: CURAT
     CURAS: CURAS
-    TAWURAN: TAWURAN
+    Begal: BEGAL
+    BEGAL: BEGAL
     KEJAHATAN_JALANAN: KEJAHATAN_JALANAN
+    Premanisme: PREMANISME
+    PREMANISME: PREMANISME
+    Narkoba: NARKOBA
+    NARKOBA: NARKOBA
+    # Kelompok B — dinilai dari informasi intelijen
+    TAWURAN: TAWURAN
+    Unjuk Rasa: UNJUK_RASA
+    UNJUK_RASA: UNJUK_RASA
+    Keramaian: KERAMAIAN
+    KERAMAIAN: KERAMAIAN
 
   status_crime:
     Dilaporkan: REPORTED

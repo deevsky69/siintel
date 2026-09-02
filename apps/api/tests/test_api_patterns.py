@@ -106,7 +106,7 @@ def _counts(session: Session, sql: str, **params: object) -> dict[str, int]:
 
 
 def test_threat_types_match_the_database(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get(ENDPOINT, headers=_auth(client, analyst))
 
@@ -124,7 +124,7 @@ def test_threat_types_match_the_database(client: TestClient, session: Session) -
 def test_source_carries_the_range_that_produced_the_numbers(
     client: TestClient, session: Session
 ) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     body = client.get(ENDPOINT, headers=_auth(client, analyst)).json()
 
@@ -143,7 +143,7 @@ def test_source_carries_the_range_that_produced_the_numbers(
 
 
 def test_where_dimension_matches_direct_sql(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     profile = client.get(f"{ENDPOINT}?threat_type=CURANMOR", headers=_auth(client, analyst)).json()[
         "profile"
@@ -176,7 +176,7 @@ def test_where_dimension_matches_direct_sql(client: TestClient, session: Session
 
 
 def test_when_dimension_matches_direct_sql(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     profile = client.get(f"{ENDPOINT}?threat_type=CURANMOR", headers=_auth(client, analyst)).json()[
         "profile"
@@ -221,7 +221,7 @@ def test_when_dimension_uses_local_time_not_utc(client: TestClient, session: Ses
     Keduanya berbeda tujuh jam pada dataset ini; memakai kolom yang salah menggeser
     seluruh profil WHEN tanpa satu pun angka terlihat janggal.
     """
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     profile = client.get(f"{ENDPOINT}?threat_type=CURANMOR", headers=_auth(client, analyst)).json()[
         "profile"
@@ -247,7 +247,7 @@ def test_when_dimension_uses_local_time_not_utc(client: TestClient, session: Ses
 
 
 def test_how_and_target_dimensions_match_direct_sql(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     profile = client.get(f"{ENDPOINT}?threat_type=CURAS", headers=_auth(client, analyst)).json()[
         "profile"
@@ -269,7 +269,7 @@ def test_how_and_target_dimensions_match_direct_sql(client: TestClient, session:
 
 
 def test_repeat_grids_match_direct_sql(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     profile = client.get(f"{ENDPOINT}?threat_type=TAWURAN", headers=_auth(client, analyst)).json()[
         "profile"
@@ -320,7 +320,7 @@ def test_repeat_grids_match_direct_sql(client: TestClient, session: Session) -> 
 
 
 def test_every_distribution_carries_its_denominator(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     profile = client.get(f"{ENDPOINT}?threat_type=CURANMOR", headers=_auth(client, analyst)).json()[
         "profile"
@@ -341,7 +341,7 @@ def test_sample_size_is_stated_in_terms_of_its_own_arithmetic(
     client: TestClient, session: Session
 ) -> None:
     """Ketelitian sampel dinyatakan tanpa mengarang ambang "terlalu sedikit"."""
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     body = client.get(f"{ENDPOINT}?threat_type=TAWURAN", headers=_auth(client, analyst)).json()
     profile = body["profile"]
@@ -356,7 +356,7 @@ def test_response_never_speaks_as_a_prediction(client: TestClient, session: Sess
     Bukan sekadar kerapian kata: begitu frekuensi historis diberi `confidence`, hitungan
     masa lalu terbaca sebagai pernyataan tentang masa depan (CLAUDE.md §27).
     """
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get(f"{ENDPOINT}?threat_type=CURANMOR", headers=_auth(client, analyst))
 
@@ -457,7 +457,7 @@ def test_scoped_user_without_a_jurisdiction_is_refused(
 def test_unknown_threat_type_is_rejected_with_the_available_list(
     client: TestClient, session: Session
 ) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get(f"{ENDPOINT}?threat_type=TIDAK_ADA", headers=_auth(client, analyst))
 
@@ -468,7 +468,7 @@ def test_unknown_threat_type_is_rejected_with_the_available_list(
 
 
 def test_threat_type_is_matched_case_insensitively(client: TestClient, session: Session) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
 
     response = client.get(f"{ENDPOINT}?threat_type=curanmor", headers=_auth(client, analyst))
 

@@ -251,7 +251,7 @@ def test_unknown_decision_value_is_refused(client: TestClient, session: Session)
 def test_analyst_cannot_decide_and_the_refusal_is_recorded(
     client: TestClient, session: Session
 ) -> None:
-    analyst = _make_user(session, "Analyst")
+    analyst = _make_user(session, "Administrator")
     recommendation = _undecided(session)
 
     response = client.post(
