@@ -19,8 +19,7 @@ Polres Metro Jakarta Selatan
 | Pembaca | Bagian yang paling relevan |
 |---|---|
 | Pejabat yang menyetujui rekomendasi | §3, §5, §7 |
-| Petugas Command Center | §3, §5, §6 |
-| Analis | §3, §5, §8 |
+| Petugas Administrator | §3, §5, §6, §8 |
 | Petugas Polsek | §3, §5 |
 | Administrator | §3, §9 |
 | Penguji / peninjau | §2, §4, §10, §11 |
@@ -64,12 +63,15 @@ melaksanakan sekaligus.
 
 | Peran | Tugas pokok dalam sistem | Cakupan data | Kewenangan khas yang tidak dimiliki peran lain |
 |---|---|---|---|
-| **Pimpinan** | Menilai dan memutuskan rekomendasi | Seluruh Polres | **Satu-satunya** yang dapat menyetujui, memodifikasi, atau menolak rekomendasi |
-| **Command Center** | Menjalankan pengendalian harian | Seluruh Polres | Menerima dan menyelesaikan peringatan; mencatat pelaksanaan operasi |
-| **Analyst** | Menyiapkan bahan analisis dan prediksi | Seluruh Polres | Menjalankan penilaian risiko, prediksi, publikasi prediksi, dan evaluasi |
+| **Pimpinan** | Menilai dan memutuskan rekomendasi; memerintahkan evaluasi | Seluruh Polres | **Satu-satunya** yang menyetujui rekomendasi, dan **satu-satunya** yang menjalankan evaluasi |
+| **Administrator** | Menyiapkan data, menjalankan analisis, mengendalikan kegiatan harian, dan mengelola akun | Seluruh Polres | Memasukkan data, menjalankan penilaian risiko dan prediksi, menerima dan menyelesaikan peringatan, mencatat pelaksanaan operasi, mengelola pengguna dan peran |
 | **Fungsi** | Menindaklanjuti sesuai fungsi masing-masing | **Hanya fungsinya sendiri** | Menulis laporan intelijen dan kegiatan fungsinya |
 | **Polsek** | Bertindak di wilayah hukumnya | **Hanya polseknya sendiri** | Menerima peringatan di wilayahnya; mencatat laporan masyarakat |
-| **Administrator** | Mengelola akun, peran, dan konfigurasi | Seluruh Polres | Mengelola pengguna dan peran |
+
+> **Empat peran, bukan enam.** Command Center dan Analyst dilebur ke Administrator pada
+> 1 September 2026 atas keputusan pemilik proyek. Akun `demo.commandcenter` dan
+> `demo.analyst` masih dapat masuk, tetapi keduanya kini berperan Administrator; untuk
+> peragaan gunakan `demo.admin`.
 
 ### 3.2 Penjelasan tiap peran
 
@@ -92,29 +94,26 @@ Setiap keputusan tercatat beserta nama pejabat, waktu, dan pertimbangannya.
 **Rekomendasi yang sudah diputus tidak dapat diputus ulang**, karena memutus dua kali
 akan mengaburkan siapa yang memutuskan apa.
 
-> Pimpinan **sengaja tidak** dapat menerima atau menyelesaikan peringatan harian. Itu
-> pekerjaan Command Center. Pemisahan ini yang membuat sistem tidak menumpuk seluruh
-> kewenangan pada satu akun.
+> Pimpinan **sengaja tidak** dapat menerima atau menyelesaikan peringatan harian, dan
+> tidak memasukkan data. Itu pekerjaan Administrator. Sebaliknya, Administrator tidak
+> dapat memutuskan maupun menjalankan evaluasi. Keduanya saling membatasi.
 
-#### Command Center
+#### Administrator
 
-Mata dan tangan pengendalian harian. Command Center memantau peringatan yang aktif,
-**menerima** peringatan sebagai tanda sudah ditangani, dan **menyatakan selesai** bila
-situasinya sudah tertangani. Ia juga mencatat pelaksanaan tindakan operasional yang
-sudah disetujui Pimpinan.
+Peran operasional terbesar. Ia memasukkan data kejadian dan laporan intelijen,
+menjalankan penilaian risiko dan prediksi, memantau serta menutup peringatan, mencatat
+pelaksanaan tindakan operasional, dan mengelola akun serta peran.
 
-Command Center **dapat menyusun** rekomendasi, tetapi **tidak dapat menyetujuinya
-sendiri** — usulan tetap harus melewati Pimpinan.
+Peran ini memegang 40 dari 43 kewenangan. Dua yang **sengaja** berada di luar
+jangkauannya, dan keduanya milik Pimpinan:
 
-#### Analyst
+| Kewenangan | Mengapa dipisahkan |
+|---|---|
+| Menyetujui rekomendasi | Yang mengusulkan tidak boleh menjadi yang memutuskan. Inilah inti rantai human-in-the-loop |
+| **Menjalankan evaluasi** | Yang menghasilkan angka tidak boleh menjadi yang menilai ketepatannya. Tanpa pemisahan ini, *precision* dan *recall* dinilai oleh pihak yang berkepentingan atas hasilnya |
 
-Peran teknis di hulu. Analyst menyiapkan bahan: memasukkan dan mengoreksi data
-kejadian, menjalankan penilaian risiko, menjalankan dan mempublikasikan prediksi, serta
-menjalankan evaluasi ketepatan prediksi.
-
-Analyst melihat semuanya dan menyentuh hampir semuanya — tetapi **tidak dapat
-memutuskan apa pun**. Itu disengaja: yang menyiapkan angka tidak boleh menjadi yang
-menyetujui tindakan atas angka itu.
+Pemisahan kedua itu hanya berbiaya satu kewenangan, tetapi ia yang membuat angka validasi
+sistem ini dapat dipertahankan ketika ditanya siapa yang memverifikasinya.
 
 #### Fungsi (Samapta, Binmas, Intelkam, Reskrim, Lantas)
 
@@ -135,20 +134,13 @@ menyatakan batas kewenangan secara terbuka alih-alih berpura-pura wilayah lain t
 ada.
 
 Polsek dapat **menerima** peringatan di wilayahnya, tetapi **tidak dapat
-menyatakannya selesai** — penutupan peringatan tetap kewenangan Command Center.
-
-#### Administrator
-
-Mengelola akun, peran, dan konfigurasi sistem. Perhatikan yang **tidak** dimilikinya:
-Administrator **tidak dapat menyetujui rekomendasi**, dan **tidak dapat menjalankan
-prediksi**. Kewenangan teknis atas sistem sengaja dipisahkan dari kewenangan
-operasional atas keputusan.
+menyatakannya selesai** — penutupan peringatan tetap kewenangan Administrator.
 
 ### 3.3 Prinsip yang mendasari pembagian ini
 
 | Prinsip | Wujudnya di sistem |
 |---|---|
-| Pemisahan kewenangan | Yang menyiapkan (Analyst) ≠ yang memutuskan (Pimpinan) ≠ yang melaksanakan (Command Center, Fungsi, Polsek) |
+| Pemisahan kewenangan | Yang menyiapkan dan melaksanakan (Administrator, Fungsi, Polsek) ≠ yang **memutuskan** (Pimpinan) ≠ yang **menilai ketepatan** (Pimpinan) |
 | Kebutuhan untuk tahu | Polsek dibatasi wilayah, Fungsi dibatasi fungsi |
 | Ditegakkan di server | Menyembunyikan tombol **bukan** pengamanan. Setiap permintaan diperiksa ulang di sisi server; akun yang memaksa tetap ditolak, dan penolakannya tercatat di audit |
 | Kebocoran tidak dibiarkan lewat pesan galat | Data di luar wilayah dijawab **"tidak ditemukan"**, bukan "terlarang" — sebab "terlarang" justru membocorkan bahwa datanya ada di wilayah lain |
@@ -253,8 +245,8 @@ Menu **Early Warning**.
 1. Pilih peringatan dari daftar.
 2. Panel kanan menampilkan prediksi sumbernya beserta faktor dominannya — **dasar**
    peringatan itu, bukan sekadar pemberitahuan.
-3. Tekan **Terima Peringatan** (Command Center atau Polsek di wilayahnya).
-4. Tekan **Nyatakan Selesai** bila sudah tertangani (Command Center).
+3. Tekan **Terima Peringatan** (Administrator, atau Polsek di wilayahnya).
+4. Tekan **Nyatakan Selesai** bila sudah tertangani (Administrator).
 
 Tombol hanya muncul bila status **dan** kewenangan mengizinkan. Bila Anda tidak
 berwenang, layar menyatakannya terus terang.

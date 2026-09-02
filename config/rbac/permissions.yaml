@@ -57,6 +57,16 @@ roles:
       - citizen_report:read
       - community_feedback:read
       - evaluation:read
+      # DIPINDAHKAN dari Administrator, 1 September 2026 — keputusan pemilik proyek.
+      #
+      # Yang bergantung pada alat ukur adalah yang memerintahkan pengukurannya.
+      # Sebelum ini, peran yang menulis data kejadian, menjalankan prediksi, dan
+      # mencatat hasil operasi juga yang menjalankan evaluasi atas ketepatannya
+      # sendiri — precision dan recall dinilai oleh pihak yang menghasilkannya.
+      #
+      # Pemisahan ini murah (satu permission) tetapi menutup pertanyaan yang paling
+      # mungkin diajukan penguji Taskap: siapa yang memverifikasi angka validasinya.
+      - evaluation:run
       - audit:read
       - config:read
 
@@ -162,21 +172,21 @@ roles:
   #
   # KONSEKUENSI YANG HARUS DISADARI, dan dinyatakan di sini supaya tidak hilang:
   #
-  # Peran ini kini memegang 40 dari 43 permission. Ia menulis data kejadian
-  # (`crime:write`), menjalankan prediksi (`prediction:run`), mempublikasikannya
-  # (`prediction:publish`), mencatat hasil operasi (`operation:write`), DAN menjalankan
-  # evaluasi yang menilai ketepatan semuanya (`evaluation:run`).
+  # Peran ini memegang 40 dari 43 permission. Ia menulis data kejadian (`crime:write`),
+  # menjalankan prediksi (`prediction:run`), mempublikasikannya (`prediction:publish`),
+  # dan mencatat hasil operasi (`operation:write`).
   #
-  # Artinya tidak ada lagi pemisahan antara yang menghasilkan angka dan yang menilai
-  # angka itu. Bila penguji bertanya "siapa yang memverifikasi precision dan recall",
-  # jawabannya kini "peran yang sama yang menghasilkannya".
+  # DUA hal sengaja berada di luar jangkauannya, dan keduanya milik Pimpinan:
   #
-  # Yang TETAP terjaga: `commander_decision:approve` hanya milik Pimpinan, sehingga
-  # rantai human-in-the-loop — inti klaim Taskap — tidak berubah sama sekali.
+  #   `commander_decision:approve` — inti rantai human-in-the-loop. Yang mengusulkan
+  #   tidak boleh menjadi yang memutuskan.
   #
-  # Bila kelak ingin memulihkan sebagian pemisahan tanpa menambah peran, jalan
-  # termurahnya adalah memindahkan `evaluation:run` ke Pimpinan: yang bergantung pada
-  # alat ukur adalah yang memerintahkan pengukurannya.
+  #   `evaluation:run` — dipindahkan 1 September 2026. Tanpa itu, peran yang
+  #   menghasilkan angka juga yang menilai ketepatannya sendiri, dan precision serta
+  #   recall kehilangan artinya sebagai ukuran independen.
+  #
+  # Keduanya murah — dua permission — tetapi keduanya menutup pertanyaan yang paling
+  # mungkin diajukan penguji: siapa yang memutuskan, dan siapa yang memverifikasi.
   Administrator:
     ALL:
       - dashboard:read
@@ -223,7 +233,6 @@ roles:
       - citizen_report:write
       - community_feedback:read
       - evaluation:read
-      - evaluation:run
       - user:manage
       - user:read
       - role:manage

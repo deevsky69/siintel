@@ -222,11 +222,21 @@ Dua cacat lain ikut terungkap dan diperbaiki: seed RBAC hanya menyisipkan sehing
 konfigurasi tidak pernah dapat mencabut apa pun, dan sebuah test memeriksa isi tabel
 padahal seharusnya menguji perilaku seed.
 
-**Keputusan 1 — dampaknya.** Karena peran tetap enam, pemisahan Analyst dan Command
-Center dipertahankan. Perlu dicatat bahwa risiko "menilai pekerjaan sendiri" tetap ada di
-dalam peran Analyst sendiri, yang memegang `crime:write` dan `evaluation:run` sekaligus.
-Bila kelak ingin ditutup, garisnya bukan antara Analyst dan Command Center, melainkan
-antara yang mencatat `prediction_actual` dan yang menjalankan evaluasi.
+**Keputusan 1 — kemudian dibalik, dan celahnya justru tertutup.** Pemilik proyek
+menggabungkan Command Center dan Analyst ke Administrator pada hari yang sama, sehingga
+peran menjadi empat.
+
+Penggabungan itu mula-mula **memperparah** risiko "menilai pekerjaan sendiri": satu peran
+menulis data kejadian, menjalankan prediksi, mencatat hasil operasi, dan menjalankan
+evaluasi atas ketepatan semuanya.
+
+Celah itu kini ditutup dengan memindahkan `evaluation:run` ke **Pimpinan** — dan garisnya
+tepat seperti yang dicatat di sini: bukan antara Analyst dan Command Center, melainkan
+antara yang menghasilkan angka dan yang menilainya. Yang bergantung pada alat ukur adalah
+yang memerintahkan pengukurannya.
+
+Dijaga `test_rbac_separation_of_duties.py`, yang gagal bila kewenangan penghasil angka dan
+kewenangan penilai kembali berkumpul di satu peran.
 
 **Keputusan 4 — sedang dikerjakan.** API tindakan operasional dan hasil nyata sudah ada
 (TASK 131); layarnya menyusul.

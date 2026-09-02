@@ -534,8 +534,7 @@
           <thead><tr><th>Pembaca</th><th>Bagian</th></tr></thead>
           <tbody>
             <tr><td>Pejabat yang menyetujui rekomendasi</td><td class="mono">03 · 05 · 08</td></tr>
-            <tr><td>Petugas Command Center</td><td class="mono">03 · 05 · 07</td></tr>
-            <tr><td>Analis</td><td class="mono">03 · 05 · 09</td></tr>
+            <tr><td>Petugas Administrator</td><td class="mono">03 · 05 · 07 · 09</td></tr>
             <tr><td>Petugas Polsek</td><td class="mono">03 · 05 · 07</td></tr>
             <tr><td>Administrator</td><td class="mono">03 · 10 · 11</td></tr>
             <tr><td>Penguji dan peninjau</td><td class="mono">02 · 03 · 12 · 13</td></tr>
@@ -613,28 +612,18 @@
           <dl>
             <div><dt>Tugas pokok</dt><dd>Menilai dan memutuskan rekomendasi tindakan.</dd></div>
             <div><dt>Cakupan data</dt><dd>Seluruh wilayah Polres.</dd></div>
-            <div><dt>Hanya peran ini</dt><dd><strong>Menyetujui, memodifikasi, atau menolak rekomendasi.</strong></dd></div>
-            <div class="cannot"><dt>Tidak dapat</dt><dd>Menerima atau menyelesaikan peringatan harian — itu pekerjaan Command Center.</dd></div>
+            <div><dt>Hanya peran ini</dt><dd><strong>Menyetujui, memodifikasi, atau menolak rekomendasi</strong>, dan <strong>menjalankan evaluasi</strong> — yang bergantung pada alat ukur adalah yang memerintahkan pengukurannya.</dd></div>
+            <div class="cannot"><dt>Tidak dapat</dt><dd>Menerima atau menyelesaikan peringatan harian, dan memasukkan data — itu pekerjaan Administrator.</dd></div>
           </dl>
         </article>
 
         <article class="role">
-          <h3 class="role-name" style="margin:0">Command Center</h3>
+          <h3 class="role-name" style="margin:0">Administrator</h3>
           <dl>
-            <div><dt>Tugas pokok</dt><dd>Menjalankan pengendalian harian dan mencatat pelaksanaan operasi.</dd></div>
-            <div><dt>Cakupan data</dt><dd>Seluruh wilayah Polres.</dd></div>
-            <div><dt>Hanya peran ini</dt><dd><strong>Menyatakan peringatan selesai</strong> dan mencatat tindakan operasional.</dd></div>
-            <div class="cannot"><dt>Tidak dapat</dt><dd>Menyetujui rekomendasinya sendiri. Usulan tetap melewati Pimpinan.</dd></div>
-          </dl>
-        </article>
-
-        <article class="role">
-          <h3 class="role-name" style="margin:0">Analyst</h3>
-          <dl>
-            <div><dt>Tugas pokok</dt><dd>Menyiapkan bahan: data kejadian, penilaian risiko, prediksi, evaluasi.</dd></div>
-            <div><dt>Cakupan data</dt><dd>Seluruh wilayah Polres.</dd></div>
-            <div><dt>Hanya peran ini</dt><dd>Menjalankan <span class="mono">risk_score:run</span>, <span class="mono">prediction:run</span>, <span class="mono">prediction:publish</span>, <span class="mono">evaluation:run</span>.</dd></div>
-            <div class="cannot"><dt>Tidak dapat</dt><dd>Memutuskan apa pun. Yang menyiapkan angka tidak boleh menyetujui tindakan atas angka itu.</dd></div>
+            <div><dt>Tugas pokok</dt><dd>Memasukkan data, menjalankan penilaian risiko dan prediksi, mengendalikan peringatan, mencatat pelaksanaan operasi, serta mengelola akun dan peran.</dd></div>
+            <div><dt>Cakupan data</dt><dd>Seluruh wilayah Polres. Memegang 40 dari 43 kewenangan.</dd></div>
+            <div><dt>Hanya peran ini</dt><dd>Menjalankan penilaian risiko dan prediksi, menyelesaikan peringatan, mencatat hasil operasi, mengelola pengguna.</dd></div>
+            <div class="cannot"><dt>Tidak dapat</dt><dd><strong>Menyetujui rekomendasi</strong> — yang mengusulkan bukan yang memutuskan. Dan <strong>menjalankan evaluasi</strong> — yang menghasilkan angka bukan yang menilai ketepatannya.</dd></div>
           </dl>
         </article>
 
@@ -654,21 +643,11 @@
             <div><dt>Tugas pokok</dt><dd>Bertindak di wilayah hukumnya dan mencatat laporan masyarakat.</dd></div>
             <div><dt>Cakupan data</dt><dd><strong>Dibatasi menurut wilayah hukum.</strong> Di peta, kecamatan lain tetap tergambar bertanda “tidak ada data” — bukan disembunyikan.</dd></div>
             <div><dt>Hanya peran ini</dt><dd>Mencatat laporan masyarakat di wilayahnya.</dd></div>
-            <div class="cannot"><dt>Tidak dapat</dt><dd>Menyatakan peringatan selesai. Menerima boleh; menutup tetap kewenangan Command Center.</dd></div>
+            <div class="cannot"><dt>Tidak dapat</dt><dd>Menyatakan peringatan selesai. Menerima boleh; menutup tetap kewenangan Administrator.</dd></div>
           </dl>
         </article>
 
-        <article class="role">
-          <h3 class="role-name" style="margin:0">Administrator</h3>
-          <dl>
-            <div><dt>Tugas pokok</dt><dd>Mengelola akun, peran, dan konfigurasi sistem.</dd></div>
-            <div><dt>Cakupan data</dt><dd>Seluruh wilayah Polres.</dd></div>
-            <div><dt>Hanya peran ini</dt><dd>Mengelola pengguna dan peran (<span class="mono">user:manage</span>, <span class="mono">role:manage</span>).</dd></div>
-            <div class="cannot"><dt>Tidak dapat</dt><dd>Menyetujui rekomendasi maupun menjalankan prediksi. Kewenangan teknis dipisahkan dari kewenangan operasional.</dd></div>
-          </dl>
-        </article>
-
-      </div>
+        </div>
 
       <h3>Prinsip yang mendasari pembagian ini</h3>
       <div class="table-wrap">
@@ -677,7 +656,7 @@
           <tbody>
             <tr>
               <td>Pemisahan kewenangan</td>
-              <td>Yang menyiapkan (Analyst) ≠ yang memutuskan (Pimpinan) ≠ yang melaksanakan (Command Center, Fungsi, Polsek).</td>
+              <td>Yang menyiapkan dan melaksanakan (Administrator, Fungsi, Polsek) ≠ yang <strong>memutuskan</strong> (Pimpinan) ≠ yang <strong>menilai ketepatan</strong> (Pimpinan).</td>
             </tr>
             <tr>
               <td>Kebutuhan untuk tahu</td>
@@ -812,8 +791,8 @@
       <ol class="steps">
         <li><span>Pilih peringatan dari daftar.</span></li>
         <li><span>Panel kanan menampilkan prediksi sumbernya beserta faktor dominannya — <strong>dasar</strong> peringatan itu, bukan sekadar pemberitahuan.</span></li>
-        <li><span>Tekan <strong>Terima Peringatan</strong> — Command Center, atau Polsek di wilayahnya.</span></li>
-        <li><span>Tekan <strong>Nyatakan Selesai</strong> bila sudah tertangani — Command Center.</span></li>
+        <li><span>Tekan <strong>Terima Peringatan</strong> — Administrator, atau Polsek di wilayahnya.</span></li>
+        <li><span>Tekan <strong>Nyatakan Selesai</strong> bila sudah tertangani — Administrator.</span></li>
       </ol>
 
       <p>
