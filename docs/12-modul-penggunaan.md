@@ -163,6 +163,8 @@ Yang perlu diketahui:
 - Menu yang tampil mengikuti peran Anda, tetapi **yang menentukan adalah server** —
   membuka alamat halaman secara langsung tidak melewati pembatasan.
 - Tombol **Keluar** di kanan atas mengakhiri sesi dan mengembalikan Anda ke halaman masuk.
+- Halaman masuk memuat jalan kembali ke **Lapor Kejadian** dan **Halaman Muka**, untuk warga
+  yang salah menekan tombol.
 
 ### Susunan menu
 
