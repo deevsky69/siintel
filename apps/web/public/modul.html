@@ -1444,9 +1444,58 @@ di mana saya menaruh sumber daya</pre>
       <h2 class="sec"><span class="num">17</span><span>Laporan masyarakat</span></h2>
       <p class="sec-note">Sinyal dari publik</p>
 
+      <h3>Bagaimana masyarakat mengirim laporan</h3>
       <p>
-        Menu <strong>Community</strong>. Ringkasan sinyal dari masyarakat: jumlah per status dan
-        kategori, wilayah dengan laporan terbanyak, dan daftar laporan yang dapat disaring.
+        Warga <strong>tidak masuk ke aplikasi ini</strong>. Mereka membuka halaman muka dan menekan
+        <strong>Lapor Kejadian</strong>:
+      </p>
+      <pre>siintel.awansurya.com  &#8594;  Lapor Kejadian  &#8594;  formulir  &#8594;  nomor tiket</pre>
+      <p>
+        Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
+        pengiriman adalah <strong>nomor tiket</strong> seperti <span class="mono">RPT-0151</span> —
+        satu-satunya penanda yang dipegangnya, dan ia tidak terikat ke nama siapa pun.
+      </p>
+
+      <p>Yang <strong>tidak</strong> ada di formulir itu, dan ketiadaannya disengaja:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tidak ada</th><th>Alasannya</th></tr></thead>
+          <tbody>
+            <tr><td>Kolom nama, telepon, alamat pelapor</td><td>Basis data memang tidak punya tempat untuk itu. Menyediakan kolomnya hanya akan menampung data yang lalu dibuang, sementara pelapor mengira datanya tersimpan.</td></tr>
+            <tr><td>Unggah foto atau video</td><td>Menyimpan berkas warga menyentuh retensi dan klasifikasi data — keputusan kebijakan yang belum diambil, bukan pekerjaan yang belum sempat.</td></tr>
+            <tr><td>Penanda &#8220;mendesak&#8221;</td><td>Urgensi ditetapkan petugas saat triase. Bila pelapor dapat mengisinya, siapa pun dapat menaikkan prioritas laporannya sendiri.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Yang dijaga di sisi sistem:</p>
+      <ul>
+        <li><strong>Kategori dari daftar tertutup</strong>, bukan isian bebas. Dua ejaan untuk satu hal akan memecah seluruh analisis pola, dan pada kanal publik ejaannya pasti bermacam-macam.</li>
+        <li><strong>Lokasi sebatas kecamatan.</strong> Titik pada peta adalah pusat kecamatan, <strong>bukan TKP sebenarnya</strong> — dan itu dinyatakan di layar.</li>
+        <li><strong>Paling banyak 10 laporan per jam dari satu jaringan.</strong> Longgar dengan sengaja: satu kantor dapat berbagi satu alamat IP.</li>
+        <li><strong>Kejadian paling lama 30 hari ke belakang.</strong> Yang lebih lama diarahkan ke Polsek setempat.</li>
+        <li><strong>Setiap pengiriman tercatat di jejak audit tanpa nama pengguna</strong> — memang tidak ada pengguna di baliknya, dan mengarangnya akan merusak arti kolom itu.</li>
+      </ul>
+
+      <div class="note caution">
+        <span class="label">Bukan pengganti laporan polisi</span>
+        <p>
+          Halaman itu menyatakannya sendiri dan mengarahkan keadaan darurat ke <strong>110</strong>.
+          Peringatan itu diletakkan <strong>di atas</strong> formulir, bukan di bawah tombol kirim:
+          orang yang sedang panik tidak membaca catatan kaki.
+        </p>
+      </div>
+
+      <p>
+        Laporan yang masuk berstatus <strong>Diterima</strong> dan menunggu verifikasi petugas.
+        Selama belum diverifikasi, ia tidak menjadi dasar tindakan.
+      </p>
+
+      <h3>Yang dilihat petugas</h3>
+      <p>
+        Menu <strong>Masyarakat</strong>. Ringkasan sinyal dari masyarakat: jumlah per status dan
+        kategori, wilayah dengan laporan terbanyak, dan daftar laporan yang dapat disaring. Triasenya
+        dikerjakan dari tab <strong>Triase</strong> pada menu <strong>Input Data</strong> (&sect;7).
       </p>
       <div class="note caution">
         <span class="label">Belum memengaruhi skor risiko sama sekali</span>

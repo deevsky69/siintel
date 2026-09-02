@@ -709,8 +709,53 @@ nyata belum ditetapkan resmi.
 
 ## 17. LAPORAN MASYARAKAT
 
-Menu **Community**. Ringkasan sinyal dari masyarakat: jumlah per status dan kategori,
-wilayah dengan laporan terbanyak, dan daftar laporan yang dapat disaring.
+### Bagaimana masyarakat mengirim laporan
+
+Warga **tidak masuk ke aplikasi ini**. Mereka membuka halaman muka dan menekan **Lapor
+Kejadian**:
+
+```text
+siintel.awansurya.com  →  Lapor Kejadian  →  formulir  →  nomor tiket
+```
+
+Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
+pengiriman adalah **nomor tiket** seperti `RPT-0151` — satu-satunya penanda yang
+dipegangnya, dan ia tidak terikat ke nama siapa pun.
+
+Yang **tidak** ada di formulir itu, dan ketiadaannya disengaja:
+
+| Tidak ada | Alasannya |
+|---|---|
+| Kolom nama, telepon, alamat pelapor | Basis data memang tidak punya tempat untuk itu. Menyediakan kolomnya hanya akan menampung data yang lalu dibuang, sementara pelapor mengira datanya tersimpan |
+| Unggah foto atau video | Menyimpan berkas warga menyentuh retensi dan klasifikasi data — keputusan kebijakan yang belum diambil, bukan pekerjaan yang belum sempat |
+| Penanda "mendesak" | Urgensi ditetapkan petugas saat triase. Bila pelapor dapat mengisinya, siapa pun dapat menaikkan prioritas laporannya sendiri |
+
+Yang dijaga di sisi sistem:
+
+- **Kategori dari daftar tertutup**, bukan isian bebas. Dua ejaan untuk satu hal akan
+  memecah seluruh analisis pola, dan pada kanal publik ejaannya pasti bermacam-macam.
+- **Lokasi sebatas kecamatan.** Pelapor memilih kecamatan dan boleh menambahkan keterangan
+  tempat sebagai teks. Titik pada peta adalah pusat kecamatan, **bukan TKP sebenarnya** —
+  dan itu dinyatakan di layar.
+- **Paling banyak 10 laporan per jam dari satu jaringan.** Longgar dengan sengaja: satu
+  kantor atau satu keluarga dapat berbagi satu alamat IP.
+- **Kejadian paling lama 30 hari ke belakang.** Yang lebih lama diarahkan ke Polsek
+  setempat.
+- **Setiap pengiriman tercatat di jejak audit tanpa nama pengguna** — memang tidak ada
+  pengguna di baliknya, dan mengarangnya akan merusak arti kolom itu.
+
+> **Halaman itu menyatakan sendiri bahwa ia bukan pengganti laporan polisi resmi**, dan
+> mengarahkan keadaan darurat ke **110**. Peringatan itu diletakkan **di atas** formulir,
+> bukan di bawah tombol kirim: orang yang sedang panik tidak membaca catatan kaki.
+
+Laporan yang masuk berstatus **Diterima** dan menunggu verifikasi petugas. Selama belum
+diverifikasi, ia tidak menjadi dasar tindakan.
+
+### Yang dilihat petugas
+
+Menu **Masyarakat**. Ringkasan sinyal dari masyarakat: jumlah per status dan kategori,
+wilayah dengan laporan terbanyak, dan daftar laporan yang dapat disaring. Triasenya
+dikerjakan dari tab **Triase** pada menu **Input Data** (§7).
 
 > **Laporan masyarakat belum memengaruhi skor risiko sama sekali.** Spesifikasi menuntut
 > klasifikasi, deteksi duplikasi, deteksi spam, dan validasi analis lebih dulu — keempatnya

@@ -36,6 +36,7 @@ from .api.routers import (
     operations,
     patterns,
     prediction_center,
+    public_intake,
     scoring,
     warning_actions,
 )
@@ -90,6 +91,7 @@ def create_app() -> FastAPI:
     api.include_router(map_view.router)
     api.include_router(dashboard.router)
     api.include_router(leadership.router)
+    api.include_router(public_intake.router)
     api.include_router(evaluation.router)
     api.include_router(patterns.router)
     api.include_router(analytics.router)

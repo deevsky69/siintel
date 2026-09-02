@@ -176,3 +176,32 @@ labels:
     HIT: Tepat
     FALSE_POSITIVE: Salah Prediksi
     FALSE_NEGATIVE: Tidak Terprediksi
+
+# =============================================================================
+# KATEGORI LAPORAN MASYARAKAT — kanal publik
+# =============================================================================
+#
+# Daftar tertutup yang boleh dipilih pelapor pada halaman `/lapor`. Nilainya disimpan apa
+# adanya ke `citizen_reports.category` — tidak dipetakan ke UPPER_SNAKE, karena kolom ini
+# memang menyimpan istilah yang dipakai masyarakat, bukan nomenklatur kedinasan.
+#
+# MENGAPA TERTUTUP, BUKAN ISIAN BEBAS
+#
+#   Isian bebas terlihat lebih ramah, tetapi dua ejaan untuk satu hal akan memecah seluruh
+#   analisis pola — dan pada kanal publik ejaannya pasti bermacam-macam. Daftar tertutup
+#   juga menutup satu jalur penyalahgunaan: kolom teks bebas yang dapat diisi siapa saja
+#   tanpa akun.
+#
+# Kategorinya sengaja BUKAN jenis gangguan kedinasan (`incident_type` di atas). Pelapor
+# bukan penyidik: ia melaporkan apa yang dilihatnya, bukan menetapkan pasal. Pemetaan ke
+# jenis gangguan resmi terjadi saat triase oleh petugas.
+#
+# Status: PROPOSED — daftar ini mengikuti kategori yang sudah ada pada data contoh, dan
+# belum ditetapkan SOP mana pun.
+citizen_report_categories:
+  - Kejahatan Jalanan
+  - Pencurian Kendaraan
+  - Tawuran dan Perkelahian Kelompok
+  - Keramaian Meresahkan
+  - Gangguan Lalu Lintas
+  - Kerawanan Lingkungan

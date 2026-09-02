@@ -46,13 +46,23 @@ PROXY_CONTAINER="coolify-proxy"
 
 docker() { sg docker -c "docker $*"; }
 
+# `+nocookie` dipakai dengan sengaja: sebagian jaringan memutus DNS cookie di tengah
+# jalan, dan dig lalu menjawab "Client COOKIE mismatch" dengan keluaran KOSONG. Tanpa
+# opsi ini, pemeriksaan di bawah menyimpulkan recordnya belum ada padahal ada.
+dig_txt() { dig +nocookie +short TXT "_acme-challenge.$DOMAIN" "@$1" 2>/dev/null | grep -v '^$' || true; }
+
 echo "==> Memeriksa record TXT"
-if ! dig +short TXT "_acme-challenge.$DOMAIN" @8.8.8.8 | grep -q .; then
-    echo "GAGAL: record TXT _acme-challenge.$DOMAIN belum terlihat dari resolver publik." >&2
+# Ditanyakan ke nameserver otoritatif LEBIH DULU, bukan hanya ke resolver publik:
+# resolver publik dapat menyimpan jawaban NXDOMAIN lama selama berjam-jam, sehingga
+# record yang sudah benar tetap terbaca "belum ada".
+FOUND="$(dig_txt ns1.domainesia.net)"
+[ -n "$FOUND" ] || FOUND="$(dig_txt 8.8.8.8)"
+if [ -z "$FOUND" ]; then
+    echo "GAGAL: record TXT _acme-challenge.$DOMAIN belum ada di nameserver otoritatif." >&2
     echo "       Pasang dulu di panel DNS, tunggu penyebarannya, lalu ulangi." >&2
     exit 1
 fi
-dig +short TXT "_acme-challenge.$DOMAIN" @8.8.8.8 | sed 's/^/    terbaca: /'
+echo "$FOUND" | sed 's/^/    terbaca: /'
 
 echo "==> Menyelesaikan verifikasi Let's Encrypt"
 "$ACME" --renew -d "$DOMAIN" --yes-I-know-dns-manual-mode-enough-go-ahead-please

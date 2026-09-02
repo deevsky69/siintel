@@ -350,7 +350,37 @@ Audit: `CREATE_OPERATIONAL_ACTION`, `UPDATE_OPERATIONAL_ACTION`.
 | PATCH | `/citizen-reports/{id}` | `citizen_report:write` |
 | GET | `/community-feedback` | `community_feedback:read` |
 
-> `NOT SPECIFIED` (U-13): kanal publik/mobile untuk mengirim laporan, identitas pelapor, lampiran bukti, dan cara pelapor memantau status. Endpoint di atas adalah kanal **internal**; kanal publik menunggu keputusan kebijakan.
+### 2.11b Kanal publik LAPOR PRESISI — **tanpa autentikasi**
+
+| Method | Path | Permission |
+|---|---|---|
+| GET | `/public/report-options` | — ✅ **ADA** |
+| POST | `/public/citizen-reports` | — ✅ **ADA** |
+
+**Keputusan pemilik proyek, 2 September 2026.** Bentuknya mengikuti `docs/14` §3:
+pengiriman **tanpa akun**, dan nomor tiket sebagai satu-satunya penanda yang dipegang
+pelapor. Ini satu-satunya bagian API yang dilayani tanpa autentikasi, sehingga batasnya
+ditulis di sini secara lengkap:
+
+| Batas | Alasannya |
+|---|---|
+| **Field tak dikenal ditolak** (`extra="forbid"`), bukan diabaikan | Pengirim yang menyertakan nama atau nomor telepon menerima penolakan yang menyebut fieldnya. Membuang diam-diam terasa lebih ramah tetapi menyesatkan orang yang menyerahkan datanya: ia menerima keberhasilan dan mengira namanya tersimpan |
+| **`status` selalu `RECEIVED`; `urgency_score` dan `verification_score` tidak diterima** | Keduanya penilaian petugas. Membiarkan pelapor mengisinya berarti membiarkan siapa pun menaikkan prioritas laporannya sendiri |
+| **Kategori dari daftar tertutup** `citizen_report_categories` | Isian bebas memecah analisis pola dengan dua ejaan untuk satu hal, dan pada kanal publik ejaannya pasti bermacam-macam |
+| **Koordinat dari master lokasi**, pelapor hanya memilih kecamatan | Meminta koordinat kepada pelapor berarti menerima titik yang tidak dapat diperiksa siapa pun. Ketepatannya sebatas kecamatan, dan respons menyatakannya pada `coordinate_basis` |
+| **Pembatas laju 10 kiriman/jam/alamat IP** → `429` | Kolom teks yang dapat diisi tanpa akun adalah tempat paling mudah membanjiri basis data. Angkanya longgar: satu kantor dapat berbagi satu IP |
+| **Waktu kejadian ≤ 30 hari** | Laporan yang lebih lama bukan laporan kamtibmas yang dapat ditindak; pesan penolakannya mengarahkan ke Polsek setempat |
+| **`GET /public/report-options` hanya mengembalikan pilihan isian** | Kanal publik tidak boleh menjadi jendela ke dalam sistem. Ada test yang mengunci daftar field responsnya |
+
+Jejak auditnya dicatat dengan **`user_id` kosong** — memang tidak ada pengguna di balik
+peristiwa ini, dan mengisinya dengan akun sistem akan membuat audit menyatakan sesuatu yang
+tidak terjadi.
+
+> **Masih `NOT SPECIFIED` (U-13):** identitas pelapor, lampiran bukti (foto/video/audio),
+> dan cara pelapor memantau status laporannya sendiri. Kanal di atas sengaja dirancang agar
+> **tidak menuntut** satu pun dari ketiganya, sehingga keputusan kebijakannya tetap utuh di
+> tangan pemilik proyek. Aplikasi Android LAPOR PRESISI (PHASE 17) tetap direncanakan
+> terpisah.
 
 ### 2.12 Dashboard & Executive Brief
 

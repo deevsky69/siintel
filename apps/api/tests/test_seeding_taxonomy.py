@@ -118,3 +118,21 @@ def test_invalid_datetime_stops_the_seed() -> None:
 def test_missing_file_stops_the_seed() -> None:
     with pytest.raises(SeedError, match="tidak ditemukan"):
         src.read_rows("berkas_yang_tidak_ada.csv")
+
+
+def test_seeded_report_categories_are_all_offered_on_the_public_form() -> None:
+    """Kategori pada data contoh harus ada di daftar yang ditawarkan kanal publik.
+
+    Keduanya hidup di tempat berbeda — pembangkit data di `seeding/regenerate.py`, daftar
+    pilihan di `config/taxonomy/mappings.yaml` — dan tidak ada yang menghubungkannya selain
+    test ini. Bila keduanya menyimpang, layar publik menawarkan kategori yang tidak pernah
+    muncul di data, atau data memuat kategori yang tidak dapat dipilih siapa pun. Keduanya
+    tidak menimbulkan galat apa pun.
+    """
+    from prediksi_presisi_api.api.routers.public_intake import load_report_categories
+    from prediksi_presisi_api.seeding.regenerate import REPORT_CATEGORIES
+
+    offered = set(load_report_categories())
+    seeded = {category.name for category in REPORT_CATEGORIES}
+
+    assert seeded <= offered, f"kategori pada data contoh tidak ditawarkan: {seeded - offered}"
