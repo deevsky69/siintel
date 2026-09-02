@@ -167,18 +167,112 @@ Yang perlu diketahui:
 
 ## 5. DASHBOARD — LAYAR PERTAMA
 
-Ringkasan situasi terkini dalam satu layar.
+Layar ini tersusun mengikuti **urutan pertanyaan**, bukan urutan ketersediaan data:
 
-| Panel | Isinya | Yang perlu diperhatikan |
+```text
+apa yang masuk hari ini
+        ↓
+bagaimana keadaan wilayah saya
+        ↓
+apa yang menuntut perhatian saya sekarang
+        ↓
+di mana saya menaruh sumber daya
+```
+
+Seluruh isinya dibatasi kewenangan Anda. Petugas Polsek melihat susunan yang sama berisi
+wilayahnya sendiri.
+
+### Empat kartu di baris pertama
+
+| Kartu | Isinya | Yang perlu diperhatikan |
 |---|---|---|
-| Indeks keamanan | Angka 0–100 | **Selalu disertai keterangan asalnya.** Ini bukan indeks resmi Polri |
-| Kejadian & prediksi 24 jam | Jumlah terbaru | Mengikuti waktu acuan sistem |
-| Ancaman teratas | Jenis ancaman berperingkat | Diurut menurut skor risiko |
-| Risiko per kecamatan | Wilayah berperingkat | Menunjukkan mana yang perlu perhatian |
-| Peringatan dini | Peringatan aktif dengan risiko tertinggi | Jalan masuk ke Warning Center |
-| Rekomendasi | Usulan tindakan | Disertai penegasan bahwa ini bukan perintah |
-| Outlook prediktif | Prediksi tiap horizon waktu | Horizon tanpa prediksi ditandai, bukan diisi angka |
-| Tren & status patroli | Tren bulanan dan kesiapan unit | |
+| **Laporan Masuk** | Jumlah laporan 24 jam terakhir | **Rinciannya tiga jenis**, dan ketiganya berbeda keandalan — lihat di bawah |
+| **Status Wilayah** | Aman / Waspada / Siaga per kecamatan | Pemetaannya **belum disetujui** — lihat di bawah |
+| **Perlu Perhatian Segera** | Butir yang masih menunggu manusia | Peringatan belum diterima, rekomendasi belum diputus, laporan belum diverifikasi |
+| **Wilayah Prioritas** | Tiga kecamatan berisiko tertinggi | Menampilkan **sel tertinggi / rata-rata** berdampingan |
+
+**"Laporan" bukan satu hal.** Sistem memuat tiga jenis catatan yang sama-sama disebut
+laporan, dan kartu ini mencacahnya terpisah dengan sengaja:
+
+| Jenis | Asalnya | Catatan |
+|---|---|---|
+| Kejadian kriminal | Dicatat petugas | Sudah terverifikasi |
+| Laporan intelijen | Fungsi Intelkam | Dicacah **per hari**, bukan per 24 jam — tabelnya hanya menyimpan tanggal, tanpa jam |
+| Laporan masyarakat | Warga | Termasuk yang **belum diverifikasi** |
+
+Sebagian laporan masyarakat tidak memiliki lokasi yang cocok dengan master lokasi. Kartu
+ini menyebut jumlahnya, karena laporan yang hilang tanpa keterangan hanya terlihat sebagai
+angka yang lebih kecil — dan tidak ada cara membedakannya dari keadaan yang memang sepi.
+
+### Status wilayah — yang harus Anda ketahui sebelum mengutipnya
+
+Sistem memiliki **empat** kelas risiko (Rendah, Sedang, Tinggi, Kritis), sedangkan nama
+status yang diminta hanya **tiga**. Dua kelas karena itu harus digabung, dan penggabungan
+itu mengubah makna:
+
+| Status | Berasal dari kelas |
+|---|---|
+| **Aman** | Rendah |
+| **Waspada** | Sedang |
+| **Siaga** | Tinggi + Kritis |
+
+Yang digabung adalah dua kelas **teratas**, bukan dua kelas terbawah. Alasannya: kesalahan
+kedua arah tidak sepadan. Menggabungkan dari atas hanya menyamakan dua kelas yang
+sama-sama menuntut tindakan; menggabungkan dari bawah akan menyebut wilayah berkelas
+Sedang sebagai "Aman", dan kata itu menghentikan orang bertanya lebih jauh.
+
+> **Pemetaan ini berstatus PROPOSED dan belum disetujui siapa pun.** Layar menyatakannya
+> sendiri. Bila SOP menetapkan pemetaan yang berbeda, yang perlu diubah hanya satu berkas
+> konfigurasi — tidak ada satu pun ambang yang tertanam di kode.
+
+Status satu kecamatan mengikuti **sel dengan skor tertinggi** di dalamnya, sama seperti
+layer risiko berjalan pada peta. Definisi itu sengaja disamakan: dua layar yang menjawab
+"berapa risiko di Tebet" dengan angka berbeda akan saling meruntuhkan, dan tidak ada di
+layar yang akan menunjukkan mana yang benar. Kartu Wilayah Prioritas menampilkan rata-rata
+seluruh sel di sebelahnya supaya selisih antara "sel terburuk" dan "keadaan menyeluruh"
+tetap terbaca.
+
+### Top area menurut jumlah laporan
+
+Sepuluh wilayah dengan laporan terbanyak dalam 30 hari terakhir, bertingkat Kritis /
+Sedang / Rendah.
+
+> **Ini bukan peringkat kerawanan.** Yang diperingkat adalah **volume laporan**: tidak
+> ditimbang, dan tidak dinormalkan terhadap luas maupun jumlah penduduk. Wilayah dengan
+> pelaporan yang lebih aktif akan selalu naik, dan wilayah yang warganya jarang melapor
+> akan selalu tampak lebih aman daripada kenyataannya.
+
+Tingkatnya **relatif terhadap wilayah teratas pada jendela yang sedang tampil** — bukan
+terhadap angka mutlak. Jumlah laporan yang sama dapat bertingkat berbeda di jendela lain.
+
+### Isu menonjol sepekan
+
+Cacah kejadian per jenis gangguan pada 7 hari terakhir, dibanding 7 hari sebelumnya.
+Perubahan disajikan sebagai **selisih kejadian**, bukan persentase: dari basis satu
+kejadian menjadi tiga, "naik 200%" terbaca jauh lebih dramatis daripada kenyataannya.
+
+### Rekomendasi kebijakan
+
+Usulan tindakan beserta fungsi yang menanganinya dan **dasar angkanya**.
+
+> **Rencananya blok ini kelak dihasilkan AI. Sekarang belum.** Setiap butir diturunkan
+> dengan **aturan** dari angka yang tampil di layar yang sama, dan diberi label `RULE` —
+> label yang sama dengan faktor dominan pada peta. Menyebutnya keluaran AI sekarang akan
+> menjadi penjelasan fiktif, dan justru pada blok inilah kebohongan itu paling mahal:
+> inilah yang dibaca sebagai saran tindakan.
+>
+> Bila tidak ada yang dapat diturunkan dari data, blok ini **dibiarkan kosong** — bukan
+> diisi saran umum yang terdengar masuk akal tetapi tidak bersandar pada apa pun.
+
+Sebagian jenis rekomendasi belum mungkin dibuat sama sekali. Contohnya "rapat koordinasi
+karena ada Car Free Day": sistem belum memuat kalender kegiatan, dan menambahkannya
+menuntut **sumber data baru**, bukan sekadar aturan baru.
+
+### Panel analitik
+
+Di bawah pemisah "Panel analitik" tersedia panel yang sudah ada sebelumnya: indeks
+keamanan, peta ringkas, ancaman teratas, outlook prediktif, tren bulanan, dan status
+patroli. Panel itu tetap dipertahankan karena masih dipakai peran selain Pimpinan.
 
 > **Kebiasaan yang benar:** setiap angka turunan pada aplikasi ini membawa keterangan
 > asal. Bacalah keterangan itu sebelum mengutip angkanya. Angka tanpa konteks adalah

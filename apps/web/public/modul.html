@@ -704,23 +704,149 @@
 
     <section id="s5">
       <h2 class="sec"><span class="num">05</span><span>Dashboard</span></h2>
-      <p class="sec-note">Ringkasan situasi dalam satu layar</p>
+      <p class="sec-note">Layar pertama, tersusun mengikuti urutan pertanyaan</p>
 
+      <pre>apa yang masuk hari ini
+        &#8595;
+bagaimana keadaan wilayah saya
+        &#8595;
+apa yang menuntut perhatian saya sekarang
+        &#8595;
+di mana saya menaruh sumber daya</pre>
+
+      <p>
+        Seluruh isinya dibatasi kewenangan Anda. Petugas Polsek melihat susunan yang sama berisi
+        wilayahnya sendiri.
+      </p>
+
+      <h3>Empat kartu di baris pertama</h3>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Panel</th><th>Isinya</th><th>Yang perlu diperhatikan</th></tr></thead>
+          <thead><tr><th>Kartu</th><th>Isinya</th><th>Yang perlu diperhatikan</th></tr></thead>
           <tbody>
-            <tr><td>Indeks keamanan</td><td>Angka 0–100</td><td><strong>Selalu disertai keterangan asalnya.</strong> Ini bukan indeks resmi Polri.</td></tr>
-            <tr><td>Kejadian &amp; prediksi 24 jam</td><td>Jumlah terbaru</td><td>Mengikuti waktu acuan sistem.</td></tr>
-            <tr><td>Ancaman teratas</td><td>Jenis ancaman berperingkat</td><td>Diurut menurut skor risiko.</td></tr>
-            <tr><td>Risiko per kecamatan</td><td>Wilayah berperingkat</td><td>Menunjukkan mana yang perlu perhatian.</td></tr>
-            <tr><td>Peringatan dini</td><td>Peringatan aktif dengan risiko tertinggi</td><td>Jalan masuk ke Warning Center.</td></tr>
-            <tr><td>Rekomendasi</td><td>Usulan tindakan</td><td>Disertai penegasan bahwa ini bukan perintah.</td></tr>
-            <tr><td>Outlook prediktif</td><td>Prediksi tiap horizon waktu</td><td>Horizon tanpa prediksi ditandai, bukan diisi angka.</td></tr>
-            <tr><td>Tren &amp; status patroli</td><td>Tren bulanan dan kesiapan unit</td><td>—</td></tr>
+            <tr><td><strong>Laporan Masuk</strong></td><td>Jumlah laporan 24 jam terakhir</td><td><strong>Rinciannya tiga jenis</strong>, dan ketiganya berbeda keandalan.</td></tr>
+            <tr><td><strong>Status Wilayah</strong></td><td>Aman / Waspada / Siaga per kecamatan</td><td>Pemetaannya <strong>belum disetujui</strong>.</td></tr>
+            <tr><td><strong>Perlu Perhatian Segera</strong></td><td>Butir yang masih menunggu manusia</td><td>Peringatan belum diterima, rekomendasi belum diputus, laporan belum diverifikasi.</td></tr>
+            <tr><td><strong>Wilayah Prioritas</strong></td><td>Tiga kecamatan berisiko tertinggi</td><td>Menampilkan <strong>sel tertinggi / rata-rata</strong> berdampingan.</td></tr>
           </tbody>
         </table>
       </div>
+
+      <p><strong>&#8220;Laporan&#8221; bukan satu hal.</strong> Sistem memuat tiga jenis catatan yang
+      sama-sama disebut laporan, dan kartu ini mencacahnya terpisah dengan sengaja:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Jenis</th><th>Asalnya</th><th>Catatan</th></tr></thead>
+          <tbody>
+            <tr><td>Kejadian kriminal</td><td>Dicatat petugas</td><td>Sudah terverifikasi.</td></tr>
+            <tr><td>Laporan intelijen</td><td>Fungsi Intelkam</td><td>Dicacah <strong>per hari</strong>, bukan per 24 jam — tabelnya hanya menyimpan tanggal, tanpa jam.</td></tr>
+            <tr><td>Laporan masyarakat</td><td>Warga</td><td>Termasuk yang <strong>belum diverifikasi</strong>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Sebagian laporan masyarakat tidak memiliki lokasi yang cocok dengan master lokasi. Kartu ini
+        menyebut jumlahnya, karena laporan yang hilang tanpa keterangan hanya terlihat sebagai angka
+        yang lebih kecil — dan tidak ada cara membedakannya dari keadaan yang memang sepi.
+      </p>
+
+      <h3>Status wilayah — yang harus diketahui sebelum mengutipnya</h3>
+      <p>
+        Sistem memiliki <strong>empat</strong> kelas risiko (Rendah, Sedang, Tinggi, Kritis),
+        sedangkan nama status yang diminta hanya <strong>tiga</strong>. Dua kelas karena itu harus
+        digabung, dan penggabungan itu mengubah makna:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Status</th><th>Berasal dari kelas</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Aman</strong></td><td>Rendah</td></tr>
+            <tr><td><strong>Waspada</strong></td><td>Sedang</td></tr>
+            <tr><td><strong>Siaga</strong></td><td>Tinggi + Kritis</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Yang digabung adalah dua kelas <strong>teratas</strong>, bukan dua kelas terbawah. Alasannya:
+        kesalahan kedua arah tidak sepadan. Menggabungkan dari atas hanya menyamakan dua kelas yang
+        sama-sama menuntut tindakan; menggabungkan dari bawah akan menyebut wilayah berkelas Sedang
+        sebagai &#8220;Aman&#8221;, dan kata itu menghentikan orang bertanya lebih jauh.
+      </p>
+
+      <div class="note caution">
+        <span class="label">Belum disetujui</span>
+        <p>
+          Pemetaan ini berstatus <span class="mono">PROPOSED</span> dan belum disetujui siapa pun.
+          Layar menyatakannya sendiri. Bila SOP menetapkan pemetaan yang berbeda, yang perlu diubah
+          hanya satu berkas konfigurasi — tidak ada satu pun ambang yang tertanam di kode.
+        </p>
+      </div>
+
+      <p>
+        Status satu kecamatan mengikuti <strong>sel dengan skor tertinggi</strong> di dalamnya, sama
+        seperti layer risiko berjalan pada peta. Definisi itu sengaja disamakan: dua layar yang
+        menjawab &#8220;berapa risiko di Tebet&#8221; dengan angka berbeda akan saling meruntuhkan,
+        dan tidak ada di layar yang akan menunjukkan mana yang benar. Kartu Wilayah Prioritas
+        menampilkan rata-rata seluruh sel di sebelahnya supaya selisih antara &#8220;sel
+        terburuk&#8221; dan &#8220;keadaan menyeluruh&#8221; tetap terbaca.
+      </p>
+
+      <h3>Top area menurut jumlah laporan</h3>
+      <p>
+        Sepuluh wilayah dengan laporan terbanyak dalam 30 hari terakhir, bertingkat Kritis / Sedang /
+        Rendah.
+      </p>
+      <div class="note caution">
+        <span class="label">Ini bukan peringkat kerawanan</span>
+        <p>
+          Yang diperingkat adalah <strong>volume laporan</strong>: tidak ditimbang, dan tidak
+          dinormalkan terhadap luas maupun jumlah penduduk. Wilayah dengan pelaporan yang lebih aktif
+          akan selalu naik, dan wilayah yang warganya jarang melapor akan selalu tampak lebih aman
+          daripada kenyataannya.
+        </p>
+        <p>
+          Tingkatnya <strong>relatif terhadap wilayah teratas pada jendela yang sedang tampil</strong>
+          — bukan terhadap angka mutlak. Jumlah laporan yang sama dapat bertingkat berbeda di jendela
+          lain.
+        </p>
+      </div>
+
+      <h3>Isu menonjol sepekan</h3>
+      <p>
+        Cacah kejadian per jenis gangguan pada 7 hari terakhir, dibanding 7 hari sebelumnya.
+        Perubahan disajikan sebagai <strong>selisih kejadian</strong>, bukan persentase: dari basis
+        satu kejadian menjadi tiga, &#8220;naik 200%&#8221; terbaca jauh lebih dramatis daripada
+        kenyataannya.
+      </p>
+
+      <h3>Rekomendasi kebijakan</h3>
+      <p>Usulan tindakan beserta fungsi yang menanganinya dan <strong>dasar angkanya</strong>.</p>
+      <div class="note caution">
+        <span class="label">Rencananya AI. Sekarang belum.</span>
+        <p>
+          Setiap butir diturunkan dengan <strong>aturan</strong> dari angka yang tampil di layar yang
+          sama, dan diberi label <span class="mono">RULE</span> — label yang sama dengan faktor
+          dominan pada peta. Menyebutnya keluaran AI sekarang akan menjadi penjelasan fiktif, dan
+          justru pada blok inilah kebohongan itu paling mahal: inilah yang dibaca sebagai saran
+          tindakan.
+        </p>
+        <p>
+          Bila tidak ada yang dapat diturunkan dari data, blok ini <strong>dibiarkan kosong</strong> —
+          bukan diisi saran umum yang terdengar masuk akal tetapi tidak bersandar pada apa pun.
+        </p>
+      </div>
+      <p>
+        Sebagian jenis rekomendasi belum mungkin dibuat sama sekali. Contohnya &#8220;rapat
+        koordinasi karena ada Car Free Day&#8221;: sistem belum memuat kalender kegiatan, dan
+        menambahkannya menuntut <strong>sumber data baru</strong>, bukan sekadar aturan baru.
+      </p>
+
+      <h3>Panel analitik</h3>
+      <p>
+        Di bawah pemisah &#8220;Panel analitik&#8221; tersedia panel yang sudah ada sebelumnya: indeks
+        keamanan, peta ringkas, ancaman teratas, outlook prediktif, tren bulanan, dan status patroli.
+        Panel itu tetap dipertahankan karena masih dipakai peran selain Pimpinan.
+      </p>
 
       <div class="note">
         <span class="label">Kebiasaan yang benar</span>

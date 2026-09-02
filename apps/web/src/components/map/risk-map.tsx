@@ -86,7 +86,7 @@ export function RiskMap({
                   aria-current={months === option ? "true" : undefined}
                   className={`rounded border px-2 py-0.5 text-[11px] transition-colors ${
                     months === option
-                      ? "border-warn/60 bg-warn/10 text-warn"
+                      ? "border-risk-high/60 bg-risk-high/10 text-risk-high"
                       : "border-base-800 text-ink-muted hover:text-ink"
                   }`}
                 >

@@ -306,6 +306,112 @@ def load_thresholds() -> Thresholds:
     )
 
 
+@dataclass(frozen=True)
+class LeadershipDisplay:
+    """Pemetaan nama untuk layar Pimpinan — **tampilan saja, bukan perhitungan**.
+
+    Ia tidak ikut menghitung skor apa pun; ia hanya memberi nama pada angka yang sudah
+    dihitung. Meski begitu ia tetap ambang, dan ambang hanya boleh hidup di
+    `config/risk/`, bukan tersebar di kode yang menampilkannya (CLAUDE.md §12).
+    """
+
+    status: str
+    area_status: tuple[dict[str, Any], ...]
+    report_volume: tuple[dict[str, Any], ...]
+
+    @property
+    def area_status_basis(self) -> str:
+        merged = ", ".join(
+            f"{row['label']} = {' + '.join(row['risk_classes'])}" for row in self.area_status
+        )
+        return (
+            f"Empat kelas risiko dipetakan ke tiga nama status: {merged}. Penggabungan "
+            "HIGH dan CRITICAL dipilih alih-alih menggabungkan LOW dan MODERATE, karena "
+            "kesalahan kedua arah tidak sepadan: menggabungkan dari atas hanya menyamakan "
+            "dua kelas yang sama-sama menuntut tindakan, sedangkan menggabungkan dari "
+            "bawah akan menyebut wilayah MODERATE sebagai 'Aman' dan kata itu "
+            f"menghentikan orang bertanya lebih jauh. Status pemetaan: {self.status} — "
+            "belum disetujui."
+        )
+
+    @property
+    def report_volume_basis(self) -> str:
+        return (
+            "Tingkat pada daftar ini adalah PERINGKAT VOLUME LAPORAN, bukan kelas risiko: "
+            "jumlah laporan tidak ditimbang dan tidak dinormalkan terhadap luas maupun "
+            "jumlah penduduk. Ambangnya relatif terhadap wilayah dengan laporan terbanyak "
+            "pada jendela yang sedang tampil, sehingga jumlah yang sama dapat berperingkat "
+            f"berbeda di jendela lain. Status: {self.status} — belum disetujui."
+        )
+
+    def status_for(self, risk_class: str | None) -> dict[str, Any]:
+        """Nama status untuk satu kelas risiko.
+
+        Kelas yang tidak dikenal dijawab apa adanya sebagai "tidak dikenali", **bukan**
+        dijatuhkan ke status teraman: kelas baru yang belum dipetakan akan tampil sebagai
+        wilayah aman, dan tidak ada yang akan menyadarinya.
+        """
+        for row in self.area_status:
+            if risk_class in row["risk_classes"]:
+                return {"status": row["status"], "label": row["label"]}
+        return {"status": None, "label": "Tidak dikenali"}
+
+    def volume_for(self, reports: int, peak: int) -> dict[str, Any]:
+        """Tingkat volume laporan, relatif terhadap wilayah terbanyak pada jendela ini."""
+        share = 0.0 if peak <= 0 else reports / peak
+        for row in self.report_volume:
+            if share >= float(row["min_share_of_peak"]):
+                return {
+                    "level": row["level"],
+                    "level_label": row["label"],
+                    "share_of_peak": round(share, 3),
+                }
+        last = self.report_volume[-1]
+        return {
+            "level": last["level"],
+            "level_label": last["label"],
+            "share_of_peak": round(share, 3),
+        }
+
+
+def load_leadership_display() -> LeadershipDisplay:
+    """Membaca blok `leadership_display` dari config ambang.
+
+    Blok ini tidak berversi — tidak ada baris tersimpan yang merujuknya — tetapi statusnya
+    ikut dibawa keluar supaya layar dapat menyatakan bahwa pemetaannya belum disetujui.
+    """
+    if not THRESHOLDS_FILE.exists():
+        message = "config/risk/warning-thresholds.yaml tidak ditemukan"
+        raise RiskEngineError(message)
+
+    catalogue: dict[str, Any] = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
+    raw = catalogue.get("leadership_display")
+    if not raw:
+        message = "config/risk/warning-thresholds.yaml tidak memuat blok leadership_display"
+        raise RiskEngineError(message)
+
+    known = {band.risk_class for band in load_thresholds().bands}
+    mapped = {name for row in raw["area_status"] for name in row["risk_classes"]}
+    # Kelas yang ada tetapi tidak dipetakan akan tampil sebagai "tidak dikenali" di layar,
+    # tanpa apa pun yang menjelaskan mengapa. Lebih baik gagal saat memuat konfigurasi.
+    if known - mapped:
+        message = (
+            "leadership_display.area_status tidak memetakan seluruh kelas risiko: "
+            f"{sorted(known - mapped)} tidak disebut"
+        )
+        raise RiskEngineError(message)
+
+    return LeadershipDisplay(
+        status=str(raw["status"]),
+        area_status=tuple(raw["area_status"]),
+        report_volume=tuple(
+            sorted(
+                raw["report_volume"], key=lambda row: float(row["min_share_of_peak"]), reverse=True
+            )
+        ),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Hasil penilaian
 # ---------------------------------------------------------------------------

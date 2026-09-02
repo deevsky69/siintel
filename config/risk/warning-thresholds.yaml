@@ -91,3 +91,55 @@ versions:
 
 # Catatan: pada dataset dummy, level LOW dan WATCH tidak pernah muncul karena peringatan
 # hanya dibuat pada skor >= 70. Ini terlihat jelas hanya setelah ambangnya ditulis di sini.
+
+# =============================================================================
+# TAMPILAN LAYAR PIMPINAN — DEMO / PROPOSED, REQUIRES USER APPROVAL
+# =============================================================================
+#
+# Blok ini TIDAK ikut menghitung skor apa pun. Ia hanya menentukan bagaimana angka yang
+# sudah dihitung diberi NAMA di layar Pimpinan. Karena itu ia berada di tingkat atas berkas
+# dan tidak berversi: tidak ada baris tersimpan yang merujuknya, sehingga mengubahnya tidak
+# membuat catatan lama tampak terbit di bawah aturan yang tidak pernah berlaku.
+#
+# Ia tetap berada di berkas ini, bukan di kode, karena keduanya adalah ambang — dan ambang
+# hanya boleh hidup di satu tempat (CLAUDE.md §12).
+leadership_display:
+  status: PROPOSED
+
+  # ---------------------------------------------------------------------------
+  # STATUS WILAYAH — Aman / Waspada / Siaga
+  #
+  # Permintaan pemilik proyek, 2 September 2026. Sistem sudah memiliki EMPAT kelas risiko;
+  # nama status yang diminta hanya TIGA, jadi dua kelas harus digabung dan penggabungan itu
+  # mengubah makna. Yang dipilih di sini:
+  #
+  #   HIGH + CRITICAL -> SIAGA
+  #
+  # bukan LOW + MODERATE -> AMAN, karena kesalahan kedua arah tidak sepadan. Menggabungkan
+  # dari atas hanya membuat wilayah CRITICAL diperlakukan setara HIGH — keduanya sama-sama
+  # menuntut tindakan. Menggabungkan dari bawah akan menyebut wilayah MODERATE sebagai
+  # "Aman", dan kata itu menghentikan orang bertanya lebih jauh.
+  #
+  # BELUM DISETUJUI. Layar menyatakan pemetaan ini terbuka beserta statusnya.
+  # ---------------------------------------------------------------------------
+  area_status:
+    - { status: AMAN, label: Aman, risk_classes: [LOW] }
+    - { status: WASPADA, label: Waspada, risk_classes: [MODERATE] }
+    - { status: SIAGA, label: Siaga, risk_classes: [HIGH, CRITICAL] }
+
+  # ---------------------------------------------------------------------------
+  # PERINGKAT VOLUME LAPORAN — daftar "Top 10 area rawan"
+  #
+  # Daftar itu diurutkan menurut JUMLAH LAPORAN per wilayah, dan jumlah laporan TIDAK punya
+  # kelas risiko: ia tidak ditimbang dan tidak dinormalkan terhadap luas maupun penduduk.
+  #
+  # Tingkat di bawah karena itu bukan kelas risiko melainkan peringkat volume, dan ambangnya
+  # RELATIF terhadap wilayah dengan laporan terbanyak pada jendela yang sedang tampil —
+  # bukan terhadap angka mutlak. Wilayah dengan 70% laporan sebanyak wilayah teratas
+  # berperingkat KRITIS pada jendela itu; pada jendela lain, jumlah yang sama bisa
+  # berperingkat lain. Layar menyatakan hal ini.
+  # ---------------------------------------------------------------------------
+  report_volume:
+    - { level: KRITIS, label: Kritis, min_share_of_peak: 0.70 }
+    - { level: SEDANG, label: Sedang, min_share_of_peak: 0.40 }
+    - { level: RENDAH, label: Rendah, min_share_of_peak: 0.0 }

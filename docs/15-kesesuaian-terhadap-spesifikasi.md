@@ -23,7 +23,7 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 | 9 | Early Warning | ✅ **ADA** | `/peringatan` beserta terima/selesaikan |
 | 10 | AI Recommendation | ✅ **ADA** | `/rekomendasi` |
 | 11 | Commander Decision / Approval | ✅ **ADA** | Setujui / Modifikasi / Tolak, usulan asli tidak tertimpa |
-| 12 | Community Intelligence & manajemen laporan masyarakat | ⚠️ **SEBAGIAN** | `/masyarakat` — 150 laporan terbaca; **triase (aksi tulis) belum ada** |
+| 12 | Community Intelligence & manajemen laporan masyarakat | ✅ **ADA** | `/masyarakat` membaca; triase menulis lewat `POST /citizen-reports/{code}/status` dan tab **Triase** pada `/input` |
 | 13 | Prediction vs Actual | ✅ **ADA** | `/evaluasi`, precision 0,397 · recall 0,400 |
 | 14 | Executive Brief | ✅ **ADA** | `/brief`, siap cetak |
 

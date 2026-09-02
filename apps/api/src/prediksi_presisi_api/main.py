@@ -31,6 +31,7 @@ from .api.routers import (
     evaluation,
     health,
     intelligence,
+    leadership,
     map_view,
     operations,
     patterns,
@@ -88,6 +89,7 @@ def create_app() -> FastAPI:
     api.include_router(warning_actions.router)
     api.include_router(map_view.router)
     api.include_router(dashboard.router)
+    api.include_router(leadership.router)
     api.include_router(evaluation.router)
     api.include_router(patterns.router)
     api.include_router(analytics.router)

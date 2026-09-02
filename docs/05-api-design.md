@@ -359,6 +359,47 @@ Audit: `CREATE_OPERATIONAL_ACTION`, `UPDATE_OPERATIONAL_ACTION`.
 | GET | `/dashboard/summary` | `dashboard:read` |
 | GET | `/dashboard/trends` | `dashboard:read` |
 | GET | `/dashboard/active-warnings` | `dashboard:read`, `warning:read` |
+| GET | `/dashboard/leadership` | `dashboard:read` — ✅ **ADA** |
+
+**`/dashboard/leadership` (TASK 150).** Permintaan pemilik proyek, 2 September 2026: layar
+beranda yang tersusun mengikuti urutan pertanyaan seorang pimpinan, bukan urutan
+ketersediaan data. Satu endpoint membawa tujuh blok karena ketujuhnya dibaca bersamaan pada
+satu layar, dan blok yang dipisah dapat menjawab jendela waktu yang berbeda tanpa apa pun di
+layar yang menunjukkannya.
+
+Empat hal pada kontraknya yang menentukan cara membacanya:
+
+1. **`reports_24h` mencacah tiga jenis catatan terpisah** — `crime_incidents`,
+   `intelligence_reports`, `citizen_reports` — beserta totalnya. Menyajikan total saja akan
+   membuat pembaca menyimpulkan hal yang berbeda dari yang dihitung. `intelligence_reports`
+   dicacah per **hari** karena tabelnya hanya menyimpan `report_date` tanpa jam; responsnya
+   membawa `intelligence_date` dan menyatakan hal itu pada `basis`.
+
+2. **`citizen_reports` tanpa `location_id` tidak dibuang.** Sebagian laporan masyarakat
+   tidak punya lokasi yang cocok dengan master lokasi. Bagi pengguna tanpa batas wilayah
+   laporan itu tetap dicacah dan jumlahnya disebut terpisah
+   (`citizen_reports_without_location`, `unattributed_reports`); bagi pengguna ber-cakupan
+   wilayah ia tidak ditampilkan, karena tidak dapat dipastikan berada di wilayahnya.
+   `JOIN` biasa akan membuangnya untuk semua orang, dan selisihnya tidak akan terlihat.
+
+3. **`area_status` memetakan EMPAT kelas risiko ke TIGA nama status** (Aman/Waspada/Siaga),
+   dan pemetaannya dibaca dari `config/risk/warning-thresholds.yaml` blok
+   `leadership_display`. Responsnya selalu membawa `mapping` dan
+   `mapping_status: PROPOSED`. **REQUIRES USER APPROVAL (U-22)** — lihat catatan di bawah.
+   Skor kecamatan memakai definisi yang sama dengan `/map/current-risk`, yaitu sel
+   tertinggi, dijaga `test_area_status_follows_the_same_definition_the_map_uses`.
+
+4. **`top_report_areas` memeringkat volume laporan, bukan risiko.** Responsnya tidak
+   membawa `risk_score` maupun `risk_class` sama sekali, dan tingkatnya
+   (Kritis/Sedang/Rendah) relatif terhadap wilayah dengan laporan terbanyak pada jendela
+   yang tampil. `policy.recommendations` seluruhnya berlabel `source: RULE`.
+
+> **REQUIRES USER APPROVAL (U-22): pemetaan status wilayah.** Nama Aman/Waspada/Siaga
+> diminta pemilik proyek; sistem memiliki empat kelas risiko sedangkan namanya tiga, jadi
+> dua kelas harus digabung dan penggabungan itu mengubah makna. Yang dipakai sekarang
+> `HIGH + CRITICAL -> SIAGA`, dipilih karena kesalahan kedua arah tidak sepadan:
+> menggabungkan dari bawah akan menyebut wilayah `MODERATE` sebagai "Aman". Belum
+> disetujui, dan layar menyatakannya.
 
 > `NOT SPECIFIED` (U-11): sumber konten **Executive Brief**. Belum ada entitas, penyedia, maupun task di roadmap. Endpoint `/executive-brief` **tidak didefinisikan** sampai diputuskan apakah kontennya dihasilkan template rule atau model bahasa (keputusan bisnis + kebijakan).
 
