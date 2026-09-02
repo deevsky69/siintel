@@ -119,6 +119,13 @@ const ICONS: Record<string, (props: IconProps) => React.ReactElement> = {
       <rect x="3.5" y="3.5" width="17" height="17" rx="3" />
     </Svg>
   ),
+  audit: (p) => (
+    <Svg {...p}>
+      <path d="M5 4h11l3 3v13H5z" />
+      <path d="M8 11h8M8 15h5" />
+      <path d="m15.5 4 0 3.5 3.5 0" />
+    </Svg>
+  ),
   admin: (p) => (
     <Svg {...p}>
       <circle cx="12" cy="12" r="3" />

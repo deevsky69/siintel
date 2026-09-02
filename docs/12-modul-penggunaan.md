@@ -23,7 +23,7 @@ Polres Metro Jakarta Selatan
 | **Petugas Fungsi** | §3 · §14 Rekomendasi · §15 Operasi |
 | **Petugas Polsek** | §3 · §5 Dashboard · §8 Peta · §13 Peringatan · §17 Laporan masyarakat |
 | **Analis / peninjau** | §9 Pattern DNA · §10 Analytics · §16 Evaluasi |
-| **Penguji Taskap** | §2 Gagasan pokok · §3 Pemisahan kewenangan · §16 Evaluasi · §21 Batasan |
+| **Penguji Taskap** | §2 Gagasan pokok · §3 Pemisahan kewenangan · §16 Evaluasi · §20 Audit · §21 Batasan |
 
 ---
 
@@ -587,22 +587,53 @@ pnpm prod:users
 
 ---
 
-## 20. YANG DICATAT SISTEM
+## 20. JEJAK AUDIT — MENELUSURI SIAPA MELAKUKAN APA
 
-Aktivitas berikut tercatat beserta waktu, pelaku, dan hasilnya:
+Menu **Audit**. Kewenangan `audit:read` — dimiliki Pimpinan dan Administrator.
 
-- percobaan masuk, berhasil maupun gagal;
-- akses ke data sensitif;
-- penerimaan dan penyelesaian peringatan;
-- **persetujuan, modifikasi, dan penolakan rekomendasi**;
-- percobaan akses **tanpa kewenangan**.
+### Yang dibuka lebih dulu: penolakan
 
-Catatan yang terakhir itu yang membuat audit ini bermakna: catatan yang hanya memuat
-keberhasilan tidak dapat dipakai menilai apakah pembatasan kewenangan benar-benar
-bekerja.
+Layar ini membuka **percobaan yang ditolak**, bukan daftar keberhasilan. Itu disengaja:
+yang pertama dicari saat memeriksa audit adalah percobaan yang gagal, dan audit yang hanya
+menonjolkan keberhasilan hanya membuktikan bahwa yang berhasil memang berhasil.
 
-Catatan audit bersifat **hanya-tambah** — tidak dapat diubah maupun dihapus dari
-aplikasi.
+| Hasil | Artinya |
+|---|---|
+| **Berhasil** | Permintaan berwenang dan aturannya terpenuhi |
+| **Ditolak — kewenangan** | Peran pengguna tidak memiliki kewenangan itu |
+| **Gagal — aturan** | Pengguna berwenang, tetapi permintaannya melanggar aturan bisnis — misalnya menyelesaikan peringatan yang sudah berstatus akhir |
+
+Membedakan keduanya penting: yang pertama menunjukkan **pembatasan kewenangan bekerja**,
+yang kedua menunjukkan **aturan bisnis bekerja**.
+
+### Yang tercatat
+
+Percobaan masuk, akses data sensitif, penerimaan dan penyelesaian peringatan, persetujuan
+dan penolakan rekomendasi, pencatatan tindakan, pemasukan data, penjalanan penilaian dan
+prediksi, perubahan penugasan pengguna — beserta nilai **sebelum dan sesudah**.
+
+Peristiwa yang tidak dipicu pengguna ditandai **“peristiwa sistem, tanpa pengguna”** —
+bukan diisi nama pengganti yang seolah-olah ada pelakunya.
+
+### Dua sifat yang membuatnya bernilai sebagai bukti
+
+**Hanya-tambah.** Tidak ada satu pun jalan mengubah maupun menghapus catatan audit —
+termasuk bagi Administrator, dan termasuk lewat API. Catatan yang dapat disunting bukan
+bukti. Ketiadaan jalan itu dijaga sebuah test yang memeriksa daftar endpoint yang
+benar-benar terdaftar.
+
+**Tidak dapat dibatasi wilayah.** Catatan audit tidak menyimpan lokasi, sehingga jejak ini
+mustahil dipersempit per polsek. Itulah sebabnya kewenangan membacanya hanya diberikan
+kepada peran bercakupan penuh — dan sebabnya `audit:read` dicabut sementara dari peran
+Polsek dan Fungsi: memberikannya berarti memberi akses penuh, dan itu pelebaran kewenangan
+yang menunggu keputusan pemilik proyek.
+
+### Menyaring
+
+Menurut hasil, jenis aksi, jenis sumber daya, dan rentang tanggal. Rentang dibaca sebagai
+waktu setempat dan **mencakup seluruh hari yang dipilih** — memilih satu tanggal yang sama
+untuk awal dan akhir tetap menampilkan aktivitas hari itu. Satu permintaan dibatasi 366
+hari.
 
 ---
 

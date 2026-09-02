@@ -100,7 +100,13 @@ Kolom **Permission** merujuk katalog `docs/03` §2. Semua endpoint memerlukan au
 | GET | `/roles` | `role:read` — ✅ **ADA** |
 | POST | `/users` | `user:manage` — **belum**, dan sengaja: membuat pengguna menuntut penetapan password, yang jalurnya terpisah (CLI di server) |
 | PUT | `/roles/{id}/permissions` | `role:manage` — **belum**, dan sebaiknya tidak dibuat: daftar permission berasal dari `config/rbac/permissions.yaml` dan diselaraskan seed. Menyuntingnya lewat API membuat berkas itu berhenti menjadi sumber kebenaran |
-| GET | `/audit-logs` | `audit:read` — **belum** |
+| GET | `/audit-logs` | `audit:read` — ✅ **ADA** |
+| GET | `/audit-logs/summary` | `audit:read` — ✅ **ADA** |
+
+Tidak ada `POST`, `PATCH`, maupun `DELETE` pada jejak audit, dan **ketiadaannya adalah
+sifat yang dijaga**, bukan pekerjaan yang belum sempat: catatan yang dapat disunting bukan
+bukti (CLAUDE.md §29). `test_the_audit_trail_offers_no_way_to_write` memeriksanya terhadap
+skema OpenAPI aplikasi yang benar-benar berjalan.
 | GET | `/permissions` | `role:read` |
 | GET | `/audit-logs` | `audit:read` |
 | GET/PUT | `/config/risk-weights`, `/config/warning-thresholds`, `/config/taxonomy` | `config:read` / `config:manage` — **belum dibuat** |

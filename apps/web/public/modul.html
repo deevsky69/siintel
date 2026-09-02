@@ -527,7 +527,7 @@
       <li><a href="#s17"><span>17</span><span>Laporan masyarakat</span></a></li>
       <li><a href="#s18"><span>18</span><span>Laporan intelijen</span></a></li>
       <li><a href="#s19"><span>19</span><span>Administrasi</span></a></li>
-      <li><a href="#s20"><span>20</span><span>Yang dicatat sistem</span></a></li>
+      <li><a href="#s20"><span>20</span><span>Jejak audit</span></a></li>
       <li><a href="#s21"><span>21</span><span>Batasan yang wajib dipahami</span></a></li>
     </ol>
   </nav>
@@ -1267,24 +1267,73 @@
     </section>
 
     <section id="s20">
-      <h2 class="sec"><span class="num">20</span><span>Yang dicatat sistem</span></h2>
-      <p class="sec-note">Audit trail</p>
-
-      <ul>
-        <li>Percobaan masuk, berhasil maupun gagal.</li>
-        <li>Akses ke data sensitif.</li>
-        <li>Penerimaan dan penyelesaian peringatan.</li>
-        <li><strong>Persetujuan, modifikasi, dan penolakan rekomendasi.</strong></li>
-        <li>Percobaan akses <strong>tanpa kewenangan</strong>.</li>
-      </ul>
-
+      <h2 class="sec"><span class="num">20</span><span>Jejak audit</span></h2>
+      <p class="sec-note">Menelusuri siapa melakukan apa</p>
       <p>
-        Catatan yang terakhir itu yang membuat audit ini bermakna: catatan yang hanya memuat
-        keberhasilan tidak dapat dipakai menilai apakah pembatasan kewenangan benar-benar bekerja.
+        Menu <strong>Audit</strong>. Kewenangan <span class="mono">audit:read</span> — dimiliki
+        Pimpinan dan Administrator.
+      </p>
+
+      <h3>Yang dibuka lebih dulu: penolakan</h3>
+      <p>
+        Layar ini membuka <strong>percobaan yang ditolak</strong>, bukan daftar keberhasilan. Itu
+        disengaja: yang pertama dicari saat memeriksa audit adalah percobaan yang gagal, dan audit
+        yang hanya menonjolkan keberhasilan hanya membuktikan bahwa yang berhasil memang berhasil.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hasil</th><th>Artinya</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Berhasil</strong></td><td>Permintaan berwenang dan aturannya terpenuhi.</td></tr>
+            <tr><td><strong>Ditolak — kewenangan</strong></td><td>Peran pengguna tidak memiliki kewenangan itu.</td></tr>
+            <tr><td><strong>Gagal — aturan</strong></td><td>Pengguna berwenang, tetapi permintaannya melanggar aturan bisnis — misalnya menyelesaikan peringatan yang sudah berstatus akhir.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Membedakan keduanya penting: yang pertama menunjukkan <strong>pembatasan kewenangan
+        bekerja</strong>, yang kedua menunjukkan <strong>aturan bisnis bekerja</strong>.
+      </p>
+
+      <h3>Yang tercatat</h3>
+      <p>
+        Percobaan masuk, akses data sensitif, penerimaan dan penyelesaian peringatan, persetujuan
+        dan penolakan rekomendasi, pencatatan tindakan, pemasukan data, penjalanan penilaian dan
+        prediksi, serta perubahan penugasan pengguna — beserta nilai <strong>sebelum dan
+        sesudah</strong>.
       </p>
       <p>
-        Catatan audit bersifat <strong>hanya-tambah</strong> — tidak dapat diubah maupun dihapus
-        dari aplikasi.
+        Peristiwa yang tidak dipicu pengguna ditandai <em>“peristiwa sistem, tanpa pengguna”</em> —
+        bukan diisi nama pengganti yang seolah-olah ada pelakunya.
+      </p>
+
+      <h3>Dua sifat yang membuatnya bernilai sebagai bukti</h3>
+      <div class="note">
+        <span class="label">Hanya-tambah</span>
+        <p>
+          Tidak ada satu pun jalan mengubah maupun menghapus catatan audit — termasuk bagi
+          Administrator, dan termasuk lewat API. Catatan yang dapat disunting bukan bukti.
+          Ketiadaan jalan itu dijaga sebuah test yang memeriksa daftar endpoint yang benar-benar
+          terdaftar.
+        </p>
+      </div>
+      <div class="note caution">
+        <span class="label">Tidak dapat dibatasi wilayah</span>
+        <p>
+          Catatan audit tidak menyimpan lokasi, sehingga jejak ini mustahil dipersempit per polsek.
+          Itulah sebabnya kewenangan membacanya hanya diberikan kepada peran bercakupan penuh — dan
+          sebabnya <span class="mono">audit:read</span> dicabut sementara dari peran Polsek dan
+          Fungsi: memberikannya berarti memberi akses penuh, dan itu pelebaran kewenangan yang
+          menunggu keputusan pemilik proyek.
+        </p>
+      </div>
+
+      <h3>Menyaring</h3>
+      <p>
+        Menurut hasil, jenis aksi, jenis sumber daya, dan rentang tanggal. Rentang dibaca sebagai
+        waktu setempat dan <strong>mencakup seluruh hari yang dipilih</strong> — memilih satu
+        tanggal yang sama untuk awal dan akhir tetap menampilkan aktivitas hari itu. Satu
+        permintaan dibatasi 366 hari.
       </p>
     </section>
 

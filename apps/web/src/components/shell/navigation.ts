@@ -29,5 +29,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { href: "/input", label: "Data Entry", icon: "entry" },
   { href: "/masyarakat", label: "Community", icon: "community" },
   { href: "/intelijen", label: "Intelligence", icon: "intelligence" },
+  // Jejak audit berdampingan dengan Admin: keduanya pemeriksaan atas sistem,
+  // bukan pekerjaan operasional.
+  { href: "/audit", label: "Audit", icon: "audit" },
   { href: "/admin", label: "Admin", icon: "admin" },
 ] as const;
