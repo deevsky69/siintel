@@ -18,6 +18,8 @@ from . import __version__
 from .api.errors import register_error_handlers
 from .api.middleware import RequestContextMiddleware, SecurityHeadersMiddleware
 from .api.routers import (
+    administration,
+    analytics,
     auth,
     brief,
     catalog,
@@ -31,6 +33,7 @@ from .api.routers import (
     map_view,
     operations,
     patterns,
+    prediction_center,
     scoring,
     warning_actions,
 )
@@ -73,6 +76,7 @@ def create_app() -> FastAPI:
     api = APIRouter(prefix=API_PREFIX)
     api.include_router(health.router)
     api.include_router(auth.router)
+    api.include_router(administration.router)
     api.include_router(catalog.router)
     api.include_router(community.router)
     api.include_router(data_entry.router)
@@ -84,7 +88,9 @@ def create_app() -> FastAPI:
     api.include_router(dashboard.router)
     api.include_router(evaluation.router)
     api.include_router(patterns.router)
+    api.include_router(analytics.router)
     api.include_router(scoring.router)
+    api.include_router(prediction_center.router)
     api.include_router(brief.router)
     app.include_router(api)
 

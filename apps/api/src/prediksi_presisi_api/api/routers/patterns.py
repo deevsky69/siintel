@@ -50,25 +50,25 @@ from datetime import date
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy import Integer, Select, cast, func, select
+from sqlalchemy import Integer, cast, func
 from sqlalchemy.orm import Session
 
 from ...models import CrimeIncident, Location
+from ..analysis import (
+    DAY_LABELS,
+    HOURS_PER_DAY,
+    MAX_THREAT_TYPE_LENGTH,
+    TIME_BASIS,
+    incidents,
+    share,
+    threat_types,
+)
 from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
 from ..errors import ApiError
 
 # Path mengikuti kontrak `docs/05` §2.5 — sekelompok dengan analitik lain, sejalan
 # dengan permission yang dipakainya (`analytics:read`).
 router = APIRouter(prefix="/analytics", tags=["pola kejahatan"])
-
-#: Panjang maksimal nilai `threat_type` yang diterima. Nilai yang lebih panjang ditolak
-#: sebagai kesalahan masukan sebelum menyentuh database (CLAUDE.md §21).
-MAX_THREAT_TYPE_LENGTH = 50
-
-#: Nama hari untuk `extract(isodow)` PostgreSQL: 1 = Senin … 7 = Minggu.
-DAY_LABELS = ("Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu")
-
-HOURS_PER_DAY = 24
 
 #: Label yang dipakai bila kolom taksonomi kosong. Kejadian tanpa modus/target tetap
 #: dihitung — membuangnya diam-diam akan mengubah penyebut tanpa diketahui pembaca.
@@ -85,12 +85,6 @@ ANALYSIS_BASIS = (
     "sehingga yang disajikan hanya jumlah dan persentase beserta penyebutnya."
 )
 
-TIME_BASIS = (
-    "Jam diambil dari kolom incident_time dan hari dari incident_date — keduanya waktu "
-    "setempat (WIB). Kolom occurred_at menyimpan UTC dan tidak dipakai di sini karena "
-    "akan menggeser jam rawan sebesar tujuh jam."
-)
-
 REPEAT_BASIS = (
     f"Sebuah grid dihitung berulang bila memuat sekurang-kurangnya {REPEAT_MIN_INCIDENTS} "
     "kejadian jenis ini sepanjang rentang data, tanpa memandang jarak waktu antar "
@@ -100,32 +94,12 @@ REPEAT_BASIS = (
 )
 
 
-def _scoped(query: Select[Any], polsek: str | None) -> Select[Any]:
-    return query if polsek is None else query.where(Location.polsek == polsek)
-
-
-def _incidents(polsek: str | None, threat_type: str | None = None) -> Select[Any]:
-    """Kerangka query kejadian yang sudah tersaring cakupan (dan jenis, bila diminta)."""
-    query = _scoped(
-        select()
-        .select_from(CrimeIncident)
-        .join(Location, Location.location_id == CrimeIncident.location_id),
-        polsek,
-    )
-    return query if threat_type is None else query.where(CrimeIncident.incident_type == threat_type)
-
-
-def _share(count: int, denominator: int) -> float:
-    """Persentase satu golongan terhadap penyebutnya, satu angka di belakang koma."""
-    return 0.0 if denominator == 0 else round(100 * count / denominator, 1)
-
-
 def _bucket(key: str, label: str, count: int, denominator: int) -> dict[str, Any]:
     return {
         "key": key,
         "label": label,
         "incidents": count,
-        "share_percent": _share(count, denominator),
+        "share_percent": share(count, denominator),
     }
 
 
@@ -145,7 +119,7 @@ def _ranked_distribution(
     tampil dalam urutan yang sama — hasil yang dapat direproduksi (CLAUDE.md §25).
     """
     query = (
-        _incidents(polsek, threat_type)
+        incidents(polsek, threat_type)
         .add_columns(column, func.count())
         .group_by(column)
         .order_by(func.count().desc(), column)
@@ -180,7 +154,7 @@ def _hour_distribution(
     nol, bukan karena datanya tidak ada.
     """
     hour = cast(func.extract("hour", CrimeIncident.incident_time), Integer).label("jam")
-    query = _incidents(polsek, threat_type).add_columns(hour, func.count()).group_by(hour)
+    query = incidents(polsek, threat_type).add_columns(hour, func.count()).group_by(hour)
     counts = {int(value): int(count) for value, count in session.execute(query).all()}
 
     return {
@@ -200,7 +174,7 @@ def _day_distribution(
 ) -> dict[str, Any]:
     """Sebaran hari dalam pekan, urut Senin–Minggu — termasuk hari tanpa kejadian."""
     day = cast(func.extract("isodow", CrimeIncident.incident_date), Integer).label("hari")
-    query = _incidents(polsek, threat_type).add_columns(day, func.count()).group_by(day)
+    query = incidents(polsek, threat_type).add_columns(day, func.count()).group_by(day)
     counts = {int(value): int(count) for value, count in session.execute(query).all()}
 
     return {
@@ -225,7 +199,7 @@ def _repeat_profile(
     tahun — dua keadaan yang menuntut tanggapan berbeda.
     """
     query = (
-        _incidents(polsek, threat_type)
+        incidents(polsek, threat_type)
         .add_columns(
             Location.grid_id,
             Location.kecamatan,
@@ -253,7 +227,7 @@ def _repeat_profile(
                 "grid_id": grid_id,
                 "kecamatan": kecamatan,
                 "incidents": total,
-                "share_percent": _share(total, denominator),
+                "share_percent": share(total, denominator),
                 "first_date": first,
                 "last_date": last,
                 "span_days": (last - first).days,
@@ -265,7 +239,7 @@ def _repeat_profile(
         "repeat_grids": len(grids),
         "single_incident_grids": len(rows) - len(grids),
         "incidents_in_repeat_grids": incidents_in_repeat_grids,
-        "share_percent": _share(incidents_in_repeat_grids, denominator),
+        "share_percent": share(incidents_in_repeat_grids, denominator),
         "denominator": denominator,
         "grids": grids,
         "basis": REPEAT_BASIS,
@@ -294,23 +268,9 @@ def _sample_note(threat_type: str, incidents: int) -> str:
     )
 
 
-def _threat_types(session: Session, polsek: str | None) -> list[dict[str, Any]]:
-    """Jenis gangguan yang ada di dalam cakupan pengguna, beserta jumlahnya."""
-    query = (
-        _incidents(polsek)
-        .add_columns(CrimeIncident.incident_type, func.count())
-        .group_by(CrimeIncident.incident_type)
-        .order_by(func.count().desc(), CrimeIncident.incident_type)
-    )
-    return [
-        {"threat_type": incident_type, "incidents": int(count)}
-        for incident_type, count in session.execute(query).all()
-    ]
-
-
 def _range(session: Session, polsek: str | None, threat_type: str | None) -> tuple[Any, Any, int]:
     """Rentang tanggal dan jumlah baris yang menghasilkan angka — `source` docs/05 §2.5."""
-    query = _incidents(polsek, threat_type).add_columns(
+    query = incidents(polsek, threat_type).add_columns(
         func.min(CrimeIncident.incident_date),
         func.max(CrimeIncident.incident_date),
         func.count(),
@@ -401,7 +361,7 @@ def crime_pattern_dna(
     tidak berkejadian, padahal yang terjadi adalah nama yang tidak dikenal.
     """
     polsek = jurisdiction_filter(current, "analytics:read")
-    available = _threat_types(session, polsek)
+    available = threat_types(session, polsek)
 
     requested: str | None = None
     if threat_type is not None:

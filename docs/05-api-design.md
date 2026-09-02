@@ -95,15 +95,22 @@ Kolom **Permission** merujuk katalog `docs/03` §2. Semua endpoint memerlukan au
 
 | Method | Path | Permission |
 |---|---|---|
-| GET/POST | `/users`, `/users/{id}` | `user:read` / `user:manage` |
-| PATCH | `/users/{id}` | `user:manage` |
-| GET | `/roles`, `/roles/{id}` | `role:read` |
-| PUT | `/roles/{id}/permissions` | `role:manage` |
+| GET | `/users` | `user:read` — ✅ **ADA** |
+| PATCH | `/users/{code}` | `user:manage` — ✅ **ADA** |
+| GET | `/roles` | `role:read` — ✅ **ADA** |
+| POST | `/users` | `user:manage` — **belum**, dan sengaja: membuat pengguna menuntut penetapan password, yang jalurnya terpisah (CLI di server) |
+| PUT | `/roles/{id}/permissions` | `role:manage` — **belum**, dan sebaiknya tidak dibuat: daftar permission berasal dari `config/rbac/permissions.yaml` dan diselaraskan seed. Menyuntingnya lewat API membuat berkas itu berhenti menjadi sumber kebenaran |
+| GET | `/audit-logs` | `audit:read` — **belum** |
 | GET | `/permissions` | `role:read` |
 | GET | `/audit-logs` | `audit:read` |
 | GET/PUT | `/config/risk-weights`, `/config/warning-thresholds`, `/config/taxonomy` | `config:read` / `config:manage` — **belum dibuat** |
 | GET | `/risk-scores/config` | `config:read` — ✅ **ADA** |
 | POST | `/risk-scores/run` | `risk_score:run` — ✅ **ADA** |
+| POST | `/predictions/run` | `prediction:run` — ✅ **ADA** |
+| POST | `/predictions/{code}/publish` | `prediction:publish` — ✅ **ADA** |
+| POST | `/crimes` | `crime:write` — ✅ **ADA** |
+| POST | `/citizen-reports/{code}/status` | `citizen_report:write` — ✅ **ADA** |
+| GET | `/police-units` | `police_unit:read` — ✅ **ADA** |
 
 Dua endpoint konfigurasi di atas **sengaja berbeda**, bukan duplikasi. `/config/risk-weights`
 adalah **pengelolaan** berkas konfigurasi, lengkap dengan `PUT` dan `config:manage` — belum
@@ -128,7 +135,7 @@ Tidak ada endpoint tulis/hapus untuk `/audit-logs`.
 | GET | `/crimes`, `/crimes/{id}` | `crime:read` |
 | POST/PATCH | `/crimes`, `/crimes/{id}` | `crime:write` |
 | GET | `/crimes/export` | `crime:export` |
-| GET/POST | `/intelligence-reports` | `intelligence:read` / `intelligence:write` |
+| GET/POST | `/intelligence-reports` | `intelligence:read` / `intelligence:write` — ✅ **ADA** |
 | GET/POST | `/patrol-activities` | `patrol:read` / `patrol:write` |
 | GET/POST | `/police-units` | `police_unit:read` / `police_unit:write` |
 
@@ -162,14 +169,25 @@ mentah dan menyatakannya terbuka lewat `basis`.
 | Method | Path | Permission | Status |
 |---|---|---|---|
 | GET | `/analytics/crime-pattern-dna` | `analytics:read` | ✅ **ADA** |
-| GET | `/analytics/trend` | `analytics:read` | belum |
-| GET | `/analytics/time-pattern` | `analytics:read` | belum — sebagian tercakup dimensi WHEN pada DNA |
-| GET | `/analytics/spatial-pattern` | `analytics:read` | belum — sebagian tercakup dimensi WHERE pada DNA |
+| GET | `/analytics/trend` | `analytics:read` | ✅ **ADA** |
+| GET | `/analytics/time-pattern` | `analytics:read` | ✅ **ADA** — matriks hari × jam |
+| GET | `/analytics/spatial-pattern` | `analytics:read` | ✅ **ADA** — perbandingan antarkecamatan |
 | GET | `/analytics/location-profile/{location_id}` | `analytics:read` | belum |
 | GET | `/analytics/export` | `analytics:export` | belum |
 
 Setiap respons analitik menyertakan `source` (rentang data & jumlah baris) agar dapat ditelusuri
 kembali ke data sumber (TASK 090–094).
+
+**Crime Analytics dan Crime Pattern DNA sengaja tidak digabung**, meskipun keduanya membaca
+`crime_incidents` dan berbagi pembantu agregasi yang sama (`api/analysis.py`). Sudut pandangnya
+berbeda: DNA memprofilkan **satu jenis gangguan** pada lima dimensinya, sedangkan Analytics
+**membandingkan lintas jenis dan lintas waktu**. `/analytics/time-pattern` menghasilkan matriks
+hari × jam — perkalian dua sebaran yang pada DNA hanya tersedia terpisah — dan
+`/analytics/spatial-pattern` **menolak** parameter `threat_type`, sebab menyaringnya ke satu
+jenis akan mengubahnya menjadi dimensi WHERE milik DNA.
+
+Angka keduanya wajib sama untuk pertanyaan yang sama; dijaga
+`test_analytics_agrees_with_crime_pattern_dna_on_the_same_numbers`.
 
 **Catatan path (TASK 090).** Implementasi Crime Pattern DNA sempat dibangun pada `/patterns/dna`
 — nama yang saya sebut keliru pada instruksi, bukan yang tertulis di kontrak ini. Kode
@@ -331,3 +349,23 @@ Audit: `CREATE_OPERATIONAL_ACTION`, `UPDATE_OPERATIONAL_ACTION`.
 ## 4. YANG DITETAPKAN PADA TASK BERIKUTNYA
 
 Skema request/response per endpoint, contoh payload, dan aturan validasi rinci ditulis bersama implementasi (TASK 030–040) dan diverifikasi lewat OpenAPI + test. Dokumen ini menetapkan bentuk kontrak, bukan menggantikan OpenAPI.
+
+
+---
+
+## 8. CATATAN PENEGAKAN PADA `PATCH /users/{code}`
+
+Empat penolakan ditegakkan endpoint ini, dan ketiganya diperiksa **terhadap keadaan basis
+data**, bukan terhadap nama peran — sehingga tetap benar bila nama peran berubah atau
+`config/rbac/permissions.yaml` disesuaikan.
+
+| Keadaan | Jawaban | Alasan |
+|---|---|---|
+| Badan memuat bidang kredensial | `400` | Password hanya ditetapkan lewat CLI di server (TASK 050). Bidang lain yang tak dikenal diabaikan diam-diam; yang menyerupai kredensial **ditolak dengan tegas** supaya kekeliruannya terlihat |
+| Pengguna mengubah perannya sendiri | `409` | Tanpa ini, seorang Administrator dapat mengangkat dirinya menjadi Pimpinan dan seluruh pemisahan kewenangan runtuh |
+| Perubahan menghabiskan pemegang `commander_decision:approve` yang masih aktif | `409` | Berlaku untuk pemindahan peran **maupun** penonaktifan akun: keduanya mematikan rantai persetujuan dengan cara yang sama persis |
+| Peran ber-cakupan diberikan tanpa atributnya | `400` | Akun `OWN_JURISDICTION` tanpa `polsek` akan ditolak setiap endpoint ber-cakupan dan tampak seperti sistem rusak |
+
+Audit `UPDATE_USER` memuat nilai sebelum dan sesudah untuk keempat bidang yang boleh
+berubah. **Nilai bidang kredensial tidak pernah masuk ke sana** — hanya namanya, dan hanya
+pada catatan penolakan.

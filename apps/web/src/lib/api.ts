@@ -97,4 +97,8 @@ export const apiGet = <T>(path: string): Promise<T> => call<T>(path, READ);
 export const apiPost = <T>(path: string, body: unknown): Promise<T> =>
   call<T>(path, { method: "POST", body });
 
+/** Mengubah sebagian isi sebuah sumber daya. Jalurnya sama dengan `apiPost`. */
+export const apiPatch = <T>(path: string, body: unknown): Promise<T> =>
+  call<T>(path, { method: "PATCH", body });
+
 export { BASE_URL, REFRESH_COOKIE };
