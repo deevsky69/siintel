@@ -726,6 +726,52 @@
         berwenang memutuskan, karena angka yang tidak dapat Anda selesaikan hanya menjadi kecemasan
         tanpa jalan keluar.
       </p>
+      <h3>Menu utama dan &#8220;Lainnya&#8221;</h3>
+      <p>
+        Sidebar hanya menampilkan menu <strong>utama</strong>; sisanya berada di balik tombol
+        <strong>Lainnya</strong> yang dapat dibuka. Tidak ada satu pun layar yang hilang — yang
+        berubah hanya bahwa ia tidak ikut dibaca setiap kali sidebar dipandang.
+      </p>
+      <p>
+        Aturan pemisahannya satu kalimat: <strong>menu utama adalah yang dapat Anda kerjakan,
+        ditambah lima layar inti</strong> (Beranda, Brief, Peta, Peringatan, Audit). Layar inti
+        tetap utama walau tidak ada yang dapat Anda kerjakan di sana, sebab ia konteks untuk
+        mengambil keputusan — dan keputusan tanpa konteks justru yang paling ingin dihindari
+        sistem ini.
+      </p>
+      <p>
+        Aturan ini <strong>diturunkan dari kewenangan</strong>, bukan dari daftar per peran yang
+        ditulis tangan. Daftar tulis tangan akan menua diam-diam setiap kali permission berubah,
+        dan menuanya tidak terlihat sebagai kesalahan apa pun — hanya sebagai menu yang terasa
+        &#8220;agak aneh&#8221;.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Peran</th><th>Menu utama</th><th>Di dalam &#8220;Lainnya&#8221;</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Pimpinan</strong></td><td>Keputusan &middot; Peringatan &middot; Beranda &middot; Brief &middot; Peta &middot; Evaluasi &middot; Audit</td><td>Operasi &middot; Prediksi &middot; Skoring &middot; Pola &middot; Analitik &middot; Masyarakat &middot; Intelijen</td></tr>
+            <tr><td><strong>Polsek</strong></td><td>Peringatan &middot; Operasi &middot; Beranda &middot; Brief &middot; Peta &middot; Input Data &middot; Masyarakat</td><td>Keputusan &middot; Prediksi &middot; Skoring &middot; Pola &middot; Analitik &middot; Evaluasi &middot; Intelijen</td></tr>
+            <tr><td><strong>Fungsi</strong></td><td>Peringatan &middot; Operasi &middot; Beranda &middot; Brief &middot; Peta &middot; Input Data</td><td>Keputusan &middot; Prediksi &middot; Skoring &middot; Pola &middot; Analitik &middot; Evaluasi</td></tr>
+            <tr><td><strong>Administrator</strong></td><td>14 menu</td><td>Pola &middot; Evaluasi</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <span class="label">Mengapa Pimpinan hanya tujuh</span>
+        <p>
+          Dari 22 kewenangan yang dipegang seorang Pimpinan, <strong>20 di antaranya hanya
+          membaca</strong>. Persis dua membiarkannya mengubah sesuatu: menyetujui rekomendasi
+          (<span class="mono">commander_decision:approve</span>) dan menjalankan evaluasi
+          (<span class="mono">evaluation:run</span>) — dan keduanya tidak dipegang peran lain mana
+          pun. Sebelumnya kedua menu itu tenggelam di antara dua belas menu bacaan yang tampil
+          serupa.
+        </p>
+      </div>
+      <p>
+        &#8220;Lainnya&#8221; <strong>terbuka sendiri</strong> bila Anda sedang berada di salah satu
+        isinya, supaya menu yang sedang aktif tidak pernah hilang dari sidebar.
+      </p>
+
       <p>
         <strong>Menu yang tidak dapat Anda pakai sama sekali tidak ditampilkan.</strong> Seorang
         Pimpinan misalnya tidak memegang satu pun izin tulis, sehingga menu <strong>Input Data</strong>

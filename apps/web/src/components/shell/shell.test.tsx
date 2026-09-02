@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Panel } from "@/components/panel";
 import { NAV_ITEMS } from "@/components/shell/navigation";
@@ -8,16 +8,39 @@ import { RISK_LABELS, riskClassOf } from "@/lib/risk";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
-/** Seluruh permission yang disebut menu mana pun — untuk menguji keadaan "boleh semua". */
-const ALL_PERMISSIONS = [...new Set(NAV_ITEMS.flatMap((item) => item.permissions))];
+/**
+ * Seluruh permission yang disebut menu mana pun, **baca maupun tindakan**.
+ *
+ * `actions` wajib ikut: tanpanya seluruh menu menjadi "hanya dapat dibaca" dan pindah ke
+ * kelompok Lainnya yang tertutup — keadaan yang tidak dimaksudkan test ini.
+ */
+const ALL_PERMISSIONS = [
+  ...new Set(NAV_ITEMS.flatMap((item) => [...item.permissions, ...item.actions])),
+];
 
 describe("shell aplikasi", () => {
-  it("menampilkan seluruh menu bagi pengguna yang memegang seluruh kewenangan", () => {
+  it("membuat setiap menu tetap dapat dicapai — sebagian di balik Lainnya", () => {
+    // "Lainnya" memindahkan menu keluar dari jalur harian, bukan menghapusnya. Yang
+    // diperiksa di sini justru itu: tidak ada satu pun layar yang menjadi tidak
+    // terjangkau dari sidebar.
     render(<Sidebar permissions={ALL_PERMISSIONS} />);
+    fireEvent.click(screen.getByRole("button", { name: /lainnya/i }));
 
     for (const item of NAV_ITEMS) {
-      expect(screen.getByRole("link", { name: new RegExp(item.label, "i") })).toBeDefined();
+      expect(
+        screen.getByRole("link", { name: new RegExp(item.label, "i") }),
+        item.href,
+      ).toBeDefined();
     }
+  });
+
+  it("menutup Lainnya secara bawaan supaya sidebar tetap pendek", () => {
+    render(<Sidebar permissions={ALL_PERMISSIONS} />);
+
+    expect(screen.queryByRole("link", { name: /pola/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /lainnya/i }).getAttribute("aria-expanded")).toBe(
+      "false",
+    );
   });
 
   it("menandai menu yang sedang aktif untuk pembaca layar", () => {

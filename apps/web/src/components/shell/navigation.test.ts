@@ -1,5 +1,38 @@
 import { describe, expect, it } from "vitest";
-import { groupedNavItems, NAV_GROUPS, NAV_ITEMS, visibleNavItems } from "./navigation";
+import {
+  groupedNavItems,
+  isPrimaryFor,
+  NAV_GROUPS,
+  NAV_ITEMS,
+  secondaryNavItems,
+  visibleNavItems,
+} from "./navigation";
+
+/** Kewenangan Pimpinan yang sebenarnya, disalin dari config/rbac/permissions.yaml. */
+const PIMPINAN = [
+  "analytics:read",
+  "audit:read",
+  "citizen_report:read",
+  "commander_decision:approve",
+  "commander_decision:read",
+  "community_feedback:read",
+  "config:read",
+  "crime:read",
+  "dashboard:read",
+  "evaluation:read",
+  "evaluation:run",
+  "intelligence:read",
+  "location:read",
+  "map:read",
+  "operation:read",
+  "patrol:read",
+  "police_unit:read",
+  "prediction:read",
+  "public_alert:read",
+  "recommendation:read",
+  "risk_score:read",
+  "warning:read",
+];
 
 /**
  * Penyaringan menu diuji sebagai fungsi murni, terpisah dari komponennya.
@@ -31,8 +64,77 @@ describe("penyaringan menu menurut kewenangan", () => {
     expect(sections[0].items.map((item) => item.href)).toEqual(["/", "/brief"]);
   });
 
+  it("tidak menghilangkan satu pun menu: utama dan lainnya menjumlah seluruh yang terlihat", () => {
+    // "Lainnya" memindahkan menu keluar dari jalur harian, bukan menghapusnya. Bila
+    // penjumlahan ini meleset, ada layar yang tidak dapat dicapai dari sidebar sama sekali.
+    for (const held of [PIMPINAN, ["crime:write", "dashboard:read"], ["map:read"]]) {
+      const visible = visibleNavItems(held)
+        .map((item) => item.href)
+        .sort();
+      const split = [
+        ...groupedNavItems(held).flatMap((section) => section.items),
+        ...secondaryNavItems(held),
+      ]
+        .map((item) => item.href)
+        .sort();
+
+      expect(split).toEqual(visible);
+    }
+  });
+});
+
+describe("pemisahan menu utama dan lainnya", () => {
+  it("menaruh tepat tujuh menu utama bagi Pimpinan", () => {
+    // Aturannya diturunkan dari kewenangan, bukan dari daftar per peran yang ditulis
+    // tangan: menu utama = yang dapat dikerjakan penggunanya, ditambah layar inti.
+    const primary = groupedNavItems(PIMPINAN).flatMap((section) => section.items);
+
+    expect(primary.map((item) => item.href)).toEqual([
+      "/rekomendasi",
+      "/peringatan",
+      "/",
+      "/brief",
+      "/peta",
+      "/evaluasi",
+      "/audit",
+    ]);
+  });
+
+  it("menyisihkan menu yang hanya dapat dibaca Pimpinan ke Lainnya", () => {
+    const secondary = secondaryNavItems(PIMPINAN).map((item) => item.href);
+
+    // Pimpinan memegang `prediction:read` tetapi tidak `prediction:run` maupun
+    // `prediction:publish`; layar itu hanya dapat ditonton olehnya.
+    expect(secondary).toContain("/prediksi");
+    expect(secondary).toContain("/skoring");
+    expect(secondary).toContain("/masyarakat");
+    expect(secondary).not.toContain("/rekomendasi");
+  });
+
+  it("menjadikan menu utama begitu satu izin tindakannya dipegang", () => {
+    const reader = ["prediction:read"];
+    const runner = ["prediction:read", "prediction:run"];
+    const item = NAV_ITEMS.find((row) => row.href === "/prediksi");
+    if (!item) throw new Error("menu /prediksi tidak ditemukan");
+
+    expect(isPrimaryFor(item, reader)).toBe(false);
+    expect(isPrimaryFor(item, runner)).toBe(true);
+  });
+
+  it("mempertahankan layar inti sebagai menu utama walau tidak ada yang dapat dikerjakan", () => {
+    // Beranda, Brief, Peta, Peringatan, dan Audit adalah konteks untuk mengambil
+    // keputusan. Menyembunyikannya berarti menuntut keputusan tanpa konteks.
+    for (const href of ["/", "/brief", "/peta", "/peringatan", "/audit"]) {
+      const item = NAV_ITEMS.find((row) => row.href === href);
+      if (!item) throw new Error(`menu ${href} tidak ditemukan`);
+      expect(isPrimaryFor(item, []), href).toBe(true);
+    }
+  });
+
   it("mengurutkan kelompok sesuai NAV_GROUPS, dengan Putuskan lebih dulu", () => {
-    const all = [...new Set(NAV_ITEMS.flatMap((item) => item.permissions))];
+    // `actions` ikut dibawa: tanpanya seluruh menu menjadi hanya-baca dan pindah ke
+    // kelompok Lainnya, sehingga urutan kelompok tidak teruji sama sekali.
+    const all = [...new Set(NAV_ITEMS.flatMap((item) => [...item.permissions, ...item.actions]))];
     const sections = groupedNavItems(all);
 
     expect(sections.map((section) => section.group)).toEqual(NAV_GROUPS.map((group) => group.id));

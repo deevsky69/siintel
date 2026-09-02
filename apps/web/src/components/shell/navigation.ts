@@ -32,7 +32,28 @@ export type NavItem = {
    * penjelasan mengapa layar itu kosong.
    */
   permissions: readonly string[];
+  /**
+   * Permission yang membuat pengguna dapat **melakukan sesuatu** di layar ini, bukan
+   * sekadar membacanya.
+   *
+   * Inilah yang memisahkan menu utama dari menu "Lainnya". Seorang Pimpinan memegang 22
+   * permission dan **20 di antaranya hanya membaca**; tanpa pemisahan ini, dua menu yang
+   * benar-benar menuntut tindakannya tenggelam di antara dua belas menu bacaan yang
+   * tampil serupa.
+   *
+   * Kosong berarti layar itu memang hanya untuk dibaca oleh siapa pun.
+   */
+  actions: readonly string[];
   group: NavGroup;
+  /**
+   * Menu yang selalu utama selama terlihat, walau tidak ada yang dapat dilakukan di sana.
+   *
+   * Empat layar keadaan (Beranda, Brief, Peta, Peringatan) dan satu layar pemeriksaan
+   * (Audit). Menaruhnya di "Lainnya" berarti menyembunyikan konteks yang justru dibutuhkan
+   * untuk mengambil keputusan — dan keputusan tanpa konteks adalah yang paling ingin
+   * dihindari sistem ini.
+   */
+  core?: true;
 };
 
 export type NavGroup = "pantau" | "putuskan" | "telaah" | "data" | "sistem";
@@ -57,6 +78,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Keputusan",
     icon: "recommendation",
     permissions: ["recommendation:read"],
+    actions: ["commander_decision:approve", "recommendation:write"],
     group: "putuskan",
   },
   {
@@ -64,6 +86,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Peringatan",
     icon: "warning",
     permissions: ["warning:read"],
+    actions: ["warning:acknowledge", "warning:resolve"],
+    core: true,
     group: "putuskan",
   },
   {
@@ -71,6 +95,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Operasi",
     icon: "operation",
     permissions: ["operation:read"],
+    actions: ["operation:write", "patrol:write"],
     group: "putuskan",
   },
 
@@ -80,6 +105,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Beranda",
     icon: "dashboard",
     permissions: ["dashboard:read"],
+    actions: [],
+    core: true,
     group: "pantau",
   },
   {
@@ -87,9 +114,19 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Brief",
     icon: "brief",
     permissions: ["dashboard:read"],
+    actions: [],
+    core: true,
     group: "pantau",
   },
-  { href: "/peta", label: "Peta", icon: "map", permissions: ["map:read"], group: "pantau" },
+  {
+    href: "/peta",
+    label: "Peta",
+    icon: "map",
+    permissions: ["map:read"],
+    actions: [],
+    core: true,
+    group: "pantau",
+  },
 
   // --- Telaah: ditelusuri saat ada pertanyaan, bukan dibaca tiap hari. ------------------
   {
@@ -97,6 +134,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Prediksi",
     icon: "prediction",
     permissions: ["prediction:read"],
+    actions: ["prediction:run", "prediction:publish"],
     group: "telaah",
   },
   {
@@ -104,6 +142,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Skoring",
     icon: "scoring",
     permissions: ["risk_score:read"],
+    actions: ["risk_score:run"],
     group: "telaah",
   },
   {
@@ -111,6 +150,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Pola",
     icon: "pattern",
     permissions: ["analytics:read"],
+    actions: [],
     group: "telaah",
   },
   {
@@ -118,6 +158,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Analitik",
     icon: "analytics",
     permissions: ["analytics:read"],
+    actions: ["analytics:export"],
     group: "telaah",
   },
   {
@@ -125,6 +166,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Evaluasi",
     icon: "evaluation",
     permissions: ["evaluation:read"],
+    actions: ["evaluation:run"],
     group: "telaah",
   },
 
@@ -135,6 +177,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: "entry",
     // Menuntut izin **tulis**: tanpa satu pun, seluruh formulirnya tersembunyi.
     permissions: ["crime:write", "intelligence:write", "citizen_report:write"],
+    actions: ["crime:write", "intelligence:write", "citizen_report:write"],
     group: "data",
   },
   {
@@ -142,6 +185,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Masyarakat",
     icon: "community",
     permissions: ["citizen_report:read"],
+    actions: ["citizen_report:write"],
     group: "data",
   },
   {
@@ -149,6 +193,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Intelijen",
     icon: "intelligence",
     permissions: ["intelligence:read"],
+    actions: ["intelligence:write"],
     group: "data",
   },
 
@@ -158,6 +203,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Audit",
     icon: "audit",
     permissions: ["audit:read"],
+    actions: [],
+    core: true,
     group: "sistem",
   },
   {
@@ -165,6 +212,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: "Admin",
     icon: "admin",
     permissions: ["user:read", "user:manage", "role:manage", "config:manage"],
+    actions: ["user:manage", "role:manage", "config:manage"],
     group: "sistem",
   },
 ] as const;
@@ -182,14 +230,42 @@ export function visibleNavItems(held: readonly string[]): NavItem[] {
   return NAV_ITEMS.filter((item) => item.permissions.some((name) => owned.has(name)));
 }
 
-/** Menu terlihat, dikelompokkan dan urut sesuai `NAV_GROUPS`. Kelompok kosong dibuang. */
+/**
+ * Menu utama bagi pemegang `held`: yang **dapat ia kerjakan**, ditambah layar inti.
+ *
+ * Aturannya satu kalimat: sebuah menu utama bila pengguna memegang salah satu
+ * `actions`-nya, atau bila menu itu `core`. Sisanya tetap dapat dibuka, hanya tidak
+ * berada di jalur harian.
+ *
+ * Aturan ini **diturunkan dari kewenangan**, bukan dari daftar per peran yang ditulis
+ * tangan. Daftar tulis tangan akan menua diam-diam setiap kali permission berubah, dan
+ * menuanya tidak terlihat sebagai kesalahan apa pun — hanya sebagai menu yang terasa
+ * "agak aneh" bagi peran tertentu.
+ */
+export function isPrimaryFor(item: NavItem, held: readonly string[]): boolean {
+  if (item.core === true) return true;
+  const owned = new Set(held);
+  return item.actions.some((name) => owned.has(name));
+}
+
+/** Menu utama yang terlihat, dikelompokkan dan urut sesuai `NAV_GROUPS`. */
 export function groupedNavItems(
   held: readonly string[],
 ): Array<{ group: NavGroup; label: string; items: NavItem[] }> {
-  const visible = visibleNavItems(held);
+  const primary = visibleNavItems(held).filter((item) => isPrimaryFor(item, held));
   return NAV_GROUPS.map((group) => ({
     group: group.id,
     label: group.label,
-    items: visible.filter((item) => item.group === group.id),
+    items: primary.filter((item) => item.group === group.id),
   })).filter((section) => section.items.length > 0);
+}
+
+/**
+ * Menu terlihat yang **bukan** menu utama — isi kelompok "Lainnya".
+ *
+ * Tetap terlihat dan tetap dapat dibuka: yang berubah hanya bahwa ia tidak ikut dibaca
+ * setiap kali sidebar dipandang. Tidak ada satu pun layar yang hilang.
+ */
+export function secondaryNavItems(held: readonly string[]): NavItem[] {
+  return visibleNavItems(held).filter((item) => !isPrimaryFor(item, held));
 }

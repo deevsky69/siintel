@@ -183,6 +183,39 @@ membawa **lencana berisi jumlah rekomendasi yang menunggu keputusan Anda** — d
 itu hanya muncul bagi yang berwenang memutuskan, karena angka yang tidak dapat Anda
 selesaikan hanya menjadi kecemasan tanpa jalan keluar.
 
+### Menu utama dan "Lainnya"
+
+Sidebar hanya menampilkan menu **utama**; sisanya berada di balik tombol **Lainnya** yang
+dapat dibuka. Tidak ada satu pun layar yang hilang — yang berubah hanya bahwa ia tidak ikut
+dibaca setiap kali sidebar dipandang.
+
+Aturan pemisahannya satu kalimat: **menu utama adalah yang dapat Anda kerjakan, ditambah
+lima layar inti** (Beranda, Brief, Peta, Peringatan, Audit). Layar inti tetap utama walau
+tidak ada yang dapat Anda kerjakan di sana, sebab ia konteks untuk mengambil keputusan —
+dan keputusan tanpa konteks justru yang paling ingin dihindari sistem ini.
+
+Aturan ini **diturunkan dari kewenangan**, bukan dari daftar per peran yang ditulis tangan.
+Daftar tulis tangan akan menua diam-diam setiap kali permission berubah, dan menuanya tidak
+terlihat sebagai kesalahan apa pun — hanya sebagai menu yang terasa "agak aneh".
+
+Hasilnya berbeda menurut peran:
+
+| Peran | Menu utama | Di dalam "Lainnya" |
+|---|---|---|
+| **Pimpinan** | Keputusan · Peringatan · Beranda · Brief · Peta · Evaluasi · Audit | Operasi · Prediksi · Skoring · Pola · Analitik · Masyarakat · Intelijen |
+| **Polsek** | Peringatan · Operasi · Beranda · Brief · Peta · Input Data · Masyarakat | Keputusan · Prediksi · Skoring · Pola · Analitik · Evaluasi · Intelijen |
+| **Fungsi** | Peringatan · Operasi · Beranda · Brief · Peta · Input Data | Keputusan · Prediksi · Skoring · Pola · Analitik · Evaluasi |
+| **Administrator** | 14 menu | Pola · Evaluasi |
+
+> **Mengapa Pimpinan hanya tujuh.** Dari 22 kewenangan yang dipegang seorang Pimpinan,
+> **20 di antaranya hanya membaca**. Persis dua membiarkannya mengubah sesuatu:
+> menyetujui rekomendasi (`commander_decision:approve`) dan menjalankan evaluasi
+> (`evaluation:run`) — dan keduanya tidak dipegang peran lain mana pun. Sebelumnya kedua
+> menu itu tenggelam di antara dua belas menu bacaan yang tampil serupa.
+
+"Lainnya" **terbuka sendiri** bila Anda sedang berada di salah satu isinya, supaya menu yang
+sedang aktif tidak pernah hilang dari sidebar.
+
 **Menu yang tidak dapat Anda pakai sama sekali tidak ditampilkan.** Seorang Pimpinan
 misalnya tidak memegang satu pun izin tulis, sehingga menu **Input Data** dan **Admin**
 tidak muncul — sebelumnya keduanya tampil dan hanya menyambut dengan kalimat "Akun Anda
