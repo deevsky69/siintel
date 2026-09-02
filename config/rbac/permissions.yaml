@@ -186,6 +186,18 @@ roles:
       - crime:read
       - crime:write
       - intelligence:read
+      # Diberikan 1 September 2026 setelah `POST /intelligence-reports` dibuat.
+      #
+      # Sebelumnya `intelligence:write` HANYA dimiliki peran Fungsi, dan pencabutannya
+      # dari Fungsi meninggalkan permission ini tanpa pemegang sama sekali — endpoint
+      # yang ada tetapi mustahil dipakai siapa pun. Mencabut kewenangan dari satu peran
+      # ternyata perlu memeriksa siapa lagi yang memegangnya, bukan hanya apakah
+      # cakupannya dapat ditegakkan.
+      #
+      # Diberikan ke Administrator, bukan dikembalikan ke Fungsi: sejak penggabungan
+      # peran, Administrator adalah peran yang memasukkan data operasional, dan ia
+      # sudah memegang `crime:write` maupun `intelligence:read`.
+      - intelligence:write
       - patrol:read
       - patrol:write
       - police_unit:read

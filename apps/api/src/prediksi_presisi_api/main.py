@@ -23,6 +23,7 @@ from .api.routers import (
     catalog,
     community,
     dashboard,
+    data_entry,
     decisions,
     evaluation,
     health,
@@ -30,6 +31,7 @@ from .api.routers import (
     map_view,
     operations,
     patterns,
+    scoring,
     warning_actions,
 )
 from .config import get_settings
@@ -73,6 +75,7 @@ def create_app() -> FastAPI:
     api.include_router(auth.router)
     api.include_router(catalog.router)
     api.include_router(community.router)
+    api.include_router(data_entry.router)
     api.include_router(intelligence.router)
     api.include_router(decisions.router)
     api.include_router(operations.router)
@@ -81,6 +84,7 @@ def create_app() -> FastAPI:
     api.include_router(dashboard.router)
     api.include_router(evaluation.router)
     api.include_router(patterns.router)
+    api.include_router(scoring.router)
     api.include_router(brief.router)
     app.include_router(api)
 

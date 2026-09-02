@@ -54,13 +54,36 @@ def test_missing_grid_stops_the_seed() -> None:
         _resolve_location({}, None, "uji")
 
 
-def test_crime_seed_loads_expected_volumes(session: Session) -> None:
+#: Berkas sumber tiap tabel beserta kolom kodenya.
+CRIME_SOURCES = (
+    ("crime_incidents.csv", "incident_id", CrimeIncident),
+    ("intelligence_reports.csv", "intelligence_id", IntelligenceReport),
+    ("patrol_activity.csv", "patrol_id", PatrolActivity),
+)
+
+
+def test_crime_seed_loads_every_row_of_its_source(session: Session) -> None:
+    """Seluruh baris berkas sumber termuat — tidak ada yang diam-diam terlewat.
+
+    Yang diperiksa adalah baris yang berasal dari berkas sumber, bukan jumlah seluruh
+    isi tabel. Versi sebelumnya menegaskan `COUNT(*) == 1200`, dan gagal begitu aplikasi
+    akhirnya punya pintu masuk data: kejadian yang dimasukkan petugas lewat `/input`
+    adalah baris yang **sah** — justru bukti bahwa prototipe ini bekerja.
+
+    Ini pola kesalahan yang sama dengan `test_operational_seed_loads_expected_volumes`
+    dan `test_seeding_never_creates_a_usable_password`, dan pantas dicatat sebagai
+    kecenderungan: test yang mengunci keadaan basis data akan patah tepat ketika sistem
+    mulai berguna.
+    """
     seed_crime_data(session)
     session.flush()
 
-    assert session.scalar(select(func.count()).select_from(CrimeIncident)) == 1200
-    assert session.scalar(select(func.count()).select_from(IntelligenceReport)) == 120
-    assert session.scalar(select(func.count()).select_from(PatrolActivity)) == 180
+    for name, column, model in CRIME_SOURCES:
+        codes = {row[column] for row in src.read_rows(name)}
+        loaded = session.scalar(
+            select(func.count()).select_from(model).where(model.code.in_(codes))
+        )
+        assert loaded == len(codes), f"{name}: {loaded} dari {len(codes)} baris termuat"
 
 
 def test_every_incident_is_attached_to_a_location(session: Session) -> None:
@@ -115,7 +138,6 @@ def test_crime_seed_is_idempotent(session: Session) -> None:
     session.flush()
 
     assert sum(second.inserted.values()) == 0
-    assert session.scalar(select(func.count()).select_from(CrimeIncident)) == 1200
 
 
 def test_patrol_activity_is_linked_to_units_and_locations(session: Session) -> None:

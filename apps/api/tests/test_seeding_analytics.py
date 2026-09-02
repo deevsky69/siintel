@@ -160,9 +160,21 @@ def test_analytics_seed_loads_expected_volumes(session: Session) -> None:
     seed_analytics_data(session)
     session.flush()
 
-    assert session.scalar(select(func.count()).select_from(RiskScore)) == 2019
-    assert session.scalar(select(func.count()).select_from(Prediction)) == 180
-    assert session.scalar(select(func.count()).select_from(EarlyWarning)) == 84
+    # Sama seperti pada seed kejadian dan operasional: yang diperiksa adalah baris yang
+    # berasal dari berkas sumber, bukan jumlah seluruh isi tabel. Penilaian risiko yang
+    # dijalankan lewat `/skoring` menambah baris yang sah, dan test yang mengunci
+    # `COUNT(*)` akan patah tepat ketika mesin penilaiannya mulai dipakai.
+    for name, column, model in (
+        ("risk_scores.csv", "risk_score_id", RiskScore),
+        ("predictions.csv", "prediction_id", Prediction),
+        ("early_warnings.csv", "warning_id", EarlyWarning),
+        ("recommendations.csv", "recommendation_id", Recommendation),
+    ):
+        codes = {row[column] for row in src.read_rows(name)}
+        loaded = session.scalar(
+            select(func.count()).select_from(model).where(model.code.in_(codes))
+        )
+        assert loaded == len(codes), f"{name}: {loaded} dari {len(codes)} baris termuat"
     assert session.scalar(select(func.count()).select_from(Recommendation)) == 84
 
 

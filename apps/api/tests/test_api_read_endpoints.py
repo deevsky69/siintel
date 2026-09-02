@@ -13,12 +13,12 @@ from collections.abc import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.main import app
-from prediksi_presisi_api.models import AuditLog, Location, Role, User
+from prediksi_presisi_api.models import AuditLog, CrimeIncident, Location, Role, User
 from prediksi_presisi_api.security.passwords import hash_password
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
@@ -84,12 +84,19 @@ def _auth(client: TestClient, user: User) -> dict[str, str]:
 
 
 def test_leader_sees_every_incident(client: TestClient, session: Session) -> None:
+    """Pimpinan melihat seluruh kejadian yang ada, berapa pun jumlahnya.
+
+    Jumlahnya dibandingkan dengan hitungan basis data, bukan dengan angka tetap:
+    sejak `/input` ada, kejadian bertambah lewat layar dan angka tetap apa pun akan
+    usang. Yang diuji adalah **tidak ada penyaringan**, bukan besarnya dataset.
+    """
     leader = _make_user(session, "Pimpinan")
+    everything = session.scalar(select(func.count()).select_from(CrimeIncident)) or 0
 
     response = client.get("/api/v1/crimes?page_size=1", headers=_auth(client, leader))
 
     assert response.status_code == 200
-    assert response.json()["pagination"]["total_items"] == 1200
+    assert response.json()["pagination"]["total_items"] == everything
 
 
 def test_polsek_user_only_sees_its_own_jurisdiction(client: TestClient, session: Session) -> None:
@@ -101,7 +108,8 @@ def test_polsek_user_only_sees_its_own_jurisdiction(client: TestClient, session:
 
     assert response.status_code == 200
     body = response.json()
-    assert body["pagination"]["total_items"] < 1200
+    everything = session.scalar(select(func.count()).select_from(CrimeIncident)) or 0
+    assert body["pagination"]["total_items"] < everything
     assert {row["polsek"] for row in body["data"]} == {polsek}
 
 

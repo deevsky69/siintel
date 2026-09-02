@@ -101,7 +101,19 @@ Kolom **Permission** merujuk katalog `docs/03` §2. Semua endpoint memerlukan au
 | PUT | `/roles/{id}/permissions` | `role:manage` |
 | GET | `/permissions` | `role:read` |
 | GET | `/audit-logs` | `audit:read` |
-| GET/PUT | `/config/risk-weights`, `/config/warning-thresholds`, `/config/taxonomy` | `config:read` / `config:manage` |
+| GET/PUT | `/config/risk-weights`, `/config/warning-thresholds`, `/config/taxonomy` | `config:read` / `config:manage` — **belum dibuat** |
+| GET | `/risk-scores/config` | `config:read` — ✅ **ADA** |
+| POST | `/risk-scores/run` | `risk_score:run` — ✅ **ADA** |
+
+Dua endpoint konfigurasi di atas **sengaja berbeda**, bukan duplikasi. `/config/risk-weights`
+adalah **pengelolaan** berkas konfigurasi, lengkap dengan `PUT` dan `config:manage` — belum
+dibuat, dan menyuntingnya lewat API berarti mengubah bobot yang sedang dirujuk baris
+`risk_scores`, yang justru dilarang oleh mekanisme versi.
+
+`/risk-scores/config` menyajikan konfigurasi **sebagaimana dipakai mesin penilaian**: versi
+aktif, profil beserta bobotnya, jenis ancaman yang dicakup, dan faktor mana yang benar-benar
+dapat disimpan pada tabel. Yang terakhir itu tidak ada di berkas konfigurasi — ia sifat
+schema — sehingga tidak dapat dijawab oleh endpoint pengelolaan config.
 
 Audit: `CREATE_USER`, `UPDATE_USER`, `CHANGE_ROLE_PERMISSION`, `CHANGE_CONFIGURATION` (menyimpan nilai sebelum/sesudah pada `detail`).
 Tidak ada endpoint tulis/hapus untuk `/audit-logs`.
