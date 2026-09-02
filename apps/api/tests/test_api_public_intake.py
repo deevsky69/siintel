@@ -306,3 +306,66 @@ def test_the_report_lands_where_officers_can_see_it(client: TestClient, session:
     )
 
     assert after == int(before or 0) + 1
+
+
+def test_the_rate_limit_counts_each_reporter_separately(
+    client: TestClient, session: Session
+) -> None:
+    """Dua pelapor dari alamat berbeda tidak boleh saling membungkam.
+
+    Ini penjaga terhadap kegagalan yang paling mudah terjadi pada susunan ini: permintaan
+    berangkat dari container web, sehingga tanpa `X-Forwarded-For` backend melihat SATU
+    alamat untuk seluruh dunia. Pembatasnya lalu memperlakukan semua pengunjung sebagai
+    satu pengirim, dan sepuluh laporan dari siapa pun akan membungkam semua orang selama
+    sejam — lebih buruk daripada tidak ada pembatas, dan tidak terlihat sampai ada yang
+    benar-benar melapor.
+    """
+    from prediksi_presisi_api.api.routers.public_intake import RATE_LIMIT_PER_HOUR
+
+    first = {"X-Forwarded-For": "203.0.113.10"}
+    second = {"X-Forwarded-For": "198.51.100.20"}
+
+    for _ in range(RATE_LIMIT_PER_HOUR):
+        assert (
+            client.post(
+                "/api/v1/public/citizen-reports", json=_payload(session), headers=first
+            ).status_code
+            == 201
+        )
+
+    assert (
+        client.post(
+            "/api/v1/public/citizen-reports", json=_payload(session), headers=first
+        ).status_code
+        == 429
+    ), "pelapor pertama sudah melewati jatahnya"
+
+    assert (
+        client.post(
+            "/api/v1/public/citizen-reports", json=_payload(session), headers=second
+        ).status_code
+        == 201
+    ), "pelapor kedua tidak boleh ikut terblokir"
+
+
+def test_a_proxy_chain_is_read_from_its_first_entry(client: TestClient, session: Session) -> None:
+    """`X-Forwarded-For` dapat berisi rantai; yang pertama adalah pelapornya."""
+    chain = {"X-Forwarded-For": "203.0.113.30, 10.0.0.5, 10.0.0.6"}
+    single = {"X-Forwarded-For": "203.0.113.30"}
+    from prediksi_presisi_api.api.routers.public_intake import RATE_LIMIT_PER_HOUR
+
+    for _ in range(RATE_LIMIT_PER_HOUR):
+        assert (
+            client.post(
+                "/api/v1/public/citizen-reports", json=_payload(session), headers=chain
+            ).status_code
+            == 201
+        )
+
+    # Alamat yang sama, ditulis tanpa rantai — harus dihitung sebagai pengirim yang sama.
+    assert (
+        client.post(
+            "/api/v1/public/citizen-reports", json=_payload(session), headers=single
+        ).status_code
+        == 429
+    )

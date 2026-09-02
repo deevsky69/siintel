@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { BASE_URL } from "@/lib/api";
 
 /**
@@ -10,9 +11,15 @@ import { BASE_URL } from "@/lib/api";
  * tanpa autentikasi, dan menyertakan token pengguna lain yang kebetulan sedang masuk di
  * peramban yang sama akan mengubah laporan anonim menjadi laporan atas nama orang itu.
  *
- * Permintaan tetap berangkat dari **server**, bukan dari peramban pelapor. Dengan begitu
- * alamat API tidak perlu dibuka ke publik, dan pembatas laju di backend melihat alamat
- * pelapor lewat `X-Forwarded-For` yang diteruskan proxy.
+ * Permintaan tetap berangkat dari **server**, bukan dari peramban pelapor, sehingga alamat
+ * API tidak perlu dibuka ke publik.
+ *
+ * Akibatnya satu hal harus dikerjakan dengan sadar: backend akan melihat alamat IP
+ * **container web**, bukan alamat pelapor. Dibiarkan begitu, pembatas laju memperlakukan
+ * seluruh pengunjung sebagai satu pengirim — dan sepuluh laporan dari siapa pun akan
+ * membungkam semua orang selama sejam. Itu lebih buruk daripada tidak ada pembatas sama
+ * sekali, dan tidak akan terlihat sampai ada yang benar-benar melapor. Karena itu
+ * `X-Forwarded-For` yang diterima dari proxy diteruskan apa adanya.
  */
 
 export type ReportOptions = {
@@ -40,6 +47,18 @@ export async function getReportOptions(): Promise<ReportOptions> {
   return (await response.json()) as ReportOptions;
 }
 
+/**
+ * Alamat pelapor, untuk diteruskan ke backend.
+ *
+ * Diambil dari header yang dipasang proxy. Bila tidak ada satu pun, dikembalikan `null`
+ * dan backend memakai alamat yang dilihatnya sendiri — tidak dikarang, karena alamat
+ * karangan pada pembatas laju sama saja dengan tidak ada pembatas.
+ */
+async function forwardedFor(): Promise<string | null> {
+  const incoming = await headers();
+  return incoming.get("x-forwarded-for") ?? incoming.get("x-real-ip");
+}
+
 export async function submitReport(_previous: SubmitState, form: FormData): Promise<SubmitState> {
   const incidentTime = String(form.get("incident_time") ?? "").trim();
   const locationText = String(form.get("location_text") ?? "").trim();
@@ -55,11 +74,15 @@ export async function submitReport(_previous: SubmitState, form: FormData): Prom
   if (locationText) body.location_text = locationText;
   if (incidentTime) body.incident_time = new Date(incidentTime).toISOString();
 
+  const client = await forwardedFor();
+  const outgoing: Record<string, string> = { "Content-Type": "application/json" };
+  if (client) outgoing["X-Forwarded-For"] = client;
+
   let response: Response;
   try {
     response = await fetch(`${BASE_URL}/api/v1/public/citizen-reports`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: outgoing,
       body: JSON.stringify(body),
       cache: "no-store",
     });
