@@ -686,6 +686,38 @@ Perintah ini memuat seluruh data sintetis dari `data/sample/` — lokasi, kejadi
 peringatan, rekomendasi, keputusan, dan data evaluasi. Ringkasan jumlah baris per tabel akan
 ditampilkan di akhir.
 
+### 6.2b Mengubah konfigurasi memerlukan pembangunan ulang image API
+
+Berkas di `config/` — katalog permission, bobot risiko, ambang, taksonomi — **ikut
+dipanggang ke dalam image API**, bukan dibaca dari repositori saat berjalan.
+
+Konsekuensinya mudah terlewat dan membingungkan: menyunting
+`config/rbac/permissions.yaml` lalu menjalankan seed di server **tidak mengubah apa pun**.
+Seed membaca berkas di dalam container, yang masih berisi versi lama, sehingga
+keluarannya melaporkan "sudah ada" untuk semuanya dan tidak ada satu pun kewenangan yang
+berpindah.
+
+Urutan yang benar setelah mengubah berkas `config/`:
+
+```bash
+pnpm prod:build        # atau: predpol build api
+pnpm prod:up
+pnpm prod:migrate      # bila schema ikut berubah
+predpol exec api python -m prediksi_presisi_api.seeding master
+```
+
+Baris terakhir yang membuktikan berhasil berbunyi seperti ini — perhatikan catatan dalam
+kurung siku, yang hanya muncul bila ada yang benar-benar berpindah:
+
+```text
+role_permissions     +1      (sudah ada: 100)  [cakupan diperbarui: 0, pemberian dicabut: 1]
+```
+
+Bila catatan itu tidak muncul padahal Anda baru saja mengubah kewenangan, image-nya belum
+dibangun ulang.
+
+---
+
 ### 6.3 Memastikan berhasil
 
 ```bash
