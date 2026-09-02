@@ -134,9 +134,31 @@ Kelas risiko tetap seperti `config/risk/warning-thresholds.yaml` dan **tidak diu
 
 Peringatan dini terbit pada skor ≥ 70.
 
-**Usulan tambahan untuk Kelompok B:** peringatan terbit pada skor ≥ 60, karena gangguan
-terencana punya waktu persiapan dan peringatan yang terlambat kehilangan gunanya.
-Menunggu penetapan.
+**Kelompok B: peringatan terbit pada skor ≥ 60** — **DIPUTUSKAN 1 September 2026.**
+
+Alasannya bukan bahwa gangguan terencana lebih berbahaya, melainkan bahwa ia punya
+**waktu persiapan**. Peringatan curanmor yang terbit sejam sebelum kejadian masih berguna
+untuk mengarahkan patroli; peringatan unjuk rasa yang terbit sejam sebelum massa
+berkumpul sudah terlambat untuk menyiapkan pengamanan. Ambang yang lebih rendah membeli
+waktu itu.
+
+Severity ikut digeser satu tingkat: skor 60–69 yang pada Kelompok A hanya berstatus
+`WATCH`, di sini sudah berstatus `WARNING` — menuntut penyiapan, bukan sekadar pemantauan.
+
+| | Kelompok A | Kelompok B |
+|---|---|---|
+| Peringatan terbit | ≥ 70 | **≥ 60** |
+| `WATCH` | 60–69 | 50–59 |
+| `WARNING` | 70–84 | **60–84** |
+| `CRITICAL` | 85–100 | 85–100 |
+
+**Ongkosnya dinyatakan terbuka:** lebih banyak peringatan yang tidak berujung gangguan.
+Untuk Kelompok B hal itu **bukan kegagalan prediksi** — lihat §4.
+
+Tercatat pada `config/risk/warning-thresholds.yaml` versi `proposed-2026-09-01`, dan
+belum berlaku: `active_version` masih `dummy-v1`. Menyalakannya berarti membangkitkan
+ulang peringatannya, sebab 84 peringatan yang ada menyimpan `threshold_version: dummy-v1`
+dan alasan terbitnya harus tetap dapat ditelusuri ke ambang yang berlaku saat itu.
 
 ---
 
@@ -160,5 +182,5 @@ CLAUDE.md §27.
 | 3 | Bobot Profil A pada §3 | Terima sebagai `DEMO / PROPOSED` |
 | 4 | Bobot Profil B pada §4 | Terima sebagai `DEMO / PROPOSED` |
 | 5 | `community_factor` disetel 0 sampai verifikasi ada | Ya |
-| 6 | Ambang peringatan Kelompok B diturunkan ke 60 | Menunggu |
+| 6 | Ambang peringatan Kelompok B diturunkan ke 60 | ✅ **DIPUTUSKAN** — lihat §5 |
 | 7 | Kelompok B dikecualikan dari precision/recall | Menunggu — menyangkut klaim validasi Taskap |

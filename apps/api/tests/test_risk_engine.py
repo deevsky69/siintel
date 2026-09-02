@@ -73,8 +73,10 @@ def test_risk_classes_come_from_the_threshold_file() -> None:
     raw = yaml.safe_load(engine.THRESHOLDS_FILE.read_text(encoding="utf-8"))
     thresholds = engine.load_thresholds()
 
-    assert thresholds.version == raw["version"]
-    for band in raw["risk_classes"]:
+    # Versi diambil dari `active_version`, bukan dari kunci `version` di tingkat atas
+    # yang sudah tidak ada sejak ambang diberi versi.
+    assert thresholds.version == raw["active_version"]
+    for band in raw["versions"][raw["active_version"]]["risk_classes"]:
         assert thresholds.class_for(int(band["min"])) == band["class"]
         assert thresholds.class_for(int(band["max"])) == band["class"]
 

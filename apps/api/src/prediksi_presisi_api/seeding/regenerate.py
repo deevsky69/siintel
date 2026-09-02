@@ -39,6 +39,19 @@ from .paths import REPO_ROOT, SAMPLE_DATA_DIR
 RISK_WEIGHTS_FILE = REPO_ROOT / "config" / "risk" / "risk-weights.yaml"
 THRESHOLDS_FILE = REPO_ROOT / "config" / "risk" / "warning-thresholds.yaml"
 
+
+def active_thresholds() -> dict[str, Any]:
+    """Ambang yang sedang berlaku, menurut `active_version`.
+
+    Dipakai bersama alih-alih membaca `["risk_classes"]` di tingkat atas: sejak ambang
+    diberi versi, membacanya langsung akan mengambil kunci yang tidak ada lagi.
+    """
+    raw = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
+    version = str(raw["active_version"])
+    resolved: dict[str, Any] = raw["versions"][version]
+    return resolved
+
+
 #: Seed tetap. Setiap baris memakai seed turunan dari kodenya sendiri, sehingga hasil
 #: pembangkitan hanya bergantung pada isi baris — bukan pada urutan maupun jumlah baris
 #: yang kebetulan sedang diproses. Tanpa itu, menjalankan ulang di atas hasil sebelumnya
@@ -113,6 +126,8 @@ def load_risk_config() -> RiskConfig:
     # lalu membangkitkan ulang, bukan menyunting versi yang sedang berlaku.
     active = str(weights_raw["active_version"])
     profiles = weights_raw["versions"][active]["profiles"]
+    active_threshold = str(thresholds_raw["active_version"])
+    threshold_set = thresholds_raw["versions"][active_threshold]
     weights = {key: float(value) for key, value in profiles["historical"]["weights"].items()}
     total = sum(weights.values())
     if abs(total - 1.0) > 1e-9:
@@ -122,9 +137,12 @@ def load_risk_config() -> RiskConfig:
     return RiskConfig(
         weights_version=active,
         weights=weights,
-        threshold_version=str(thresholds_raw["version"]),
-        minimum_warning_score=int(thresholds_raw["early_warning"]["minimum_score"]),
-        severities=list(thresholds_raw["early_warning"]["severities"]),
+        threshold_version=active_threshold,
+        # Ambang bawaan, bukan ambang per profil: pembangkit dummy hanya menghasilkan
+        # jenis Kelompok A. Ambang Kelompok B (`profiles.planned`) baru berlaku ketika
+        # `active_version` dipindah dan peringatannya dibangkitkan ulang.
+        minimum_warning_score=int(threshold_set["early_warning"]["default"]["minimum_score"]),
+        severities=list(threshold_set["early_warning"]["default"]["severities"]),
     )
 
 
@@ -316,7 +334,7 @@ def regenerate(directory: Path | None = None) -> dict[str, int]:
 
 
 def _risk_class(score: int) -> str:
-    thresholds = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))["risk_classes"]
+    thresholds = active_thresholds()["risk_classes"]
     for band in thresholds:
         if band["min"] <= score <= band["max"]:
             # Gaya penulisan mengikuti berkas sumber (Low/Moderate/...), bukan enum tersimpan;
@@ -723,7 +741,7 @@ def high_risk_minimum() -> int:
     Dibaca dari konfigurasi, tidak ditulis sebagai angka di sini: ambang berstatus
     `DEMO / PROPOSED` (U-01) dan CLAUDE.md §12 melarang menyebarkannya ke banyak tempat.
     """
-    classes = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))["risk_classes"]
+    classes = active_thresholds()["risk_classes"]
     for band in classes:
         if str(band["class"]).upper() == "HIGH":
             return int(band["min"])

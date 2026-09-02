@@ -11,23 +11,83 @@
 # Threshold TIDAK dipasang sebagai CHECK constraint (docs/06 §3) dan TIDAK di-hardcode
 # di kode mana pun (CLAUDE.md §12). Setiap peringatan menyimpan `threshold_version`.
 
-version: dummy-v1
-status: DEMO / PROPOSED
+# MENGAPA BERVERSI
+#
+#   Setiap baris `early_warnings` menyimpan `threshold_version`. Ambang sebuah versi yang
+#   masih dirujuk baris mana pun TIDAK BOLEH diubah: menurunkannya akan membuat peringatan
+#   lama tampak seolah terbit di bawah aturan yang tidak pernah berlaku saat itu, dan
+#   alasan terbitnya tidak lagi dapat ditelusuri.
+#
+#   Cara yang benar untuk mengubah ambang adalah menambah versi baru.
 
-# Kelas risiko berdasarkan risk_score 0–100.
-risk_classes:
-  - { class: LOW, min: 0, max: 44 }
-  - { class: MODERATE, min: 45, max: 69 }
-  - { class: HIGH, min: 70, max: 84 }
-  - { class: CRITICAL, min: 85, max: 100 }
+# Versi yang dipakai seed dan mesin penilaian saat ini.
+active_version: dummy-v1
 
-# Peringatan dini terbit bila risk_score prediksi mencapai `minimum_score`.
-early_warning:
-  minimum_score: 70
-  severities:
-    - { severity: WATCH, min: 60, max: 69 }
-    - { severity: WARNING, min: 70, max: 84 }
-    - { severity: CRITICAL, min: 85, max: 100 }
+versions:
+  # ===========================================================================
+  # dummy-v1 — BERLAKU untuk 84 baris `early_warnings` yang sudah ada.
+  # JANGAN diubah selama baris itu masih ada.
+  # ===========================================================================
+  dummy-v1:
+    status: DEMO
+    risk_classes:
+      - { class: LOW, min: 0, max: 44 }
+      - { class: MODERATE, min: 45, max: 69 }
+      - { class: HIGH, min: 70, max: 84 }
+      - { class: CRITICAL, min: 85, max: 100 }
+    early_warning:
+      # Satu ambang untuk seluruh jenis ancaman.
+      default:
+        minimum_score: 70
+        severities:
+          - { severity: WATCH, min: 60, max: 69 }
+          - { severity: WARNING, min: 70, max: 84 }
+          - { severity: CRITICAL, min: 85, max: 100 }
 
-# Catatan: level LOW dan WATCH tidak pernah muncul pada dataset dummy karena peringatan
+  # ===========================================================================
+  # proposed-2026-09-01 — ambang terpisah untuk gangguan terencana.
+  #
+  # Keputusan pemilik proyek, 1 September 2026: peringatan bagi Kelompok B
+  # (unjuk rasa, keramaian, tawuran) terbit pada skor >= 60, bukan 70.
+  #
+  # Alasannya bukan bahwa gangguan terencana lebih berbahaya, melainkan bahwa ia
+  # punya WAKTU PERSIAPAN. Peringatan curanmor yang terbit sejam sebelum kejadian
+  # masih berguna untuk mengarahkan patroli; peringatan unjuk rasa yang terbit
+  # sejam sebelum massa berkumpul sudah terlambat untuk menyiapkan pengamanan.
+  # Ambang yang lebih rendah membeli waktu itu.
+  #
+  # Ongkosnya dinyatakan terbuka: lebih banyak peringatan yang tidak berujung
+  # gangguan. Untuk Kelompok B hal itu BUKAN kegagalan prediksi — lihat docs/16 §4.
+  #
+  # Belum dipakai menghitung apa pun. Menyalakannya berarti mengubah
+  # `active_version` DAN membangkitkan ulang peringatannya.
+  # ===========================================================================
+  proposed-2026-09-01:
+    status: PROPOSED
+    risk_classes:
+      # Kelas risiko TIDAK berubah — yang berubah hanya ambang penerbitan peringatan.
+      - { class: LOW, min: 0, max: 44 }
+      - { class: MODERATE, min: 45, max: 69 }
+      - { class: HIGH, min: 70, max: 84 }
+      - { class: CRITICAL, min: 85, max: 100 }
+    early_warning:
+      default:
+        minimum_score: 70
+        severities:
+          - { severity: WATCH, min: 60, max: 69 }
+          - { severity: WARNING, min: 70, max: 84 }
+          - { severity: CRITICAL, min: 85, max: 100 }
+      # Ambang per profil penilaian pada config/risk/risk-weights.yaml.
+      # Nama profilnya harus sama persis; dijaga `test_threshold_profiles_match_weights`.
+      profiles:
+        planned:
+          minimum_score: 60
+          # Severity ikut digeser satu tingkat: skor 60–69 yang pada Kelompok A hanya
+          # berstatus WATCH, di sini sudah menuntut tindakan penyiapan.
+          severities:
+            - { severity: WATCH, min: 50, max: 59 }
+            - { severity: WARNING, min: 60, max: 84 }
+            - { severity: CRITICAL, min: 85, max: 100 }
+
+# Catatan: pada dataset dummy, level LOW dan WATCH tidak pernah muncul karena peringatan
 # hanya dibuat pada skor >= 70. Ini terlihat jelas hanya setelah ambangnya ditulis di sini.

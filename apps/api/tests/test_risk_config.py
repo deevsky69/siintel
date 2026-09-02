@@ -44,8 +44,20 @@ def _profiles() -> dict[str, dict[str, Any]]:
 
 
 def _thresholds() -> dict[str, Any]:
-    loaded: dict[str, Any] = yaml.safe_load(THRESHOLDS.read_text())
-    return loaded
+    """Ambang versi yang sedang berlaku — bukan tingkat atas berkas.
+
+    Ambang diberi versi pada 1 September 2026, sama alasannya dengan bobot: ambang
+    sebuah versi yang masih dirujuk baris `early_warnings` tidak boleh diubah.
+    """
+    catalogue: dict[str, Any] = yaml.safe_load(THRESHOLDS.read_text())
+    resolved: dict[str, Any] = catalogue["versions"][str(catalogue["active_version"])]
+    return resolved
+
+
+def _threshold_versions() -> dict[str, Any]:
+    catalogue: dict[str, Any] = yaml.safe_load(THRESHOLDS.read_text())
+    versions: dict[str, Any] = catalogue["versions"]
+    return versions
 
 
 @pytest.mark.parametrize("profile", sorted(_profiles()))
@@ -122,3 +134,42 @@ def test_the_check_would_catch_an_unbalanced_profile() -> None:
     broken = {"a": 0.25, "b": 0.20, "c": 0.18, "d": 0.12, "e": 0.10, "f": 0.08, "g": 0.00}
     assert not math.isclose(sum(broken.values()), 1.0, abs_tol=1e-9)
     assert math.isclose(sum(broken.values()), 0.93, abs_tol=1e-9)
+
+
+def test_threshold_profiles_match_the_weight_profiles() -> None:
+    """Nama profil ambang harus ada di profil bobot pada versi yang sama.
+
+    Ambang untuk profil yang tidak ada tidak akan pernah dipakai, dan ketiadaannya tidak
+    menimbulkan galat apa pun — peringatan Kelompok B sekadar tidak pernah terbit,
+    diam-diam. Salah eja `planned` menjadi `plannned` cukup untuk itu.
+    """
+    weights = _catalogue()["versions"]
+
+    for version, body in _threshold_versions().items():
+        named = set(body["early_warning"].get("profiles", {}))
+        if not named:
+            continue
+
+        assert version in weights, (
+            f"ambang versi '{version}' menyebut profil, tetapi versi bobot dengan nama "
+            f"itu tidak ada — keduanya harus berversi seiring"
+        )
+        available = set(weights[version]["profiles"])
+        assert named <= available, (
+            f"ambang versi '{version}' menyebut profil {sorted(named - available)} "
+            f"yang tidak ada pada bobot; tersedia: {sorted(available)}"
+        )
+
+
+def test_planned_disturbances_warn_earlier_than_crime() -> None:
+    """Kelompok B diperingatkan lebih awal — keputusan pemilik proyek, 1 September 2026.
+
+    Alasannya bukan bahwa gangguan terencana lebih berbahaya, melainkan bahwa ia punya
+    waktu persiapan: peringatan yang terbit sejam sebelum massa berkumpul sudah terlambat
+    untuk menyiapkan pengamanan.
+    """
+    proposed = _threshold_versions()["proposed-2026-09-01"]["early_warning"]
+    planned = proposed["profiles"]["planned"]["minimum_score"]
+
+    assert planned < proposed["default"]["minimum_score"]
+    assert planned == 60

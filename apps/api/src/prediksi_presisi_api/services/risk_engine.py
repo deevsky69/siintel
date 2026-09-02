@@ -289,7 +289,10 @@ def load_thresholds() -> Thresholds:
         message = "config/risk/warning-thresholds.yaml tidak ditemukan"
         raise RiskEngineError(message)
 
-    raw: dict[str, Any] = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
+    catalogue: dict[str, Any] = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
+    # Ambang berversi sejak 1 September 2026: kelas risiko diambil dari versi yang
+    # sedang berlaku, bukan dari tingkat atas berkas.
+    raw: dict[str, Any] = catalogue["versions"][str(catalogue["active_version"])]
     bands = tuple(
         RiskBand(risk_class=str(band["class"]), minimum=int(band["min"]), maximum=int(band["max"]))
         for band in raw["risk_classes"]
@@ -298,7 +301,9 @@ def load_thresholds() -> Thresholds:
         message = "config/risk/warning-thresholds.yaml tidak memuat satu pun kelas risiko"
         raise RiskEngineError(message)
 
-    return Thresholds(version=str(raw["version"]), status=str(raw["status"]), bands=bands)
+    return Thresholds(
+        version=str(catalogue["active_version"]), status=str(raw["status"]), bands=bands
+    )
 
 
 # ---------------------------------------------------------------------------
