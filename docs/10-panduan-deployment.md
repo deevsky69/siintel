@@ -338,6 +338,22 @@ Bila jawabannya tidak boleh, jalan keluarnya adalah meminta ISP membuka port 80/
 apa adanya, lalu memakai `pnpm prod:up:tls` (§3.2). Susunan compose sengaja memisahkan
 pintu masuk ke berkas tersendiri agar penggantian ini tidak membongkar aplikasi.
 
+#### Sebelum memilih jalur ini: ada jalan yang jauh lebih murah
+
+Kebuntuan DNS-01 pada §3.2 **bukan** karena zona `awansurya.com` menolak nama berawalan
+garis bawah. Zona itu sudah memuat dua di antaranya — `_dmarc` dan `default._domainkey` —
+dan keduanya terbaca normal. Yang menolak adalah **formulir tambah-record di panel
+DomaiNesia**, yang menolaknya tanpa pesan galat sehingga tampak seolah tersimpan.
+
+Artinya satu pesan ke dukungan DomaiNesia — *"tolong tambahkan record TXT
+`_acme-challenge.siintel` pada zona awansurya.com"* — kemungkinan besar menyelesaikan
+seluruh persoalan, tanpa memindahkan apa pun.
+
+**Timbanglah itu lebih dulu.** Memindahkan nameserver sebuah domain yang membawa email
+aktif, demi sebuah sertifikat, adalah menukar masalah kecil dengan risiko yang jauh lebih
+besar. Jalur di bawah tetap layak — tetapi karena keuntungannya sendiri (tanpa nomor port,
+perpanjangan otomatis), bukan sebagai jalan pintas dari kebuntuan tadi.
+
 #### Langkah
 
 **1. Daftarkan `awansurya.com` di Cloudflare**
@@ -345,15 +361,43 @@ pintu masuk ke berkas tersendiri agar penggantian ini tidak membongkar aplikasi.
 Buat akun (paket gratis memadai), tambahkan situs `awansurya.com`, dan biarkan
 Cloudflare memindai record DNS yang ada.
 
-> ### ⚠ PERIKSA HASIL PEMINDAIAN SEBELUM MELANJUTKAN
+> ### ⚠ DOMAIN INI MEMBAWA EMAIL YANG SEDANG HIDUP
 >
 > Mengganti nameserver memindahkan **seluruh** `awansurya.com`, bukan hanya subdomain
-> ini. Record yang tidak ikut tersalin akan mati begitu nameserver berpindah — dan yang
-> paling sering terlewat justru yang paling terasa: **MX** (email masuk) dan **TXT**
-> untuk SPF/DKIM (email keluar dianggap spam).
+> ini. Record yang tidak ikut tersalin akan mati begitu nameserver berpindah.
 >
-> Bandingkan daftar di Cloudflare dengan daftar di panel DomaiNesia **baris demi baris**,
-> dan tambahkan sendiri yang belum ada. Lakukan ini sebelum langkah 2, bukan sesudahnya.
+> Pada domain ini taruhannya lebih tinggi daripada biasanya: `_dmarc` berbunyi
+> **`p=reject`**. Artinya bila SPF atau DKIM tidak ikut berpindah dengan benar, email
+> yang Anda kirim **ditolak mentah-mentah** oleh penerima — bukan sekadar masuk folder
+> spam, dan tanpa pemberitahuan kepada Anda.
+>
+> Inventaris zona per 2 September 2026, hasil pembacaan langsung dari
+> `ns1.domainesia.net`. Cocokkan baris demi baris di Cloudflare **sebelum** langkah 2:
+>
+> | Nama | Tipe | Isi | Proxy Cloudflare |
+> |---|---|---|---|
+> | `awansurya.com` | A | `203.135.178.8` | terserah |
+> | `awansurya.com` | MX | `0 mx.mailspace.id.` | **tidak bisa diproxy** |
+> | `awansurya.com` | TXT | `v=spf1 a mx include:relay.mailchannels.net ~all` | — |
+> | `www` | CNAME | `awansurya.com` | terserah |
+> | `ftp` | CNAME | `awansurya.com` | **DNS only** |
+> | `mail` | A | `103.147.154.136` | **DNS only** — wajib |
+> | `_dmarc` | TXT | `v=DMARC1; p=reject; rua=mailto:dmarc@awansurya.com` | — |
+> | `default._domainkey` | TXT | kunci DKIM (panjang, tersimpan sebagai **dua potongan**) | — |
+> | `siintel` | A | `111.68.123.134` | **hapus** — digantikan terowongan pada langkah 5 |
+>
+> Tiga hal yang paling sering merusak email pada perpindahan seperti ini:
+>
+> 1. **`mail.awansurya.com` ikut diproxy** (awan jingga). Server surat tidak berbicara
+>    HTTP, jadi memproxynya memutus pengiriman. Pastikan abu-abu, **DNS only**.
+> 2. **DKIM terpotong.** Kuncinya melebihi 255 karakter sehingga disimpan sebagai dua
+>    string. Sebagian panel menyalinnya menjadi satu baris yang terpotong di tengah, dan
+>    tanda tangannya lalu selalu gagal. Bandingkan panjangnya, bukan hanya awalannya.
+> 3. **Perpindahan dilakukan sebelum daftarnya dicocokkan.** Setelah nameserver berganti,
+>    Anda tidak lagi bisa membaca zona lama untuk membandingkan.
+>
+> Salin dulu inventaris di atas ke tempat yang aman. Setelah nameserver berpindah, daftar
+> di DomaiNesia tidak lagi menjadi acuan.
 
 **2. Ganti nameserver di DomaiNesia**
 
