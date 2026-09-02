@@ -48,10 +48,19 @@ export type NavItem = {
   /**
    * Menu yang selalu utama selama terlihat, walau tidak ada yang dapat dilakukan di sana.
    *
-   * Empat layar keadaan (Beranda, Brief, Peta, Peringatan) dan satu layar pemeriksaan
-   * (Audit). Menaruhnya di "Lainnya" berarti menyembunyikan konteks yang justru dibutuhkan
-   * untuk mengambil keputusan — dan keputusan tanpa konteks adalah yang paling ingin
-   * dihindari sistem ini.
+   * Dua jenis layar masuk ke sini:
+   *
+   * 1. **Konteks untuk memutuskan** — Beranda, Brief, Peta, Peringatan, Audit.
+   *    Menaruhnya di "Lainnya" berarti menyembunyikan konteks yang justru dibutuhkan untuk
+   *    mengambil keputusan, dan keputusan tanpa konteks adalah yang paling ingin dihindari
+   *    sistem ini.
+   *
+   * 2. **Pekerjaan yang ditujukan kepada pembacanya** — Keputusan. Aturan "utama = yang
+   *    dapat dikerjakan" sempat menaruhnya di "Lainnya" bagi Fungsi dan Polsek, karena
+   *    keduanya hanya dapat membacanya. Itu benar menurut aturan tetapi salah menurut
+   *    kenyataan: rekomendasi **dialamatkan kepada fungsi tertentu**, dan bagi yang
+   *    dialamati ia bacaan harian — bukan layar yang ditengok saat penasaran. Keputusan
+   *    pemilik proyek, 2 September 2026.
    */
   core?: true;
 };
@@ -79,6 +88,10 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: "recommendation",
     permissions: ["recommendation:read"],
     actions: ["commander_decision:approve", "recommendation:write"],
+    // Utama bagi setiap peran yang dapat membacanya, bukan hanya bagi yang dapat
+    // memutuskannya: rekomendasi dialamatkan kepada fungsi tertentu, dan yang dialamati
+    // perlu melihatnya setiap hari meski keputusannya bukan di tangannya.
+    core: true,
     group: "putuskan",
   },
   {

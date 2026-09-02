@@ -131,6 +131,29 @@ describe("pemisahan menu utama dan lainnya", () => {
     }
   });
 
+  it("menjadikan Keputusan menu utama bagi setiap peran yang dapat membacanya", () => {
+    // Keputusan pemilik proyek, 2 September 2026. Aturan "utama = yang dapat dikerjakan"
+    // sempat menaruhnya di Lainnya bagi Fungsi dan Polsek karena keduanya hanya membaca —
+    // benar menurut aturan, salah menurut kenyataan: rekomendasi DIALAMATKAN kepada fungsi
+    // tertentu, dan yang dialamati membacanya setiap hari.
+    const fungsi = ["dashboard:read", "map:read", "recommendation:read", "crime:write"];
+    const polsek = [...fungsi, "citizen_report:read", "citizen_report:write"];
+
+    for (const held of [fungsi, polsek]) {
+      const primary = groupedNavItems(held).flatMap((section) => section.items);
+
+      expect(primary.map((item) => item.href)).toContain("/rekomendasi");
+      expect(secondaryNavItems(held).map((item) => item.href)).not.toContain("/rekomendasi");
+    }
+  });
+
+  it("menempatkan Keputusan paling atas bagi peran mana pun yang melihatnya", () => {
+    const fungsi = ["dashboard:read", "map:read", "recommendation:read", "crime:write"];
+    const primary = groupedNavItems(fungsi).flatMap((section) => section.items);
+
+    expect(primary[0]?.href).toBe("/rekomendasi");
+  });
+
   it("mengurutkan kelompok sesuai NAV_GROUPS, dengan Putuskan lebih dulu", () => {
     // `actions` ikut dibawa: tanpanya seluruh menu menjadi hanya-baca dan pindah ke
     // kelompok Lainnya, sehingga urutan kelompok tidak teruji sama sekali.

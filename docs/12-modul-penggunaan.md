@@ -190,9 +190,18 @@ dapat dibuka. Tidak ada satu pun layar yang hilang — yang berubah hanya bahwa 
 dibaca setiap kali sidebar dipandang.
 
 Aturan pemisahannya satu kalimat: **menu utama adalah yang dapat Anda kerjakan, ditambah
-lima layar inti** (Beranda, Brief, Peta, Peringatan, Audit). Layar inti tetap utama walau
-tidak ada yang dapat Anda kerjakan di sana, sebab ia konteks untuk mengambil keputusan —
-dan keputusan tanpa konteks justru yang paling ingin dihindari sistem ini.
+enam layar inti** (Keputusan, Beranda, Brief, Peta, Peringatan, Audit).
+
+Layar inti tetap utama walau tidak ada yang dapat Anda kerjakan di sana, karena dua alasan
+yang berbeda:
+
+- **Beranda, Brief, Peta, Peringatan, Audit** adalah konteks untuk mengambil keputusan.
+  Menyembunyikannya berarti menuntut keputusan tanpa konteks — hal yang paling ingin
+  dihindari sistem ini.
+- **Keputusan** adalah pekerjaan yang **dialamatkan kepada pembacanya**. Rekomendasi selalu
+  menyebut fungsi yang menanganinya, dan bagi fungsi yang dialamati ia bacaan harian —
+  bukan layar yang ditengok saat penasaran. Karena itu ia menu utama bagi setiap peran yang
+  dapat membacanya, bukan hanya bagi Pimpinan yang memutuskannya.
 
 Aturan ini **diturunkan dari kewenangan**, bukan dari daftar per peran yang ditulis tangan.
 Daftar tulis tangan akan menua diam-diam setiap kali permission berubah, dan menuanya tidak
@@ -203,8 +212,8 @@ Hasilnya berbeda menurut peran:
 | Peran | Menu utama | Di dalam "Lainnya" |
 |---|---|---|
 | **Pimpinan** | Keputusan · Peringatan · Beranda · Brief · Peta · Evaluasi · Audit | Operasi · Prediksi · Skoring · Pola · Analitik · Masyarakat · Intelijen |
-| **Polsek** | Peringatan · Operasi · Beranda · Brief · Peta · Input Data · Masyarakat | Keputusan · Prediksi · Skoring · Pola · Analitik · Evaluasi · Intelijen |
-| **Fungsi** | Peringatan · Operasi · Beranda · Brief · Peta · Input Data | Keputusan · Prediksi · Skoring · Pola · Analitik · Evaluasi |
+| **Polsek** | Keputusan · Peringatan · Operasi · Beranda · Brief · Peta · Input Data · Masyarakat | Prediksi · Skoring · Pola · Analitik · Evaluasi · Intelijen |
+| **Fungsi** | Keputusan · Peringatan · Operasi · Beranda · Brief · Peta · Input Data | Prediksi · Skoring · Pola · Analitik · Evaluasi |
 | **Administrator** | 14 menu | Pola · Evaluasi |
 
 > **Mengapa Pimpinan hanya tujuh.** Dari 22 kewenangan yang dipegang seorang Pimpinan,
