@@ -8,9 +8,12 @@ import { RISK_LABELS, riskClassOf } from "@/lib/risk";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
+/** Seluruh permission yang disebut menu mana pun — untuk menguji keadaan "boleh semua". */
+const ALL_PERMISSIONS = [...new Set(NAV_ITEMS.flatMap((item) => item.permissions))];
+
 describe("shell aplikasi", () => {
-  it("menampilkan seluruh menu utama sesuai referensi visual", () => {
-    render(<Sidebar />);
+  it("menampilkan seluruh menu bagi pengguna yang memegang seluruh kewenangan", () => {
+    render(<Sidebar permissions={ALL_PERMISSIONS} />);
 
     for (const item of NAV_ITEMS) {
       expect(screen.getByRole("link", { name: new RegExp(item.label, "i") })).toBeDefined();
@@ -18,10 +21,68 @@ describe("shell aplikasi", () => {
   });
 
   it("menandai menu yang sedang aktif untuk pembaca layar", () => {
-    render(<Sidebar />);
+    render(<Sidebar permissions={ALL_PERMISSIONS} />);
 
-    const active = screen.getByRole("link", { name: /dashboard/i });
+    const active = screen.getByRole("link", { name: /beranda/i });
     expect(active.getAttribute("aria-current")).toBe("page");
+  });
+
+  it("menyembunyikan menu yang tidak dapat dipakai peran itu sama sekali", () => {
+    // Kewenangan Pimpinan yang sebenarnya, disalin dari config/rbac/permissions.yaml.
+    // Ia tidak memegang satu pun izin tulis maupun pengelolaan pengguna.
+    const pimpinan = [
+      "analytics:read",
+      "audit:read",
+      "citizen_report:read",
+      "commander_decision:approve",
+      "commander_decision:read",
+      "dashboard:read",
+      "evaluation:read",
+      "intelligence:read",
+      "map:read",
+      "operation:read",
+      "prediction:read",
+      "recommendation:read",
+      "risk_score:read",
+      "warning:read",
+    ];
+
+    render(<Sidebar permissions={pimpinan} />);
+
+    expect(screen.queryByRole("link", { name: /input data/i })).toBeNull();
+    expect(screen.queryByRole("link", { name: /admin/i })).toBeNull();
+    expect(screen.getByRole("link", { name: /keputusan/i })).toBeDefined();
+    expect(screen.getByRole("link", { name: /audit/i })).toBeDefined();
+  });
+
+  it("tidak menampilkan menu apa pun ketika kewenangan tidak diketahui", () => {
+    // Kegagalan memuat profil tidak boleh berubah menjadi sidebar yang menjanjikan lebih
+    // banyak daripada yang dapat dibuka.
+    render(<Sidebar permissions={[]} />);
+
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
+  });
+
+  it("menampilkan lencana jumlah keputusan yang menunggu", () => {
+    render(<Sidebar permissions={ALL_PERMISSIONS} pendingDecisions={19} />);
+
+    expect(screen.getByText("19")).toBeDefined();
+    expect(screen.getByText("19 rekomendasi menunggu keputusan Anda")).toBeDefined();
+  });
+
+  it("tidak menggambar lencana ketika tidak ada yang menunggu", () => {
+    render(<Sidebar permissions={ALL_PERMISSIONS} pendingDecisions={0} />);
+
+    expect(screen.queryByText(/menunggu keputusan Anda/)).toBeNull();
+  });
+
+  it("meletakkan kelompok Putuskan lebih dulu daripada kelompok lain", () => {
+    // Bagi Pimpinan, Keputusan adalah satu-satunya menu berisi sesuatu yang hanya dapat
+    // diselesaikan olehnya. Sebelumnya ia berada di urutan kesembilan.
+    render(<Sidebar permissions={ALL_PERMISSIONS} />);
+
+    const links = screen.getAllByRole("link");
+    expect(links[0].getAttribute("href")).toBe("/rekomendasi");
   });
 
   it("menampilkan identitas sistem dan satuan wilayah", () => {

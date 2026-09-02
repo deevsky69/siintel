@@ -162,6 +162,35 @@ Yang perlu diketahui:
 - Sesi berumur pendek dan diperpanjang otomatis selama Anda aktif.
 - Menu yang tampil mengikuti peran Anda, tetapi **yang menentukan adalah server** —
   membuka alamat halaman secara langsung tidak melewati pembatasan.
+- Tombol **Keluar** di kanan atas mengakhiri sesi dan mengembalikan Anda ke halaman masuk.
+
+### Susunan menu
+
+Menu dikelompokkan menurut **apa yang Anda lakukan**, bukan menurut jenis datanya:
+
+| Kelompok | Isinya | Untuk |
+|---|---|---|
+| **Putuskan** | Keputusan · Peringatan · Operasi | Hal yang menunggu tindakan seseorang |
+| **Pantau** | Beranda · Brief · Peta | Keadaan sekarang |
+| **Telaah** | Prediksi · Skoring · Pola · Analitik · Evaluasi | Ditelusuri saat ada pertanyaan |
+| **Data** | Input Data · Masyarakat · Intelijen | Pekerjaan harian petugas |
+| **Sistem** | Audit · Admin | Pemeriksaan atas sistem |
+
+**Putuskan diletakkan paling atas.** Bagi Pimpinan, menu **Keputusan** adalah satu-satunya
+yang memuat sesuatu yang **hanya dapat diselesaikan olehnya**; sebelumnya ia berada di
+urutan kesembilan tanpa satu pun penanda bahwa ada yang menunggu di dalamnya. Kini ia
+membawa **lencana berisi jumlah rekomendasi yang menunggu keputusan Anda** — dan lencana
+itu hanya muncul bagi yang berwenang memutuskan, karena angka yang tidak dapat Anda
+selesaikan hanya menjadi kecemasan tanpa jalan keluar.
+
+**Menu yang tidak dapat Anda pakai sama sekali tidak ditampilkan.** Seorang Pimpinan
+misalnya tidak memegang satu pun izin tulis, sehingga menu **Input Data** dan **Admin**
+tidak muncul — sebelumnya keduanya tampil dan hanya menyambut dengan kalimat "Akun Anda
+tidak memiliki kewenangan".
+
+> **Menyembunyikan menu bukan pengamanan.** Server tetap memeriksa setiap permintaan.
+> Menyalin alamat halaman yang tersembunyi dan membukanya langsung tetap ditolak, dan
+> percobaannya tercatat di jejak audit.
 
 ---
 
@@ -268,11 +297,16 @@ Sebagian jenis rekomendasi belum mungkin dibuat sama sekali. Contohnya "rapat ko
 karena ada Car Free Day": sistem belum memuat kalender kegiatan, dan menambahkannya
 menuntut **sumber data baru**, bukan sekadar aturan baru.
 
-### Panel analitik
+### Panel analitik — terlipat
 
-Di bawah pemisah "Panel analitik" tersedia panel yang sudah ada sebelumnya: indeks
-keamanan, peta ringkas, ancaman teratas, outlook prediktif, tren bulanan, dan status
-patroli. Panel itu tetap dipertahankan karena masih dipakai peran selain Pimpinan.
+Di bagian bawah terdapat "Panel analitik" yang **terlipat**; klik untuk membukanya. Isinya
+panel yang sudah ada sebelumnya: indeks keamanan, peta ringkas, ancaman teratas, outlook
+prediktif, tren bulanan, dan status patroli.
+
+Panel itu tidak dihapus — ia masih dipakai peran selain Pimpinan — tetapi dikeluarkan dari
+bacaan pertama. Enam panel teknis di bawah blok keputusan membuat halaman terlalu panjang
+untuk dibaca sekali duduk, dan yang pertama dibaca seorang pimpinan seharusnya yang
+menuntut keputusannya, bukan yang paling banyak angkanya.
 
 > **Kebiasaan yang benar:** setiap angka turunan pada aplikasi ini membawa keterangan
 > asal. Bacalah keterangan itu sebelum mengutip angkanya. Angka tanpa konteks adalah

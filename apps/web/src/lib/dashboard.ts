@@ -75,5 +75,26 @@ export const getRecommendations = (warningCode: string) =>
     `/recommendations?warning_code=${encodeURIComponent(warningCode)}&page_size=10`,
   );
 
-export const getProfile = () =>
-  apiGet<{ full_name: string | null; username: string; role: string }>("/auth/me");
+export type Profile = {
+  full_name: string | null;
+  username: string;
+  role: string;
+  /** Permission efektif pengguna — dipakai menyaring menu, **bukan** menegakkan izin. */
+  permissions: string[];
+};
+
+export const getProfile = () => apiGet<Profile>("/auth/me");
+
+/**
+ * Jumlah rekomendasi yang menunggu keputusan.
+ *
+ * Diambil dari `pagination.total_items`, bukan dengan menghitung baris: satu halaman berisi
+ * satu baris sudah cukup, dan menarik seluruh rekomendasi hanya untuk mencacahnya akan
+ * membebani setiap pemuatan halaman.
+ */
+export async function getPendingDecisionCount(): Promise<number> {
+  const page = await apiGet<Page<RecommendationRow>>(
+    "/recommendations?status=PENDING_REVIEW&page_size=1",
+  );
+  return page.pagination.total_items;
+}

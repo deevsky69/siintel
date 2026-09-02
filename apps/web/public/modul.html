@@ -699,7 +699,46 @@
         <li>Password tidak pernah tersimpan di dalam kode maupun berkas contoh; hanya ditetapkan langsung di server.</li>
         <li>Sesi berumur pendek dan diperpanjang otomatis selama Anda aktif.</li>
         <li>Menu yang tampil mengikuti peran Anda, tetapi <strong>yang menentukan adalah server</strong> — membuka alamat halaman secara langsung tidak melewati pembatasan.</li>
+        <li>Tombol <strong>Keluar</strong> di kanan atas mengakhiri sesi dan mengembalikan Anda ke halaman masuk.</li>
       </ul>
+
+      <h3>Susunan menu</h3>
+      <p>Menu dikelompokkan menurut <strong>apa yang Anda lakukan</strong>, bukan menurut jenis
+      datanya:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kelompok</th><th>Isinya</th><th>Untuk</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Putuskan</strong></td><td>Keputusan &middot; Peringatan &middot; Operasi</td><td>Hal yang menunggu tindakan seseorang.</td></tr>
+            <tr><td><strong>Pantau</strong></td><td>Beranda &middot; Brief &middot; Peta</td><td>Keadaan sekarang.</td></tr>
+            <tr><td><strong>Telaah</strong></td><td>Prediksi &middot; Skoring &middot; Pola &middot; Analitik &middot; Evaluasi</td><td>Ditelusuri saat ada pertanyaan.</td></tr>
+            <tr><td><strong>Data</strong></td><td>Input Data &middot; Masyarakat &middot; Intelijen</td><td>Pekerjaan harian petugas.</td></tr>
+            <tr><td><strong>Sistem</strong></td><td>Audit &middot; Admin</td><td>Pemeriksaan atas sistem.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <strong>Putuskan diletakkan paling atas.</strong> Bagi Pimpinan, menu
+        <strong>Keputusan</strong> adalah satu-satunya yang memuat sesuatu yang <strong>hanya dapat
+        diselesaikan olehnya</strong>; sebelumnya ia berada di urutan kesembilan tanpa satu pun
+        penanda bahwa ada yang menunggu di dalamnya. Kini ia membawa <strong>lencana berisi jumlah
+        rekomendasi yang menunggu keputusan Anda</strong> — dan lencana itu hanya muncul bagi yang
+        berwenang memutuskan, karena angka yang tidak dapat Anda selesaikan hanya menjadi kecemasan
+        tanpa jalan keluar.
+      </p>
+      <p>
+        <strong>Menu yang tidak dapat Anda pakai sama sekali tidak ditampilkan.</strong> Seorang
+        Pimpinan misalnya tidak memegang satu pun izin tulis, sehingga menu <strong>Input Data</strong>
+        dan <strong>Admin</strong> tidak muncul — sebelumnya keduanya tampil dan hanya menyambut
+        dengan kalimat &#8220;Akun Anda tidak memiliki kewenangan&#8221;.
+      </p>
+      <div class="note caution">
+        <span class="label">Menyembunyikan menu bukan pengamanan</span>
+        <p>
+          Server tetap memeriksa setiap permintaan. Menyalin alamat halaman yang tersembunyi dan
+          membukanya langsung tetap ditolak, dan percobaannya tercatat di jejak audit.
+        </p>
+      </div>
     </section>
 
     <section id="s5">
@@ -841,11 +880,17 @@ di mana saya menaruh sumber daya</pre>
         menambahkannya menuntut <strong>sumber data baru</strong>, bukan sekadar aturan baru.
       </p>
 
-      <h3>Panel analitik</h3>
+      <h3>Panel analitik — terlipat</h3>
       <p>
-        Di bawah pemisah &#8220;Panel analitik&#8221; tersedia panel yang sudah ada sebelumnya: indeks
-        keamanan, peta ringkas, ancaman teratas, outlook prediktif, tren bulanan, dan status patroli.
-        Panel itu tetap dipertahankan karena masih dipakai peran selain Pimpinan.
+        Di bagian bawah terdapat &#8220;Panel analitik&#8221; yang <strong>terlipat</strong>; klik
+        untuk membukanya. Isinya panel yang sudah ada sebelumnya: indeks keamanan, peta ringkas,
+        ancaman teratas, outlook prediktif, tren bulanan, dan status patroli.
+      </p>
+      <p>
+        Panel itu tidak dihapus — ia masih dipakai peran selain Pimpinan — tetapi dikeluarkan dari
+        bacaan pertama. Enam panel teknis di bawah blok keputusan membuat halaman terlalu panjang
+        untuk dibaca sekali duduk, dan yang pertama dibaca seorang pimpinan seharusnya yang menuntut
+        keputusannya, bukan yang paling banyak angkanya.
       </p>
 
       <div class="note">

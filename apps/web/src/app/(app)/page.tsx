@@ -36,9 +36,13 @@ export const dynamic = "force-dynamic";
  *
  * Susunannya mengikuti permintaan pemilik proyek, 2 September 2026: empat kartu ringkas,
  * lalu daftar wilayah menurut jumlah laporan, isu menonjol sepekan, dan rekomendasi
- * kebijakan. Panel teknis yang sudah ada — peta, tren, outlook, status patroli — tetap
- * berada di bawahnya, tidak dihapus: ia masih dipakai peran selain Pimpinan, dan menghapus
- * fitur yang bekerja bukan bagian dari permintaan ini.
+ * kebijakan.
+ *
+ * Panel teknis yang sudah ada — peta, tren, outlook, status patroli — berada di bawahnya
+ * dalam bagian yang **terlipat**, tidak dihapus. Ia masih dipakai peran selain Pimpinan,
+ * dan menghapus fitur yang bekerja bukan bagian dari permintaan ini; tetapi membiarkannya
+ * terbentang membuat halaman terlalu panjang untuk dibaca sekali duduk, dan itu keluhan
+ * yang memang disampaikan pemilik proyek.
  *
  * Seluruh blok dibatasi kewenangan di backend. Pengguna Polsek menerima layar dengan
  * susunan yang sama, berisi wilayahnya sendiri.
@@ -87,50 +91,62 @@ export default async function DashboardPage() {
         <PolicyRecommendations policy={board.policy} />
       </div>
 
-      <div className="flex items-center gap-3 pt-1">
-        <span className="text-[10px] uppercase tracking-wider text-ink-faint">Panel analitik</span>
-        <span className="h-px flex-1 bg-base-800" />
-      </div>
+      {/* Panel analitik dilipat, bukan dihapus.
+          Layar ini dibaca lebih dulu oleh pimpinan, dan enam panel teknis di bawah blok
+          keputusan membuat halaman terlalu panjang untuk dibaca sekali duduk — keluhan
+          yang memang disampaikan pemilik proyek. Melipatnya mempertahankan seluruh
+          fungsinya bagi peran yang memakainya sehari-hari, sekaligus mengeluarkannya dari
+          bacaan pertama. `details` dipakai apa adanya: ia bekerja tanpa JavaScript dan
+          sudah dikenali pembaca layar sebagai bagian yang dapat dibuka. */}
+      <details className="group space-y-3">
+        <summary className="flex cursor-pointer list-none items-center gap-3 py-1 text-[10px] uppercase tracking-wider text-ink-faint transition-colors hover:text-ink-muted">
+          <span className="transition-transform group-open:rotate-90" aria-hidden="true">
+            &#9656;
+          </span>
+          <span>Panel analitik</span>
+          <span className="h-px flex-1 bg-base-800" />
+        </summary>
 
-      <div className="grid grid-cols-12 gap-3">
-        <div className="col-span-12 flex flex-col gap-3 xl:col-span-3">
-          <SituationOverview summary={summary} />
+        <div className="grid grid-cols-12 gap-3">
+          <div className="col-span-12 flex flex-col gap-3 xl:col-span-3">
+            <SituationOverview summary={summary} />
+            <ScoreList
+              title="Top Threat"
+              rows={summary.top_threats.map((row) => ({
+                label: row.threat_type,
+                score: row.risk_score,
+              }))}
+              emptyLabel="Belum ada penilaian risiko."
+            />
+          </div>
+
+          <div className="col-span-12 xl:col-span-6">
+            <MapPanel data={map} />
+          </div>
+
+          <div className="col-span-12 flex flex-col gap-3 xl:col-span-3">
+            <EarlyWarningPanel warning={topWarning} total={warnings.pagination.total_items} />
+            <RecommendationPanel
+              rows={recommendations?.data ?? []}
+              forWarning={topWarning?.code ?? null}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <OutlookPanel rows={outlook.outlook} />
+          <TrendChart series={trends.series} />
           <ScoreList
-            title="Top Threat"
-            rows={summary.top_threats.map((row) => ({
-              label: row.threat_type,
+            title="Risk Index by District"
+            rows={summary.risk_by_district.map((row) => ({
+              label: row.kecamatan,
               score: row.risk_score,
             }))}
             emptyLabel="Belum ada penilaian risiko."
           />
+          <PatrolStatus units={summary.units} operations={summary.active_operations} />
         </div>
-
-        <div className="col-span-12 xl:col-span-6">
-          <MapPanel data={map} />
-        </div>
-
-        <div className="col-span-12 flex flex-col gap-3 xl:col-span-3">
-          <EarlyWarningPanel warning={topWarning} total={warnings.pagination.total_items} />
-          <RecommendationPanel
-            rows={recommendations?.data ?? []}
-            forWarning={topWarning?.code ?? null}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <OutlookPanel rows={outlook.outlook} />
-        <TrendChart series={trends.series} />
-        <ScoreList
-          title="Risk Index by District"
-          rows={summary.risk_by_district.map((row) => ({
-            label: row.kecamatan,
-            score: row.risk_score,
-          }))}
-          emptyLabel="Belum ada penilaian risiko."
-        />
-        <PatrolStatus units={summary.units} operations={summary.active_operations} />
-      </div>
+      </details>
     </div>
   );
 }
