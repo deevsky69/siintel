@@ -107,14 +107,20 @@ def load_risk_config() -> RiskConfig:
     weights_raw = yaml.safe_load(RISK_WEIGHTS_FILE.read_text(encoding="utf-8"))
     thresholds_raw = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
 
-    weights = {key: float(value) for key, value in weights_raw["weights"].items()}
+    # Bobot kini berversi: baris `risk_scores` menyimpan `weights_version`, dan bobot
+    # sebuah versi tidak boleh berubah selama masih dirujuk. Yang dipakai membangkitkan
+    # adalah versi aktif, bukan versi terbaru — mengganti bobot berarti menambah versi
+    # lalu membangkitkan ulang, bukan menyunting versi yang sedang berlaku.
+    active = str(weights_raw["active_version"])
+    profiles = weights_raw["versions"][active]["profiles"]
+    weights = {key: float(value) for key, value in profiles["historical"]["weights"].items()}
     total = sum(weights.values())
     if abs(total - 1.0) > 1e-9:
         message = f"bobot risk score harus berjumlah 1, saat ini {total}"
         raise SeedError(message)
 
     return RiskConfig(
-        weights_version=str(weights_raw["version"]),
+        weights_version=active,
         weights=weights,
         threshold_version=str(thresholds_raw["version"]),
         minimum_warning_score=int(thresholds_raw["early_warning"]["minimum_score"]),

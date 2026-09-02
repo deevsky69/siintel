@@ -7,81 +7,115 @@
 # diperlukan agar hubungan antara faktor dan skor dapat diperiksa sama sekali.
 # CLAUDE.md §11 mengizinkannya secara eksplisit selama ditandai DEMO / PROPOSED.
 #
-# DUA PROFIL, BUKAN SATU
+# MENGAPA BERVERSI
 #
-#   Ancaman yang dinilai sistem ini tidak seragam sifatnya. Begal terjadi diam-diam dan
-#   baru diketahui setelahnya, sehingga riwayat kejadian adalah petunjuk terkuat.
+#   Setiap baris `risk_scores` menyimpan `weights_version`. Bobot sebuah versi yang
+#   masih dirujuk baris manapun TIDAK BOLEH diubah: mengubahnya membuat hubungan
+#   `risk_score = Sum(bobot x faktor)` pada data lama tidak lagi berlaku, dan seluruh
+#   angka historis kehilangan ketertelusurannya (temuan audit S-04).
+#
+#   Cara yang benar untuk mengganti bobot adalah menambah versi baru, lalu
+#   membangkitkan ulang skornya.
+#
+# MENGAPA DUA PROFIL
+#
+#   Ancaman yang dinilai sistem ini tidak seragam sifatnya. Begal terjadi diam-diam
+#   dan baru diketahui setelahnya, sehingga riwayat kejadian adalah petunjuk terkuat.
 #   Unjuk rasa direncanakan terbuka dan diketahui SEBELUM terjadi, sehingga riwayat
-#   hampir tidak berarti — yang menentukan adalah informasi intelijen, dan yang dinilai
-#   bukan kemungkinan terjadi melainkan perkiraan dampaknya.
+#   hampir tidak berarti — yang menentukan adalah informasi intelijen, dan yang
+#   dinilai bukan kemungkinan terjadi melainkan perkiraan dampaknya.
 #
 #   Menilai keduanya dengan satu rumus akan membuat salah satunya selalu keliru.
-#
-# Setiap baris `risk_scores` menyimpan `weights_version`, sehingga skor lama tetap dapat
-# ditelusuri ke bobot yang berlaku saat itu meskipun bobotnya kelak diganti.
 
-version: proposed-2026-09-01
-status: DEMO / PROPOSED
+# Versi yang dipakai seed dan mesin penilaian saat ini.
+active_version: dummy-v1
 
-profiles:
-  # ---------------------------------------------------------------------------
-  # PROFIL A — POLA HISTORIS
-  # Untuk kejahatan yang berulang dan meninggalkan jejak statistik.
+versions:
+  # ===========================================================================
+  # dummy-v1 — BERLAKU untuk 2019 baris `risk_scores` yang sudah ada.
+  # JANGAN diubah selama baris itu masih ada.
+  # ===========================================================================
+  dummy-v1:
+    status: DEMO
+    profiles:
+      historical:
+        applies_to: [CURANMOR, CURAT, CURAS, KEJAHATAN_JALANAN, TAWURAN]
+        weights:
+          historical_factor: 0.30 # kepadatan kejadian historis
+          recent_trend_factor: 0.25 # tren kejadian terkini
+          temporal_factor: 0.20 # kesesuaian dengan pola waktu
+          spatial_factor: 0.15 # konsentrasi spasial / near-repeat
+          context_factor: 0.10 # faktor kontekstual (kegiatan, POI, dsb.)
+
+  # ===========================================================================
+  # proposed-2026-09-01 — RANCANGAN BARU, belum dipakai menghitung apa pun.
   #
-  #   risk_score = round( Sum( bobot_i x faktor_i ) )   Sum bobot = 1, faktor 0..100
-  #
-  # Jumlah bobot WAJIB tepat 1. Bila kurang, skor tertinggi yang mungkin dicapai
-  # ikut turun tanpa ada yang menyadarinya: kelas CRITICAL menjadi mustahil, dan
-  # ambang 85 pada warning-thresholds.yaml tidak pernah tersentuh.
-  # Dijaga oleh `test_risk_weights_sum_correctly`.
-  # ---------------------------------------------------------------------------
-  historical:
-    applies_to: [CURANMOR, CURAT, CURAS, BEGAL, KEJAHATAN_JALANAN, PREMANISME, NARKOBA]
-    weights:
-      historical_factor: 0.27 # kepadatan kejadian historis pada sel & jenis ini
-      recent_trend_factor: 0.22 # kecenderungan 30 hari terakhir
-      temporal_factor: 0.19 # kesesuaian jendela waktu dengan jam rawan
-      spatial_factor: 0.13 # konsentrasi spasial & pengulangan pada sel
-      context_factor: 0.11 # objek di sekitar: pasar, terminal, ATM, permukiman
-      intelligence_factor: 0.08 # laporan intelijen terverifikasi
-      # Laporan masyarakat sengaja BERBOBOT NOL untuk sekarang.
+  # Menyalakannya berarti mengubah `active_version` DAN membangkitkan ulang
+  # `risk_scores`. Sampai itu dilakukan, versi ini adalah dokumen yang dapat diuji.
+  # ===========================================================================
+  proposed-2026-09-01:
+    status: PROPOSED
+    profiles:
+      # -----------------------------------------------------------------------
+      # PROFIL A — POLA HISTORIS
+      # Untuk kejahatan yang berulang dan meninggalkan jejak statistik.
       #
-      # Spesifikasi §4 tegas: laporan masyarakat tidak langsung dianggap fakta, dan
-      # wajib melewati klasifikasi, deteksi duplikasi, deteksi spam, serta validasi
-      # analis sebelum boleh memengaruhi risk score. Keempatnya BELUM ADA.
+      #   risk_score = round( Sum( bobot_i x faktor_i ) )
+      #   Sum bobot = 1, faktor 0..100
       #
-      # Nilainya ditulis 0 dan bukan dihapus supaya jalurnya terlihat, dan supaya
-      # menyalakannya kelak menjadi keputusan sadar — bukan penambahan diam-diam.
-      # Bila dinyalakan, bobot faktor lain harus dikurangi agar jumlahnya tetap 1.
-      community_factor: 0.00
+      # Jumlah bobot WAJIB tepat 1. Bila kurang, skor tertinggi yang mungkin
+      # dicapai ikut turun tanpa ada yang menyadarinya: kelas CRITICAL menjadi
+      # mustahil dan ambang 85 pada warning-thresholds.yaml tak pernah tersentuh.
+      # Dijaga oleh `test_risk_weights_sum_correctly`.
+      # -----------------------------------------------------------------------
+      historical:
+        applies_to:
+          [CURANMOR, CURAT, CURAS, BEGAL, KEJAHATAN_JALANAN, PREMANISME, NARKOBA]
+        weights:
+          historical_factor: 0.27 # kepadatan kejadian historis pada sel & jenis ini
+          recent_trend_factor: 0.22 # kecenderungan 30 hari terakhir
+          temporal_factor: 0.19 # kesesuaian jendela waktu dengan jam rawan
+          spatial_factor: 0.13 # konsentrasi spasial & pengulangan pada sel
+          context_factor: 0.11 # objek di sekitar: pasar, terminal, ATM, permukiman
+          intelligence_factor: 0.08 # laporan intelijen terverifikasi
+          # Laporan masyarakat sengaja BERBOBOT NOL untuk sekarang.
+          #
+          # Spesifikasi §4 tegas: laporan masyarakat tidak langsung dianggap fakta,
+          # dan wajib melewati klasifikasi, deteksi duplikasi, deteksi spam, serta
+          # validasi analis sebelum boleh memengaruhi risk score. Keempatnya BELUM ADA.
+          #
+          # Nilainya ditulis 0 dan bukan dihapus supaya jalurnya terlihat, dan supaya
+          # menyalakannya kelak menjadi keputusan sadar — bukan penambahan diam-diam.
+          # Bila dinyalakan, bobot lain harus dikurangi agar jumlahnya tetap 1.
+          community_factor: 0.00
 
-  # ---------------------------------------------------------------------------
-  # PROFIL B — GANGGUAN TERENCANA
-  # Untuk kegiatan yang diketahui SEBELUM terjadi. Yang dinilai adalah perkiraan
-  # DAMPAK bila terjadi, bukan kemungkinan terjadinya.
-  #
-  # Aritmetikanya berbeda dari Profil A karena ada faktor bertanda negatif:
-  #
-  #   dasar      = Sum( bobot_positif_i x faktor_i )      Sum bobot_positif = 1
-  #   risk_score = round( clamp( dasar + (bobot_readiness x faktor_readiness), 0, 100 ) )
-  #
-  # Bobot POSITIF yang berjumlah 1, bukan seluruh bobot — kalau readiness ikut
-  # dijumlahkan, skor tertinggi turun menjadi 90 dan CRITICAL sulit tercapai.
-  # ---------------------------------------------------------------------------
-  planned:
-    applies_to: [UNJUK_RASA, KERAMAIAN, TAWURAN]
-    weights:
-      mass_estimate_factor: 0.33 # perkiraan jumlah massa
-      location_sensitivity_factor: 0.28 # kedekatan objek vital & jalan protokol
-      history_of_disorder_factor: 0.22 # riwayat kericuhan pada isu/lokasi serupa
-      source_reliability_factor: 0.17 # keandalan sumber informasi
-      # BERTANDA NEGATIF, dan itu disengaja: makin siap satuan, makin rendah
-      # perkiraan dampaknya. Tanpa faktor ini model tidak menjawab tindakan sama
-      # sekali — risiko akan tetap sama tinggi meskipun pengamanan sudah disiapkan,
-      # dan rekomendasi kehilangan artinya.
-      readiness_factor: -0.10
+      # -----------------------------------------------------------------------
+      # PROFIL B — GANGGUAN TERENCANA
+      # Untuk kegiatan yang diketahui SEBELUM terjadi. Yang dinilai adalah
+      # perkiraan DAMPAK bila terjadi, bukan kemungkinan terjadinya.
+      #
+      # Aritmetikanya berbeda karena ada faktor bertanda negatif:
+      #
+      #   dasar      = Sum( bobot_positif_i x faktor_i )   Sum bobot_positif = 1
+      #   risk_score = round( clamp( dasar + bobot_readiness x faktor_readiness, 0, 100 ) )
+      #
+      # Yang berjumlah 1 adalah bobot POSITIF saja. Bila readiness ikut dijumlahkan,
+      # skor tertinggi turun menjadi 90 dan CRITICAL sulit tercapai.
+      # -----------------------------------------------------------------------
+      planned:
+        applies_to: [UNJUK_RASA, KERAMAIAN, TAWURAN]
+        weights:
+          mass_estimate_factor: 0.33 # perkiraan jumlah massa
+          location_sensitivity_factor: 0.28 # kedekatan objek vital & jalan protokol
+          history_of_disorder_factor: 0.22 # riwayat kericuhan pada isu/lokasi serupa
+          source_reliability_factor: 0.17 # keandalan sumber informasi
+          # BERTANDA NEGATIF, dan itu disengaja: makin siap satuan, makin rendah
+          # perkiraan dampaknya. Tanpa faktor ini model tidak menjawab tindakan sama
+          # sekali — risiko tetap tinggi meskipun pengamanan sudah disiapkan, dan
+          # rekomendasi kehilangan artinya.
+          readiness_factor: -0.10
 
 # TAWURAN berada di antara dua kelompok: ia berulang seperti kejahatan, tetapi kerap
-# didahului seruan yang terdeteksi intelijen. Untuk sekarang dimasukkan ke Profil B
-# karena nilai peringatan dininya terletak pada pencegahan sebelum terjadi.
-# Ini keputusan yang pantas ditinjau ulang bila datanya bertambah.
+# didahului seruan yang terdeteksi intelijen. Pada dummy-v1 ia dinilai historis; pada
+# rancangan baru dipindah ke Profil B karena nilai peringatan dininya terletak pada
+# pencegahan sebelum terjadi. Pantas ditinjau ulang bila datanya bertambah.
