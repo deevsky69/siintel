@@ -1,7 +1,8 @@
 # KESESUAIAN TERHADAP RESUME SPESIFIKASI APLIKASI
 
 Sumber: `docs/source/Resume_Spesifikasi_Aplikasi_PREDIKSI_PRESISI.pdf`
-Diperiksa: 1 September 2026 — terhadap kode dan basis data yang berjalan, bukan terhadap ingatan.
+Diperiksa ulang: 2 September 2026 — terhadap kode dan basis data yang berjalan, bukan terhadap ingatan.
+Pemeriksaan pertama: 1 September 2026.
 
 ---
 
@@ -11,14 +12,14 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 
 | # | Fitur MVP | Status | Bukti / catatan |
 |---|---|---|---|
-| 1 | Login dan Role-Based Access Control | ✅ **ADA** | 6 peran, 43 permission, cakupan ditegakkan di query |
+| 1 | Login dan Role-Based Access Control | ✅ **ADA** | **4 peran** (22/40/17/22 grant), 43 permission, cakupan ditegakkan di query |
 | 2 | Executive Dashboard | ✅ **ADA** | `/` |
 | 3 | Live Crime Map | ⚠️ **SEBAGIAN** | Peta ada; layer **titik kejadian aktual** belum |
 | 4 | Historical Heatmap | ⚠️ **SEBAGIAN** | Riwayat tampil sebagai angka di panel rincian, belum sebagai layer peta |
 | 5 | Crime Pattern DNA | ✅ **ADA** | `/pola` — kelima dimensi dari 1200 kejadian |
 | 6 | Predictive Heatmap | ✅ **ADA** | Layer prediktif pada `/peta` |
-| 7 | AI Prediction Center | ❌ **BELUM** | Halaman `/prediksi` masih berupa rencana |
-| 8 | Risk Scoring | ⚠️ **SEBAGIAN** | Skor ada dan terpakai; **menjalankannya** dari layar belum bisa |
+| 7 | AI Prediction Center | ✅ **ADA** | `/prediksi`; `POST /predictions/run` dan `/predictions/{code}/publish` |
+| 8 | Risk Scoring | ✅ **ADA** | `/skoring`; `POST /risk-scores/run` beserta bobot dan ambang yang mendasarinya |
 | 9 | Early Warning | ✅ **ADA** | `/peringatan` beserta terima/selesaikan |
 | 10 | AI Recommendation | ✅ **ADA** | `/rekomendasi` |
 | 11 | Commander Decision / Approval | ✅ **ADA** | Setujui / Modifikasi / Tolak, usulan asli tidak tertimpa |
@@ -26,11 +27,23 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 | 13 | Prediction vs Actual | ✅ **ADA** | `/evaluasi`, precision 0,397 · recall 0,400 |
 | 14 | Executive Brief | ✅ **ADA** | `/brief`, siap cetak |
 
-**Skor per 1 September 2026: 10 dari 14 lengkap, 3 sebagian, 1 belum.**
+**Skor per 2 September 2026: 11 dari 14 lengkap, 3 sebagian, 0 belum.**
 
-Naik dari 8/3/3 pada pemeriksaan pertama hari ini. Yang tersisa belum sama sekali
-hanya **#7 AI Prediction Center** — ia memerlukan endpoint `prediction:run` dan
-`prediction:publish`, dan itu bukan sekadar layar.
+Riwayat: 8/3/3 → 10/3/1 (1 September) → **11/3/0** (2 September). Tidak ada lagi butir
+yang belum tersentuh sama sekali; yang tersisa adalah tiga butir yang setengah jalan.
+
+Dua di antaranya melekat pada layar yang sama, `/peta`:
+
+- **#3** menuntut layer **titik kejadian aktual**;
+- **#4** menuntut riwayat sebagai **layer peta**, bukan angka di panel.
+
+Keduanya pekerjaan peta, bukan pekerjaan data: kejadiannya sudah ada di basis data dan
+sudah terbaca di panel rincian kecamatan. Yang belum ada hanya cara menggambarnya di
+bidang peta.
+
+Sisanya, **#12**, menuntut **triase** — laporan masyarakat sudah terbaca tetapi statusnya
+belum dapat diubah dari layar. `community.py` sampai hari ini hanya memiliki dua endpoint
+baca dan tidak satu pun endpoint tulis.
 
 ---
 
@@ -39,11 +52,11 @@ hanya **#7 AI Prediction Center** — ia memerlukan endpoint `prediction:run` da
 | Modul | Status |
 |---|---|
 | Executive Dashboard | ✅ |
-| Live Kamtibmas Map | ⚠️ layer kejadian & laporan masyarakat belum; layer unit patroli belum |
-| Crime Analytics | ⚠️ sebagian tercakup Crime Pattern DNA; `/analitik` masih rencana |
+| Live Kamtibmas Map | ⚠️ layer kejadian, laporan masyarakat, dan unit patroli belum |
+| Crime Analytics | ✅ `/analitik` — tren bulanan, pola waktu, perbandingan antarwilayah |
 | Crime Pattern DNA | ✅ |
-| AI Prediction Center | ❌ |
-| Risk Scoring Engine | ⚠️ skor ada, mesin penjalannya belum |
+| AI Prediction Center | ✅ `/prediksi` |
+| Risk Scoring Engine | ✅ `/skoring` |
 | Early Warning Center | ✅ |
 | AI Recommendation | ✅ |
 | Commander Decision | ✅ |
