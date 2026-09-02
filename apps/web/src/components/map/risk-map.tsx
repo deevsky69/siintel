@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Panel } from "@/components/panel";
 import type { AreaDetail, MapData } from "@/lib/map-data";
-import type { MapLayer } from "./area";
-import { MAP_LAYERS, mapHref } from "./area";
+import type { HistoricalMonths, MapLayer } from "./area";
+import { HISTORICAL_MONTH_LABELS, HISTORICAL_MONTHS, MAP_LAYERS, mapHref } from "./area";
 import { DistrictDetail } from "./district-detail";
 import { RiskLegend } from "./legend";
 import { MapCanvas } from "./map-canvas";
@@ -19,11 +19,13 @@ export function RiskMap({
   selected,
   detail,
   layer,
+  months,
 }: {
   data: MapData;
   selected: string | null;
   detail: AreaDetail | null;
   layer: MapLayer;
+  months: HistoricalMonths;
 }) {
   const district = data.districts.find((row) => row.kecamatan === selected) ?? null;
 
@@ -43,7 +45,7 @@ export function RiskMap({
             {MAP_LAYERS.map((option) => (
               <Link
                 key={option.id}
-                href={mapHref(selected, option.id)}
+                href={mapHref(selected, option.id, months)}
                 scroll={false}
                 aria-current={layer === option.id ? "true" : undefined}
                 className={`rounded border px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors ${
@@ -56,11 +58,13 @@ export function RiskMap({
               </Link>
             ))}
             <span className="text-[10px] text-ink-faint">
-              {layer === "current"
-                ? data.assessmentDate
-                  ? `Penilaian ${data.assessmentDate}`
-                  : "Belum ada tanggal penilaian"
-                : `Horizon ${data.horizon}`}
+              {layer === "historical"
+                ? `${data.historical.windowFrom} s.d. ${data.historical.windowTo}`
+                : layer === "current"
+                  ? data.assessmentDate
+                    ? `Penilaian ${data.assessmentDate}`
+                    : "Belum ada tanggal penilaian"
+                  : `Horizon ${data.horizon}`}
               {/* Versi bobot ikut tampil supaya pertanyaan "bobotnya dari mana"
                   dapat dijawab dari layar, bukan dari ingatan (CLAUDE.md §25). */}
               {layer === "current" && data.weightsVersion
@@ -69,9 +73,53 @@ export function RiskMap({
             </span>
           </nav>
 
-          <MapCanvas districts={data.districts} layer={layer} selected={selected} />
+          {/* Pemilih jendela hanya muncul pada layer historis: menampilkannya di layer
+              lain akan menjanjikan pengaruh yang tidak ada. */}
+          {layer === "historical" ? (
+            <nav aria-label="Jendela waktu historis" className="flex flex-wrap items-center gap-2">
+              <span className="stat-label">Jendela</span>
+              {HISTORICAL_MONTHS.map((option) => (
+                <Link
+                  key={option}
+                  href={mapHref(selected, "historical", option)}
+                  scroll={false}
+                  aria-current={months === option ? "true" : undefined}
+                  className={`rounded border px-2 py-0.5 text-[11px] transition-colors ${
+                    months === option
+                      ? "border-warn/60 bg-warn/10 text-warn"
+                      : "border-base-800 text-ink-muted hover:text-ink"
+                  }`}
+                >
+                  {HISTORICAL_MONTH_LABELS[option]}
+                </Link>
+              ))}
+              {data.historical.observedFrom === null ? (
+                <span className="text-[10px] text-ink-faint">
+                  Tidak ada kejadian tercatat pada jendela ini
+                </span>
+              ) : (
+                <span className="text-[10px] text-ink-faint">
+                  Data ditemukan {data.historical.observedFrom} s.d. {data.historical.observedTo}
+                </span>
+              )}
+            </nav>
+          ) : null}
 
-          <RiskLegend layer={layer} />
+          <MapCanvas
+            districts={data.districts}
+            layer={layer}
+            selected={selected}
+            historical={data.historical}
+            months={months}
+          />
+
+          <RiskLegend
+            layer={layer}
+            historical={{
+              peakIncidents: data.historical.peakIncidents,
+              totalIncidents: data.historical.totalIncidents,
+            }}
+          />
 
           <p className="text-[10px] leading-relaxed text-ink-faint">
             Bentuk wilayah pada peta ini adalah <strong>perkiraan</strong> yang diturunkan dari
@@ -79,7 +127,11 @@ export function RiskMap({
           </p>
 
           <p className="text-[10px] leading-relaxed text-ink-faint">
-            {layer === "current" ? data.currentRiskBasis : data.predictiveBasis}
+            {layer === "historical"
+              ? data.historicalBasis
+              : layer === "current"
+                ? data.currentRiskBasis
+                : data.predictiveBasis}
           </p>
         </Panel>
       </div>

@@ -802,11 +802,65 @@
       <p class="sec-note">Menu Live Map</p>
 
       <ol class="steps">
-        <li><span>Pilih layer: <strong>Risiko Berjalan</strong> atau <strong>Prediktif</strong>.</span></li>
+        <li><span>Pilih layer: <strong>Historis</strong>, <strong>Risiko Berjalan</strong>, atau <strong>Prediktif</strong>.</span></li>
+        <li><span>Pada layer Historis, pilih jendela waktunya: <strong>1 bulan</strong>, <strong>3 bulan</strong>, <strong>12 bulan</strong>, atau <strong>Seluruh data</strong>. Pemilih ini hanya muncul di layer Historis, karena hanya di situ ia berpengaruh.</span></li>
         <li><span>Arahkan kursor ke sebuah kecamatan untuk menyorotnya.</span></li>
         <li><span><strong>Klik</strong> kecamatan itu untuk membuka rinciannya di panel kanan.</span></li>
         <li><span>Alamat halaman ikut berubah, sehingga tampilan itu <strong>dapat dibagikan sebagai tautan</strong> — berguna saat paparan.</span></li>
       </ol>
+
+      <h3>Tiga layer, tiga pertanyaan berbeda</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Layer</th><th>Menjawab</th><th>Satuannya</th><th>Warnanya</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Historis</strong></td><td>Di mana kejadian selama ini menumpuk.</td><td><strong>Cacah kejadian</strong></td><td>Kuning-jingga</td></tr>
+            <tr><td><strong>Risiko Berjalan</strong></td><td>Di mana risikonya tinggi sekarang.</td><td>Skor 0–100 berkelas</td><td>Tangga hijau→merah</td></tr>
+            <tr><td><strong>Prediktif</strong></td><td>Di mana risikonya diperkirakan tinggi.</td><td>Skor 0–100 <strong>tanpa kelas</strong></td><td>Sian</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Ketiganya digambar di bidang yang sama, jadi warnanya sengaja dibuat berjauhan — dari
+        kursi belakang ruang paparan, ketiganya tetap dapat dibedakan.
+      </p>
+
+      <div class="note caution">
+        <span class="label">Yang paling mudah keliru</span>
+        <p>
+          Angka besar di tengah kecamatan <strong>berganti satuan mengikuti layer</strong>. Pada
+          layer Historis angka itu <strong>jumlah kejadian</strong> (bisa 180); pada dua layer lain
+          ia <strong>skor 0–100</strong>. Legenda di bawah peta selalu menyebutkan satuan yang
+          sedang berlaku.
+        </p>
+      </div>
+
+      <h3>Membaca layer Historis</h3>
+      <ul>
+        <li><strong>Bidang warna</strong> = jumlah kejadian per kecamatan pada jendela terpilih.</li>
+        <li><strong>Titik</strong> = satu lokasi; luas lingkarannya sebanding dengan jumlah kejadian di situ.</li>
+        <li>
+          Kepekatan warnanya <strong>relatif terhadap kecamatan terbanyak pada jendela yang sedang
+          tampil</strong> — bukan terhadap ambang apa pun. Berganti jendela berarti berganti
+          pembanding, jadi warna yang sama di dua jendela berbeda <strong>tidak</strong> berarti
+          jumlah yang sama. Angka puncak yang sedang berlaku selalu tertulis di legenda.
+        </li>
+        <li>
+          Layer ini <strong>tidak punya kelas risiko</strong>, dan itu disengaja. Kecamatan dengan
+          kejadian terbanyak belum tentu kecamatan paling rawan: cacah mentah tidak ditimbang dan
+          tidak dinormalkan terhadap luas maupun jumlah penduduk.
+        </li>
+        <li>
+          <strong>Titik berada di koordinat lokasi, bukan di TKP sebenarnya.</strong> Basis data
+          mencatat kejadian pada <span class="mono">location_id</span> dan tidak menyimpan koordinat
+          kejadiannya sendiri, sehingga seluruh kejadian pada satu lokasi menumpuk di satu titik.
+        </li>
+        <li>
+          Karena bentuk wilayah hanyalah perkiraan, sebagian kecil titik dapat tampak sedikit
+          melewati garis kecamatannya. Nama kecamatan yang benar selalu diambil dari data, bukan
+          dari poligon tempat titik itu tergambar.
+        </li>
+      </ul>
 
       <h3>Isi panel rincian</h3>
       <div class="table-wrap">

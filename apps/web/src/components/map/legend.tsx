@@ -1,7 +1,7 @@
 import type { RiskClass } from "@/lib/risk";
 import { RISK_HEX, RISK_LABELS, riskClassOf } from "@/lib/risk";
 import type { MapLayer } from "./area";
-import { PREDICTIVE_HEX, predictiveOpacity } from "./area";
+import { HISTORICAL_HEX, historicalOpacity, PREDICTIVE_HEX, predictiveOpacity } from "./area";
 
 /**
  * Legenda peta.
@@ -14,6 +14,11 @@ import { PREDICTIVE_HEX, predictiveOpacity } from "./area";
  * Layer prediktif **tidak punya tangga kelas**: API tidak mengirim `risk_class` untuk
  * prediksi karena ambangnya belum ditetapkan (U-01). Legendanya karena itu berupa skala
  * menerus 0–100 dengan pernyataan terbuka bahwa yang ditampilkan adalah skor mentah.
+ *
+ * Layer historis tidak punya tangga kelas **maupun** skala mutlak: yang digambar adalah
+ * cacah kejadian, dan kepekatannya relatif terhadap wilayah terbanyak pada jendela yang
+ * sedang tampil. Legendanya karena itu menyebut angka puncak yang sedang berlaku — tanpa
+ * itu, pembaca akan menyangka warna yang sama berarti jumlah yang sama di jendela lain.
  */
 export type RiskBand = { risk: RiskClass; min: number; max: number };
 
@@ -76,6 +81,51 @@ function PredictiveLegend() {
   );
 }
 
-export function RiskLegend({ layer = "current" }: { layer?: MapLayer }) {
+function HistoricalLegend({ peak, total }: { peak: number; total: number }) {
+  const ticks = peak > 0 ? [0, Math.round(peak / 2), peak] : [0];
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+      <span className="stat-label">Cacah Kejadian</span>
+      {ticks.map((tick) => (
+        <span key={tick} className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+          <span
+            aria-hidden="true"
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: HISTORICAL_HEX, opacity: historicalOpacity(tick, peak) }}
+          />
+          <span className="font-mono">{tick}</span>
+        </span>
+      ))}
+      <span className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+        <span
+          aria-hidden="true"
+          className="h-2 w-2 rounded-full border border-base-950"
+          style={{ backgroundColor: HISTORICAL_HEX, opacity: 0.55 }}
+        />
+        <span>titik = lokasi, luasnya sebanding cacah</span>
+      </span>
+      <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+        Skala relatif · {total} kejadian pada jendela ini · bukan kelas risiko
+      </span>
+    </div>
+  );
+}
+
+export function RiskLegend({
+  layer = "current",
+  historical,
+}: {
+  layer?: MapLayer;
+  historical?: { peakIncidents: number; totalIncidents: number };
+}) {
+  if (layer === "historical") {
+    return (
+      <HistoricalLegend
+        peak={historical?.peakIncidents ?? 0}
+        total={historical?.totalIncidents ?? 0}
+      />
+    );
+  }
   return layer === "predictive" ? <PredictiveLegend /> : <CurrentRiskLegend />;
 }

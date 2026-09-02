@@ -3,11 +3,27 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { DistrictShape } from "@/lib/geo";
-import { KECAMATAN_SHAPES, MAP_VIEWBOX, polygonPoints, toPercent } from "@/lib/geo";
-import type { MapDistrict } from "@/lib/map-data";
+import {
+  isWithinMap,
+  KECAMATAN_SHAPES,
+  MAP_VIEWBOX,
+  polygonPoints,
+  projectLatLon,
+  toPercent,
+} from "@/lib/geo";
+import type { HistoricalPoint, MapDistrict } from "@/lib/map-data";
 import { RISK_HEX, RISK_LABELS } from "@/lib/risk";
-import type { MapLayer } from "./area";
-import { mapHref, PREDICTIVE_HEX, predictiveOpacity, toRiskClass } from "./area";
+import type { HistoricalMonths, MapLayer } from "./area";
+import {
+  DEFAULT_HISTORICAL_MONTHS,
+  HISTORICAL_HEX,
+  historicalOpacity,
+  mapHref,
+  PREDICTIVE_HEX,
+  pointRadius,
+  predictiveOpacity,
+  toRiskClass,
+} from "./area";
 
 /**
  * Bidang gambar peta — dipakai halaman peta maupun panel ringkas dashboard.
@@ -20,21 +36,34 @@ import { mapHref, PREDICTIVE_HEX, predictiveOpacity, toRiskClass } from "./area"
  * Ini satu-satunya bagian peta yang berjalan di peramban, semata karena wilayah yang
  * sedang disorot adalah keadaan sesaat yang tidak pantas masuk ke alamat.
  *
- * Dua layer digambar dengan cara yang berbeda **dengan sengaja**:
+ * Tiga layer digambar dengan cara yang berbeda **dengan sengaja**:
  *
+ * - `historical` — **cacah kejadian**, bukan skor. Diwarnai kuning-jingga dengan kepekatan
+ *   relatif terhadap wilayah terbanyak pada jendela yang tampil, sebab cacah tidak punya
+ *   kelas dan tidak boleh diberi satu pun di sini. Hanya layer ini yang menggambar titik.
  * - `current` — diwarnai menurut `risk_class` yang dikirim backend. Kelas tidak pernah
  *   dihitung ulang di sini (CLAUDE.md §12).
  * - `predictive` — prediksi **tidak menyimpan kelas risiko** dan tidak diberi kelas oleh
  *   API, karena ambangnya masih DEMO / PROPOSED (U-01). Layer ini karenanya memakai satu
  *   warna dengan kepekatan mengikuti skor, bukan tangga warna risiko, dan layar
  *   menyatakan bahwa yang ditampilkan adalah skor mentah tanpa kelas resmi.
+ *
+ * Ketiganya memakai warna yang berjauhan supaya tidak ada layer yang terbaca sebagai
+ * layer lain saat dipandang sekilas dari kursi belakang ruang paparan.
  */
 
 /** Warna wilayah tanpa data — sewarna garis panel, jelas berbeda dari tangga risiko. */
 const NO_DATA_FILL = "#132339";
 
-/** Skor wilayah pada layer yang sedang ditampilkan; `null` bila tidak ada data. */
-export function layerScore(district: MapDistrict, layer: MapLayer): number | null {
+/**
+ * Angka besar di tengah wilayah pada layer yang sedang tampil; `null` bila tidak ada data.
+ *
+ * Pada layer historis angka ini adalah **cacah kejadian**, bukan skor 0–100. Keduanya
+ * digambar di tempat yang sama, jadi satuannya dinyatakan di legenda dan di tooltip —
+ * angka telanjang 214 dan 78 mustahil dibedakan hanya dari rupanya.
+ */
+export function layerValue(district: MapDistrict, layer: MapLayer): number | null {
+  if (layer === "historical") return district.historical?.incidents ?? null;
   const area = layer === "current" ? district.current : district.predictive;
   return area?.risk_score ?? null;
 }
@@ -46,6 +75,15 @@ export function layerScore(district: MapDistrict, layer: MapLayer): number | nul
  * mengarang kelas yang tidak dikirim API.
  */
 export function districtSummary(district: MapDistrict, layer: MapLayer): string {
+  if (layer === "historical") {
+    const incidents = district.historical?.incidents;
+    if (incidents === undefined) return "tidak ada kejadian tercatat";
+    const dominant = district.historical?.by_threat_type[0];
+    return dominant
+      ? `${incidents} kejadian · terbanyak ${dominant.threat_type}`
+      : `${incidents} kejadian`;
+  }
+
   if (layer === "predictive") {
     const score = district.predictive?.risk_score;
     if (score === undefined) return "tidak ada prediksi";
@@ -60,6 +98,12 @@ export function districtSummary(district: MapDistrict, layer: MapLayer): string 
 
 function ariaLabel(shape: DistrictShape, district: MapDistrict | undefined, layer: MapLayer) {
   if (!district) return `${shape.kecamatan} — tidak ada data`;
+
+  if (layer === "historical") {
+    const incidents = district.historical?.incidents;
+    if (incidents === undefined) return `${shape.kecamatan} — tidak ada kejadian tercatat`;
+    return `${shape.kecamatan} — ${incidents} kejadian pada jendela yang ditampilkan`;
+  }
 
   if (layer === "predictive") {
     const area = district.predictive;
@@ -77,6 +121,7 @@ function ariaLabel(shape: DistrictShape, district: MapDistrict | undefined, laye
 
 function fillOf(district: MapDistrict | undefined, layer: MapLayer): string {
   if (!district) return NO_DATA_FILL;
+  if (layer === "historical") return district.historical ? HISTORICAL_HEX : NO_DATA_FILL;
   if (layer === "predictive") return district.predictive ? PREDICTIVE_HEX : NO_DATA_FILL;
 
   const risk = toRiskClass(district.current?.risk_class ?? null);
@@ -87,7 +132,15 @@ function opacityOf(
   district: MapDistrict | undefined,
   layer: MapLayer,
   emphasis: "selected" | "active" | "rest",
+  peakIncidents = 0,
 ): number {
+  // Sama seperti layer prediktif: kepekatan sedang memikul nilai, jadi penyorotan hanya
+  // menambah sedikit dan sisanya dikerjakan garis tepi.
+  if (layer === "historical" && district?.historical) {
+    const base = historicalOpacity(district.historical.incidents, peakIncidents);
+    return emphasis === "selected" ? Math.min(1, base + 0.12) : base;
+  }
+
   // Layer prediktif memakai kepekatan sebagai skala nilai, jadi penyorotan tidak boleh
   // menimpanya; wilayah terpilih hanya dipertegas sedikit dan selebihnya oleh garis tepi.
   if (layer === "predictive" && district?.predictive) {
@@ -103,6 +156,8 @@ export function MapCanvas({
   selected,
   className = "mx-auto max-h-[62vh] w-full",
   showScores = true,
+  historical,
+  months = DEFAULT_HISTORICAL_MONTHS,
 }: {
   districts: MapDistrict[];
   layer: MapLayer;
@@ -110,6 +165,15 @@ export function MapCanvas({
   className?: string;
   /** Angka besar di tengah wilayah; dapat dimatikan bila ruangnya sempit. */
   showScores?: boolean;
+  /**
+   * Titik lokasi dan puncak cacah untuk layer historis.
+   *
+   * Opsional karena panel ringkas dashboard memakai bidang gambar yang sama tanpa pernah
+   * menampilkan layer historis. Bila layer historis diminta tanpa data ini, wilayah tetap
+   * digambar dan titiknya saja yang tidak muncul — bukan halaman yang gagal.
+   */
+  historical?: { points: HistoricalPoint[]; peakIncidents: number; peakPointIncidents: number };
+  months?: HistoricalMonths;
 }) {
   const byName = useMemo(
     () => new Map(districts.map((district) => [district.kecamatan, district])),
@@ -129,9 +193,11 @@ export function MapCanvas({
         viewBox={`0 0 ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`}
         role="group"
         aria-label={
-          layer === "predictive"
-            ? "Peta skor prediksi kamtibmas per kecamatan"
-            : "Peta risiko kamtibmas per kecamatan"
+          layer === "historical"
+            ? "Peta cacah kejadian kamtibmas per kecamatan"
+            : layer === "predictive"
+              ? "Peta skor prediksi kamtibmas per kecamatan"
+              : "Peta risiko kamtibmas per kecamatan"
         }
         className={className}
       >
@@ -139,12 +205,12 @@ export function MapCanvas({
           const district = byName.get(shape.kecamatan);
           const isSelected = selected === shape.kecamatan;
           const isActive = active === shape.kecamatan;
-          const score = district ? layerScore(district, layer) : null;
+          const score = district ? layerValue(district, layer) : null;
 
           return (
             <g key={shape.kecamatan}>
               <Link
-                href={mapHref(shape.kecamatan, layer)}
+                href={mapHref(shape.kecamatan, layer, months)}
                 scroll={false}
                 aria-label={ariaLabel(shape, district, layer)}
                 aria-current={isSelected ? "true" : undefined}
@@ -161,6 +227,7 @@ export function MapCanvas({
                     district,
                     layer,
                     isSelected ? "selected" : isActive ? "active" : "rest",
+                    historical?.peakIncidents ?? 0,
                   )}
                   stroke={isSelected ? "#22d3ee" : isActive ? "#67e8f9" : "#050b18"}
                   strokeWidth={isSelected || isActive ? 6 : 3}
@@ -194,6 +261,37 @@ export function MapCanvas({
             </g>
           );
         })}
+        {/* Titik kejadian digambar setelah seluruh wilayah supaya tidak tertimpa poligon
+            tetangga, dan `pointerEvents="none"` supaya klik tetap mengenai wilayah di
+            bawahnya — titik bukan tautan, wilayah tetap satu-satunya sasaran.
+
+            Lingkarannya tidak membawa teks dan tidak dapat difokus, jadi tidak ada yang
+            perlu disembunyikan dari pembaca layar: keterangan yang sama sudah dibawa
+            `aria-label` tiap wilayah dan panel rincian. */}
+        {layer === "historical" && historical ? (
+          <g pointerEvents="none">
+            {historical.points.map((point) => {
+              const position = projectLatLon(point.latitude, point.longitude);
+              // Titik di luar bidang gambar dibuang, bukan dijepitkan ke tepi: menjepitkan
+              // akan menaruhnya di wilayah yang bukan wilayahnya.
+              if (!isWithinMap(position)) return null;
+              const radius = pointRadius(point.incidents, historical.peakPointIncidents);
+
+              return (
+                <circle
+                  key={point.location_code}
+                  cx={position[0]}
+                  cy={position[1]}
+                  r={radius}
+                  fill={HISTORICAL_HEX}
+                  fillOpacity={0.55}
+                  stroke="#050b18"
+                  strokeWidth={2}
+                />
+              );
+            })}
+          </g>
+        ) : null}
       </svg>
 
       {hoveredShape && hovered ? (

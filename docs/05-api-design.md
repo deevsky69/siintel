@@ -151,14 +151,41 @@ Audit: `VIEW_SENSITIVE_DATA` untuk detail kejadian, `IMPORT_DATA` untuk impor.
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
-| GET | `/map/incidents` | `map:read` | Titik kejadian (GeoJSON) |
-| GET | `/map/historical-heatmap` | `map:read` | Agregasi historis per grid |
+| GET | `/map/historical` | `map:read`, `crime:read` | ✅ **ADA** — layer historis: cacah per kecamatan **dan** titik lokasi; parameter `months` |
+| GET | `/map/incidents` | `map:read` | ~~Titik kejadian (GeoJSON)~~ — digabung ke `/map/historical` |
+| GET | `/map/historical-heatmap` | `map:read` | ~~Agregasi historis per grid~~ — digabung ke `/map/historical` |
 | GET | `/map/current-risk` | `map:read`, `risk_score:read` | Layer risiko berjalan |
 | GET | `/map/predictive-heatmap` | `map:read`, `prediction:read` | Layer prediktif; parameter `horizon` |
 | GET | `/map/area/{kecamatan}` | `map:read` | Rincian wilayah: ancaman berperingkat, jam rawan, riwayat kejadian, peringatan aktif, prediksi + WHY |
 | GET | `/map/grid/{location_id}` | `map:read` | Detail satu sel grid — **belum dibuat** |
 
 `/map/current-risk` dan `/map/predictive-heatmap` dipisah karena keduanya layer berbeda (docs/04).
+
+**TECHNICAL DECISION — dua endpoint historis digabung menjadi satu.** Rancangan awal
+memisahkan `/map/incidents` (titik, GeoJSON) dari `/map/historical-heatmap` (agregasi per
+grid). Keduanya digabung menjadi `GET /map/historical` dengan dua alasan:
+
+1. **Keduanya selalu digambar bersamaan, pada jendela waktu yang sama.** Dipisah, keduanya
+   dapat menjawab jendela yang berbeda — titik untuk 12 bulan di atas bidang warna untuk 3
+   bulan — dan tidak ada di layar yang akan menunjukkan bahwa itu terjadi. Satu endpoint
+   membuat ketidakcocokan itu mustahil, bukan sekadar tidak mungkin terjadi.
+2. **Satuan "per grid" salah untuk layer ini**, dengan alasan yang sama yang membuat
+   `/map/area` memakai kecamatan: sel grid terlalu sempit untuk membawa cacah yang bermakna.
+   Bidang warna karena itu per kecamatan, dan titiknya per **lokasi**.
+
+Titik berada di koordinat `locations`, **bukan** di tempat kejadian sebenarnya:
+`crime_incidents` menyimpan `location_id` dan tidak menyimpan koordinatnya sendiri, sehingga
+seluruh kejadian pada satu lokasi menumpuk di satu titik. Respons menyatakan ini pada
+`aggregation_basis`; menyembunyikannya akan membuat titik terbaca sebagai TKP.
+
+Bentuk GeoJSON tidak dipakai — tidak ada consumer yang membutuhkannya, dan peta digambar
+sebagai SVG tanpa pustaka peta.
+
+Responsnya **tidak pernah membawa `risk_class` maupun `risk_score`.** Yang dicacah adalah
+kejadian, bukan risiko; memberi kelas pada cacah mentah akan menyatakan wilayah dengan
+kejadian terbanyak sebagai wilayah paling rawan, dan itu tidak dapat disimpulkan tanpa
+pembobotan maupun normalisasi terhadap luas dan penduduk. `test_historical_never_reports_a_risk_class`
+menjaganya.
 
 **Perubahan setelah implementasi (TASK 082–084):** satuan rincian yang benar-benar dipakai
 layar adalah **kecamatan**, bukan sel grid. Pengguna bertanya "apa ancaman di Tebet",

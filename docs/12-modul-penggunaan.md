@@ -244,11 +244,48 @@ Menu **Live Map**.
 
 ### Cara memakai
 
-1. Pilih layer: **Risiko Berjalan** atau **Prediktif**.
-2. Arahkan kursor ke sebuah kecamatan untuk menyorotnya.
-3. **Klik** kecamatan itu untuk membuka rinciannya di panel kanan.
-4. Alamat halaman ikut berubah, sehingga tampilan itu **dapat dibagikan sebagai
+1. Pilih layer: **Historis**, **Risiko Berjalan**, atau **Prediktif**.
+2. Pada layer Historis, pilih jendela waktunya: **1 bulan**, **3 bulan**, **12 bulan**,
+   atau **Seluruh data**. Pemilih ini hanya muncul di layer Historis, karena hanya di situ
+   ia berpengaruh.
+3. Arahkan kursor ke sebuah kecamatan untuk menyorotnya.
+4. **Klik** kecamatan itu untuk membuka rinciannya di panel kanan.
+5. Alamat halaman ikut berubah, sehingga tampilan itu **dapat dibagikan sebagai
    tautan** — berguna saat paparan.
+
+### Tiga layer, tiga pertanyaan berbeda
+
+| Layer | Menjawab | Satuannya | Warnanya |
+|---|---|---|---|
+| **Historis** | Di mana kejadian selama ini menumpuk | **Cacah kejadian** | Kuning-jingga |
+| **Risiko Berjalan** | Di mana risikonya tinggi sekarang | Skor 0–100 berkelas | Tangga hijau→merah |
+| **Prediktif** | Di mana risikonya diperkirakan tinggi | Skor 0–100 **tanpa kelas** | Sian |
+
+Ketiganya digambar di bidang yang sama, jadi warnanya sengaja dibuat berjauhan — dari
+kursi belakang ruang paparan, ketiganya tetap dapat dibedakan.
+
+**Satu hal yang paling mudah keliru:** angka besar di tengah kecamatan berganti satuan
+mengikuti layer. Pada layer Historis angka itu **jumlah kejadian** (bisa 180), pada dua
+layer lain **skor 0–100**. Legenda di bawah peta selalu menyebutkan satuan yang sedang
+berlaku.
+
+### Membaca layer Historis
+
+- **Bidang warna** = jumlah kejadian per kecamatan pada jendela terpilih.
+- **Titik** = satu lokasi; luas lingkarannya sebanding dengan jumlah kejadian di situ.
+- Kepekatan warnanya **relatif terhadap kecamatan terbanyak pada jendela yang sedang
+  tampil** — bukan terhadap ambang apa pun. Berganti jendela berarti berganti pembanding,
+  jadi warna yang sama di dua jendela berbeda **tidak** berarti jumlah yang sama. Angka
+  puncak yang sedang berlaku selalu tertulis di legenda.
+- Layer ini **tidak punya kelas risiko**, dan itu disengaja. Kecamatan dengan kejadian
+  terbanyak belum tentu kecamatan paling rawan: cacah mentah tidak ditimbang dan tidak
+  dinormalkan terhadap luas maupun jumlah penduduk.
+- **Titik berada di koordinat lokasi, bukan di TKP sebenarnya.** Basis data mencatat
+  kejadian pada `location_id` dan tidak menyimpan koordinat kejadiannya sendiri, sehingga
+  seluruh kejadian pada satu lokasi menumpuk di satu titik.
+- Karena bentuk wilayah hanyalah perkiraan, sebagian kecil titik dapat tampak sedikit
+  melewati garis kecamatannya. Nama kecamatan yang benar selalu diambil dari data, bukan
+  dari poligon tempat titik itu tergambar.
 
 ### Isi panel rincian
 

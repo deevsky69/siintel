@@ -14,8 +14,8 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 |---|---|---|---|
 | 1 | Login dan Role-Based Access Control | ✅ **ADA** | **4 peran** (22/40/17/22 grant), 43 permission, cakupan ditegakkan di query |
 | 2 | Executive Dashboard | ✅ **ADA** | `/` |
-| 3 | Live Crime Map | ⚠️ **SEBAGIAN** | Peta ada; layer **titik kejadian aktual** belum |
-| 4 | Historical Heatmap | ⚠️ **SEBAGIAN** | Riwayat tampil sebagai angka di panel rincian, belum sebagai layer peta |
+| 3 | Live Crime Map | ✅ **ADA** | Layer historis pada `/peta` menggambar titik lokasi, luasnya sebanding cacah kejadian |
+| 4 | Historical Heatmap | ✅ **ADA** | Layer **Historis** pada `/peta`, jendela 1 / 3 / 12 / 36 bulan |
 | 5 | Crime Pattern DNA | ✅ **ADA** | `/pola` — kelima dimensi dari 1200 kejadian |
 | 6 | Predictive Heatmap | ✅ **ADA** | Layer prediktif pada `/peta` |
 | 7 | AI Prediction Center | ✅ **ADA** | `/prediksi`; `POST /predictions/run` dan `/predictions/{code}/publish` |
@@ -27,23 +27,18 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 | 13 | Prediction vs Actual | ✅ **ADA** | `/evaluasi`, precision 0,397 · recall 0,400 |
 | 14 | Executive Brief | ✅ **ADA** | `/brief`, siap cetak |
 
-**Skor per 2 September 2026: 11 dari 14 lengkap, 3 sebagian, 0 belum.**
+**Skor per 2 September 2026: 13 dari 14 lengkap, 1 sebagian, 0 belum.**
 
-Riwayat: 8/3/3 → 10/3/1 (1 September) → **11/3/0** (2 September). Tidak ada lagi butir
-yang belum tersentuh sama sekali; yang tersisa adalah tiga butir yang setengah jalan.
+Riwayat: 8/3/3 → 10/3/1 (1 September) → 11/3/0 → **13/1/0** (2 September).
 
-Dua di antaranya melekat pada layar yang sama, `/peta`:
+`/peta` kini memuat **ketiga** layer yang diminta CLAUDE.md §24 — historis, risiko
+berjalan, prediktif — sehingga #3 dan #4 tertutup sekaligus. Ketiganya sengaja berwarna
+berjauhan dan bersatuan berbeda: dua layer memakai skor 0–100, sedangkan layer historis
+memakai **cacah kejadian** dan karena itu tidak diberi kelas risiko apa pun.
 
-- **#3** menuntut layer **titik kejadian aktual**;
-- **#4** menuntut riwayat sebagai **layer peta**, bukan angka di panel.
-
-Keduanya pekerjaan peta, bukan pekerjaan data: kejadiannya sudah ada di basis data dan
-sudah terbaca di panel rincian kecamatan. Yang belum ada hanya cara menggambarnya di
-bidang peta.
-
-Sisanya, **#12**, menuntut **triase** — laporan masyarakat sudah terbaca tetapi statusnya
-belum dapat diubah dari layar. `community.py` sampai hari ini hanya memiliki dua endpoint
-baca dan tidak satu pun endpoint tulis.
+Yang tersisa satu, **#12**: laporan masyarakat sudah terbaca tetapi statusnya belum dapat
+diubah dari layar. `community.py` sampai hari ini hanya memiliki dua endpoint baca dan
+tidak satu pun endpoint tulis — **triase** itulah pekerjaan berikutnya.
 
 ---
 
@@ -52,7 +47,7 @@ baca dan tidak satu pun endpoint tulis.
 | Modul | Status |
 |---|---|
 | Executive Dashboard | ✅ |
-| Live Kamtibmas Map | ⚠️ layer kejadian, laporan masyarakat, dan unit patroli belum |
+| Live Kamtibmas Map | ⚠️ layer kejadian ✅; layer laporan masyarakat dan unit patroli belum |
 | Crime Analytics | ✅ `/analitik` — tren bulanan, pola waktu, perbandingan antarwilayah |
 | Crime Pattern DNA | ✅ |
 | AI Prediction Center | ✅ `/prediksi` |
@@ -70,7 +65,7 @@ baca dan tidak satu pun endpoint tulis.
 
 | # | Keluaran | Status |
 |---|---|---|
-| 1 | Peta kerawanan historis dan predictive heatmap | ⚠️ prediktif ada, historis belum sebagai layer |
+| 1 | Peta kerawanan historis dan predictive heatmap | ✅ ketiga layer §24 ada: historis, risiko berjalan, prediktif |
 | 2 | Crime Pattern DNA | ✅ |
 | 3 | Kamtibmas Risk Score per wilayah dan time-window | ✅ |
 | 4 | Early warning dan alert operasional tervalidasi | ✅ |

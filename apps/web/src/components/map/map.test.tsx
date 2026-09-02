@@ -1,11 +1,17 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { toRiskClass } from "@/components/map/area";
+import { historicalOpacity, toHistoricalMonths, toRiskClass } from "@/components/map/area";
 import { DistrictDetail } from "@/components/map/district-detail";
 import { RiskLegend, riskBands } from "@/components/map/legend";
 import { RiskMap } from "@/components/map/risk-map";
-import { KECAMATAN_SHAPES } from "@/lib/geo";
-import type { AreaDetail, CurrentRiskResponse, MapData, PredictiveResponse } from "@/lib/map-data";
+import { isWithinMap, KECAMATAN_SHAPES, projectLatLon } from "@/lib/geo";
+import type {
+  AreaDetail,
+  CurrentRiskResponse,
+  HistoricalResponse,
+  MapData,
+  PredictiveResponse,
+} from "@/lib/map-data";
 import { buildMapData, resolveSelectedDistrict } from "@/lib/map-data";
 
 /**
@@ -175,7 +181,70 @@ const areaDetail: AreaDetail = {
   active_warnings_basis: "Hanya peringatan berstatus ACTIVE.",
 };
 
-const data: MapData = buildMapData(currentRisk, predictive);
+const HISTORICAL_BASIS =
+  "Angka per kecamatan adalah cacah kejadian mentah pada jendela waktu terpilih, bukan skor risiko.";
+
+const historical: HistoricalResponse = {
+  reference_time: "2025-12-27T09:30:00+07:00",
+  demo_clock: true,
+  months: 12,
+  window_from: "2024-12-28",
+  window_to: "2025-12-27",
+  observed_from: "2025-01-03",
+  observed_to: "2025-12-24",
+  total_incidents: 260,
+  aggregation_basis: HISTORICAL_BASIS,
+  areas: [
+    {
+      kecamatan: "Kebayoran Baru",
+      polsek: "Polsek Kebayoran Baru",
+      incidents: 180,
+      by_threat_type: [
+        { threat_type: "CURANMOR", incidents: 120 },
+        { threat_type: "CURAT", incidents: 60 },
+      ],
+    },
+    {
+      kecamatan: "Tebet",
+      polsek: "Polsek Tebet",
+      incidents: 80,
+      by_threat_type: [{ threat_type: "BEGAL", incidents: 80 }],
+    },
+  ],
+  points: [
+    {
+      location_code: "LOC-001",
+      kecamatan: "Kebayoran Baru",
+      kelurahan: "Gunung",
+      latitude: -6.227,
+      longitude: 106.8,
+      incidents: 100,
+      dominant_threat_type: "CURANMOR",
+    },
+    {
+      location_code: "LOC-021",
+      kecamatan: "Tebet",
+      kelurahan: "Tebet Barat",
+      latitude: -6.23,
+      longitude: 106.855,
+      incidents: 40,
+      dominant_threat_type: "BEGAL",
+    },
+    {
+      // Sengaja di luar bentang Jakarta Selatan: titik seperti ini tidak boleh dijepitkan
+      // ke tepi peta, sebab menjepitkan menaruhnya di wilayah yang bukan wilayahnya.
+      location_code: "LOC-999",
+      kecamatan: "Kebayoran Baru",
+      kelurahan: null,
+      latitude: -5.0,
+      longitude: 110.0,
+      incidents: 5,
+      dominant_threat_type: null,
+    },
+  ],
+};
+
+const data: MapData = buildMapData(currentRisk, predictive, historical);
 const districtOf = (kecamatan: string) =>
   data.districts.find((row) => row.kecamatan === kecamatan) ?? null;
 
@@ -238,6 +307,14 @@ describe("pemilihan wilayah lewat alamat", () => {
     const kosong = buildMapData(
       { ...currentRisk, assessment_date: null, areas: [] },
       { ...predictive, areas: [] },
+      {
+        ...historical,
+        areas: [],
+        points: [],
+        total_incidents: 0,
+        observed_from: null,
+        observed_to: null,
+      },
     );
 
     expect(resolveSelectedDistrict(kosong, null)).toBeNull();
@@ -273,6 +350,7 @@ describe("peta risiko", () => {
     selected: "Kebayoran Baru",
     detail: areaDetail,
     layer: "current" as const,
+    months: 12 as const,
   };
 
   it("menggambar seluruh kecamatan sebagai tautan yang dapat dibagikan", () => {
@@ -441,5 +519,149 @@ describe("rincian wilayah", () => {
     render(<DistrictDetail district={null} detail={null} horizon="6H" />);
 
     expect(screen.getByText(/pilih salah satu kecamatan/i)).toBeDefined();
+  });
+});
+
+describe("proyeksi titik ke bidang peta", () => {
+  /**
+   * Titik acuan diambil dari `locations` yang menjadi simpul terluar saat bentuk wilayah
+   * dihitung. Nilai harapnya bukan angka yang dikarang untuk mencocokkan kode: ia keluar
+   * dari menjalankan ulang pipeline pada `lib/geo.ts` dan terbukti menghasilkan kesepuluh
+   * simpul `KECAMATAN_SHAPES` sampai satu angka di belakang koma.
+   *
+   * Test ini yang menahan tetapan proyeksi agar tidak diubah tanpa sadar — pergeseran
+   * kecil di sini tidak menimbulkan galat apa pun, hanya titik yang "agak meleset".
+   */
+  const REFERENSI = [
+    { code: "LOC-023", latitude: -6.209, longitude: 106.85, x: 875.2, y: 97.9 },
+    { code: "LOC-033", latitude: -6.345, longitude: 106.824, x: 623.3, y: 1423.1 },
+    { code: "LOC-006", latitude: -6.276, longitude: 106.767, x: 71.2, y: 750.8 },
+    { code: "LOC-019", latitude: -6.257, longitude: 106.856, x: 933.3, y: 565.6 },
+  ] as const;
+
+  it("menempatkan titik acuan tepat di koordinat yang menghasilkan bentuk wilayah", () => {
+    for (const titik of REFERENSI) {
+      const [x, y] = projectLatLon(titik.latitude, titik.longitude);
+      expect(x).toBeCloseTo(titik.x, 1);
+      expect(y).toBeCloseTo(titik.y, 1);
+    }
+  });
+
+  it("menaruh utara di atas", () => {
+    const utara = projectLatLon(-6.209, 106.85);
+    const selatan = projectLatLon(-6.345, 106.824);
+
+    expect(utara[1]).toBeLessThan(selatan[1]);
+  });
+
+  it("mengenali titik di luar bidang gambar alih-alih menjepitkannya ke tepi", () => {
+    expect(isWithinMap(projectLatLon(-6.24, 106.8))).toBe(true);
+    expect(isWithinMap(projectLatLon(-5.0, 110.0))).toBe(false);
+  });
+});
+
+describe("layer historis", () => {
+  const historicalProps = {
+    data,
+    selected: "Kebayoran Baru",
+    detail: areaDetail,
+    layer: "historical" as const,
+    months: 12 as const,
+  };
+
+  it("memberi label wilayah berisi cacah kejadian, bukan skor", () => {
+    render(<RiskMap {...historicalProps} />);
+
+    expect(
+      screen.getByRole("link", {
+        name: "Kebayoran Baru — 180 kejadian pada jendela yang ditampilkan",
+      }),
+    ).toBeDefined();
+    expect(screen.queryByRole("link", { name: /skor risiko/ })).toBeNull();
+  });
+
+  it("menyatakan wilayah tanpa kejadian sebagai tidak tercatat, bukan nol", () => {
+    render(<RiskMap {...historicalProps} />);
+
+    expect(
+      screen.getByRole("link", { name: "Cilandak — tidak ada kejadian tercatat" }),
+    ).toBeDefined();
+  });
+
+  it("menggambar titik lokasi dan membuang yang jatuh di luar bidang gambar", () => {
+    const { container } = render(<RiskMap {...historicalProps} />);
+
+    // Dua dari tiga titik contoh berada di Jakarta Selatan; yang ketiga sengaja di luar.
+    expect(container.querySelectorAll("circle")).toHaveLength(2);
+  });
+
+  it("tidak menggambar titik pada layer selain historis", () => {
+    const { container } = render(<RiskMap {...historicalProps} layer="current" />);
+
+    expect(container.querySelectorAll("circle")).toHaveLength(0);
+  });
+
+  it("menyatakan skalanya relatif terhadap jendela yang sedang tampil", () => {
+    render(<RiskMap {...historicalProps} />);
+
+    expect(screen.getByText(/Skala relatif · 260 kejadian pada jendela ini/)).toBeDefined();
+    expect(screen.getByText(/bukan kelas risiko/)).toBeDefined();
+  });
+
+  it("meneruskan keterangan asal angka dari API apa adanya", () => {
+    render(<RiskMap {...historicalProps} />);
+
+    expect(screen.getByText(HISTORICAL_BASIS)).toBeDefined();
+  });
+
+  it("menampilkan jendela yang diminta beserta rentang data yang benar-benar ditemukan", () => {
+    render(<RiskMap {...historicalProps} />);
+
+    expect(screen.getByText("2024-12-28 s.d. 2025-12-27")).toBeDefined();
+    expect(screen.getByText(/Data ditemukan 2025-01-03 s.d. 2025-12-24/)).toBeDefined();
+  });
+
+  it("hanya menawarkan pemilih jendela pada layer historis", () => {
+    const { rerender } = render(<RiskMap {...historicalProps} />);
+    expect(screen.getByRole("navigation", { name: "Jendela waktu historis" })).toBeDefined();
+
+    rerender(<RiskMap {...historicalProps} layer="current" />);
+    expect(screen.queryByRole("navigation", { name: "Jendela waktu historis" })).toBeNull();
+  });
+
+  it("membawa jendela terpilih di dalam tautan, dan menghilangkannya saat jendela bawaan", () => {
+    render(<RiskMap {...historicalProps} months={36} />);
+
+    const jendela = screen.getByRole("navigation", { name: "Jendela waktu historis" });
+    expect(within(jendela).getByRole("link", { name: "Seluruh data" }).getAttribute("href")).toBe(
+      "/peta?wilayah=Kebayoran+Baru&layer=historical&bulan=36",
+    );
+    expect(within(jendela).getByRole("link", { name: "12 bulan" }).getAttribute("href")).toBe(
+      "/peta?wilayah=Kebayoran+Baru&layer=historical",
+    );
+  });
+});
+
+describe("skala warna historis", () => {
+  it("tidak membagi dengan nol ketika belum ada kejadian sama sekali", () => {
+    expect(historicalOpacity(0, 0)).toBeGreaterThan(0);
+    expect(Number.isFinite(historicalOpacity(5, 0))).toBe(true);
+  });
+
+  it("memberi wilayah terbanyak kepekatan tertinggi", () => {
+    expect(historicalOpacity(180, 180)).toBeGreaterThan(historicalOpacity(80, 180));
+  });
+});
+
+describe("jendela historis dari alamat", () => {
+  it("membuang panjang jendela yang tidak dilayani API", () => {
+    expect(toHistoricalMonths("7")).toBe(12);
+    expect(toHistoricalMonths("bukan angka")).toBe(12);
+    expect(toHistoricalMonths(null)).toBe(12);
+  });
+
+  it("menerima panjang jendela yang dilayani", () => {
+    expect(toHistoricalMonths("1")).toBe(1);
+    expect(toHistoricalMonths("36")).toBe(36);
   });
 });

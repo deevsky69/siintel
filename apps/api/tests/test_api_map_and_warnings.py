@@ -15,6 +15,7 @@ tanpa disadari:
 
 from __future__ import annotations
 
+import json
 import os
 import uuid
 from collections.abc import Iterator
@@ -29,6 +30,7 @@ from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.main import app
 from prediksi_presisi_api.models import (
     AuditLog,
+    CrimeIncident,
     EarlyWarning,
     Location,
     Permission,
@@ -501,3 +503,154 @@ def test_map_carries_the_weights_version_that_produced_the_scores(
     )
     assert detail.status_code == 200, detail.text
     assert detail.json()["weights_version"] == expected
+
+
+# --- Peta: layer historis ---------------------------------------------------------------
+
+
+def _historical(client: TestClient, user: User, months: int = 12) -> dict[str, object]:
+    response = client.get(f"/api/v1/map/historical?months={months}", headers=_auth(client, user))
+    assert response.status_code == 200, response.text
+    body: dict[str, object] = response.json()
+    return body
+
+
+def test_historical_counts_match_the_database(client: TestClient, session: Session) -> None:
+    """Cacah per kecamatan dibandingkan terhadap query langsung, bukan terhadap dirinya sendiri.
+
+    Jendela diambil dari respons, bukan ditulis ulang di sini: waktu acuan aplikasi dapat
+    berubah, dan test yang mengunci tanggalnya akan gagal karena alasan yang salah.
+    """
+    leader = _make_user(session, "Pimpinan")
+    body = _historical(client, leader, months=36)
+
+    expected = dict(
+        session.execute(
+            select(Location.kecamatan, func.count())
+            .select_from(CrimeIncident)
+            .join(Location, Location.location_id == CrimeIncident.location_id)
+            .where(
+                CrimeIncident.incident_date >= date.fromisoformat(str(body["window_from"])),
+                CrimeIncident.incident_date <= date.fromisoformat(str(body["window_to"])),
+            )
+            .group_by(Location.kecamatan)
+        ).all()
+    )
+
+    # Tanpa penegasan ini perbandingan di bawah lulus ketika keduanya kosong — dan
+    # endpoint yang tidak mengembalikan apa pun akan terbaca sebagai endpoint yang benar.
+    assert expected, "data dummy tidak memuat kejadian pada jendela 36 bulan"
+
+    areas = {area["kecamatan"]: area["incidents"] for area in body["areas"]}  # type: ignore[index,union-attr]
+    assert areas == {name: int(count) for name, count in expected.items()}
+    assert body["total_incidents"] == sum(expected.values())
+
+
+def test_historical_window_excludes_what_falls_outside_it(
+    client: TestClient, session: Session
+) -> None:
+    """Jendela yang lebih pendek tidak boleh membawa kejadian di luarnya.
+
+    Tanpa penjagaan ini, `months` dapat berhenti berpengaruh tanpa ada yang terlihat rusak:
+    layar tetap menampilkan angka, hanya saja angka yang salah.
+    """
+    leader = _make_user(session, "Pimpinan")
+
+    wide = _historical(client, leader, months=36)
+    narrow = _historical(client, leader, months=1)
+
+    assert date.fromisoformat(str(narrow["window_from"])) > date.fromisoformat(
+        str(wide["window_from"])
+    )
+    assert int(narrow["total_incidents"]) <= int(wide["total_incidents"])  # type: ignore[arg-type]
+
+    observed_from = narrow["observed_from"]
+    if observed_from is not None:
+        assert date.fromisoformat(str(observed_from)) >= date.fromisoformat(
+            str(narrow["window_from"])
+        )
+
+
+def test_historical_points_carry_coordinates_and_add_up(
+    client: TestClient, session: Session
+) -> None:
+    """Titik peta harus dapat digambar **dan** menjumlah ke cacah wilayah.
+
+    Titik yang tidak menjumlah berarti ada kejadian yang hilang dari peta tanpa jejak.
+    """
+    leader = _make_user(session, "Pimpinan")
+    body = _historical(client, leader, months=36)
+
+    points = body["points"]
+    assert isinstance(points, list) and points
+
+    for point in points:
+        assert isinstance(point["latitude"], float)
+        assert isinstance(point["longitude"], float)
+        assert point["incidents"] >= 1
+        assert point["location_code"]
+
+    assert sum(int(point["incidents"]) for point in points) == int(body["total_incidents"])  # type: ignore[arg-type]
+
+
+def test_historical_never_reports_a_risk_class(client: TestClient, session: Session) -> None:
+    """Layer ini mencacah kejadian, bukan menilai risiko — dan tidak boleh terbaca sebaliknya.
+
+    `risk_class` di sini akan menjadi ambang kedua di luar `config/risk/`, persis yang
+    dilarang CLAUDE.md §12; ia juga akan menyatakan wilayah dengan kejadian terbanyak
+    sebagai wilayah paling rawan, yang tidak dapat disimpulkan dari cacah mentah.
+    """
+    leader = _make_user(session, "Pimpinan")
+    body = _historical(client, leader, months=36)
+
+    assert "risk_class" not in json.dumps(body)
+    assert "risk_score" not in json.dumps(body)
+    assert "cacah kejadian mentah" in str(body["aggregation_basis"])
+
+
+def test_historical_rejects_a_window_length_it_does_not_offer(
+    client: TestClient, session: Session
+) -> None:
+    leader = _make_user(session, "Pimpinan")
+
+    response = client.get("/api/v1/map/historical?months=7", headers=_auth(client, leader))
+
+    assert response.status_code == 400, response.text
+    assert "months" in response.text
+
+
+def test_historical_is_limited_to_the_users_jurisdiction(
+    client: TestClient, session: Session
+) -> None:
+    """Pengguna Polsek tidak boleh menyimpulkan sebaran kejadian di wilayah lain.
+
+    Diperiksa pada `areas` **dan** `points`: membatasi satu tetapi tidak yang lain adalah
+    kebocoran yang tidak terlihat di layar karena keduanya digambar berlapis.
+    """
+    scoped_polsek = session.scalar(
+        select(Location.polsek).where(Location.polsek.is_not(None)).order_by(Location.polsek)
+    )
+    assert scoped_polsek is not None
+
+    officer = _make_user(session, "Polsek", polsek=scoped_polsek)
+    body = _historical(client, officer, months=36)
+
+    assert body["areas"], "pengguna Polsek harus tetap melihat wilayahnya sendiri"
+    assert {area["polsek"] for area in body["areas"]} == {scoped_polsek}  # type: ignore[index,union-attr]
+
+    allowed = set(
+        session.scalars(
+            select(Location.kecamatan).where(Location.polsek == scoped_polsek).distinct()
+        ).all()
+    )
+    assert {point["kecamatan"] for point in body["points"]} <= allowed  # type: ignore[index,union-attr]
+
+
+def test_historical_requires_both_gates(client: TestClient, session: Session) -> None:
+    """`map:read` saja tidak cukup: layer ini membuka data kejadian, jadi `crime:read` wajib."""
+    role = _role_granting(session, ["map:read"])
+    user = _user_for_role(session, role)
+
+    response = client.get("/api/v1/map/historical", headers=_auth(client, user))
+
+    assert response.status_code == 403, response.text

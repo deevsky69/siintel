@@ -1,3 +1,4 @@
+import { DEFAULT_HISTORICAL_MONTHS } from "@/components/map/area";
 import { ApiError, apiGet } from "./api";
 import { KECAMATAN_SHAPES } from "./geo";
 
@@ -7,6 +8,7 @@ import { KECAMATAN_SHAPES } from "./geo";
  * Peta memakai endpoint peta, bukan hasil agregasi di antarmuka:
  *
  * ```text
+ * GET /map/historical                → layer historis + titik kejadian
  * GET /map/current-risk              → layer risiko berjalan
  * GET /map/predictive-heatmap        → layer prediktif
  * GET /map/area/{kecamatan}          → panel rincian satu wilayah
@@ -105,6 +107,38 @@ export type PredictiveResponse = {
   aggregation_basis: string;
 };
 
+export type HistoricalArea = {
+  kecamatan: string;
+  polsek: string | null;
+  /** Cacah kejadian mentah pada jendela. **Bukan skor, dan tidak berkelas** — lihat basis. */
+  incidents: number;
+  by_threat_type: { threat_type: string; incidents: number }[];
+};
+
+export type HistoricalPoint = {
+  location_code: string;
+  kecamatan: string;
+  kelurahan: string | null;
+  latitude: number;
+  longitude: number;
+  incidents: number;
+  dominant_threat_type: string | null;
+};
+
+export type HistoricalResponse = {
+  reference_time: string;
+  demo_clock: boolean;
+  months: number;
+  window_from: string;
+  window_to: string;
+  observed_from: string | null;
+  observed_to: string | null;
+  total_incidents: number;
+  areas: HistoricalArea[];
+  points: HistoricalPoint[];
+  aggregation_basis: string;
+};
+
 export type DominantFactor = { factor: string; contribution: number; source: string };
 
 export type AreaPrediction = {
@@ -188,6 +222,7 @@ export type AreaDetail = {
  */
 export type MapDistrict = {
   kecamatan: string;
+  historical: HistoricalArea | null;
   current: CurrentRiskArea | null;
   predictive: PredictiveArea | null;
 };
@@ -201,7 +236,22 @@ export type MapData = {
   horizon: string;
   /** Sembilan kecamatan, urut sesuai bentuk peta — termasuk yang tanpa data. */
   districts: MapDistrict[];
+  /** Jendela historis yang sedang tampil, apa adanya dari API. */
+  historical: {
+    months: number;
+    windowFrom: string;
+    windowTo: string;
+    observedFrom: string | null;
+    observedTo: string | null;
+    totalIncidents: number;
+    points: HistoricalPoint[];
+    /** Cacah tertinggi antar kecamatan — dasar skala warna **relatif** layer historis. */
+    peakIncidents: number;
+    /** Cacah tertinggi satu titik lokasi — dasar ukuran lingkaran. */
+    peakPointIncidents: number;
+  };
   /** Keterangan asal angka dari backend; ditampilkan, tidak dibuang. */
+  historicalBasis: string;
   currentRiskBasis: string;
   predictiveBasis: string;
 };
@@ -216,9 +266,11 @@ export type MapData = {
 export function buildMapData(
   current: CurrentRiskResponse,
   predictive: PredictiveResponse,
+  historical: HistoricalResponse,
 ): MapData {
   const currentByName = new Map(current.areas.map((area) => [area.kecamatan, area]));
   const predictiveByName = new Map(predictive.areas.map((area) => [area.kecamatan, area]));
+  const historicalByName = new Map(historical.areas.map((area) => [area.kecamatan, area]));
 
   return {
     referenceTime: current.reference_time,
@@ -230,9 +282,27 @@ export function buildMapData(
     horizon: predictive.horizon,
     districts: KECAMATAN_SHAPES.map((shape) => ({
       kecamatan: shape.kecamatan,
+      historical: historicalByName.get(shape.kecamatan) ?? null,
       current: currentByName.get(shape.kecamatan) ?? null,
       predictive: predictiveByName.get(shape.kecamatan) ?? null,
     })),
+    historical: {
+      months: historical.months,
+      windowFrom: historical.window_from,
+      windowTo: historical.window_to,
+      observedFrom: historical.observed_from,
+      observedTo: historical.observed_to,
+      totalIncidents: historical.total_incidents,
+      points: historical.points,
+      // Puncak dihitung sekali di sini, bukan di dalam komponen: menghitungnya ulang saat
+      // menggambar akan menjadikan warna satu wilayah bergantung pada urutan penggambaran.
+      peakIncidents: historical.areas.reduce((peak, area) => Math.max(peak, area.incidents), 0),
+      peakPointIncidents: historical.points.reduce(
+        (peak, point) => Math.max(peak, point.incidents),
+        0,
+      ),
+    },
+    historicalBasis: historical.aggregation_basis,
     currentRiskBasis: current.aggregation_basis,
     predictiveBasis: predictive.aggregation_basis,
   };
@@ -275,13 +345,17 @@ export function resolveSelectedDistrict(data: MapData, requested: string | null)
  * Pemanggilan API
  * ------------------------------------------------------------------ */
 
-export async function getMapData(horizon: string = MAP_HORIZON): Promise<MapData> {
-  const [current, predictive] = await Promise.all([
+export async function getMapData(
+  horizon: string = MAP_HORIZON,
+  months: number = DEFAULT_HISTORICAL_MONTHS,
+): Promise<MapData> {
+  const [current, predictive, historical] = await Promise.all([
     apiGet<CurrentRiskResponse>("/map/current-risk"),
     apiGet<PredictiveResponse>(`/map/predictive-heatmap?horizon=${encodeURIComponent(horizon)}`),
+    apiGet<HistoricalResponse>(`/map/historical?months=${encodeURIComponent(String(months))}`),
   ]);
 
-  return buildMapData(current, predictive);
+  return buildMapData(current, predictive, historical);
 }
 
 /**

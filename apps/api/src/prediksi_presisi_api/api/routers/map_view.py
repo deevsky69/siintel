@@ -4,9 +4,10 @@ Tiga layer pada CLAUDE.md §24 bersandar pada tabel yang berbeda dan **tidak** d
 menjadi satu endpoint (docs/05 §2.4):
 
 ```text
-/map/current-risk        ← risk_scores    (kondisi berjalan)
-/map/predictive-heatmap  ← predictions    (jendela waktu ke depan)
-/map/area/{kecamatan}    ← keduanya + kejadian historis + peringatan aktif
+/map/historical          ← crime_incidents (kejadian yang sudah terjadi)
+/map/current-risk        ← risk_scores     (kondisi berjalan)
+/map/predictive-heatmap  ← predictions     (jendela waktu ke depan)
+/map/area/{kecamatan}    ← ketiganya + peringatan aktif
 ```
 
 Dua catatan yang menentukan bentuk modul ini:
@@ -29,7 +30,7 @@ data di wilayah lain tidak bocor (docs/05 §1).
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, Path, Query, status
@@ -320,6 +321,162 @@ def predictive_heatmap(
         "horizon": requested,
         "areas": ordered,
         "aggregation_basis": PREDICTIVE_BASIS,
+    }
+
+
+#: Panjang jendela historis yang boleh diminta, dalam bulan. Daftar tertutup dengan
+#: sengaja: rentang bebas mengundang pertanyaan "kenapa 7 bulan" yang tidak ada jawabannya,
+#: sementara empat pilihan ini menjawab pertanyaan nyata — sebulan terakhir, satu triwulan,
+#: setahun, dan seluruh rentang data 2023–2025.
+HISTORICAL_MONTHS = (1, 3, 12, 36)
+
+HISTORICAL_BASIS = (
+    "Angka per kecamatan adalah **cacah kejadian mentah** pada jendela waktu terpilih, "
+    "bukan skor risiko: tidak ada pembobotan, tidak ada normalisasi terhadap luas maupun "
+    "jumlah penduduk, dan karenanya tidak ada kelas risiko. Wilayah dengan kejadian "
+    "terbanyak belum tentu wilayah paling rawan. "
+    "Titik pada peta berada di koordinat **lokasi**, bukan di tempat kejadian sebenarnya: "
+    "crime_incidents menyimpan location_id dan tidak menyimpan koordinatnya sendiri, "
+    "sehingga seluruh kejadian pada satu lokasi menumpuk di satu titik yang sama."
+)
+
+
+def _month_window(months: int) -> tuple[date, date]:
+    """Jendela `months` bulan ke belakang dari tanggal acuan, kedua ujung inklusif.
+
+    Dihitung mundur per bulan kalender, bukan dengan mengalikan 30 hari: "12 bulan
+    terakhir" yang meleset dua hari akan membuat cacah tahunan tidak pernah cocok dengan
+    cacah yang sama pada layar analitik.
+    """
+    end = clock.reference_now().astimezone(clock.JAKARTA).date()
+    month_index = end.year * 12 + (end.month - 1) - months
+    year, month = divmod(month_index, 12)
+    # Hari yang sama pada bulan awal; bila tanggalnya tidak ada di bulan itu (31 Februari)
+    # dipakai hari pertama bulan berikutnya, lalu mundur sehari.
+    try:
+        start = date(year, month + 1, end.day)
+    except ValueError:
+        start = date(year + (month + 1) // 12, (month + 1) % 12 + 1, 1) - timedelta(days=1)
+    return start + timedelta(days=1), end
+
+
+@router.get("/historical", summary="Layer kerawanan historis per kecamatan beserta titiknya")
+def historical(
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("map:read"),
+    _crime_reader: CurrentUser = require_permission("crime:read"),
+    months: int = Query(12, description=f"Panjang jendela, salah satu dari {HISTORICAL_MONTHS}"),
+) -> dict[str, Any]:
+    """Kejadian yang **sudah terjadi**, sebagai bidang warna per kecamatan dan titik lokasi.
+
+    Layer ketiga CLAUDE.md §24, dan satu-satunya yang memandang ke belakang. Ia menjawab
+    "di mana selama ini kejadian menumpuk", bukan "di mana risikonya tinggi" — dua hal
+    yang mudah tertukar justru karena keduanya digambar di bidang yang sama. Karena itu
+    responsnya tidak pernah membawa `risk_class`, dan `aggregation_basis` menyatakan
+    terbuka bahwa yang dicacah adalah kejadian, bukan risiko.
+
+    Membutuhkan `map:read` **dan** `crime:read`, diperiksa sebagai dependency terpisah
+    supaya penolakan salah satunya tetap tercatat di audit.
+    """
+    if months not in HISTORICAL_MONTHS:
+        raise ApiError(
+            status.HTTP_400_BAD_REQUEST,
+            "Panjang jendela historis tidak dikenal.",
+            details=[{"field": "months", "issue": f"harus salah satu dari {HISTORICAL_MONTHS}"}],
+        )
+
+    polsek = _jurisdiction(current, "map:read", "crime:read")
+    window_from, window_to = _month_window(months)
+
+    def scoped(query: Select[Any]) -> Select[Any]:
+        return _scoped(
+            query.join(Location, Location.location_id == CrimeIncident.location_id).where(
+                CrimeIncident.incident_date >= window_from,
+                CrimeIncident.incident_date <= window_to,
+            ),
+            polsek,
+        )
+
+    areas: dict[str, dict[str, Any]] = {}
+    by_type = session.execute(
+        scoped(
+            select(Location.kecamatan, Location.polsek, CrimeIncident.incident_type, func.count())
+        )
+        .group_by(Location.kecamatan, Location.polsek, CrimeIncident.incident_type)
+        .order_by(func.count().desc())
+    ).all()
+    for kecamatan, area_polsek, incident_type, count in by_type:
+        area = areas.setdefault(
+            kecamatan,
+            {
+                "kecamatan": kecamatan,
+                "polsek": area_polsek,
+                "incidents": 0,
+                "by_threat_type": [],
+            },
+        )
+        area["incidents"] += int(count)
+        area["by_threat_type"].append(
+            {"threat_type": incident_type, "incidents": int(count)},
+        )
+
+    points = [
+        {
+            "location_code": code,
+            "kecamatan": kecamatan,
+            "kelurahan": kelurahan,
+            # Koordinat disalin apa adanya dari `locations`; lihat HISTORICAL_BASIS soal
+            # mengapa ini koordinat lokasi dan bukan koordinat kejadian.
+            "latitude": float(latitude),
+            "longitude": float(longitude),
+            "incidents": int(count),
+            "dominant_threat_type": dominant,
+        }
+        for code, kecamatan, kelurahan, latitude, longitude, count, dominant in session.execute(
+            scoped(
+                select(
+                    Location.code,
+                    Location.kecamatan,
+                    Location.kelurahan,
+                    Location.latitude,
+                    Location.longitude,
+                    func.count(),
+                    # Jenis gangguan terbanyak di lokasi itu, dihitung di database supaya
+                    # tidak perlu menarik 1.200 baris kejadian ke lapisan API.
+                    func.mode().within_group(CrimeIncident.incident_type),
+                )
+            )
+            .where(Location.latitude.is_not(None), Location.longitude.is_not(None))
+            .group_by(
+                Location.code,
+                Location.kecamatan,
+                Location.kelurahan,
+                Location.latitude,
+                Location.longitude,
+            )
+            .order_by(func.count().desc())
+        ).all()
+    ]
+
+    observed_from, observed_to = session.execute(
+        scoped(select(func.min(CrimeIncident.incident_date), func.max(CrimeIncident.incident_date)))
+    ).one()
+
+    return {
+        "reference_time": clock.reference_now(),
+        "demo_clock": clock.is_demo_clock(),
+        "months": months,
+        "window_from": window_from,
+        "window_to": window_to,
+        # Rentang data yang benar-benar ditemukan di dalam jendela. Dikembalikan terpisah
+        # supaya hasil kosong dapat dibedakan: jendela yang salah, atau memang tidak ada
+        # kejadian. Tanpa ini keduanya terbaca sama di layar.
+        "observed_from": observed_from,
+        "observed_to": observed_to,
+        "total_incidents": sum(int(area["incidents"]) for area in areas.values()),
+        "areas": sorted(areas.values(), key=lambda item: int(item["incidents"]), reverse=True),
+        "points": points,
+        "aggregation_basis": HISTORICAL_BASIS,
     }
 
 

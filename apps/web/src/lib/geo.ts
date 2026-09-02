@@ -170,3 +170,53 @@ export function toPercent([x, y]: MapPoint): { left: string; top: string } {
     top: `${(y / MAP_VIEWBOX.height) * 100}%`,
   };
 }
+
+/* ------------------------------------------------------------------ *
+ * Proyeksi titik lintang/bujur ke bidang gambar
+ * ------------------------------------------------------------------ */
+
+/**
+ * Tetapan proyeksi yang menghasilkan `KECAMATAN_SHAPES` di atas.
+ *
+ * Angka-angka ini **bukan angka baru**. Ia adalah tetapan yang sama yang dipakai saat
+ * bentuk wilayah dihitung, dipulihkan kembali dengan menjalankan ulang langkah 1–4 pada
+ * catatan di kepala berkas terhadap 33 titik `locations`, lalu dibandingkan terhadap
+ * poligon yang sudah dibekukan: **kesepuluh simpul terluar cocok sampai satu angka di
+ * belakang koma**. Tanpa pencocokan itu, titik kejadian akan tergambar pada bidang yang
+ * sedikit bergeser dari poligonnya — kesalahan yang tidak menimbulkan galat apa pun dan
+ * hanya terlihat sebagai titik yang "agak meleset".
+ *
+ * `REFERENCE_LATITUDE` adalah rata-rata lintang ke-33 titik, dan `SCALE` seragam untuk
+ * kedua sumbu sehingga peta tidak melar ke satu arah. Tinggi hasil penskalaan adalah
+ * 1537,27 — `MAP_VIEWBOX.height` membulatkannya ke atas menjadi 1538.
+ */
+const PROJECTION = {
+  referenceLatitude: -6.263484848484849,
+  cosReferenceLatitude: 0.9940306883272865,
+  originX: 106.12236467020288,
+  originY: 6.1989519461326195,
+  scale: 9744.335125286332,
+} as const;
+
+/**
+ * Titik lintang/bujur pada sistem koordinat `MAP_VIEWBOX`.
+ *
+ * Sumbu tegak dibalik terhadap lintang (`-latitude`) supaya utara berada di atas, seperti
+ * peta pada umumnya — bukan karena rumusnya menuntut demikian.
+ *
+ * Hasilnya **boleh berada di luar bidang gambar** bila koordinatnya berada di luar
+ * cakupan Jakarta Selatan; pemanggil yang menggambarnya wajib memeriksa sendiri dengan
+ * {@link isWithinMap}, sebab menjepitkan titik ke tepi akan menaruhnya di tempat yang
+ * bukan tempatnya.
+ */
+export function projectLatLon(latitude: number, longitude: number): MapPoint {
+  return [
+    (longitude * PROJECTION.cosReferenceLatitude - PROJECTION.originX) * PROJECTION.scale,
+    (-latitude - PROJECTION.originY) * PROJECTION.scale,
+  ];
+}
+
+/** Benar bila titik hasil proyeksi masih berada di dalam bidang gambar. */
+export function isWithinMap([x, y]: MapPoint): boolean {
+  return x >= 0 && x <= MAP_VIEWBOX.width && y >= 0 && y <= MAP_VIEWBOX.height;
+}
