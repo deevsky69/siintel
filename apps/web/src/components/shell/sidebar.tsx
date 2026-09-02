@@ -5,29 +5,22 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { NavIcon } from "./icons";
 import type { NavItem } from "./navigation";
-import { groupedNavItems, secondaryNavItems } from "./navigation";
+import { groupOf, visibleNavGroups } from "./navigation";
 
 /**
- * Sidebar ikon + label, dikelompokkan menurut kata kerja.
+ * Sidebar berkelompok dengan submenu yang dapat dibuka-tutup.
  *
  * **Menyembunyikan menu bukan pengganti otorisasi.** Backend tetap memutuskan setiap
  * permintaan, dan membuka alamat yang tersembunyi tetap dijawab sebagaimana mestinya
- * (CLAUDE.md §15). Yang dikerjakan di sini semata mengurangi apa yang harus dibaca:
- * sebelumnya keenambelas menu tampil kepada semua peran, dan seorang Pimpinan yang membuka
- * `Input Data` atau `Admin` hanya disambut kalimat "Akun Anda tidak memiliki kewenangan".
+ * (CLAUDE.md §15). Yang dikerjakan di sini semata mengurangi apa yang harus dibaca.
  *
- * Lencana pada `Keputusan` hanya muncul bagi pemegang `commander_decision:approve`. Bagi
- * peran lain, rekomendasi yang menunggu bukan pekerjaan mereka, dan angka merah yang tidak
- * dapat mereka selesaikan hanya menjadi kecemasan tanpa jalan keluar.
+ * **Hanya kelompok yang sedang aktif yang terbuka.** Membuka seluruhnya mengembalikan
+ * persoalan yang justru hendak diselesaikan susunan ini: dua puluh baris setara yang harus
+ * dibaca semuanya untuk menemukan satu. Kelompok lain cukup satu klik.
  *
- * Menu dipisah menjadi **utama** dan **"Lainnya"**. Yang utama adalah yang dapat dikerjakan
- * pengguna, ditambah layar inti; sisanya tetap ada, hanya tidak ikut dibaca setiap kali
- * sidebar dipandang. Keputusan pemilik proyek, 2 September 2026, setelah menimbang bahwa
- * dari 22 permission seorang Pimpinan, 20 hanya membaca — sehingga dua menu yang
- * benar-benar menuntut tindakannya tenggelam di antara dua belas menu yang tampil serupa.
- *
- * Keadaan terbuka/tertutup "Lainnya" hidup di komponen, bukan di alamat: ia keadaan sesaat
- * yang tidak pantas ikut tersalin saat seseorang membagikan tautan halaman.
+ * Kelompok yang dibuka pengguna **ditambahkan**, bukan menggantikan yang aktif: menutup
+ * kelompok tempat halaman yang sedang dibuka berada akan menghilangkan penanda posisi, dan
+ * pengguna kehilangan jejak di mana ia berada.
  */
 export function Sidebar({
   permissions,
@@ -38,100 +31,110 @@ export function Sidebar({
   pendingDecisions?: number;
 }) {
   const pathname = usePathname();
-  const sections = groupedNavItems(permissions);
-  const secondary = secondaryNavItems(permissions);
-  const [showSecondary, setShowSecondary] = useState(false);
+  const groups = visibleNavGroups(permissions);
+  const activeGroup = groupOf(pathname);
+
+  /** Kelompok yang dibuka sendiri oleh pengguna, di luar yang sedang aktif. */
+  const [opened, setOpened] = useState<Set<string>>(new Set());
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
-  // "Lainnya" terbuka sendiri bila pengguna sedang berada di salah satu isinya — kalau
-  // tidak, menu yang sedang aktif tidak akan terlihat di sidebar sama sekali.
-  const open = showSecondary || secondary.some((item) => isActive(item.href));
+  const toggle = (id: string) =>
+    setOpened((previous) => {
+      const next = new Set(previous);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   return (
     <nav
       aria-label="Navigasi utama"
-      className="flex w-[92px] shrink-0 flex-col items-center gap-1 overflow-y-auto border-r border-base-800 bg-base-900/60 py-3"
+      className="flex w-[196px] shrink-0 flex-col gap-0.5 overflow-y-auto border-r border-base-800 bg-base-900/60 px-2 py-3"
     >
-      {sections.map((section, index) => (
-        <div key={section.group} className="flex w-full flex-col items-center">
-          {/* Pemisah kelompok pertama tidak digambar: garis di puncak sidebar hanya
-              menambah coretan tanpa memisahkan apa pun. */}
-          {index > 0 ? <span className="my-1.5 h-px w-12 bg-base-800" /> : null}
-          <span className="mb-1 text-[8px] font-semibold uppercase tracking-[0.14em] text-ink-faint">
-            {section.label}
-          </span>
+      {groups.map((group) => {
+        const open = group.id === activeGroup ? !opened.has(group.id) : opened.has(group.id);
+        const badge = group.items.some((item) => item.href === "/rekomendasi")
+          ? pendingDecisions
+          : 0;
 
-          {section.items.map((item) => (
-            <NavLink
-              key={item.href}
-              item={item}
-              active={isActive(item.href)}
-              badge={item.href === "/rekomendasi" ? pendingDecisions : 0}
-            />
-          ))}
-        </div>
-      ))}
+        return (
+          <div key={group.id}>
+            <button
+              type="button"
+              onClick={() => toggle(group.id)}
+              aria-expanded={open}
+              className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition-colors ${
+                group.id === activeGroup
+                  ? "text-accent"
+                  : "text-ink-muted hover:bg-base-800/70 hover:text-ink"
+              }`}
+            >
+              <NavIcon name={group.icon} className="h-4 w-4 shrink-0" />
+              <span className="flex-1 font-heading text-[11px] font-semibold uppercase tracking-wider">
+                {group.label}
+              </span>
+              {/* Lencana pindah ke judul kelompok saat submenunya tertutup, supaya
+                  keputusan yang menunggu tetap terlihat tanpa harus membuka apa pun. */}
+              {badge > 0 && !open ? (
+                <span
+                  aria-hidden="true"
+                  className="min-w-[16px] rounded-full bg-risk-critical px-1 text-center font-mono text-[9px] font-bold leading-4 text-base-950"
+                >
+                  {badge > 99 ? "99+" : badge}
+                </span>
+              ) : null}
+              <span
+                aria-hidden="true"
+                className={`text-[9px] transition-transform ${open ? "rotate-90" : ""}`}
+              >
+                &#9656;
+              </span>
+            </button>
 
-      {secondary.length > 0 ? (
-        <div className="flex w-full flex-col items-center">
-          <span className="my-1.5 h-px w-12 bg-base-800" />
-          <button
-            type="button"
-            onClick={() => setShowSecondary((value) => !value)}
-            aria-expanded={open}
-            className="flex w-[76px] flex-col items-center gap-1 rounded-md px-1 py-2 text-ink-faint transition-colors hover:bg-base-800/70 hover:text-ink-muted"
-          >
-            <span aria-hidden="true" className="text-sm leading-none">
-              {open ? "\u2212" : "\u22ef"}
-            </span>
-            <span className="text-center text-[9px] font-semibold uppercase leading-tight tracking-wider">
-              Lainnya
-            </span>
-            <span className="sr-only">
-              {open ? "Sembunyikan" : "Tampilkan"} {secondary.length} menu lainnya
-            </span>
-          </button>
-
-          {open
-            ? secondary.map((item) => (
-                <NavLink key={item.href} item={item} active={isActive(item.href)} badge={0} />
-              ))
-            : null}
-        </div>
-      ) : null}
+            {open ? (
+              <ul className="mb-1 ml-[13px] border-l border-base-800 pl-2">
+                {group.items.map((item) => (
+                  <li key={item.href}>
+                    <SubmenuLink
+                      item={item}
+                      active={isActive(item.href)}
+                      badge={item.href === "/rekomendasi" ? pendingDecisions : 0}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        );
+      })}
     </nav>
   );
 }
 
-function NavLink({ item, active, badge }: { item: NavItem; active: boolean; badge: number }) {
+function SubmenuLink({ item, active, badge }: { item: NavItem; active: boolean; badge: number }) {
   return (
     <Link
       href={item.href}
+      title={item.hint}
       aria-current={active ? "page" : undefined}
-      className={[
-        "group relative flex w-[76px] flex-col items-center gap-1.5 rounded-md px-1 py-2.5 transition-colors",
+      className={`flex items-center gap-2 rounded px-2 py-1.5 text-[11px] leading-tight transition-colors ${
         active
-          ? "bg-accent/10 text-accent shadow-glow"
-          : "text-ink-muted hover:bg-base-800/70 hover:text-ink",
-      ].join(" ")}
+          ? "bg-accent/10 font-semibold text-accent"
+          : "text-ink-muted hover:bg-base-800/70 hover:text-ink"
+      }`}
     >
-      <NavIcon name={item.icon} />
+      <span className="flex-1">{item.label}</span>
       {badge > 0 ? (
-        <span
-          // Jumlahnya ikut dibaca pembaca layar lewat teks tersembunyi di bawah, sehingga
-          // lencana visual ini tidak perlu diumumkan dua kali.
-          aria-hidden="true"
-          className="absolute right-2.5 top-1.5 min-w-[16px] rounded-full bg-risk-critical px-1 text-center font-mono text-[9px] font-bold leading-4 text-base-950"
-        >
-          {badge > 99 ? "99+" : badge}
-        </span>
-      ) : null}
-      <span className="text-center text-[9px] font-semibold uppercase leading-tight tracking-wider">
-        {item.label}
-      </span>
-      {badge > 0 ? (
-        <span className="sr-only">{badge} rekomendasi menunggu keputusan Anda</span>
+        <>
+          <span
+            aria-hidden="true"
+            className="min-w-[16px] rounded-full bg-risk-critical px-1 text-center font-mono text-[9px] font-bold leading-4 text-base-950"
+          >
+            {badge > 99 ? "99+" : badge}
+          </span>
+          <span className="sr-only">{badge} rekomendasi menunggu keputusan Anda</span>
+        </>
       ) : null}
     </Link>
   );

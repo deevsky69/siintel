@@ -1,21 +1,28 @@
 /**
- * Menu utama.
+ * Menu utama — kelompok dan submenu.
  *
- * Dua hal yang berubah pada 2 September 2026, keduanya menjawab keluhan yang sama —
- * layar pimpinan memuat terlalu banyak hal untuk dibaca:
+ * Susunannya ditetapkan pemilik proyek, 2 September 2026: lima kelompok yang masing-masing
+ * membuka submenu, menggantikan deret enam belas ikon setara yang sebelumnya memaksa mata
+ * membaca seluruhnya untuk menemukan satu.
  *
- * 1. **Menu disaring menurut kewenangan.** Sebelumnya keenambelas menu tampil kepada semua
- *    peran. Seorang Pimpinan yang membuka `Data Entry` atau `Admin` hanya disambut kalimat
- *    "Akun Anda tidak memiliki kewenangan" — menu yang tidak pernah dapat dipakai, tetapi
- *    tetap menuntut perhatian setiap kali sidebar dibaca.
+ * Kelompoknya disusun mengikuti **alur kerja**, bukan jenis data:
  *
- * 2. **Menu dikelompokkan menurut kata kerja**, bukan dideret rata. Enam belas ikon setara
- *    memaksa mata membaca seluruhnya untuk menemukan satu; empat kelompok pendek dapat
- *    dilompati.
+ * ```text
+ * Pemantauan  →  apa yang sedang terjadi
+ * Laporan     →  apa yang masuk
+ * Analisis    →  apa artinya
+ * Operasi     →  apa yang dikerjakan
+ * Sistem      →  siapa melakukan apa
+ * ```
  *
- * **Menyembunyikan menu bukan otorisasi.** Backend tetap memeriksa setiap permintaan, dan
- * membuka alamatnya langsung tetap dijawab sebagaimana mestinya (CLAUDE.md §15, §21).
- * Penyaringan di sini semata mengurangi apa yang harus dibaca.
+ * Beberapa layar yang tidak disebut dalam permintaan tetap dimasukkan ke kelompok yang
+ * paling sesuai — Prediksi, Penilaian Risiko, Evaluasi, Peringatan, Rekomendasi, Brief.
+ * Menghilangkannya dari menu akan memutus rantai tertutup yang menjadi inti sistem ini
+ * (CLAUDE.md §9): tanpa Prediksi dan Evaluasi, tidak ada yang dapat menunjukkan bahwa
+ * ramalannya pernah diuji terhadap kenyataan.
+ *
+ * **Menyembunyikan menu bukan otorisasi.** Backend memeriksa setiap permintaan, dan
+ * membuka alamat yang tersembunyi tetap dijawab sebagaimana mestinya (CLAUDE.md §15).
  */
 
 export type NavItem = {
@@ -24,261 +31,248 @@ export type NavItem = {
   /** Nama ikon pada `components/shell/icons.tsx`. */
   icon: string;
   /**
-   * Menu tampil bila pengguna memegang **salah satu** permission ini.
+   * Submenu tampil bila pengguna memegang **salah satu** permission ini.
    *
-   * Berisi permission yang membuat layarnya bermakna — bukan seluruh permission yang
-   * mungkin dipakai di dalamnya. `Data Entry` misalnya menuntut salah satu izin **tulis**:
-   * tanpa satu pun di antaranya, seluruh formulirnya tersembunyi dan yang tersisa hanya
-   * penjelasan mengapa layar itu kosong.
+   * Berisi permission yang membuat layarnya bermakna — bukan seluruh yang mungkin dipakai
+   * di dalamnya. `Input Data` menuntut salah satu izin **tulis**: tanpa satu pun, seluruh
+   * formulirnya tersembunyi dan yang tersisa hanya penjelasan mengapa layar itu kosong.
    */
   permissions: readonly string[];
-  /**
-   * Permission yang membuat pengguna dapat **melakukan sesuatu** di layar ini, bukan
-   * sekadar membacanya.
-   *
-   * Inilah yang memisahkan menu utama dari menu "Lainnya". Seorang Pimpinan memegang 22
-   * permission dan **20 di antaranya hanya membaca**; tanpa pemisahan ini, dua menu yang
-   * benar-benar menuntut tindakannya tenggelam di antara dua belas menu bacaan yang
-   * tampil serupa.
-   *
-   * Kosong berarti layar itu memang hanya untuk dibaca oleh siapa pun.
-   */
-  actions: readonly string[];
-  group: NavGroup;
-  /**
-   * Menu yang selalu utama selama terlihat, walau tidak ada yang dapat dilakukan di sana.
-   *
-   * Dua jenis layar masuk ke sini:
-   *
-   * 1. **Konteks untuk memutuskan** — Beranda, Brief, Peta, Peringatan, Audit.
-   *    Menaruhnya di "Lainnya" berarti menyembunyikan konteks yang justru dibutuhkan untuk
-   *    mengambil keputusan, dan keputusan tanpa konteks adalah yang paling ingin dihindari
-   *    sistem ini.
-   *
-   * 2. **Pekerjaan yang ditujukan kepada pembacanya** — Keputusan. Aturan "utama = yang
-   *    dapat dikerjakan" sempat menaruhnya di "Lainnya" bagi Fungsi dan Polsek, karena
-   *    keduanya hanya dapat membacanya. Itu benar menurut aturan tetapi salah menurut
-   *    kenyataan: rekomendasi **dialamatkan kepada fungsi tertentu**, dan bagi yang
-   *    dialamati ia bacaan harian — bukan layar yang ditengok saat penasaran. Keputusan
-   *    pemilik proyek, 2 September 2026.
-   */
-  core?: true;
+  /** Keterangan satu baris, ditampilkan sebagai `title` pada tautannya. */
+  hint?: string;
 };
 
-export type NavGroup = "pantau" | "putuskan" | "telaah" | "data" | "sistem";
+export type NavGroup = {
+  id: string;
+  label: string;
+  icon: string;
+  items: readonly NavItem[];
+};
 
-export const NAV_GROUPS: ReadonlyArray<{ id: NavGroup; label: string }> = [
-  { id: "putuskan", label: "Putuskan" },
-  { id: "pantau", label: "Pantau" },
-  { id: "telaah", label: "Telaah" },
-  { id: "data", label: "Data" },
-  { id: "sistem", label: "Sistem" },
-] as const;
-
-export const NAV_ITEMS: readonly NavItem[] = [
-  // --- Putuskan: yang menuntut tindakan seseorang, bukan sekadar dibaca. ---------------
-  //
-  // Kelompok ini diletakkan **paling atas** dengan sengaja. Bagi Pimpinan, `Keputusan`
-  // adalah satu-satunya menu yang memuat sesuatu yang hanya dapat diselesaikan olehnya
-  // (`commander_decision:approve`); sebelumnya ia berada di urutan kesembilan, tanpa satu
-  // pun penanda bahwa ada yang menunggu di dalamnya.
+export const NAV_GROUPS: readonly NavGroup[] = [
   {
-    href: "/rekomendasi",
-    label: "Keputusan",
-    icon: "recommendation",
-    permissions: ["recommendation:read"],
-    actions: ["commander_decision:approve", "recommendation:write"],
-    // Utama bagi setiap peran yang dapat membacanya, bukan hanya bagi yang dapat
-    // memutuskannya: rekomendasi dialamatkan kepada fungsi tertentu, dan yang dialamati
-    // perlu melihatnya setiap hari meski keputusannya bukan di tangannya.
-    core: true,
-    group: "putuskan",
+    id: "pemantauan",
+    label: "Pemantauan",
+    icon: "dashboard",
+    items: [
+      {
+        href: "/",
+        label: "Beranda",
+        icon: "dashboard",
+        permissions: ["dashboard:read"],
+        hint: "Ringkasan keadaan hari ini",
+      },
+      {
+        href: "/informasi",
+        label: "Informasi Terbaru",
+        icon: "feed",
+        // Menggabungkan tiga jenis catatan, jadi cukup salah satunya untuk bermakna.
+        permissions: ["crime:read", "citizen_report:read", "intelligence:read"],
+        hint: "Laporan dan kejadian terbaru dari seluruh kanal",
+      },
+      {
+        href: "/peta",
+        label: "Peta",
+        icon: "map",
+        permissions: ["map:read"],
+        hint: "Historis, risiko berjalan, dan prediktif",
+      },
+      {
+        href: "/peringatan",
+        label: "Peringatan Dini",
+        icon: "warning",
+        permissions: ["warning:read"],
+        hint: "Peringatan yang menunggu tindakan",
+      },
+    ],
   },
   {
-    href: "/peringatan",
-    label: "Peringatan",
-    icon: "warning",
-    permissions: ["warning:read"],
-    actions: ["warning:acknowledge", "warning:resolve"],
-    core: true,
-    group: "putuskan",
+    id: "laporan",
+    label: "Laporan",
+    icon: "community",
+    items: [
+      {
+        href: "/masyarakat",
+        label: "Laporan Masyarakat",
+        icon: "community",
+        permissions: ["citizen_report:read"],
+        hint: "Laporan yang masuk lewat kanal publik",
+      },
+      {
+        href: "/laporan-petugas",
+        label: "Laporan Petugas",
+        icon: "entry",
+        permissions: ["crime:read"],
+        hint: "Kejadian yang dicatat petugas",
+      },
+      {
+        href: "/panic",
+        label: "Panic Button",
+        icon: "panic",
+        permissions: ["citizen_report:read"],
+        hint: "Permintaan bantuan darurat",
+      },
+      {
+        href: "/input",
+        label: "Input Data",
+        icon: "write",
+        permissions: ["crime:write", "intelligence:write", "citizen_report:write"],
+        hint: "Mencatat kejadian, laporan intelijen, dan triase",
+      },
+    ],
   },
   {
-    href: "/operasi",
+    id: "analisis",
+    label: "Analisis",
+    icon: "analytics",
+    items: [
+      {
+        href: "/analitik",
+        label: "Analitik",
+        icon: "analytics",
+        permissions: ["analytics:read"],
+        hint: "Tren bulanan, pola waktu, perbandingan wilayah",
+      },
+      {
+        href: "/wilayah",
+        label: "Wilayah Rawan",
+        icon: "area",
+        permissions: ["risk_score:read"],
+        hint: "Peringkat wilayah beserta rincian datanya",
+      },
+      {
+        href: "/pola",
+        label: "Pola Gangguan",
+        icon: "pattern",
+        permissions: ["analytics:read"],
+        hint: "Crime Pattern DNA per jenis gangguan",
+      },
+      {
+        href: "/prediksi",
+        label: "Prediksi",
+        icon: "prediction",
+        permissions: ["prediction:read"],
+        hint: "Prediksi per horizon beserta faktor dominannya",
+      },
+      {
+        href: "/skoring",
+        label: "Penilaian Risiko",
+        icon: "scoring",
+        permissions: ["risk_score:read"],
+        hint: "Skor risiko beserta bobot yang menghasilkannya",
+      },
+      {
+        href: "/evaluasi",
+        label: "Evaluasi",
+        icon: "evaluation",
+        permissions: ["evaluation:read"],
+        hint: "Prediksi dibandingkan kejadian sebenarnya",
+      },
+    ],
+  },
+  {
+    id: "operasi",
     label: "Operasi",
     icon: "operation",
-    permissions: ["operation:read"],
-    actions: ["operation:write", "patrol:write"],
-    group: "putuskan",
-  },
-
-  // --- Pantau: keadaan sekarang. --------------------------------------------------------
-  {
-    href: "/",
-    label: "Beranda",
-    icon: "dashboard",
-    permissions: ["dashboard:read"],
-    actions: [],
-    core: true,
-    group: "pantau",
-  },
-  {
-    href: "/brief",
-    label: "Brief",
-    icon: "brief",
-    permissions: ["dashboard:read"],
-    actions: [],
-    core: true,
-    group: "pantau",
-  },
-  {
-    href: "/peta",
-    label: "Peta",
-    icon: "map",
-    permissions: ["map:read"],
-    actions: [],
-    core: true,
-    group: "pantau",
-  },
-
-  // --- Telaah: ditelusuri saat ada pertanyaan, bukan dibaca tiap hari. ------------------
-  {
-    href: "/prediksi",
-    label: "Prediksi",
-    icon: "prediction",
-    permissions: ["prediction:read"],
-    actions: ["prediction:run", "prediction:publish"],
-    group: "telaah",
+    items: [
+      {
+        href: "/operasi",
+        label: "Operasi & Penugasan",
+        icon: "operation",
+        permissions: ["operation:read"],
+        hint: "Tindakan yang dijalankan dan hasilnya",
+      },
+      {
+        href: "/rekomendasi",
+        label: "Rekomendasi & Keputusan",
+        icon: "recommendation",
+        permissions: ["recommendation:read"],
+        hint: "Usulan tindakan dan keputusan komandan",
+      },
+      {
+        href: "/intelijen",
+        label: "Dokumen Intelijen",
+        icon: "intelligence",
+        permissions: ["intelligence:read"],
+        hint: "Laporan intelijen beserta keandalannya",
+      },
+      {
+        href: "/brief",
+        label: "Brief Pimpinan",
+        icon: "brief",
+        permissions: ["dashboard:read"],
+        hint: "Ringkasan siap cetak sebelum apel",
+      },
+    ],
   },
   {
-    href: "/skoring",
-    label: "Skoring",
-    icon: "scoring",
-    permissions: ["risk_score:read"],
-    actions: ["risk_score:run"],
-    group: "telaah",
-  },
-  {
-    href: "/pola",
-    label: "Pola",
-    icon: "pattern",
-    permissions: ["analytics:read"],
-    actions: [],
-    group: "telaah",
-  },
-  {
-    href: "/analitik",
-    label: "Analitik",
-    icon: "analytics",
-    permissions: ["analytics:read"],
-    actions: ["analytics:export"],
-    group: "telaah",
-  },
-  {
-    href: "/evaluasi",
-    label: "Evaluasi",
-    icon: "evaluation",
-    permissions: ["evaluation:read"],
-    actions: ["evaluation:run"],
-    group: "telaah",
-  },
-
-  // --- Data: pekerjaan harian petugas. --------------------------------------------------
-  {
-    href: "/input",
-    label: "Input Data",
-    icon: "entry",
-    // Menuntut izin **tulis**: tanpa satu pun, seluruh formulirnya tersembunyi.
-    permissions: ["crime:write", "intelligence:write", "citizen_report:write"],
-    actions: ["crime:write", "intelligence:write", "citizen_report:write"],
-    group: "data",
-  },
-  {
-    href: "/masyarakat",
-    label: "Masyarakat",
-    icon: "community",
-    permissions: ["citizen_report:read"],
-    actions: ["citizen_report:write"],
-    group: "data",
-  },
-  {
-    href: "/intelijen",
-    label: "Intelijen",
-    icon: "intelligence",
-    permissions: ["intelligence:read"],
-    actions: ["intelligence:write"],
-    group: "data",
-  },
-
-  // --- Sistem: pemeriksaan atas sistem, bukan pekerjaan operasional. --------------------
-  {
-    href: "/audit",
-    label: "Audit",
-    icon: "audit",
-    permissions: ["audit:read"],
-    actions: [],
-    core: true,
-    group: "sistem",
-  },
-  {
-    href: "/admin",
-    label: "Admin",
+    id: "sistem",
+    label: "Sistem",
     icon: "admin",
-    permissions: ["user:read", "user:manage", "role:manage", "config:manage"],
-    actions: ["user:manage", "role:manage", "config:manage"],
-    group: "sistem",
+    items: [
+      {
+        href: "/admin",
+        label: "Manajemen Pengguna",
+        icon: "admin",
+        permissions: ["user:read", "user:manage", "role:manage"],
+        hint: "Akun, peran, dan kewenangannya",
+      },
+      {
+        href: "/audit",
+        label: "Audit Log",
+        icon: "audit",
+        permissions: ["audit:read"],
+        hint: "Jejak siapa melakukan apa",
+      },
+      {
+        href: "/pengaturan",
+        label: "Pengaturan Sistem",
+        icon: "settings",
+        permissions: ["config:read", "config:manage"],
+        hint: "Bobot, ambang, dan taksonomi yang sedang berlaku",
+      },
+    ],
   },
 ] as const;
 
-/**
- * Menu yang pantas ditampilkan kepada pemegang `held`.
- *
- * Daftar kosong menghasilkan menu kosong, **bukan** seluruh menu. Kegagalan memuat profil
- * tidak boleh berubah menjadi sidebar yang menjanjikan lebih banyak daripada yang dapat
- * dibuka — dan karena penyaringan ini bukan otorisasi, tidak ada yang bocor dengan
- * bersikap ketat di sini.
- */
-export function visibleNavItems(held: readonly string[]): NavItem[] {
-  const owned = new Set(held);
-  return NAV_ITEMS.filter((item) => item.permissions.some((name) => owned.has(name)));
-}
+/** Seluruh submenu, tanpa kelompoknya — dipakai pengujian dan pencarian rute. */
+export const NAV_ITEMS: readonly NavItem[] = NAV_GROUPS.flatMap((group) => group.items);
 
 /**
- * Menu utama bagi pemegang `held`: yang **dapat ia kerjakan**, ditambah layar inti.
+ * Kelompok beserta submenu yang pantas ditampilkan kepada pemegang `held`.
  *
- * Aturannya satu kalimat: sebuah menu utama bila pengguna memegang salah satu
- * `actions`-nya, atau bila menu itu `core`. Sisanya tetap dapat dibuka, hanya tidak
- * berada di jalur harian.
+ * Kelompok yang tidak menyisakan satu pun submenu dibuang seluruhnya — judul kelompok
+ * yang membuka daftar kosong hanya menjanjikan sesuatu yang tidak ada.
  *
- * Aturan ini **diturunkan dari kewenangan**, bukan dari daftar per peran yang ditulis
- * tangan. Daftar tulis tangan akan menua diam-diam setiap kali permission berubah, dan
- * menuanya tidak terlihat sebagai kesalahan apa pun — hanya sebagai menu yang terasa
- * "agak aneh" bagi peran tertentu.
+ * Kewenangan kosong menghasilkan menu kosong, **bukan** seluruh menu: kegagalan memuat
+ * profil tidak boleh berubah menjadi sidebar yang menjanjikan lebih banyak daripada yang
+ * dapat dibuka. Tidak ada yang bocor dengan bersikap ketat, sebab ini bukan otorisasi.
  */
-export function isPrimaryFor(item: NavItem, held: readonly string[]): boolean {
-  if (item.core === true) return true;
+export function visibleNavGroups(held: readonly string[]): NavGroup[] {
   const owned = new Set(held);
-  return item.actions.some((name) => owned.has(name));
-}
-
-/** Menu utama yang terlihat, dikelompokkan dan urut sesuai `NAV_GROUPS`. */
-export function groupedNavItems(
-  held: readonly string[],
-): Array<{ group: NavGroup; label: string; items: NavItem[] }> {
-  const primary = visibleNavItems(held).filter((item) => isPrimaryFor(item, held));
   return NAV_GROUPS.map((group) => ({
-    group: group.id,
-    label: group.label,
-    items: primary.filter((item) => item.group === group.id),
-  })).filter((section) => section.items.length > 0);
+    ...group,
+    items: group.items.filter((item) => item.permissions.some((name) => owned.has(name))),
+  })).filter((group) => group.items.length > 0);
+}
+
+/** Submenu yang terlihat, tanpa kelompoknya. */
+export function visibleNavItems(held: readonly string[]): NavItem[] {
+  return visibleNavGroups(held).flatMap((group) => group.items);
 }
 
 /**
- * Menu terlihat yang **bukan** menu utama — isi kelompok "Lainnya".
+ * Kelompok yang memuat rute tertentu — dipakai membuka kelompok yang sedang aktif.
  *
- * Tetap terlihat dan tetap dapat dibuka: yang berubah hanya bahwa ia tidak ikut dibaca
- * setiap kali sidebar dipandang. Tidak ada satu pun layar yang hilang.
+ * Beranda (`/`) dicocokkan persis; sisanya dengan awalan, supaya rute turunan seperti
+ * `/wilayah/Tebet` tetap dikenali sebagai bagian dari submenunya.
  */
-export function secondaryNavItems(held: readonly string[]): NavItem[] {
-  return visibleNavItems(held).filter((item) => !isPrimaryFor(item, held));
+export function groupOf(pathname: string): string | null {
+  for (const group of NAV_GROUPS) {
+    for (const item of group.items) {
+      const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+      if (active) return group.id;
+    }
+  }
+  return null;
 }

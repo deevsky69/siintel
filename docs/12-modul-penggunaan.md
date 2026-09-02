@@ -168,73 +168,70 @@ Yang perlu diketahui:
 
 ### Susunan menu
 
-Menu dikelompokkan menurut **apa yang Anda lakukan**, bukan menurut jenis datanya:
+Menu tersusun dalam **lima kelompok**, masing-masing membuka submenu. Hanya kelompok tempat
+halaman yang sedang Anda buka yang terbuka sendiri; kelompok lain cukup satu klik.
 
-| Kelompok | Isinya | Untuk |
+| Kelompok | Submenu | Menjawab |
 |---|---|---|
-| **Putuskan** | Keputusan · Peringatan · Operasi | Hal yang menunggu tindakan seseorang |
-| **Pantau** | Beranda · Brief · Peta | Keadaan sekarang |
-| **Telaah** | Prediksi · Skoring · Pola · Analitik · Evaluasi | Ditelusuri saat ada pertanyaan |
-| **Data** | Input Data · Masyarakat · Intelijen | Pekerjaan harian petugas |
-| **Sistem** | Audit · Admin | Pemeriksaan atas sistem |
+| **Pemantauan** | Beranda · Informasi Terbaru · Peta · Peringatan Dini | Apa yang sedang terjadi |
+| **Laporan** | Laporan Masyarakat · Laporan Petugas · Panic Button · Input Data | Apa yang masuk |
+| **Analisis** | Analitik · Wilayah Rawan · Pola Gangguan · Prediksi · Penilaian Risiko · Evaluasi | Apa artinya |
+| **Operasi** | Operasi & Penugasan · Rekomendasi & Keputusan · Dokumen Intelijen · Brief Pimpinan | Apa yang dikerjakan |
+| **Sistem** | Manajemen Pengguna · Audit Log · Pengaturan Sistem | Siapa melakukan apa |
 
-**Putuskan diletakkan paling atas.** Bagi Pimpinan, menu **Keputusan** adalah satu-satunya
-yang memuat sesuatu yang **hanya dapat diselesaikan olehnya**; sebelumnya ia berada di
-urutan kesembilan tanpa satu pun penanda bahwa ada yang menunggu di dalamnya. Kini ia
-membawa **lencana berisi jumlah rekomendasi yang menunggu keputusan Anda** — dan lencana
-itu hanya muncul bagi yang berwenang memutuskan, karena angka yang tidak dapat Anda
-selesaikan hanya menjadi kecemasan tanpa jalan keluar.
+Susunan ini ditetapkan pemilik proyek pada 2 September 2026, menggantikan deret enam belas
+ikon setara yang sebelumnya memaksa mata membaca seluruhnya untuk menemukan satu.
 
-### Menu utama dan "Lainnya"
+**Menu yang tidak dapat Anda pakai sama sekali tidak ditampilkan**, dan kelompok yang tidak
+menyisakan satu pun submenu ikut hilang. Seorang Pimpinan misalnya tidak memegang satu pun
+izin tulis, sehingga **Input Data** dan **Manajemen Pengguna** tidak muncul — sebelumnya
+keduanya tampil dan hanya menyambut dengan kalimat "Akun Anda tidak memiliki kewenangan".
 
-Sidebar hanya menampilkan menu **utama**; sisanya berada di balik tombol **Lainnya** yang
-dapat dibuka. Tidak ada satu pun layar yang hilang — yang berubah hanya bahwa ia tidak ikut
-dibaca setiap kali sidebar dipandang.
-
-Aturan pemisahannya satu kalimat: **menu utama adalah yang dapat Anda kerjakan, ditambah
-enam layar inti** (Keputusan, Beranda, Brief, Peta, Peringatan, Audit).
-
-Layar inti tetap utama walau tidak ada yang dapat Anda kerjakan di sana, karena dua alasan
-yang berbeda:
-
-- **Beranda, Brief, Peta, Peringatan, Audit** adalah konteks untuk mengambil keputusan.
-  Menyembunyikannya berarti menuntut keputusan tanpa konteks — hal yang paling ingin
-  dihindari sistem ini.
-- **Keputusan** adalah pekerjaan yang **dialamatkan kepada pembacanya**. Rekomendasi selalu
-  menyebut fungsi yang menanganinya, dan bagi fungsi yang dialamati ia bacaan harian —
-  bukan layar yang ditengok saat penasaran. Karena itu ia menu utama bagi setiap peran yang
-  dapat membacanya, bukan hanya bagi Pimpinan yang memutuskannya.
-
-Aturan ini **diturunkan dari kewenangan**, bukan dari daftar per peran yang ditulis tangan.
-Daftar tulis tangan akan menua diam-diam setiap kali permission berubah, dan menuanya tidak
-terlihat sebagai kesalahan apa pun — hanya sebagai menu yang terasa "agak aneh".
-
-Hasilnya berbeda menurut peran:
-
-| Peran | Menu utama | Di dalam "Lainnya" |
-|---|---|---|
-| **Pimpinan** | Keputusan · Peringatan · Beranda · Brief · Peta · Evaluasi · Audit | Operasi · Prediksi · Skoring · Pola · Analitik · Masyarakat · Intelijen |
-| **Polsek** | Keputusan · Peringatan · Operasi · Beranda · Brief · Peta · Input Data · Masyarakat | Prediksi · Skoring · Pola · Analitik · Evaluasi · Intelijen |
-| **Fungsi** | Keputusan · Peringatan · Operasi · Beranda · Brief · Peta · Input Data | Prediksi · Skoring · Pola · Analitik · Evaluasi |
-| **Administrator** | 14 menu | Pola · Evaluasi |
-
-> **Mengapa Pimpinan hanya tujuh.** Dari 22 kewenangan yang dipegang seorang Pimpinan,
-> **20 di antaranya hanya membaca**. Persis dua membiarkannya mengubah sesuatu:
-> menyetujui rekomendasi (`commander_decision:approve`) dan menjalankan evaluasi
-> (`evaluation:run`) — dan keduanya tidak dipegang peran lain mana pun. Sebelumnya kedua
-> menu itu tenggelam di antara dua belas menu bacaan yang tampil serupa.
-
-"Lainnya" **terbuka sendiri** bila Anda sedang berada di salah satu isinya, supaya menu yang
-sedang aktif tidak pernah hilang dari sidebar.
-
-**Menu yang tidak dapat Anda pakai sama sekali tidak ditampilkan.** Seorang Pimpinan
-misalnya tidak memegang satu pun izin tulis, sehingga menu **Input Data** dan **Admin**
-tidak muncul — sebelumnya keduanya tampil dan hanya menyambut dengan kalimat "Akun Anda
-tidak memiliki kewenangan".
+**Rekomendasi & Keputusan** membawa lencana berisi jumlah yang menunggu keputusan Anda.
+Lencana itu pindah ke judul kelompok **Operasi** saat submenunya tertutup, sehingga tetap
+terlihat tanpa membuka apa pun — dan hanya muncul bagi yang berwenang memutuskan, karena
+angka yang tidak dapat Anda selesaikan hanya menjadi kecemasan tanpa jalan keluar.
 
 > **Menyembunyikan menu bukan pengamanan.** Server tetap memeriksa setiap permintaan.
 > Menyalin alamat halaman yang tersembunyi dan membukanya langsung tetap ditolak, dan
 > percobaannya tercatat di jejak audit.
+
+### Empat layar yang baru
+
+| Submenu | Isinya |
+|---|---|
+| **Informasi Terbaru** | Tiga kanal berdampingan — kejadian, laporan masyarakat, laporan intelijen. Sengaja **tidak dilebur** jadi satu aliran: keandalan ketiganya berbeda, dan aliran tunggal membuat perbedaan itu hilang |
+| **Laporan Petugas** | Kejadian yang dicatat petugas. Berbeda dari Laporan Masyarakat, setiap barisnya **sudah terverifikasi** |
+| **Wilayah Rawan** | Peringkat kecamatan; **tiap baris dapat diklik** untuk melihat ancaman, jam rawan, riwayat, peringatan aktif, dan kejadian terbarunya |
+| **Pengaturan Sistem** | Bobot, ambang, dan kelas risiko yang sedang berlaku — **hanya membaca** |
+
+**Pengaturan Sistem sengaja tidak dapat menyunting.** Setiap baris skor risiko menyimpan
+versi bobot yang menghasilkannya, dan versi yang masih dirujuk baris mana pun tidak boleh
+berubah isinya: menurunkannya akan membuat skor lama tampak terbit di bawah aturan yang
+tidak pernah berlaku saat itu. Cara yang benar mengubah bobot adalah **menambah versi
+baru**, lewat berkas konfigurasi lalu pembangunan ulang.
+
+Pada layar **Wilayah Rawan**, dua kolom terakhir bukan pengukuran yang sama dengan kolom
+skor: jumlah laporan tidak ditimbang sama sekali. Wilayah dengan banyak laporan tetapi skor
+rendah biasanya bukan wilayah yang memburuk, melainkan wilayah yang **warganya rajin
+melapor** — dan sebaliknya, wilayah sepi laporan bisa saja justru wilayah yang warganya
+enggan melapor.
+
+### Panic Button — baca ini sebelum mengandalkannya
+
+> **Kanal darurat sekali-tekan belum tersambung.** Ia menuntut dua hal: aplikasi di tangan
+> warga yang dapat mengirim lokasi seketika, dan — yang lebih menentukan — **komitmen
+> respons**: siapa yang menerima, dalam berapa lama, dan apa yang terjadi bila tidak ada
+> yang menjawab.
+>
+> Yang kedua bukan pekerjaan teknis. Tombol darurat yang menjanjikan bantuan tanpa ada yang
+> berkewajiban datang **lebih berbahaya daripada tidak ada tombol sama sekali** — ia membuat
+> orang berhenti mencari pertolongan lain.
+>
+> Layar **Panic Button** karena itu tidak berpura-pura menjadi kanal itu. Ia menampilkan hal
+> terdekat yang benar-benar ada: laporan masyarakat berurgensi tinggi yang belum tertangani,
+> dan menyatakan perbedaannya di bagian paling atas layar. Untuk keadaan darurat, jalur yang
+> berlaku tetap **110**.
 
 ---
 

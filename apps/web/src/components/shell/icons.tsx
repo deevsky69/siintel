@@ -126,6 +126,39 @@ const ICONS: Record<string, (props: IconProps) => React.ReactElement> = {
       <path d="m15.5 4 0 3.5 3.5 0" />
     </Svg>
   ),
+  feed: (p) => (
+    <Svg {...p}>
+      <path d="M4 6h10M4 10h10M4 14h7" />
+      <path d="M17 5v14M17 5l3 3M17 5l-3 3" />
+    </Svg>
+  ),
+  panic: (p) => (
+    <Svg {...p}>
+      <circle cx="12" cy="12" r="4.5" />
+      <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22" />
+      <path d="m5 5 1.8 1.8M17.2 17.2 19 19M19 5l-1.8 1.8M6.8 17.2 5 19" />
+    </Svg>
+  ),
+  area: (p) => (
+    <Svg {...p}>
+      <path d="M4 7.5 9.5 5l5 2.5L20 5v11.5L14.5 19l-5-2.5L4 19Z" />
+      <path d="M9.5 5v11.5M14.5 7.5V19" />
+    </Svg>
+  ),
+  write: (p) => (
+    <Svg {...p}>
+      <path d="M4 20h16" />
+      <path d="M14.5 4.5a2.1 2.1 0 0 1 3 3L9 16l-4 1 1-4Z" />
+    </Svg>
+  ),
+  settings: (p) => (
+    <Svg {...p}>
+      <path d="M4 7h10M18 7h2M4 12h2M10 12h10M4 17h12M18 17h2" />
+      <circle cx="16" cy="7" r="2" />
+      <circle cx="8" cy="12" r="2" />
+      <circle cx="16" cy="17" r="2" />
+    </Svg>
+  ),
   admin: (p) => (
     <Svg {...p}>
       <circle cx="12" cy="12" r="3" />

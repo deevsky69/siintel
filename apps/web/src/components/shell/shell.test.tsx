@@ -8,23 +8,44 @@ import { RISK_LABELS, riskClassOf } from "@/lib/risk";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
-/**
- * Seluruh permission yang disebut menu mana pun, **baca maupun tindakan**.
- *
- * `actions` wajib ikut: tanpanya seluruh menu menjadi "hanya dapat dibaca" dan pindah ke
- * kelompok Lainnya yang tertutup — keadaan yang tidak dimaksudkan test ini.
- */
-const ALL_PERMISSIONS = [
-  ...new Set(NAV_ITEMS.flatMap((item) => [...item.permissions, ...item.actions])),
-];
+/** Seluruh permission yang disebut submenu mana pun. */
+const ALL_PERMISSIONS = [...new Set(NAV_ITEMS.flatMap((item) => item.permissions))];
 
 describe("shell aplikasi", () => {
-  it("membuat setiap menu tetap dapat dicapai — sebagian di balik Lainnya", () => {
-    // "Lainnya" memindahkan menu keluar dari jalur harian, bukan menghapusnya. Yang
-    // diperiksa di sini justru itu: tidak ada satu pun layar yang menjadi tidak
-    // terjangkau dari sidebar.
+  it("menampilkan kelima kelompok menu", () => {
     render(<Sidebar permissions={ALL_PERMISSIONS} />);
-    fireEvent.click(screen.getByRole("button", { name: /lainnya/i }));
+
+    for (const label of ["Pemantauan", "Laporan", "Analisis", "Operasi", "Sistem"]) {
+      expect(screen.getByRole("button", { name: new RegExp(label, "i") })).toBeDefined();
+    }
+  });
+
+  it("membuka hanya kelompok yang sedang aktif", () => {
+    // Membuka seluruhnya mengembalikan persoalan yang hendak diselesaikan susunan ini:
+    // dua puluh baris setara yang harus dibaca semuanya untuk menemukan satu.
+    render(<Sidebar permissions={ALL_PERMISSIONS} />);
+
+    // usePathname dipalsukan ke "/", yang berada di kelompok Pemantauan.
+    expect(screen.getByRole("link", { name: /beranda/i })).toBeDefined();
+    expect(screen.queryByRole("link", { name: /audit log/i })).toBeNull();
+  });
+
+  it("membuka kelompok lain ketika judulnya ditekan", () => {
+    render(<Sidebar permissions={ALL_PERMISSIONS} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /sistem/i }));
+
+    expect(screen.getByRole("link", { name: /audit log/i })).toBeDefined();
+    // Kelompok yang aktif tetap terbuka: menutupnya menghilangkan penanda posisi.
+    expect(screen.getByRole("link", { name: /beranda/i })).toBeDefined();
+  });
+
+  it("membuat setiap submenu dapat dicapai setelah kelompoknya dibuka", () => {
+    render(<Sidebar permissions={ALL_PERMISSIONS} />);
+
+    for (const group of ["Laporan", "Analisis", "Operasi", "Sistem"]) {
+      fireEvent.click(screen.getByRole("button", { name: new RegExp(group, "i") }));
+    }
 
     for (const item of NAV_ITEMS) {
       expect(
@@ -34,31 +55,22 @@ describe("shell aplikasi", () => {
     }
   });
 
-  it("menutup Lainnya secara bawaan supaya sidebar tetap pendek", () => {
+  it("menandai submenu yang sedang aktif untuk pembaca layar", () => {
     render(<Sidebar permissions={ALL_PERMISSIONS} />);
 
-    expect(screen.queryByRole("link", { name: /pola/i })).toBeNull();
-    expect(screen.getByRole("button", { name: /lainnya/i }).getAttribute("aria-expanded")).toBe(
-      "false",
+    expect(screen.getByRole("link", { name: /beranda/i }).getAttribute("aria-current")).toBe(
+      "page",
     );
   });
 
-  it("menandai menu yang sedang aktif untuk pembaca layar", () => {
-    render(<Sidebar permissions={ALL_PERMISSIONS} />);
-
-    const active = screen.getByRole("link", { name: /beranda/i });
-    expect(active.getAttribute("aria-current")).toBe("page");
-  });
-
-  it("menyembunyikan menu yang tidak dapat dipakai peran itu sama sekali", () => {
-    // Kewenangan Pimpinan yang sebenarnya, disalin dari config/rbac/permissions.yaml.
-    // Ia tidak memegang satu pun izin tulis maupun pengelolaan pengguna.
+  it("menyembunyikan submenu yang tidak dapat dipakai peran itu sama sekali", () => {
     const pimpinan = [
       "analytics:read",
       "audit:read",
       "citizen_report:read",
       "commander_decision:approve",
-      "commander_decision:read",
+      "config:read",
+      "crime:read",
       "dashboard:read",
       "evaluation:read",
       "intelligence:read",
@@ -71,11 +83,12 @@ describe("shell aplikasi", () => {
     ];
 
     render(<Sidebar permissions={pimpinan} />);
+    fireEvent.click(screen.getByRole("button", { name: /laporan/i }));
+    fireEvent.click(screen.getByRole("button", { name: /sistem/i }));
 
     expect(screen.queryByRole("link", { name: /input data/i })).toBeNull();
-    expect(screen.queryByRole("link", { name: /admin/i })).toBeNull();
-    expect(screen.getByRole("link", { name: /keputusan/i })).toBeDefined();
-    expect(screen.getByRole("link", { name: /audit/i })).toBeDefined();
+    expect(screen.queryByRole("link", { name: /manajemen pengguna/i })).toBeNull();
+    expect(screen.getByRole("link", { name: /audit log/i })).toBeDefined();
   });
 
   it("tidak menampilkan menu apa pun ketika kewenangan tidak diketahui", () => {
@@ -84,28 +97,29 @@ describe("shell aplikasi", () => {
     render(<Sidebar permissions={[]} />);
 
     expect(screen.queryAllByRole("link")).toHaveLength(0);
+    expect(screen.queryAllByRole("button")).toHaveLength(0);
   });
 
-  it("menampilkan lencana jumlah keputusan yang menunggu", () => {
+  it("menampilkan lencana keputusan yang menunggu pada submenunya", () => {
+    render(<Sidebar permissions={ALL_PERMISSIONS} pendingDecisions={19} />);
+    fireEvent.click(screen.getByRole("button", { name: /operasi/i }));
+
+    expect(screen.getByText("19 rekomendasi menunggu keputusan Anda")).toBeDefined();
+  });
+
+  it("memindahkan lencana ke judul kelompok saat submenunya tertutup", () => {
+    // Keputusan yang menunggu harus tetap terlihat tanpa membuka apa pun.
     render(<Sidebar permissions={ALL_PERMISSIONS} pendingDecisions={19} />);
 
-    expect(screen.getByText("19")).toBeDefined();
-    expect(screen.getByText("19 rekomendasi menunggu keputusan Anda")).toBeDefined();
+    const operasi = screen.getByRole("button", { name: /operasi/i });
+    expect(operasi.getAttribute("aria-expanded")).toBe("false");
+    expect(operasi.textContent).toContain("19");
   });
 
   it("tidak menggambar lencana ketika tidak ada yang menunggu", () => {
     render(<Sidebar permissions={ALL_PERMISSIONS} pendingDecisions={0} />);
 
     expect(screen.queryByText(/menunggu keputusan Anda/)).toBeNull();
-  });
-
-  it("meletakkan kelompok Putuskan lebih dulu daripada kelompok lain", () => {
-    // Bagi Pimpinan, Keputusan adalah satu-satunya menu berisi sesuatu yang hanya dapat
-    // diselesaikan olehnya. Sebelumnya ia berada di urutan kesembilan.
-    render(<Sidebar permissions={ALL_PERMISSIONS} />);
-
-    const links = screen.getAllByRole("link");
-    expect(links[0].getAttribute("href")).toBe("/rekomendasi");
   });
 
   it("menampilkan identitas sistem dan satuan wilayah", () => {
