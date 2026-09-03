@@ -19,6 +19,7 @@ import {
 } from "@/lib/dashboard";
 import { getLeadership } from "@/lib/leadership";
 import { getAreaDetail, getMapData, resolveSelectedDistrict } from "@/lib/map-data";
+import { getCitizenReports, getCrimes } from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +76,21 @@ export default async function DashboardPage({
   // pembaca mengira ia sedang melihat wilayah yang paling penting, padahal ia hanya
   // melihat wilayah yang kebetulan terpilih lebih dulu.
   const selected = requested === null ? null : resolveSelectedDistrict(map, requested);
-  const detail = selected === null ? null : await getAreaDetail(selected);
+
+  // Ketiganya diambil bersamaan; kegagalan salah satu tidak menjatuhkan dua lainnya.
+  // `null` berarti kanal itu di luar kewenangan pembaca — dinyatakan apa adanya di panel,
+  // bukan ditampilkan sebagai daftar kosong yang artinya berbeda jauh.
+  const [detail, crimes, reports] = selected
+    ? await Promise.all([
+        getAreaDetail(selected),
+        getCrimes({ kecamatan: selected, page_size: 4 })
+          .then((page) => page.data)
+          .catch(() => null),
+        getCitizenReports({ page_size: 60 })
+          .then((page) => page.data.filter((row) => row.kecamatan === selected).slice(0, 4))
+          .catch(() => null),
+      ])
+    : [null, null, null];
 
   const topWarning = warnings.data[0] ?? null;
   const recommendations = topWarning ? await getRecommendations(topWarning.code) : null;
@@ -99,7 +114,7 @@ export default async function DashboardPage({
 
       <Highlights board={board} />
 
-      <MapHero data={map} selected={selected} detail={detail} />
+      <MapHero data={map} selected={selected} detail={detail} crimes={crimes} reports={reports} />
 
       <Notables board={board} />
 

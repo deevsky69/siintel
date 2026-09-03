@@ -180,18 +180,14 @@ describe("community signal dashboard", () => {
     expect(screen.getByText("Tidak ada laporan yang cocok dengan penyaringan ini.")).toBeDefined();
   });
 
-  it("menyatakan ketiadaan kewenangan umpan balik, bukan menampilkan nol", () => {
-    render(
-      <CommunityView
-        summary={{ ...summary, feedback: null }}
-        reports={reports}
-        filters={noFilter}
-      />,
-    );
+  it("tidak lagi menampilkan blok umpan balik masyarakat", () => {
+    // Dihapus atas permintaan pemilik proyek, 3 September 2026. Test ini bukan sisa yang
+    // terlupakan: ia menjaga agar bloknya tidak kembali diam-diam saat layar ini disunting
+    // berikutnya, dan menyatakan bahwa hilangnya memang disengaja.
+    render(<CommunityView summary={summary} reports={reports} filters={noFilter} />);
 
-    expect(screen.getByText("tidak berwenang")).toBeDefined();
-    expect(screen.getByText(/tidak memiliki kewenangan membaca umpan balik/i)).toBeDefined();
     expect(screen.queryByText("Umpan Balik Masyarakat")).toBeNull();
+    expect(screen.queryByText("Umpan Balik")).toBeNull();
   });
 
   it("tidak pernah menampilkan identitas pelapor", () => {

@@ -1,13 +1,14 @@
 import Link from "next/link";
+import { changeReportStatus } from "@/app/(app)/masyarakat/actions";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
+import { StatusForm } from "@/components/reports/status-form";
 import { StatusNotice } from "@/components/warnings/status-notice";
 import {
   areaOf,
   type CitizenReportPage,
   type CitizenReportRow,
   type CommunitySummary,
-  FEEDBACK_TYPE_LABELS,
   formatMoment,
   labelOf,
   REPORT_STATUS_CLASSES,
@@ -70,7 +71,13 @@ function FilterChip({
   );
 }
 
-function ReportTable({ reports }: { reports: CitizenReportRow[] }) {
+function ReportTable({
+  reports,
+  statusLabels,
+}: {
+  reports: CitizenReportRow[];
+  statusLabels: Record<string, string>;
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-xs">
@@ -83,6 +90,7 @@ function ReportTable({ reports }: { reports: CitizenReportRow[] }) {
             <th className="stat-label pb-2 text-right">Urgensi</th>
             <th className="stat-label pb-2 text-right">Verifikasi</th>
             <th className="stat-label pb-2">Tahapan</th>
+            <th className="stat-label pb-2">Ubah tahapan</th>
           </tr>
         </thead>
         <tbody>
@@ -112,10 +120,26 @@ function ReportTable({ reports }: { reports: CitizenReportRow[] }) {
               <td className="py-2 pr-3 text-right font-mono text-ink">
                 {report.verification_score ?? "—"}
               </td>
-              <td className="py-2">
+              <td className="py-2 pr-3">
                 <span className={`badge ${REPORT_STATUS_CLASSES[report.status] ?? ""}`}>
                   {labelOf(REPORT_STATUS_LABELS, report.status)}
                 </span>
+              </td>
+              <td className="py-2">
+                {/* Triase langsung di daftar. Formulir pada Input Data tetap ada — ia
+                    berguna ketika beberapa laporan ditriase berurutan — tetapi pertanyaan
+                    "bagaimana cara mengubah tahapan?" muncul justru saat seseorang sedang
+                    menatap daftarnya. */}
+                {Object.keys(statusLabels).length > 0 ? (
+                  <StatusForm
+                    code={report.code}
+                    current={report.status}
+                    options={statusLabels}
+                    action={changeReportStatus}
+                  />
+                ) : (
+                  <span className="text-[10px] text-ink-faint">Perlu kewenangan menulis</span>
+                )}
               </td>
             </tr>
           ))}
@@ -139,10 +163,13 @@ export function CommunityView({
   summary,
   reports,
   filters,
+  statusLabels = {},
 }: {
   summary: CommunitySummary;
   reports: CitizenReportPage;
   filters: CommunityFilters;
+  /** Nilai status tersimpan → labelnya. Kosong berarti pengguna tidak berwenang menulis. */
+  statusLabels?: Record<string, string>;
 }) {
   const categories = Object.entries(summary.per_category).sort((a, b) => b[1] - a[1]);
   const filtered = filters.status !== null || filters.category !== null;
@@ -160,7 +187,7 @@ export function CommunityView({
         {summary.total_reports === 0 ? (
           <EmptyState label="Belum ada laporan masyarakat pada cakupan Anda." />
         ) : (
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <MetricCard
               label="Laporan Masuk"
               value={String(summary.total_reports)}
@@ -170,15 +197,6 @@ export function CommunityView({
               label="Belum Terpetakan"
               value={String(summary.unmapped_reports)}
               hint={summary.unmapped_basis}
-            />
-            <MetricCard
-              label="Umpan Balik"
-              value={summary.feedback ? String(summary.feedback.total) : "tidak berwenang"}
-              hint={
-                summary.feedback
-                  ? "Tanggapan masyarakat atas laporan yang sudah masuk"
-                  : "Peran Anda tidak memiliki kewenangan membaca umpan balik masyarakat"
-              }
             />
           </div>
         )}
@@ -303,7 +321,7 @@ export function CommunityView({
             }
           />
         ) : (
-          <ReportTable reports={reports.data} />
+          <ReportTable reports={reports.data} statusLabels={statusLabels} />
         )}
 
         <p className="mt-3 border-t border-base-800 pt-3 text-[10px] leading-relaxed text-ink-muted">
@@ -313,33 +331,6 @@ export function CommunityView({
           dibangun, sehingga laporan di sini belum tersaring dari kemungkinan pengulangan.
         </p>
       </Panel>
-
-      {summary.feedback ? (
-        <Panel
-          title="Umpan Balik Masyarakat"
-          action={<span className="panel-action">{summary.feedback.total} tanggapan</span>}
-        >
-          {summary.feedback.total === 0 ? (
-            <EmptyState label="Belum ada umpan balik pada cakupan Anda." />
-          ) : (
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-              {Object.entries(summary.feedback.per_type)
-                .sort((a, b) => b[1] - a[1])
-                .map(([type, total]) => (
-                  <div
-                    key={type}
-                    className="rounded border border-base-800 bg-base-950/40 px-3 py-2"
-                  >
-                    <div className="stat-label">{labelOf(FEEDBACK_TYPE_LABELS, type)}</div>
-                    <div className="mt-1 font-heading text-xl font-bold leading-none text-ink">
-                      {total}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          )}
-        </Panel>
-      ) : null}
     </div>
   );
 }

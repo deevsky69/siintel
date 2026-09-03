@@ -269,6 +269,13 @@ class IntelligenceRequest(BaseModel):
     status: str | None = Field(default=None, description="Status tindak lanjut; kosong = NEW")
 
 
+class CrimeStatusRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    status: str = Field(description="Status baru menurut taksonomi status_crime")
+    note: str | None = Field(default=None, max_length=1000, description="Alasan/keterangan")
+
+
 class ReportStatusRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -512,6 +519,118 @@ def create_intelligence(
         "kecamatan": location.kecamatan,
         "polsek": location.polsek,
         "grid_id": location.grid_id,
+    }
+
+
+@router.post(
+    "/crimes/{code}/status",
+    summary="Mengubah status penanganan satu kejadian",
+)
+def update_crime_status(
+    code: str,
+    payload: CrimeStatusRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("crime:write"),
+) -> dict[str, Any]:
+    """Memindahkan kejadian sepanjang alur penanganannya, beserta jejaknya.
+
+    Sampai 3 September 2026 kolom `crime_incidents.status` **hanya dapat diisi saat
+    kejadian dicatat** dan tidak pernah dapat diubah sesudahnya. Akibatnya alur
+    `Dilaporkan → Penyelidikan → Penyidikan → Selesai` tersimpan di taksonomi tetapi tidak
+    dapat dijalani satu langkah pun: seluruh 1.202 kejadian membeku pada status yang
+    diberikan seed. Endpoint ini yang membukanya.
+
+    ATURAN PERPINDAHAN — sama dengan triase laporan masyarakat, dan karena alasan yang sama.
+
+    Alur `status_crime` adalah urutan **penulisan** pada berkas taksonomi, bukan aturan
+    yang disetujui. Tidak ada dokumen yang menyatakan urutan itu wajib, bahwa status tidak
+    boleh mundur, atau bahwa `CLOSED` bersifat final. Membuat larangan itu berarti
+    mengarang SOP — dan pada penanganan perkara, larangan mundur punya akibat nyata:
+    perkara yang keliru ditutup tidak akan pernah dapat dibuka kembali.
+
+    Yang dipilih adalah pilihan paling longgar **tetapi tercatat**: setiap perpindahan
+    menulis audit lengkap dengan status sebelum dan sesudah, sehingga perpindahan yang
+    tidak wajar tetap terlihat oleh yang memeriksa. Satu-satunya yang ditolak adalah
+    perpindahan ke status yang sedang berlaku (`409`) — itu penjagaan audit, bukan aturan
+    alur kerja: mencatat "perubahan" yang tidak mengubah apa pun membuat jejak audit memuat
+    peristiwa yang tidak terjadi.
+
+    **Ini menunggu keputusan pemilik proyek.** Begitu SOP penanganan ditetapkan, aturannya
+    ditulis di satu tempat — di sini — dan bukan disebar ke layar.
+    """
+    new_status = _validated(DOMAIN_CRIME_STATUS, payload.status, "Status kejadian")
+    polsek = jurisdiction_filter(current, "crime:write")
+
+    query = (
+        select(CrimeIncident, Location)
+        .join(Location, Location.location_id == CrimeIncident.location_id)
+        .where(CrimeIncident.code == code)
+    )
+    if polsek is not None:
+        query = query.where(Location.polsek == polsek)
+
+    row = session.execute(query).first()
+    if row is None:
+        # 404 juga untuk kejadian di luar cakupan: 403 akan membocorkan keberadaannya.
+        audit.record(
+            session,
+            action="UPDATE_CRIME_STATUS",
+            resource_type="crime",
+            result=audit.RESULT_FAILED,
+            user_id=current.user.user_id,
+            resource_id=code,
+            detail={"reason": "kejadian tidak dikenal atau di luar cakupan wilayah"},
+        )
+        session.commit()
+        raise not_found()
+
+    incident: CrimeIncident = row[0]
+    location: Location = row[1]
+    previous = incident.status
+
+    if previous == new_status:
+        audit.record(
+            session,
+            action="UPDATE_CRIME_STATUS",
+            resource_type="crime",
+            result=audit.RESULT_FAILED,
+            user_id=current.user.user_id,
+            resource_id=incident.code,
+            detail={"reason": f"sudah berstatus {previous}"},
+        )
+        session.commit()
+        raise ApiError(
+            status.HTTP_409_CONFLICT,
+            f"Kejadian {incident.code} sudah berstatus "
+            f"{_choices(DOMAIN_CRIME_STATUS).get(str(previous), str(previous))}.",
+        )
+
+    incident.status = new_status
+
+    detail: dict[str, Any] = {"status_before": previous, "status_after": new_status}
+    if payload.note:
+        detail["note"] = payload.note.strip()
+
+    audit.record(
+        session,
+        action="UPDATE_CRIME_STATUS",
+        resource_type="crime",
+        result=audit.RESULT_SUCCESS,
+        user_id=current.user.user_id,
+        resource_id=incident.code,
+        detail=detail,
+    )
+    session.commit()
+    session.refresh(incident)
+
+    return {
+        "code": incident.code,
+        "status_before": previous,
+        "status": incident.status,
+        "incident_type": incident.incident_type,
+        "kecamatan": location.kecamatan,
+        "polsek": location.polsek,
+        "transition_basis": TRANSITION_BASIS,
     }
 
 

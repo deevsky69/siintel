@@ -4,6 +4,7 @@ import { RiskLegend } from "@/components/map/legend";
 import { MapCanvas } from "@/components/map/map-canvas";
 import { Panel } from "@/components/panel";
 import type { AreaDetail, MapData } from "@/lib/map-data";
+import type { CitizenRow, CrimeRow } from "@/lib/reports";
 import { RISK_LABELS, RISK_TEXT, riskClassOf } from "@/lib/risk";
 
 /**
@@ -34,10 +35,16 @@ export function MapHero({
   data,
   selected,
   detail,
+  crimes,
+  reports,
 }: {
   data: MapData;
   selected: string | null;
   detail: AreaDetail | null;
+  /** Kejadian terbaru di wilayah terpilih; `null` bila di luar kewenangan pembaca. */
+  crimes: CrimeRow[] | null;
+  /** Laporan masyarakat terbaru di wilayah terpilih; `null` bila di luar kewenangan. */
+  reports: CitizenRow[] | null;
 }) {
   const scored = data.districts.filter((district) => district.current !== null);
 
@@ -85,7 +92,7 @@ export function MapHero({
               label={`Tidak ada rincian untuk ${selected}. Wilayah ini mungkin berada di luar kewenangan akun Anda.`}
             />
           ) : (
-            <AreaSummary detail={detail} kecamatan={selected} />
+            <AreaSummary detail={detail} kecamatan={selected} crimes={crimes} reports={reports} />
           )}
         </Panel>
       </div>
@@ -100,7 +107,17 @@ export function MapHero({
  * menonjol", bukan "ceritakan semuanya". Yang dipilih adalah lima hal yang menentukan
  * apakah wilayah ini perlu ditindak hari ini — sisanya satu klik lagi.
  */
-function AreaSummary({ detail, kecamatan }: { detail: AreaDetail; kecamatan: string }) {
+function AreaSummary({
+  detail,
+  kecamatan,
+  crimes,
+  reports,
+}: {
+  detail: AreaDetail;
+  kecamatan: string;
+  crimes: CrimeRow[] | null;
+  reports: CitizenRow[] | null;
+}) {
   const top = detail.threats[0];
   const risk = top ? riskClassOf(top.risk_score) : null;
 
@@ -146,6 +163,34 @@ function AreaSummary({ detail, kecamatan }: { detail: AreaDetail; kecamatan: str
         </div>
       ) : null}
 
+      {/* Kejadian dan laporan ditampilkan TERPISAH, bukan disatukan menurut waktu.
+          Keduanya berbeda keandalan — kejadian sudah dicatat petugas, laporan masyarakat
+          sebagiannya belum diperiksa siapa pun — dan satu daftar berurut waktu membuat
+          perbedaan itu hilang tepat di tempat keputusan diambil. */}
+      <RecentList
+        title="Kejadian terbaru"
+        empty="Tidak ada kejadian tercatat."
+        denied="Di luar kewenangan akun Anda."
+        rows={crimes?.map((row) => ({
+          key: row.code,
+          headline: row.incident_type,
+          meta: `${row.incident_date} ${row.incident_time.slice(0, 5)}`,
+          tail: row.status ?? null,
+        }))}
+      />
+
+      <RecentList
+        title="Laporan masyarakat"
+        empty="Tidak ada laporan warga."
+        denied="Di luar kewenangan akun Anda."
+        rows={reports?.map((row) => ({
+          key: row.code,
+          headline: row.category,
+          meta: row.reported_at.slice(0, 10),
+          tail: row.status,
+        }))}
+      />
+
       <div className="mt-auto flex flex-wrap gap-2 pt-3">
         <Link
           href={`/wilayah/${encodeURIComponent(kecamatan)}`}
@@ -160,6 +205,56 @@ function AreaSummary({ detail, kecamatan }: { detail: AreaDetail; kecamatan: str
           Buka di peta
         </Link>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Daftar ringkas isi wilayah — paling banyak empat baris.
+ *
+ * Dibatasi dengan sengaja: panel ini melengkapi peta, bukan menggantikan layar daftar.
+ * Empat baris cukup menjawab "apa yang terjadi di sini akhir-akhir ini"; selebihnya ada
+ * di tautan "Rincian lengkap" tepat di bawahnya.
+ *
+ * `rows` bernilai `undefined` berarti kanal itu **di luar kewenangan pembaca** — dinyatakan
+ * apa adanya, bukan ditampilkan sebagai daftar kosong. Keduanya terlihat sama di layar
+ * padahal artinya berbeda jauh.
+ */
+function RecentList({
+  title,
+  rows,
+  empty,
+  denied,
+}: {
+  title: string;
+  rows: { key: string; headline: string; meta: string; tail: string | null }[] | undefined;
+  empty: string;
+  denied: string;
+}) {
+  return (
+    <div className="mt-3">
+      <p className="stat-label">{title}</p>
+      {rows === undefined ? (
+        <p className="mt-1 text-[10px] text-ink-faint">{denied}</p>
+      ) : rows.length === 0 ? (
+        <p className="mt-1 text-[10px] text-ink-faint">{empty}</p>
+      ) : (
+        <ul className="mt-1 space-y-1">
+          {rows.slice(0, 4).map((row) => (
+            <li key={row.key} className="text-[11px] leading-tight">
+              <div className="flex items-baseline gap-2">
+                <span className="text-ink">{row.headline}</span>
+                {row.tail ? (
+                  <span className="ml-auto shrink-0 text-[9px] uppercase tracking-wider text-ink-faint">
+                    {row.tail}
+                  </span>
+                ) : null}
+              </div>
+              <div className="text-[10px] text-ink-faint">{row.meta}</div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

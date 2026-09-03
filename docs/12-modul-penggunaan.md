@@ -201,7 +201,7 @@ angka yang tidak dapat Anda selesaikan hanya menjadi kecemasan tanpa jalan kelua
 | Submenu | Isinya |
 |---|---|
 | **Informasi Terbaru** | Tiga kanal berdampingan — kejadian, laporan masyarakat, laporan intelijen. Sengaja **tidak dilebur** jadi satu aliran: keandalan ketiganya berbeda, dan aliran tunggal membuat perbedaan itu hilang |
-| **Laporan Petugas** | Kejadian yang dicatat petugas. Berbeda dari Laporan Masyarakat, setiap barisnya **sudah terverifikasi** |
+| **Laporan Petugas** | Kejadian yang dicatat petugas, dengan **pencarian, rentang tanggal, dan penyaring**. Statusnya dapat diubah langsung dari daftar |
 | **Wilayah Rawan** | Peringkat kecamatan; **tiap baris dapat diklik** untuk melihat ancaman, jam rawan, riwayat, peringatan aktif, dan kejadian terbarunya |
 | **Pengaturan Sistem** | Bobot, ambang, dan kelas risiko yang sedang berlaku — **hanya membaca** |
 
@@ -357,14 +357,40 @@ diketahui:
 - Petugas yang dibatasi wilayah hanya dapat menulis di wilayahnya. Lokasi di luar itu
   dijawab "tidak ditemukan", bukan "terlarang".
 
-### Triase laporan masyarakat
+### Mengubah status — dua alur, satu aturan
 
-Mengubah status laporan: Diterima → Diverifikasi → Diteruskan → Ditangani → Selesai.
+Ada **dua alur status** pada sistem ini, dan keduanya dapat diubah dari dua tempat: langsung
+di daftarnya, atau lewat formulir di menu **Input Data**.
 
-Status **boleh mundur dan boleh melompat**. Itu disengaja: belum ada SOP yang menetapkan
-urutannya wajib, dan melarangnya berarti laporan yang keliru diverifikasi tidak dapat
-dikembalikan. Yang ditolak hanya memindahkan ke status yang sedang berlaku — itu
-penjagaan catatan, bukan aturan alur kerja.
+| Alur | Tahapannya | Diubah dari |
+|---|---|---|
+| **Laporan Petugas** (kejadian) | Dilaporkan → Penyelidikan → Penyidikan → Selesai | Kolom **Ubah status** pada menu Laporan Petugas |
+| **Laporan Masyarakat** | Diterima → Diverifikasi → Diteruskan → Ditangani → Selesai | Kolom **Ubah tahapan** pada menu Laporan Masyarakat, atau tab **Triase** di Input Data |
+
+Caranya sama untuk keduanya: pilih tahapan baru dari daftar di baris yang bersangkutan, lalu
+tekan **Simpan**. Status yang sedang berlaku tidak muncul di pilihan — memilihnya akan
+ditolak, dan menawarkan pilihan yang pasti ditolak hanya memancing kekeliruan.
+
+**Status boleh mundur dan boleh melompat.** Itu disengaja, dan berlaku untuk kedua alur:
+belum ada SOP yang menetapkan urutannya wajib. Melarang mundur punya akibat nyata — laporan
+yang keliru diverifikasi tidak dapat dikembalikan, dan perkara yang keliru ditutup tidak
+akan pernah dapat dibuka kembali.
+
+Yang **ditolak** hanya memindahkan ke status yang sedang berlaku. Itu bukan aturan alur
+kerja melainkan penjagaan catatan: mencatat "perubahan" yang tidak mengubah apa pun membuat
+jejak audit memuat peristiwa yang tidak terjadi.
+
+> **Setiap perpindahan tercatat di jejak audit** lengkap dengan status sebelum dan
+> sesudahnya. Karena perpindahannya sengaja dibiarkan longgar, jejak itulah yang menjadi
+> penjaga: perpindahan yang tidak wajar tetap terlihat oleh yang memeriksa.
+
+Perlu kewenangan menulis — `crime:write` untuk kejadian, `citizen_report:write` untuk
+laporan masyarakat. Tanpa itu, kolomnya berbunyi "Perlu kewenangan menulis".
+
+### Triase laporan masyarakat lewat Input Data
+
+Formulir tersendiri untuk mengubah status laporan masyarakat. Berguna ketika beberapa
+laporan ditriase berurutan tanpa mencarinya satu per satu di daftar.
 
 > **Verifikasi adalah tindakan yang bermakna.** Laporan berstatus terverifikasi kelak
 > ikut memengaruhi skor risiko. Untuk sekarang bobotnya masih nol — lihat §11.
@@ -713,6 +739,24 @@ Yang dijaga di sisi sistem:
 
 Laporan yang masuk berstatus **Diterima** dan menunggu verifikasi petugas. Selama belum
 diverifikasi, ia tidak menjadi dasar tindakan.
+
+### Mencari dan menyaring
+
+Menu **Laporan Masyarakat** dan **Laporan Petugas** sama-sama memiliki panel **Cari dan
+Saring** di atas daftarnya:
+
+| Isian | Mencari pada |
+|---|---|
+| **Cari** | Kode, kategori atau jenis, isi laporan, wilayah, modus |
+| **Tanggal dari / sampai** | Tanggal lapor (masyarakat) atau tanggal kejadian (petugas) |
+| **Penyaring** | Tahapan/status, kategori atau jenis, dan kecamatan |
+
+Hasil saringan **tersimpan di alamat halaman**, sehingga tautannya dapat dibagikan — berguna
+saat meminta rekan melihat hal yang sama, dan saat paparan. Tombol mundur peramban bekerja
+seperti yang diharapkan, dan **Hapus saringan** mengembalikan daftar utuh.
+
+Penyaringan wilayah tetap ditegakkan server: saringan di layar hanya **mempersempit** apa
+yang sudah menjadi hak Anda, tidak pernah memperluasnya.
 
 ### Yang dilihat petugas
 

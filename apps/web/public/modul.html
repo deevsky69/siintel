@@ -936,7 +936,62 @@ Selebihnya  terlipat</pre>
           dijawab “tidak ditemukan”, bukan “terlarang”.</li>
       </ul>
 
-      <h3>Triase laporan masyarakat</h3>
+      <h3>Mengubah status — dua alur, satu aturan</h3>
+      <p>
+        Ada <strong>dua alur status</strong>, dan keduanya dapat diubah dari dua tempat: langsung di
+        daftarnya, atau lewat formulir di menu <strong>Input Data</strong>.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Alur</th><th>Tahapannya</th><th>Diubah dari</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Laporan Petugas</strong> (kejadian)</td><td>Dilaporkan &#8594; Penyelidikan &#8594; Penyidikan &#8594; Selesai</td><td>Kolom <strong>Ubah status</strong> pada menu Laporan Petugas.</td></tr>
+            <tr><td><strong>Laporan Masyarakat</strong></td><td>Diterima &#8594; Diverifikasi &#8594; Diteruskan &#8594; Ditangani &#8594; Selesai</td><td>Kolom <strong>Ubah tahapan</strong> pada menu Laporan Masyarakat, atau tab <strong>Triase</strong> di Input Data.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Caranya sama untuk keduanya: pilih tahapan baru dari daftar di baris yang bersangkutan,
+        lalu tekan <strong>Simpan</strong>. Status yang sedang berlaku tidak muncul di pilihan —
+        memilihnya akan ditolak, dan menawarkan pilihan yang pasti ditolak hanya memancing
+        kekeliruan.
+      </p>
+      <p>
+        <strong>Status boleh mundur dan boleh melompat.</strong> Itu disengaja dan berlaku untuk
+        kedua alur: belum ada SOP yang menetapkan urutannya wajib. Melarang mundur punya akibat
+        nyata — laporan yang keliru diverifikasi tidak dapat dikembalikan, dan perkara yang keliru
+        ditutup tidak akan pernah dapat dibuka kembali. Yang <strong>ditolak</strong> hanya
+        memindahkan ke status yang sedang berlaku, dan itu penjagaan catatan: mencatat
+        &#8220;perubahan&#8221; yang tidak mengubah apa pun membuat jejak audit memuat peristiwa
+        yang tidak terjadi.
+      </p>
+      <div class="note">
+        <span class="label">Jejaknya yang menjadi penjaga</span>
+        <p>
+          Setiap perpindahan tercatat di jejak audit lengkap dengan status sebelum dan sesudahnya.
+          Karena perpindahannya sengaja dibiarkan longgar, jejak itulah yang membuat perpindahan
+          tidak wajar tetap terlihat oleh yang memeriksa.
+        </p>
+      </div>
+      <p>
+        Perlu kewenangan menulis — <span class="mono">crime:write</span> untuk kejadian,
+        <span class="mono">citizen_report:write</span> untuk laporan masyarakat. Tanpa itu, kolomnya
+        berbunyi &#8220;Perlu kewenangan menulis&#8221;.
+      </p>
+
+      <h3>Mencari dan menyaring</h3>
+      <p>
+        Menu <strong>Laporan Masyarakat</strong> dan <strong>Laporan Petugas</strong> sama-sama
+        memiliki panel <strong>Cari dan Saring</strong> di atas daftarnya: pencarian teks, rentang
+        tanggal, dan penyaring tahapan/jenis/kecamatan.
+      </p>
+      <p>
+        Hasil saringan <strong>tersimpan di alamat halaman</strong>, sehingga tautannya dapat
+        dibagikan. Penyaringan wilayah tetap ditegakkan server: saringan di layar hanya
+        <strong>mempersempit</strong> apa yang sudah menjadi hak Anda, tidak pernah memperluasnya.
+      </p>
+
+      <h3>Triase laporan masyarakat lewat Input Data</h3>
       <p>
         Mengubah status laporan: Diterima → Diverifikasi → Diteruskan → Ditangani → Selesai.
       </p>

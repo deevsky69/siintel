@@ -115,6 +115,7 @@ skema OpenAPI aplikasi yang benar-benar berjalan.
 | POST | `/predictions/run` | `prediction:run` — ✅ **ADA** |
 | POST | `/predictions/{code}/publish` | `prediction:publish` — ✅ **ADA** |
 | POST | `/crimes` | `crime:write` — ✅ **ADA** |
+| POST | `/crimes/{code}/status` | `crime:write` — ✅ **ADA** |
 | POST | `/citizen-reports/{code}/status` | `citizen_report:write` — ✅ **ADA** |
 | GET | `/police-units` | `police_unit:read` — ✅ **ADA** |
 

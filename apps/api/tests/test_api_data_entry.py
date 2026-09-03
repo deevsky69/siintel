@@ -659,3 +659,158 @@ def test_options_do_not_leak_vocabulary_a_role_cannot_read(
 
     assert "intelligence_category" not in body["suggestions"]
     assert "modus" in body["suggestions"], "Fungsi memegang crime:read"
+
+
+# --- Status penanganan kejadian ---------------------------------------------------------
+
+
+def _an_incident(session: Session, status_value: str = "REPORTED") -> tuple[str, str]:
+    """Satu kejadian beserta polsek wilayahnya."""
+    row = session.execute(
+        select(CrimeIncident.code, Location.polsek)
+        .join(Location, Location.location_id == CrimeIncident.location_id)
+        .where(CrimeIncident.status == status_value, Location.polsek.is_not(None))
+        .order_by(CrimeIncident.code)
+        .limit(1)
+    ).first()
+    assert row is not None, f"data dummy tidak memuat kejadian berstatus {status_value}"
+    return str(row[0]), str(row[1])
+
+
+def test_a_crime_can_move_along_its_handling_flow(client: TestClient, session: Session) -> None:
+    """Sampai endpoint ini ada, `crime_incidents.status` hanya dapat diisi saat dicatat.
+
+    Akibatnya alur `Dilaporkan → Penyelidikan → Penyidikan → Selesai` tersimpan di taksonomi
+    tetapi tidak dapat dijalani satu langkah pun.
+    """
+    officer = _make_user(session, "Administrator")
+    code, _ = _an_incident(session)
+
+    response = client.post(
+        f"/api/v1/crimes/{code}/status",
+        headers=_auth(client, officer),
+        json={"status": "PRELIMINARY_INVESTIGATION", "note": "Dilimpahkan ke penyelidik."},
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status_before"] == "REPORTED"
+    assert body["status"] == "PRELIMINARY_INVESTIGATION"
+
+    stored = session.scalar(select(CrimeIncident).where(CrimeIncident.code == code))
+    assert stored is not None
+    assert stored.status == "PRELIMINARY_INVESTIGATION"
+
+
+def test_a_crime_status_may_move_backwards(client: TestClient, session: Session) -> None:
+    """Tidak ada dokumen yang melarangnya, dan melarangnya berarti mengarang SOP.
+
+    Pada penanganan perkara akibatnya nyata: perkara yang keliru ditutup tidak akan pernah
+    dapat dibuka kembali.
+    """
+    officer = _make_user(session, "Administrator")
+    code, _ = _an_incident(session, "CLOSED")
+
+    response = client.post(
+        f"/api/v1/crimes/{code}/status",
+        headers=_auth(client, officer),
+        json={"status": "REPORTED", "note": "Dibuka kembali."},
+    )
+
+    assert response.status_code == 200, response.text
+
+
+def test_moving_a_crime_to_its_current_status_is_refused(
+    client: TestClient, session: Session
+) -> None:
+    """Penjagaan audit, bukan aturan alur kerja: mencatat perubahan yang tidak mengubah
+    apa pun membuat jejak audit memuat peristiwa yang tidak terjadi."""
+    officer = _make_user(session, "Administrator")
+    code, _ = _an_incident(session)
+
+    response = client.post(
+        f"/api/v1/crimes/{code}/status",
+        headers=_auth(client, officer),
+        json={"status": "REPORTED"},
+    )
+
+    assert response.status_code == 409, response.text
+
+
+def test_an_unknown_crime_status_is_refused_with_the_valid_list(
+    client: TestClient, session: Session
+) -> None:
+    officer = _make_user(session, "Administrator")
+    code, _ = _an_incident(session)
+
+    response = client.post(
+        f"/api/v1/crimes/{code}/status",
+        headers=_auth(client, officer),
+        json={"status": "SELESAI"},
+    )
+
+    assert response.status_code == 400, response.text
+    assert "CLOSED" in response.text, "penolakan harus menyebut nilai yang sah"
+
+
+def test_a_crime_outside_the_jurisdiction_is_answered_not_found(
+    client: TestClient, session: Session
+) -> None:
+    """404, bukan 403: 403 akan membocorkan keberadaan kejadian di wilayah lain."""
+    code, polsek = _an_incident(session)
+    other = session.scalar(
+        select(Location.polsek).where(Location.polsek.is_not(None), Location.polsek != polsek)
+    )
+    assert other is not None
+
+    officer = _make_user(session, "Polsek", polsek=other)
+
+    response = client.post(
+        f"/api/v1/crimes/{code}/status",
+        headers=_auth(client, officer),
+        json={"status": "CLOSED"},
+    )
+
+    assert response.status_code == 404, response.text
+
+
+def test_changing_a_crime_status_leaves_both_sides_in_the_audit_trail(
+    client: TestClient, session: Session
+) -> None:
+    """Karena perpindahan mundur dan melompat diizinkan, jejaknya yang menjadi penjaga.
+
+    Tanpa status sebelum dan sesudah pada catatan audit, perpindahan yang tidak wajar
+    tidak dapat dikenali siapa pun yang memeriksa.
+    """
+    officer = _make_user(session, "Administrator")
+    code, _ = _an_incident(session)
+
+    client.post(
+        f"/api/v1/crimes/{code}/status",
+        headers=_auth(client, officer),
+        json={"status": "INVESTIGATION"},
+    )
+
+    entry = session.scalar(
+        select(AuditLog)
+        .where(AuditLog.resource_id == code, AuditLog.action == "UPDATE_CRIME_STATUS")
+        .order_by(AuditLog.timestamp.desc())
+    )
+    assert entry is not None
+    assert entry.result == "SUCCESS"
+    assert entry.detail is not None
+    assert entry.detail["status_before"] == "REPORTED"
+    assert entry.detail["status_after"] == "INVESTIGATION"
+
+
+def test_changing_a_crime_status_needs_crime_write(client: TestClient, session: Session) -> None:
+    reader = _make_user(session, "Pimpinan")
+    code, _ = _an_incident(session)
+
+    response = client.post(
+        f"/api/v1/crimes/{code}/status",
+        headers=_auth(client, reader),
+        json={"status": "CLOSED"},
+    )
+
+    assert response.status_code == 403, response.text
