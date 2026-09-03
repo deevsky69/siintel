@@ -64,7 +64,7 @@ export function MapHero({
                 className="mx-auto max-h-[54vh] w-full"
                 // Klik tetap di beranda: rinciannya muncul di panel sebelah, bukan dengan
                 // meninggalkan halaman yang baru saja dibuka pengguna.
-                hrefFor={(kecamatan) => `/?wilayah=${encodeURIComponent(kecamatan)}`}
+                linkTo="home"
               />
               <RiskLegend />
               <p className="text-[10px] leading-relaxed text-ink-faint">

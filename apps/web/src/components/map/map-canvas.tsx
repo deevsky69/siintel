@@ -219,7 +219,7 @@ export function MapCanvas({
   showScores = true,
   historical,
   months = DEFAULT_HISTORICAL_MONTHS,
-  hrefFor,
+  linkTo = "map",
 }: {
   districts: MapDistrict[];
   layer: MapLayer;
@@ -237,13 +237,18 @@ export function MapCanvas({
   historical?: { points: HistoricalPoint[]; peakIncidents: number; peakPointIncidents: number };
   months?: HistoricalMonths;
   /**
-   * Alamat tujuan saat sebuah wilayah diklik.
+   * Ke mana klik pada sebuah wilayah membawa pembaca.
    *
-   * Dapat diganti supaya bidang gambar yang sama dapat dipakai di dua tempat dengan
-   * perilaku klik yang berbeda: pada `/peta` klik memilih wilayah di halaman itu juga,
-   * sedangkan pada beranda klik membuka rinciannya **tanpa meninggalkan beranda**.
+   * Berupa **kata kunci, bukan fungsi**, dan itu bukan pilihan gaya. Komponen ini berjalan
+   * di peramban (`"use client"`), sedangkan pemanggilnya adalah komponen server; React
+   * tidak dapat mengirim fungsi melintasi batas itu, dan permintaan gagal dengan 500 saat
+   * dijalankan — bukan saat build, bukan saat test. Kata kunci ini dapat diserialkan, jadi
+   * penyusunan alamatnya dikerjakan di sini, di sisi yang memang berjalan di peramban.
+   *
+   * - `map` — memilih wilayah pada halaman peta, membawa serta layer dan jendelanya;
+   * - `home` — membuka rincian di beranda tanpa meninggalkan halamannya.
    */
-  hrefFor?: (kecamatan: string) => string;
+  linkTo?: "map" | "home";
 }) {
   const byName = useMemo(
     () => new Map(districts.map((district) => [district.kecamatan, district])),
@@ -280,7 +285,11 @@ export function MapCanvas({
           return (
             <g key={shape.kecamatan}>
               <Link
-                href={hrefFor ? hrefFor(shape.kecamatan) : mapHref(shape.kecamatan, layer, months)}
+                href={
+                  linkTo === "home"
+                    ? `/?wilayah=${encodeURIComponent(shape.kecamatan)}`
+                    : mapHref(shape.kecamatan, layer, months)
+                }
                 scroll={false}
                 aria-label={ariaLabel(shape, district, layer)}
                 aria-current={isSelected ? "true" : undefined}
