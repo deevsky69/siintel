@@ -389,12 +389,29 @@ describe("peta risiko", () => {
     expect(screen.getByRole("link", { name: /^Tebet —/ }).getAttribute("aria-current")).toBeNull();
   });
 
-  it("menampilkan tooltip ringkas saat wilayah disentuh tetikus", () => {
+  it("menampilkan ringkasan berlabel saat wilayah disentuh tetikus", () => {
+    // Tooltip disusun sebagai daftar berlabel sejak 3 September 2026, mengikuti cara
+    // Grafana Geomap dan ArcGIS Dashboards: identitas, angka utama, status, pembanding.
+    // Satu baris gabungan "30/100 · Rendah" memaksa pembaca menebak arti tiap bagiannya.
     render(<RiskMap {...mapProps} />);
 
     fireEvent.mouseOver(screen.getByRole("link", { name: /^Tebet —/ }));
 
-    expect(screen.getByText("30/100 · Rendah")).toBeDefined();
+    expect(screen.getByText("Skor risiko")).toBeDefined();
+    expect(screen.getByText("30/100")).toBeDefined();
+    // "Rendah" juga muncul di legenda, jadi yang diperiksa keberadaannya di tooltip —
+    // pasangan label/nilai tiap barisnya diuji terpisah lewat `tooltipRows`.
+    expect(screen.getByText("Kelas")).toBeDefined();
+  });
+
+  it("menyertakan isyarat bahwa rincian ada di balik klik", () => {
+    // Tanpa isyarat ini, pembaca tidak punya cara tahu bahwa hover bukan segalanya —
+    // dan panel rincian yang lengkap tidak pernah dibuka siapa pun.
+    render(<RiskMap {...mapProps} />);
+
+    fireEvent.mouseOver(screen.getByRole("link", { name: /^Tebet —/ }));
+
+    expect(screen.getByText("Klik untuk rincian")).toBeDefined();
   });
 
   it("menutup tooltip ketika tetikus meninggalkan wilayah", () => {

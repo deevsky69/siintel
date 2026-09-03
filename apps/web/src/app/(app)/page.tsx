@@ -5,16 +5,11 @@ import { RecommendationPanel } from "@/components/dashboard/recommendations";
 import { SituationOverview } from "@/components/dashboard/situation-overview";
 import { ScoreList } from "@/components/dashboard/threat-list";
 import { TrendChart } from "@/components/dashboard/trend-chart";
+import { Highlights, Notables } from "@/components/leadership/highlights";
 import { ProminentIssues } from "@/components/leadership/issues";
+import { MapHero } from "@/components/leadership/map-hero";
 import { PolicyRecommendations } from "@/components/leadership/policy";
-import {
-  AreaStatusCard,
-  AttentionCard,
-  PriorityAreasCard,
-  ReportsCard,
-} from "@/components/leadership/summary-cards";
 import { TopReportAreas } from "@/components/leadership/top-areas";
-import { MapPanel } from "@/components/map/map-panel";
 import {
   getActiveWarnings,
   getOutlook,
@@ -23,31 +18,49 @@ import {
   getTrends,
 } from "@/lib/dashboard";
 import { getLeadership } from "@/lib/leadership";
-import { getMapData } from "@/lib/map-data";
+import { getAreaDetail, getMapData, resolveSelectedDistrict } from "@/lib/map-data";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Executive Dashboard (TASK 070) dan layar Pimpinan (TASK 150).
+ * Beranda (TASK 070, 150, 162).
  *
- * Seluruh angka pada halaman ini berasal dari API, yang membacanya dari database.
- * Tidak ada nilai yang ditanam di kode — itu syarat klaim "working prototype,
- * bukan mockup" pada success criteria Taskap.
+ * Seluruh angka berasal dari API, yang membacanya dari database. Tidak ada nilai yang
+ * ditanam di kode — itu syarat klaim "working prototype, bukan mockup" pada success
+ * criteria Taskap.
  *
- * Susunannya mengikuti permintaan pemilik proyek, 2 September 2026: empat kartu ringkas,
- * lalu daftar wilayah menurut jumlah laporan, isu menonjol sepekan, dan rekomendasi
- * kebijakan.
+ * ## Susunannya, dan mengapa demikian
  *
- * Panel teknis yang sudah ada — peta, tren, outlook, status patroli — berada di bawahnya
- * dalam bagian yang **terlipat**, tidak dihapus. Ia masih dipakai peran selain Pimpinan,
- * dan menghapus fitur yang bekerja bukan bagian dari permintaan ini; tetapi membiarkannya
- * terbentang membuat halaman terlalu panjang untuk dibaca sekali duduk, dan itu keluhan
- * yang memang disampaikan pemilik proyek.
+ * ```text
+ * Sorotan     4 kartu — satu angka, satu baris
+ * Peta        isi utama, dengan rincian yang terbuka saat wilayah diklik
+ * Menonjol    3 kartu — apa yang BERGERAK, bukan apa yang ada
+ * Selebihnya  terlipat
+ * ```
  *
- * Seluruh blok dibatasi kewenangan di backend. Pengguna Polsek menerima layar dengan
- * susunan yang sama, berisi wilayahnya sendiri.
+ * Pemilik proyek menyampaikan beranda memuat terlalu banyak untuk dibaca sekali duduk,
+ * dan meminta peta diletakkan di sini. Keduanya menuntun ke satu keputusan: **peta menjadi
+ * isi utama, dan segala sesuatu di sekitarnya dipangkas sampai satu angka dan satu baris.**
+ *
+ * Yang dipangkas tidak dihapus. Tabel sepuluh wilayah, daftar rekomendasi kebijakan, dan
+ * panel analitik pindah ke bagian terlipat di bawah — masing-masing tetap punya layarnya
+ * sendiri di menu, dan setiap kartu sorotan menautkannya.
+ *
+ * Blok "Menonjol" menyorot apa yang **berubah**, bukan apa yang terbesar. Daftar terbesar
+ * selalu terisi dan karenanya tidak pernah memberi tahu sesuatu yang baru; yang berguna
+ * dibaca setiap pagi adalah apa yang bergerak sejak kemarin.
+ *
+ * Wilayah terpilih hidup di `?wilayah=`, bukan di dalam komponen: rinciannya diambil di
+ * server, tautannya dapat dibagikan saat paparan, dan tombol mundur peramban bekerja.
  */
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ wilayah?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const requested = typeof params.wilayah === "string" ? params.wilayah : null;
+
   const [summary, trends, outlook, warnings, map, board] = await Promise.all([
     getSummary(),
     getTrends(),
@@ -56,6 +69,13 @@ export default async function DashboardPage() {
     getMapData(),
     getLeadership(),
   ]);
+
+  // Tanpa `?wilayah=`, panel rincian dibiarkan kosong beserta ajakan mengklik — bukan
+  // diisi wilayah pilihan sistem. Rincian yang muncul sendiri tanpa diminta membuat
+  // pembaca mengira ia sedang melihat wilayah yang paling penting, padahal ia hanya
+  // melihat wilayah yang kebetulan terpilih lebih dulu.
+  const selected = requested === null ? null : resolveSelectedDistrict(map, requested);
+  const detail = selected === null ? null : await getAreaDetail(selected);
 
   const topWarning = warnings.data[0] ?? null;
   const recommendations = topWarning ? await getRecommendations(topWarning.code) : null;
@@ -66,7 +86,7 @@ export default async function DashboardPage() {
         // Dinyatakan terbuka: "24 jam terakhir" dihitung terhadap waktu acuan dataset,
         // bukan waktu sebenarnya. Menyembunyikannya akan menyesatkan pembaca layar.
         <div className="rounded border border-accent/25 bg-accent/5 px-3 py-2 text-[11px] text-accent-soft">
-          Mode demo — seluruh perhitungan waktu mengacu pada{" "}
+          Mode demo — waktu acuan{" "}
           <span className="font-mono">
             {new Date(summary.reference_time).toLocaleString("id-ID", {
               timeZone: "Asia/Jakarta",
@@ -77,65 +97,52 @@ export default async function DashboardPage() {
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <ReportsCard reports={board.reports_24h} />
-        <AreaStatusCard areaStatus={board.area_status} />
-        <AttentionCard items={board.needs_attention.items} />
-        <PriorityAreasCard areas={board.priority_areas} />
-      </div>
+      <Highlights board={board} />
 
-      <TopReportAreas top={board.top_report_areas} />
+      <MapHero data={map} selected={selected} detail={detail} />
 
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-        <ProminentIssues issues={board.prominent_issues} />
-        <PolicyRecommendations policy={board.policy} />
-      </div>
+      <Notables board={board} />
 
-      {/* Panel analitik dilipat, bukan dihapus.
-          Layar ini dibaca lebih dulu oleh pimpinan, dan enam panel teknis di bawah blok
-          keputusan membuat halaman terlalu panjang untuk dibaca sekali duduk — keluhan
-          yang memang disampaikan pemilik proyek. Melipatnya mempertahankan seluruh
-          fungsinya bagi peran yang memakainya sehari-hari, sekaligus mengeluarkannya dari
-          bacaan pertama. `details` dipakai apa adanya: ia bekerja tanpa JavaScript dan
-          sudah dikenali pembaca layar sebagai bagian yang dapat dibuka. */}
+      {/* Selebihnya dilipat, tidak dihapus.
+          Tabel sepuluh wilayah, daftar rekomendasi kebijakan, dan panel analitik masih
+          dipakai peran selain Pimpinan, dan masing-masing punya layarnya sendiri di menu.
+          Membiarkannya terbentang di beranda membuat halaman terlalu panjang untuk dibaca
+          sekali duduk — keluhan yang memang disampaikan pemilik proyek.
+
+          `details` dipakai apa adanya: ia bekerja tanpa JavaScript dan sudah dikenali
+          pembaca layar sebagai bagian yang dapat dibuka. */}
       <details className="group space-y-3">
         <summary className="flex cursor-pointer list-none items-center gap-3 py-1 text-[10px] uppercase tracking-wider text-ink-faint transition-colors hover:text-ink-muted">
           <span className="transition-transform group-open:rotate-90" aria-hidden="true">
             &#9656;
           </span>
-          <span>Panel analitik</span>
+          <span>Rincian dan panel analitik</span>
           <span className="h-px flex-1 bg-base-800" />
         </summary>
 
-        <div className="grid grid-cols-12 gap-3">
-          <div className="col-span-12 flex flex-col gap-3 xl:col-span-3">
-            <SituationOverview summary={summary} />
-            <ScoreList
-              title="Top Threat"
-              rows={summary.top_threats.map((row) => ({
-                label: row.threat_type,
-                score: row.risk_score,
-              }))}
-              emptyLabel="Belum ada penilaian risiko."
-            />
-          </div>
+        <TopReportAreas top={board.top_report_areas} />
 
-          <div className="col-span-12 xl:col-span-6">
-            <MapPanel data={map} />
-          </div>
-
-          <div className="col-span-12 flex flex-col gap-3 xl:col-span-3">
-            <EarlyWarningPanel warning={topWarning} total={warnings.pagination.total_items} />
-            <RecommendationPanel
-              rows={recommendations?.data ?? []}
-              forWarning={topWarning?.code ?? null}
-            />
-          </div>
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+          <ProminentIssues issues={board.prominent_issues} />
+          <PolicyRecommendations policy={board.policy} />
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <SituationOverview summary={summary} />
           <OutlookPanel rows={outlook.outlook} />
           <TrendChart series={trends.series} />
+          <PatrolStatus units={summary.units} operations={summary.active_operations} />
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <ScoreList
+            title="Top Threat"
+            rows={summary.top_threats.map((row) => ({
+              label: row.threat_type,
+              score: row.risk_score,
+            }))}
+            emptyLabel="Belum ada penilaian risiko."
+          />
           <ScoreList
             title="Risk Index by District"
             rows={summary.risk_by_district.map((row) => ({
@@ -144,7 +151,11 @@ export default async function DashboardPage() {
             }))}
             emptyLabel="Belum ada penilaian risiko."
           />
-          <PatrolStatus units={summary.units} operations={summary.active_operations} />
+          <EarlyWarningPanel warning={topWarning} total={warnings.pagination.total_items} />
+          <RecommendationPanel
+            rows={recommendations?.data ?? []}
+            forWarning={topWarning?.code ?? null}
+          />
         </div>
       </details>
     </div>

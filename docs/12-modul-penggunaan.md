@@ -237,121 +237,85 @@ enggan melapor.
 
 ## 5. DASHBOARD — LAYAR PERTAMA
 
-Layar ini tersusun mengikuti **urutan pertanyaan**, bukan urutan ketersediaan data:
+Beranda menjawab **apa yang menonjol hari ini**, bukan menyajikan seluruh yang diketahui
+sistem. Susunannya:
 
 ```text
-apa yang masuk hari ini
-        ↓
-bagaimana keadaan wilayah saya
-        ↓
-apa yang menuntut perhatian saya sekarang
-        ↓
-di mana saya menaruh sumber daya
+Sorotan     4 kartu — satu angka, satu baris
+Peta        isi utama, rincian terbuka saat wilayah diklik
+Menonjol    3 kartu — apa yang BERGERAK, bukan apa yang ada
+Selebihnya  terlipat
 ```
 
 Seluruh isinya dibatasi kewenangan Anda. Petugas Polsek melihat susunan yang sama berisi
 wilayahnya sendiri.
 
-### Empat kartu di baris pertama
+### Empat kartu sorotan
 
-| Kartu | Isinya | Yang perlu diperhatikan |
+| Kartu | Angkanya | Bacanya |
 |---|---|---|
-| **Laporan Masuk** | Jumlah laporan 24 jam terakhir | **Rinciannya tiga jenis**, dan ketiganya berbeda keandalan — lihat di bawah |
-| **Status Wilayah** | Aman / Waspada / Siaga per kecamatan | Pemetaannya **belum disetujui** — lihat di bawah |
-| **Perlu Perhatian Segera** | Butir yang masih menunggu manusia | Peringatan belum diterima, rekomendasi belum diputus, laporan belum diverifikasi |
-| **Wilayah Prioritas** | Tiga kecamatan berisiko tertinggi | Menampilkan **sel tertinggi / rata-rata** berdampingan |
+| **Laporan Masuk** | Total 24 jam terakhir | Rinciannya tiga jenis: kejadian, intelijen, warga |
+| **Status Wilayah** | Berapa dari berapa kecamatan pada status terbanyak | Pemetaan statusnya **belum disetujui** |
+| **Perlu Perhatian** | Butir yang masih menunggu manusia | Terpisah: peringatan belum diterima, dan keputusan yang menunggu Anda |
+| **Wilayah Prioritas** | Skor sel tertinggi wilayah teratas | Rata-rata wilayahnya disebut di bawahnya |
 
-**"Laporan" bukan satu hal.** Sistem memuat tiga jenis catatan yang sama-sama disebut
-laporan, dan kartu ini mencacahnya terpisah dengan sengaja:
+Tiap kartu hanya memuat **satu angka besar dan satu baris keterangan**. Rinciannya tidak
+dihapus — ia pindah ke layar yang memang tugasnya menjelaskan, dan setiap kartu menautkan
+ke sana.
 
-| Jenis | Asalnya | Catatan |
+### Peta — arahkan kursor, lalu klik
+
+Peta adalah isi utama beranda. Keduanya memikul beban yang berbeda:
+
+| | Isinya | Untuk |
 |---|---|---|
-| Kejadian kriminal | Dicatat petugas | Sudah terverifikasi |
-| Laporan intelijen | Fungsi Intelkam | Dicacah **per hari**, bukan per 24 jam — tabelnya hanya menyimpan tanggal, tanpa jam |
-| Laporan masyarakat | Warga | Termasuk yang **belum diverifikasi** |
+| **Arahkan kursor** | Skor risiko, kelas, ancaman utama, jam rawan | Memutuskan **apakah perlu diklik** |
+| **Klik** | Ancaman berperingkat, jam rawan, peringatan aktif, riwayat, jumlah sel | Rincian wilayah itu |
 
-Sebagian laporan masyarakat tidak memiliki lokasi yang cocok dengan master lokasi. Kartu
-ini menyebut jumlahnya, karena laporan yang hilang tanpa keterangan hanya terlihat sebagai
-angka yang lebih kecil — dan tidak ada cara membedakannya dari keadaan yang memang sepi.
+Pembagian ini mengikuti cara aplikasi pemantauan lain menyusunnya — Grafana, ArcGIS
+Dashboards, Datadog: ringkasan hover **tidak pernah lebih dari lima baris**, dan tidak
+pernah memuat sesuatu yang harus diklik. Tooltip mengikuti kursor dan hilang begitu kursor
+bergeser ke arahnya; tautan di dalamnya mustahil diraih.
 
-### Status wilayah — yang harus Anda ketahui sebelum mengutipnya
+Klik **tidak meninggalkan beranda**. Rinciannya muncul di panel sebelah kanan, dan alamat
+halaman ikut berubah menjadi `?wilayah=…` — sehingga tampilan itu dapat dibagikan sebagai
+tautan saat paparan, dan tombol mundur peramban bekerja seperti yang diharapkan.
 
-Sistem memiliki **empat** kelas risiko (Rendah, Sedang, Tinggi, Kritis), sedangkan nama
-status yang diminta hanya **tiga**. Dua kelas karena itu harus digabung, dan penggabungan
-itu mengubah makna:
+Dari panel itu tersedia dua jalan lanjut: **Rincian lengkap** (seluruh data wilayah) dan
+**Buka di peta** (peta lengkap dengan ketiga layer).
 
-| Status | Berasal dari kelas |
+> Sebelum ada wilayah yang diklik, panel kanan **sengaja dibiarkan kosong** beserta ajakan
+> mengklik — bukan diisi wilayah pilihan sistem. Rincian yang muncul sendiri tanpa diminta
+> membuat pembaca mengira ia sedang melihat wilayah yang paling penting, padahal ia hanya
+> melihat wilayah yang kebetulan terpilih lebih dulu.
+
+### Tiga kartu "menonjol"
+
+Blok ini menyorot apa yang **berubah**, bukan apa yang terbesar:
+
+| Kartu | Isinya |
 |---|---|
-| **Aman** | Rendah |
-| **Waspada** | Sedang |
-| **Siaga** | Tinggi + Kritis |
+| **Naik Paling Tajam** | Jenis gangguan dengan kenaikan terbesar dibanding pekan lalu |
+| **Wilayah Terbanyak Lapor** | Volume laporan 30 hari — **bukan** peringkat kerawanan |
+| **Tindakan Disarankan** | Satu usulan teratas, diturunkan aturan, bukan keluaran model |
 
-Yang digabung adalah dua kelas **teratas**, bukan dua kelas terbawah. Alasannya: kesalahan
-kedua arah tidak sepadan. Menggabungkan dari atas hanya menyamakan dua kelas yang
-sama-sama menuntut tindakan; menggabungkan dari bawah akan menyebut wilayah berkelas
-Sedang sebagai "Aman", dan kata itu menghentikan orang bertanya lebih jauh.
+Bedanya menentukan. Daftar "sepuluh teratas" selalu terisi dan karenanya tidak pernah
+memberi tahu sesuatu yang baru; yang berguna dibaca setiap pagi adalah apa yang bergerak
+sejak kemarin. Bila memang tidak ada yang bergerak, kartunya **mengaku kosong** alih-alih
+mengisi dirinya dengan angka terbesar yang kebetulan ada.
 
-> **Pemetaan ini berstatus PROPOSED dan belum disetujui siapa pun.** Layar menyatakannya
-> sendiri. Bila SOP menetapkan pemetaan yang berbeda, yang perlu diubah hanya satu berkas
-> konfigurasi — tidak ada satu pun ambang yang tertanam di kode.
+### Rincian dan panel analitik — terlipat
 
-Status satu kecamatan mengikuti **sel dengan skor tertinggi** di dalamnya, sama seperti
-layer risiko berjalan pada peta. Definisi itu sengaja disamakan: dua layar yang menjawab
-"berapa risiko di Tebet" dengan angka berbeda akan saling meruntuhkan, dan tidak ada di
-layar yang akan menunjukkan mana yang benar. Kartu Wilayah Prioritas menampilkan rata-rata
-seluruh sel di sebelahnya supaya selisih antara "sel terburuk" dan "keadaan menyeluruh"
-tetap terbaca.
+Di bawah terdapat bagian **terlipat**; klik untuk membukanya. Isinya tabel sepuluh wilayah,
+isu sepekan lengkap, seluruh rekomendasi kebijakan, indeks keamanan, outlook prediktif,
+tren bulanan, status patroli, dan peringatan teratas.
 
-### Top area menurut jumlah laporan
+Semuanya tetap ada dan masing-masing punya layarnya sendiri di menu. Yang berubah hanya:
+ia tidak lagi ikut dibaca pada pandangan pertama.
 
-Sepuluh wilayah dengan laporan terbanyak dalam 30 hari terakhir, bertingkat Kritis /
-Sedang / Rendah.
-
-> **Ini bukan peringkat kerawanan.** Yang diperingkat adalah **volume laporan**: tidak
-> ditimbang, dan tidak dinormalkan terhadap luas maupun jumlah penduduk. Wilayah dengan
-> pelaporan yang lebih aktif akan selalu naik, dan wilayah yang warganya jarang melapor
-> akan selalu tampak lebih aman daripada kenyataannya.
-
-Tingkatnya **relatif terhadap wilayah teratas pada jendela yang sedang tampil** — bukan
-terhadap angka mutlak. Jumlah laporan yang sama dapat bertingkat berbeda di jendela lain.
-
-### Isu menonjol sepekan
-
-Cacah kejadian per jenis gangguan pada 7 hari terakhir, dibanding 7 hari sebelumnya.
-Perubahan disajikan sebagai **selisih kejadian**, bukan persentase: dari basis satu
-kejadian menjadi tiga, "naik 200%" terbaca jauh lebih dramatis daripada kenyataannya.
-
-### Rekomendasi kebijakan
-
-Usulan tindakan beserta fungsi yang menanganinya dan **dasar angkanya**.
-
-> **Rencananya blok ini kelak dihasilkan AI. Sekarang belum.** Setiap butir diturunkan
-> dengan **aturan** dari angka yang tampil di layar yang sama, dan diberi label `RULE` —
-> label yang sama dengan faktor dominan pada peta. Menyebutnya keluaran AI sekarang akan
-> menjadi penjelasan fiktif, dan justru pada blok inilah kebohongan itu paling mahal:
-> inilah yang dibaca sebagai saran tindakan.
->
-> Bila tidak ada yang dapat diturunkan dari data, blok ini **dibiarkan kosong** — bukan
-> diisi saran umum yang terdengar masuk akal tetapi tidak bersandar pada apa pun.
-
-Sebagian jenis rekomendasi belum mungkin dibuat sama sekali. Contohnya "rapat koordinasi
-karena ada Car Free Day": sistem belum memuat kalender kegiatan, dan menambahkannya
-menuntut **sumber data baru**, bukan sekadar aturan baru.
-
-### Panel analitik — terlipat
-
-Di bagian bawah terdapat "Panel analitik" yang **terlipat**; klik untuk membukanya. Isinya
-panel yang sudah ada sebelumnya: indeks keamanan, peta ringkas, ancaman teratas, outlook
-prediktif, tren bulanan, dan status patroli.
-
-Panel itu tidak dihapus — ia masih dipakai peran selain Pimpinan — tetapi dikeluarkan dari
-bacaan pertama. Enam panel teknis di bawah blok keputusan membuat halaman terlalu panjang
-untuk dibaca sekali duduk, dan yang pertama dibaca seorang pimpinan seharusnya yang
-menuntut keputusannya, bukan yang paling banyak angkanya.
-
-> **Kebiasaan yang benar:** setiap angka turunan pada aplikasi ini membawa keterangan
-> asal. Bacalah keterangan itu sebelum mengutip angkanya. Angka tanpa konteks adalah
-> cara tercepat sebuah prototipe disalahpahami sebagai data resmi.
+> **Kebiasaan yang benar:** setiap angka turunan pada aplikasi ini membawa keterangan asal.
+> Bacalah keterangan itu sebelum mengutip angkanya. Angka tanpa konteks adalah cara
+> tercepat sebuah prototipe disalahpahami sebagai data resmi.
 
 ---
 

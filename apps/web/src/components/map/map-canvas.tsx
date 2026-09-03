@@ -69,7 +69,68 @@ export function layerValue(district: MapDistrict, layer: MapLayer): number | nul
 }
 
 /**
- * Keterangan ringkas satu wilayah — dipakai tooltip.
+ * Isi tooltip saat kursor melewati satu wilayah.
+ *
+ * Aturannya diambil dari cara aplikasi pemantauan lain menyusun tooltip peta — Grafana
+ * Geomap, ArcGIS Dashboards, Datadog, ESRI Operations Dashboard: **cukup untuk memutuskan
+ * apakah perlu diklik, tidak lebih.** Susunannya seragam di mana-mana:
+ *
+ * ```text
+ * identitas  →  angka utama  →  status  →  satu pembanding  →  isyarat klik
+ * ```
+ *
+ * Tiga hal yang sengaja TIDAK masuk ke sini:
+ *
+ * 1. **Apa pun yang harus diklik.** Tooltip mengikuti kursor dan hilang begitu kursor
+ *    bergeser; tautan di dalamnya mustahil diraih. Karena itu seluruh lapisannya
+ *    `pointer-events-none`.
+ * 2. **Rincian lengkap.** Riwayat, daftar prediksi, dan peringatan aktif adalah isi panel
+ *    **klik**. Menaruhnya di hover membuat kotak yang menutupi peta yang sedang dibaca.
+ * 3. **Angka yang menuntut pembanding.** Satu angka tanpa acuan tidak dapat dinilai
+ *    sekilas, dan tooltip tidak punya ruang untuk menjelaskan acuannya.
+ */
+export type TooltipRow = { label: string; value: string };
+
+export function tooltipRows(district: MapDistrict, layer: MapLayer): TooltipRow[] {
+  if (layer === "historical") {
+    const area = district.historical;
+    if (!area) return [{ label: "Kejadian", value: "tidak ada catatan" }];
+    const dominant = area.by_threat_type[0];
+    return [
+      { label: "Kejadian", value: `${area.incidents}` },
+      ...(dominant
+        ? [{ label: "Terbanyak", value: `${dominant.threat_type} (${dominant.incidents})` }]
+        : []),
+    ];
+  }
+
+  if (layer === "predictive") {
+    const area = district.predictive;
+    if (!area) return [{ label: "Prediksi", value: "tidak ada" }];
+    return [
+      { label: "Skor prediksi", value: `${area.risk_score}/100` },
+      { label: "Ancaman", value: area.threat_type },
+      ...(area.time_window ? [{ label: "Jendela", value: area.time_window }] : []),
+      // Prediksi tidak berkelas (U-01), dan ketiadaannya disebut supaya tidak terbaca
+      // sebagai kelas yang kebetulan tidak muat.
+      { label: "Kelas", value: "belum ditetapkan" },
+    ];
+  }
+
+  const area = district.current;
+  if (!area) return [{ label: "Risiko", value: "tidak ada data" }];
+  const risk = toRiskClass(area.risk_class);
+  const dominant = area.threats[0];
+  return [
+    { label: "Skor risiko", value: `${area.risk_score}/100` },
+    ...(risk ? [{ label: "Kelas", value: RISK_LABELS[risk] }] : []),
+    ...(dominant ? [{ label: "Ancaman utama", value: dominant.threat_type }] : []),
+    ...(dominant?.time_window ? [{ label: "Jam rawan", value: dominant.time_window }] : []),
+  ];
+}
+
+/**
+ * Keterangan ringkas satu wilayah — dipakai panel ringkas dan pembaca layar.
  *
  * Pada layer prediktif keterangan berhenti di angka: menyebut kelas di sini akan
  * mengarang kelas yang tidak dikirim API.
@@ -158,6 +219,7 @@ export function MapCanvas({
   showScores = true,
   historical,
   months = DEFAULT_HISTORICAL_MONTHS,
+  hrefFor,
 }: {
   districts: MapDistrict[];
   layer: MapLayer;
@@ -174,6 +236,14 @@ export function MapCanvas({
    */
   historical?: { points: HistoricalPoint[]; peakIncidents: number; peakPointIncidents: number };
   months?: HistoricalMonths;
+  /**
+   * Alamat tujuan saat sebuah wilayah diklik.
+   *
+   * Dapat diganti supaya bidang gambar yang sama dapat dipakai di dua tempat dengan
+   * perilaku klik yang berbeda: pada `/peta` klik memilih wilayah di halaman itu juga,
+   * sedangkan pada beranda klik membuka rinciannya **tanpa meninggalkan beranda**.
+   */
+  hrefFor?: (kecamatan: string) => string;
 }) {
   const byName = useMemo(
     () => new Map(districts.map((district) => [district.kecamatan, district])),
@@ -210,7 +280,7 @@ export function MapCanvas({
           return (
             <g key={shape.kecamatan}>
               <Link
-                href={mapHref(shape.kecamatan, layer, months)}
+                href={hrefFor ? hrefFor(shape.kecamatan) : mapHref(shape.kecamatan, layer, months)}
                 scroll={false}
                 aria-label={ariaLabel(shape, district, layer)}
                 aria-current={isSelected ? "true" : undefined}
@@ -303,7 +373,17 @@ export function MapCanvas({
           style={toPercent(hoveredShape.label)}
         >
           <p className="font-heading text-xs font-semibold text-ink">{hoveredShape.kecamatan}</p>
-          <p className="font-mono text-[11px] text-ink-muted">{districtSummary(hovered, layer)}</p>
+          <dl className="mt-1 space-y-0.5">
+            {tooltipRows(hovered, layer).map((row) => (
+              <div key={row.label} className="flex items-baseline gap-3">
+                <dt className="text-[10px] text-ink-faint">{row.label}</dt>
+                <dd className="ml-auto font-mono text-[11px] text-ink">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-1.5 border-t border-base-800 pt-1 text-[9px] uppercase tracking-wider text-ink-faint">
+            Klik untuk rincian
+          </p>
         </div>
       ) : null}
     </div>
