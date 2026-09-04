@@ -39,3 +39,7 @@ __pycache__/
 # Artefak build & test
 playwright-report/
 test-results/
+
+# APK hasil build. Berkasnya besar dan dibangun ulang dari sumber; yang dibagikan adalah
+# berkas rilisnya, bukan riwayat git.
+/dist/

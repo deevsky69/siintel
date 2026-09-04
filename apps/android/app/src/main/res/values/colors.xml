@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="base_950">#050B18</color>
+    <color name="base_900">#0A1424</color>
+    <color name="base_800">#132339</color>
+    <color name="base_700">#1B2F4A</color>
+    <color name="ink">#E6F0FF</color>
+    <color name="ink_muted">#8EA6C8</color>
+    <color name="ink_faint">#5B7796</color>
+    <color name="accent">#22D3EE</color>
+    <color name="critical">#EF4444</color>
+    <color name="ok">#4ADE80</color>
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LAPOR PRESISI</string>
+    <string name="subtitle">Polres Metro Jakarta Selatan</string>
+
+    <string name="emergency_title">Sedang darurat? Hubungi 110.</string>
+    <string name="emergency_body">Aplikasi ini untuk laporan yang tidak memerlukan penanganan seketika. Laporan di sini bukan pengganti laporan polisi resmi.</string>
+
+    <string name="label_category">Jenis kejadian</string>
+    <string name="label_area">Kecamatan</string>
+    <string name="label_place">Keterangan tempat (opsional)</string>
+    <string name="hint_place">Misalnya: gang samping pasar, dekat halte</string>
+    <string name="label_story">Apa yang Anda lihat</string>
+    <string name="hint_story">Ceritakan apa yang terjadi.</string>
+    <string name="privacy_warning">Jangan menuliskan nama, nomor telepon, atau alamat siapa pun — termasuk nama Anda sendiri. Sistem ini tidak menyimpan identitas.</string>
+
+    <string name="send">Kirim laporan</string>
+    <string name="sending">Mengirim…</string>
+    <string name="loading_options">Memuat pilihan…</string>
+
+    <string name="sent_title">Laporan tercatat</string>
+    <string name="ticket_label">Nomor tiket Anda</string>
+    <string name="sent_body">Simpan nomor tiket ini untuk menanyakan perkembangannya kepada petugas.</string>
+    <string name="send_another">Kirim laporan lain</string>
+
+    <string name="no_identity">Tanpa akun dan tanpa identitas. Aplikasi ini tidak meminta dan tidak menyimpan nama, nomor telepon, maupun alamat pelapor.</string>
+    <string name="coord_note">Lokasi laporan sebatas kecamatan yang Anda pilih, bukan titik tempat kejadian.</string>
+
+    <string name="err_offline">Laporan tidak dapat dikirim karena sistem sedang tidak dapat dihubungi. Untuk keadaan mendesak, hubungi 110.</string>
+    <string name="err_options">Pilihan isian gagal dimuat. Periksa sambungan Anda, lalu buka ulang aplikasi.</string>
+    <string name="err_incomplete">Lengkapi jenis kejadian, kecamatan, dan keterangan kejadiannya.</string>
+    <string name="err_short">Keterangan kejadian terlalu pendek — tuliskan setidaknya satu kalimat.</string>
+</resources>

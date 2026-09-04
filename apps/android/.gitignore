@@ -1,0 +1,10 @@
+# Keluaran build dan berkas khusus mesin.
+#
+# `local.properties` memuat jalur SDK Android di mesin yang membangunnya — berbeda di tiap
+# komputer, dan tidak berguna bagi orang lain.
+.gradle/
+build/
+app/build/
+local.properties
+*.apk
+*.aab
