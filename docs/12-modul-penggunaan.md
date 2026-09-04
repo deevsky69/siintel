@@ -163,8 +163,35 @@ Yang perlu diketahui:
 - Menu yang tampil mengikuti peran Anda, tetapi **yang menentukan adalah server** —
   membuka alamat halaman secara langsung tidak melewati pembatasan.
 - Tombol **Keluar** di kanan atas mengakhiri sesi dan mengembalikan Anda ke halaman masuk.
+- **Lonceng** di kanan atas memuat antrean pekerjaan yang menunggu Anda — lihat di bawah.
 - Halaman masuk memuat jalan kembali ke **Lapor Kejadian** dan **Halaman Muka**, untuk warga
   yang salah menekan tombol.
+
+### Lonceng — pekerjaan yang menunggu Anda
+
+Lonceng di pojok kanan atas **bukan kabar tentang apa yang terjadi**, melainkan daftar
+pekerjaan yang menunggu Anda kerjakan. Bedanya menentukan, dan itu pula sebabnya isinya
+berbeda menurut peran:
+
+| Peran | Yang muncul di loncengnya |
+|---|---|
+| **Pimpinan** | Rekomendasi yang menunggu keputusannya |
+| **Polsek** | Peringatan belum diterima · laporan warga belum diverifikasi |
+| **Administrator** | Peringatan · laporan warga · prediksi draf · keputusan yang belum ditindaklanjuti |
+| **Fungsi** | Kosong, dan itu benar — kewenangannya mencatat kejadian dan patroli, bukan menyetujui atau menriase |
+
+Tiap baris terikat pada **kewenangan tindakan**, bukan kewenangan baca. Seorang Pimpinan
+dapat membaca laporan masyarakat tetapi tidak dapat memverifikasinya — jadi laporan yang
+belum diverifikasi **tidak** muncul di loncengnya. Memberitahunya hanya menambah kecemasan
+tanpa jalan keluar, dan lencana yang selalu merah berhenti dilihat orang.
+
+> **Tidak ada penanda "sudah dibaca".** Angkanya dihitung ulang dari keadaan sebenarnya
+> setiap kali halaman dimuat, sehingga ia **hanya turun ketika pekerjaannya selesai**. Itu
+> disengaja: pada antrean tugas, penanda terbaca berubah menjadi cara melupakan tugas.
+
+Antrean yang kosong tetap ditampilkan berikut angka nolnya. "Nol peringatan menunggu" adalah
+kabar baik yang pantas terbaca — dan menghilangkan barisnya membuat Anda tidak dapat
+membedakan "tidak ada" dari "tidak diperiksa".
 
 ### Susunan menu
 

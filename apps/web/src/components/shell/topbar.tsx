@@ -1,7 +1,16 @@
 import { Clock } from "./clock";
 
 /** Topbar: identitas sistem, satuan wilayah, jam WIB, dan pengguna aktif. */
-export function Topbar({ name, roleName }: { name: string; roleName: string }) {
+export function Topbar({
+  name,
+  roleName,
+  notifications,
+}: {
+  name: string;
+  roleName: string;
+  /** Lonceng antrean pekerjaan; dirakit di layout supaya bilah ini tetap murni tampilan. */
+  notifications?: React.ReactNode;
+}) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-6 border-b border-base-800 bg-base-900/70 px-5">
       <div className="flex items-center gap-3">
@@ -36,6 +45,7 @@ export function Topbar({ name, roleName }: { name: string; roleName: string }) {
         >
           Modul
         </a>
+        {notifications}
         <Clock />
         <div className="flex items-center gap-2.5 border-l border-base-800 pl-5">
           <div className="text-right leading-tight">

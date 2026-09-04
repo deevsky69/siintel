@@ -391,6 +391,7 @@ tidak terjadi.
 | GET | `/dashboard/trends` | `dashboard:read` |
 | GET | `/dashboard/active-warnings` | `dashboard:read`, `warning:read` |
 | GET | `/dashboard/leadership` | `dashboard:read` — ✅ **ADA** |
+| GET | `/notifications` | `dashboard:read` — ✅ **ADA** |
 
 **`/dashboard/leadership` (TASK 150).** Permintaan pemilik proyek, 2 September 2026: layar
 beranda yang tersusun mengikuti urutan pertanyaan seorang pimpinan, bukan urutan

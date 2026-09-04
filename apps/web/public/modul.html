@@ -700,8 +700,46 @@
         <li>Sesi berumur pendek dan diperpanjang otomatis selama Anda aktif.</li>
         <li>Menu yang tampil mengikuti peran Anda, tetapi <strong>yang menentukan adalah server</strong> — membuka alamat halaman secara langsung tidak melewati pembatasan.</li>
         <li>Tombol <strong>Keluar</strong> di kanan atas mengakhiri sesi dan mengembalikan Anda ke halaman masuk.</li>
+        <li><strong>Lonceng</strong> di kanan atas memuat antrean pekerjaan yang menunggu Anda.</li>
         <li>Halaman masuk memuat jalan kembali ke <strong>Lapor Kejadian</strong> dan <strong>Halaman Muka</strong>, untuk warga yang salah menekan tombol.</li>
       </ul>
+
+      <h3>Lonceng — pekerjaan yang menunggu Anda</h3>
+      <p>
+        Lonceng di pojok kanan atas <strong>bukan kabar tentang apa yang terjadi</strong>, melainkan
+        daftar pekerjaan yang menunggu Anda kerjakan. Bedanya menentukan, dan itu pula sebabnya
+        isinya berbeda menurut peran:
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Peran</th><th>Yang muncul di loncengnya</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Pimpinan</strong></td><td>Rekomendasi yang menunggu keputusannya.</td></tr>
+            <tr><td><strong>Polsek</strong></td><td>Peringatan belum diterima &middot; laporan warga belum diverifikasi.</td></tr>
+            <tr><td><strong>Administrator</strong></td><td>Peringatan &middot; laporan warga &middot; prediksi draf &middot; keputusan yang belum ditindaklanjuti.</td></tr>
+            <tr><td><strong>Fungsi</strong></td><td>Kosong, dan itu benar — kewenangannya mencatat kejadian dan patroli, bukan menyetujui atau menriase.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Tiap baris terikat pada <strong>kewenangan tindakan</strong>, bukan kewenangan baca. Seorang
+        Pimpinan dapat membaca laporan masyarakat tetapi tidak dapat memverifikasinya — jadi laporan
+        yang belum diverifikasi tidak muncul di loncengnya. Memberitahunya hanya menambah kecemasan
+        tanpa jalan keluar, dan lencana yang selalu merah berhenti dilihat orang.
+      </p>
+      <div class="note caution">
+        <span class="label">Tidak ada penanda &#8220;sudah dibaca&#8221;</span>
+        <p>
+          Angkanya dihitung ulang dari keadaan sebenarnya setiap kali halaman dimuat, sehingga ia
+          <strong>hanya turun ketika pekerjaannya selesai</strong>. Itu disengaja: pada antrean
+          tugas, penanda terbaca berubah menjadi cara melupakan tugas.
+        </p>
+      </div>
+      <p>
+        Antrean yang kosong tetap ditampilkan berikut angka nolnya. &#8220;Nol peringatan
+        menunggu&#8221; adalah kabar baik yang pantas terbaca — dan menghilangkan barisnya membuat
+        Anda tidak dapat membedakan &#8220;tidak ada&#8221; dari &#8220;tidak diperiksa&#8221;.
+      </p>
 
       <h3>Susunan menu</h3>
       <p>
