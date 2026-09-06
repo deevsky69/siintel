@@ -50,10 +50,34 @@
 		max_size 2MB
 	}
 
-	reverse_proxy web:3000 {
-		# Header ini yang membuat Next.js tahu permintaan aslinya HTTPS.
-		header_up X-Forwarded-Proto {scheme}
-		header_up X-Real-IP {remote_host}
+	# Backend dijangkau langsung pada awalan `/api/v1`.
+	#
+	# MENGAPA PERLU, PADAHAL APLIKASI WEB MEMANGGIL BACKEND DARI SISI SERVER
+	#
+	#   Sejak 6 September 2026 ada dua aplikasi Android yang memanggil API langsung dari
+	#   ponsel. Tanpa rute ini keduanya menerima 404 — dan itu tidak akan terlihat sampai
+	#   APK-nya dipasang di ponsel sungguhan, sebab aplikasi web tetap bekerja normal.
+	#
+	#   Awalan path dipakai, bukan subdomain `api.<domain>`, supaya tidak menuntut satu
+	#   record DNS tambahan. `/api/v1/*` bebas dari bentrokan: rute BFF aplikasi web hanya
+	#   `/api/auth/login` dan `/api/auth/logout`, tanpa `/v1`.
+	#
+	#   Yang terbuka adalah permukaan yang memang dirancang untuk itu: kanal publik
+	#   (berbatas laju, tanpa identitas) dan penukaran kredensial dengan token. Endpoint
+	#   lain tetap menuntut token dan tetap memeriksa kewenangan di query.
+	handle /api/v1/* {
+		reverse_proxy api:8000 {
+			header_up X-Forwarded-Proto {scheme}
+			header_up X-Real-IP {remote_host}
+		}
+	}
+
+	handle {
+		reverse_proxy web:3000 {
+			# Header ini yang membuat Next.js tahu permintaan aslinya HTTPS.
+			header_up X-Forwarded-Proto {scheme}
+			header_up X-Real-IP {remote_host}
+		}
 	}
 
 	log {
