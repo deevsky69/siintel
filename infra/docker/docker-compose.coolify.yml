@@ -85,28 +85,45 @@ services:
       traefik.http.middlewares.predpol-security-headers.headers.permissionsPolicy: "geolocation=(), microphone=(), camera=()"
       traefik.http.middlewares.predpol-security-headers.headers.customResponseHeaders.Cross-Origin-Opener-Policy: "same-origin"
 
-  # `api` sengaja tidak diubah di sini: tidak ikut ke network `coolify` dan tidak
-  # diberi label Traefik. Backend tetap tanpa rute publik.
+  # `api` dibuka ke publik sejak 6 September 2026, saat aplikasi Android dibangun.
   #
-  # CATATAN — bila kelak LAPOR PRESISI (Tahap F) perlu memanggil API langsung dari
-  # perangkat Android, backend dapat dibuka pada subdomain terpisah dengan menyalin
-  # blok di bawah ini ke dalam `services:` DAN membuat A record api.<domain>.
-  # Selama belum diperlukan, biarkan tetap komentar: permukaan serang yang tidak
-  # dibuka adalah permukaan serang yang tidak perlu dijaga.
+  # MENGAPA AWALAN PATH, BUKAN SUBDOMAIN
   #
-  # api:
-  #   networks:
-  #     - internal
-  #     - coolify
-  #   labels:
-  #     traefik.enable: "true"
-  #     traefik.docker.network: coolify
-  #     traefik.http.routers.predpol-api.entrypoints: https
-  #     traefik.http.routers.predpol-api.rule: Host(`api.${DOMAIN}`)
-  #     traefik.http.routers.predpol-api.tls: "true"
-  #     traefik.http.routers.predpol-api.tls.certresolver: letsencrypt
-  #     traefik.http.routers.predpol-api.service: predpol-api
-  #     traefik.http.services.predpol-api.loadbalancer.server.port: "8000"
+  #   Rancangan semula memakai `api.<domain>`, dan itu memang lebih rapi. Tetapi
+  #   subdomain menuntut satu A record baru di panel DomaiNesia — panel yang sedang
+  #   terbukti tidak dapat diandalkan: record `_acme-challenge` gagal tersimpan empat
+  #   kali berturut-turut tanpa pesan galat apa pun (`docs/10` §3.2).
+  #
+  #   Awalan path tidak menuntut DNS sama sekali. `/api/v1/*` juga bebas dari bentrokan:
+  #   rute BFF milik aplikasi web hanya `/api/auth/login` dan `/api/auth/logout`, tanpa
+  #   `/v1`. Prioritas dinaikkan supaya rute ini menang atas rute web yang mencocokkan
+  #   seluruh Host.
+  #
+  # APA YANG SEKARANG TERBUKA, DAN APA YANG TIDAK
+  #
+  #   Yang terbuka adalah permukaan yang memang dirancang untuk itu: kanal publik
+  #   (berbatas laju, tanpa identitas) dan penukaran kredensial dengan token. Seluruh
+  #   endpoint lain tetap menuntut token dan tetap memeriksa kewenangan serta cakupan
+  #   wilayah di query — tidak ada yang berubah di sana.
+  #
+  #   Yang TIDAK terbuka: basis data, dan `/openapi.json` yang memang dimatikan di
+  #   produksi.
+  api:
+    networks:
+      - internal
+      - coolify
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: coolify
+      traefik.http.routers.predpol-api.entrypoints: https
+      traefik.http.routers.predpol-api.rule: Host(`${DOMAIN}`) && PathPrefix(`/api/v1`)
+      # Lebih tinggi daripada rute web, yang mencocokkan Host saja. Tanpa ini, Traefik
+      # memilih menurut panjang aturan dan hasilnya bergantung pada kebetulan.
+      traefik.http.routers.predpol-api.priority: "100"
+      traefik.http.routers.predpol-api.tls: "true"
+      traefik.http.routers.predpol-api.service: predpol-api
+      traefik.http.routers.predpol-api.middlewares: predpol-security-headers
+      traefik.http.services.predpol-api.loadbalancer.server.port: "8000"
 
 networks:
   # Network ini SUDAH ADA dan dimiliki Coolify. `external: true` berarti compose

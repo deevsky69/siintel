@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Perisai: membedakan aplikasi petugas dari aplikasi warga di laci aplikasi, tanpa
+         memakai lambang kedinasan yang pemakaiannya diatur tersendiri. -->
+    <path android:fillColor="#22D3EE"
+        android:pathData="M54,26l20,8v18c0,13 -8,22 -20,28c-12,-6 -20,-15 -20,-28V34z" />
+    <path android:fillColor="#050B18"
+        android:pathData="M54,40l9,4v9c0,6 -4,10 -9,13c-5,-3 -9,-7 -9,-13v-9z" />
+</vector>

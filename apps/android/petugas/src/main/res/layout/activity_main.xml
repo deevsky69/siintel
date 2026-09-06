@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/base_950"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/app_name"
+            android:textColor="@color/ink"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="2dp"
+            android:letterSpacing="0.12"
+            android:text="@string/subtitle"
+            android:textAllCaps="true"
+            android:textColor="@color/ink_muted"
+            android:textSize="10sp" />
+
+        <!-- masuk -->
+        <LinearLayout
+            android:id="@+id/loginGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/usernameInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="username"
+                android:background="@drawable/box_field"
+                android:hint="@string/username"
+                android:inputType="text"
+                android:minHeight="52dp"
+                android:padding="14dp"
+                android:textColor="@color/ink"
+                android:textColorHint="@color/ink_faint"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:autofillHints="password"
+                android:background="@drawable/box_field"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:minHeight="52dp"
+                android:padding="14dp"
+                android:textColor="@color/ink"
+                android:textColorHint="@color/ink_faint"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/loginError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/box_critical"
+                android:padding="10dp"
+                android:textColor="@color/critical"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:minHeight="52dp"
+                android:text="@string/sign_in"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="@string/login_note"
+                android:textColor="@color/ink_faint"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- antrean pekerjaan -->
+        <LinearLayout
+            android:id="@+id/homeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/box_field"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:id="@+id/whoText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/ink"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/roleText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:letterSpacing="0.1"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accent"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:letterSpacing="0.1"
+                    android:text="@string/queue_title"
+                    android:textAllCaps="true"
+                    android:textColor="@color/ink_muted"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/totalText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:textColor="@color/critical"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/queueList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/queueNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/queue_note"
+                android:textColor="@color/ink_faint"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/refreshButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:minHeight="48dp"
+                android:text="@string/refresh" />
+
+            <Button
+                android:id="@+id/logoutButton"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:minHeight="48dp"
+                android:text="@string/sign_out"
+                android:textColor="@color/ink_muted" />
+
+            <TextView
+                android:id="@+id/versionText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:textColor="@color/ink_faint"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="28dp"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

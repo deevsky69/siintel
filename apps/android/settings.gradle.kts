@@ -20,3 +20,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "LaporPresisi"
 include(":app")
+include(":petugas")
