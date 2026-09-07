@@ -124,6 +124,9 @@ class MainActivity : AppCompatActivity() {
     private fun render(profile: Api.Profile, feed: Api.Feed) {
         views.loginGroup.visibility = View.GONE
         views.homeGroup.visibility = View.VISIBLE
+        // Keterangan dikembalikan ke bunyi aslinya: pesan galat dari pemuatan yang gagal
+        // sebelumnya tidak boleh tertinggal di layar setelah pemuatan berikutnya berhasil.
+        views.queueNote.text = getString(R.string.queue_note)
 
         views.whoText.text = profile.name
         views.roleText.text = profile.role

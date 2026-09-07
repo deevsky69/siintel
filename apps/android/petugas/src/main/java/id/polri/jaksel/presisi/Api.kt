@@ -50,7 +50,11 @@ object Api {
 
     class Failure(val readable: String, val unauthorized: Boolean = false) : Exception(readable)
 
-    data class Session(val accessToken: String, val refreshToken: String?)
+    /**
+     * Sepasang token hasil [login]. Dinamai begini, bukan `Session`, supaya tidak tertukar
+     * dengan kelas [Session] yang memegang aturan pembaruannya.
+     */
+    data class Credentials(val accessToken: String, val refreshToken: String?)
 
     data class Profile(val name: String, val role: String, val permissions: List<String>)
 
@@ -69,14 +73,14 @@ object Api {
     /** Badan respons beserta headernya — headernya diperlukan hanya untuk `Set-Cookie`. */
     internal class Reply(val body: String, val headers: Map<String, List<String>>)
 
-    suspend fun login(base: String, username: String, password: String): Session =
+    suspend fun login(base: String, username: String, password: String): Credentials =
         withContext(Dispatchers.IO) {
             val payload = JSONObject()
                 .put("username", username)
                 .put("password", password)
                 .toString()
             val reply = call(base, "/api/v1/auth/login", "POST", payload, null, null)
-            Session(
+            Credentials(
                 accessToken = JSONObject(reply.body).getString("access_token"),
                 refreshToken = refreshTokenFrom(reply.headers),
             )

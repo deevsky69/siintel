@@ -32,10 +32,10 @@ class ApiTest {
                 ),
             )
 
-            val session = Api.login(server.base, "demo.pimpinan", "rahasia")
+            val granted = Api.login(server.base, "demo.pimpinan", "rahasia")
 
-            assertEquals("A1", session.accessToken)
-            assertEquals("R1", session.refreshToken)
+            assertEquals("A1", granted.accessToken)
+            assertEquals("R1", granted.refreshToken)
         }
     }
 
@@ -44,10 +44,10 @@ class ApiTest {
         FakeServer().use { server ->
             server.on("/api/v1/auth/login", FakeServer.Reply(200, loginBody))
 
-            val session = Api.login(server.base, "demo.pimpinan", "rahasia")
+            val granted = Api.login(server.base, "demo.pimpinan", "rahasia")
 
-            assertEquals("A1", session.accessToken)
-            assertNull(session.refreshToken)
+            assertEquals("A1", granted.accessToken)
+            assertNull(granted.refreshToken)
         }
     }
 

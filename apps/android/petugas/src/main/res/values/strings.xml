@@ -11,7 +11,7 @@
     <string name="sign_out">Keluar</string>
 
     <string name="queue_title">Menunggu Anda</string>
-    <string name="queue_empty">Peran Anda tidak memiliki antrean pekerjaan. Itu bukan kekeliruan — kewenangan Anda membaca dan menganalisis, bukan menyetujui atau menriase.</string>
+    <string name="queue_empty">Peran Anda tidak memiliki antrean pekerjaan. Itu bukan kekeliruan — kewenangan Anda membaca dan menganalisis, bukan menyetujui atau mentriase.</string>
     <string name="queue_note">Daftar ini dihitung ulang setiap kali dibuka. Tidak ada penanda \"sudah dibaca\" — angkanya hanya turun ketika pekerjaannya selesai.</string>
     <string name="refresh">Muat ulang</string>
 
