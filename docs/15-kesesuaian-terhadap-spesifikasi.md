@@ -152,5 +152,20 @@ mekanisme akun dan kebijakan perlindungan data*.
 | 3 | AI Prediction Center | MVP #7 — perlu endpoint `prediction:run` dan `prediction:publish` |
 | 4 | Near-repeat pada Crime Pattern DNA | docs/01 §5.4 menyebutnya; definisi jendela jarak dan waktu **menunggu keputusan pemilik proyek** |
 
-**LAPOR PRESISI** (spesifikasi §4 — panic button, info sekitar, status laporan, community
-watch) tetap Tahap F sesuai ketentuan pemilik proyek: Android paling akhir.
+### Android — keadaan per 7 September 2026
+
+Dua APK sudah dapat dipasang dan **diverifikasi berjalan di emulator Android 14**, keduanya
+lewat HTTPS dengan CA satuan (`docs/implementation-notes/170-android.md`):
+
+| Aplikasi | Yang sudah bekerja | Yang belum |
+|---|---|---|
+| **LAPOR PRESISI** (warga) | Mengirim laporan — teruji sampai tersimpan di basis data | Panic button, info sekitar, status laporan, community watch (spesifikasi §4) |
+| **PRESISI Petugas** | Masuk, sesi tujuh hari, membaca antrean menurut kewenangan | Bertindak atas antrean (menyetujui, menolak, mentriase) |
+
+Sisa fitur spesifikasi §4 tetap Tahap F sesuai ketentuan pemilik proyek. Kemampuan
+**bertindak** dari ponsel bukan sekadar pekerjaan teknis: ia menyentuh pertanyaan tindakan
+mana yang pantas diputuskan dari layar kecil di lapangan, dan itu keputusan pemilik proyek.
+
+> Daftar "Masih tersisa" di atas bertanggal 1 September 2026 dan sebagian sudah dikerjakan
+> sesudahnya. Ia belum ditulis ulang di sini karena penulisan ulangnya menuntut audit penuh,
+> bukan tambalan.
