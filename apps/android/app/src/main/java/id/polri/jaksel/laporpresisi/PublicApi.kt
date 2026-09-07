@@ -47,7 +47,7 @@ object PublicApi {
         Options(
             categories = json.getJSONArray("categories").toStringList(),
             areas = json.getJSONArray("kecamatan").toStringList(),
-            coordinateBasis = json.optString("coordinate_basis"),
+            coordinateBasis = json.text("coordinate_basis"),
         )
     }
 
@@ -63,7 +63,7 @@ object PublicApi {
         }
         val body = post("$baseUrl/api/v1/public/citizen-reports", payload.toString())
         val json = JSONObject(body)
-        Ticket(code = json.getString("ticket"), message = json.optString("message"))
+        Ticket(code = json.getString("ticket"), message = json.text("message"))
     }
 
     private fun get(url: String): String = call(url, null)
@@ -117,6 +117,21 @@ object PublicApi {
             in 500..599 -> "Sistem sedang bermasalah. Coba lagi beberapa saat lagi."
             else -> "Laporan tidak dapat dikirim. Periksa kembali isian Anda, lalu coba lagi."
         }
+    }
+
+    /**
+     * Nilai teks dari sebuah field, dengan `null` JSON dibaca sebagai kosong.
+     *
+     * **Jangan menggantinya dengan `optString`.** Keduanya berbeda pada kasus yang justru
+     * paling mungkin terjadi: untuk `{"message": null}`, `optString` milik Android
+     * mengembalikan teks `"null"` — empat huruf yang lalu tergambar di layar sebagai pesan
+     * untuk pelapor. Implementasi `org.json` di JVM mengembalikan teks kosong untuk kasus
+     * yang sama, sehingga unit test **tidak dapat menangkap perbedaan ini**; ia hanya
+     * terlihat saat aplikasi berjalan di Android.
+     */
+    private fun JSONObject.text(name: String): String {
+        val value = opt(name)
+        return if (value == null || value === JSONObject.NULL) "" else value.toString()
     }
 
     private fun org.json.JSONArray.toStringList(): List<String> =

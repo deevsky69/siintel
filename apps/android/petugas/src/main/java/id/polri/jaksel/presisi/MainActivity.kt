@@ -28,8 +28,14 @@ import kotlinx.coroutines.launch
  * ## Sesi
  *
  * Token disimpan terenkripsi ([TokenStore]) dan aplikasi membuka langsung ke antrean bila
- * masih berlaku. Token yang ditolak server (`401`) menjatuhkan sesi dan mengembalikan
- * pengguna ke layar masuk beserta alasannya — bukan layar kosong yang tampak rusak.
+ * masih berlaku. Access token hanya berumur 15 menit, jadi hampir setiap kali aplikasi
+ * dibuka kembali token itu sudah kedaluwarsa; [Session] menukarnya dengan yang baru
+ * memakai refresh token tanpa melibatkan pengguna. Petugas baru diminta masuk kembali
+ * setelah tujuh hari, atau ketika akunnya dinonaktifkan.
+ *
+ * Penolakan yang tidak dapat dipulihkan (`401` yang bertahan) menjatuhkan sesi dan
+ * mengembalikan pengguna ke layar masuk beserta alasannya — bukan layar kosong yang tampak
+ * rusak. Gangguan jaringan **tidak** menjatuhkan sesi.
  *
  * Kata sandi **tidak pernah disimpan**. Petugas yang kehilangan ponselnya kehilangan sesi,
  * bukan kata sandinya.
@@ -38,12 +44,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var views: ActivityMainBinding
     private lateinit var tokens: TokenStore
+    private lateinit var session: Session
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         views = ActivityMainBinding.inflate(layoutInflater)
         setContentView(views.root)
         tokens = TokenStore(this)
+        session = Session(BuildConfig.API_BASE, tokens)
 
         views.versionText.text = getString(
             R.string.version_label,
@@ -72,8 +80,9 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val session = Api.login(BuildConfig.API_BASE, username, password)
-                tokens.accessToken = session.accessToken
+                val granted = Api.login(BuildConfig.API_BASE, username, password)
+                tokens.accessToken = granted.accessToken
+                tokens.refreshToken = granted.refreshToken
                 // Kata sandi dihapus dari layar begitu ditukar dengan token: membiarkannya
                 // tertinggal di kolom berarti ia terbaca siapa pun yang meminjam ponselnya.
                 views.passwordInput.text?.clear()
@@ -89,13 +98,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadQueues() {
-        val token = tokens.accessToken ?: return showLogin(null)
+        if (tokens.accessToken == null) return showLogin(null)
 
         busy(true)
         lifecycleScope.launch {
             try {
-                val profile = Api.profile(BuildConfig.API_BASE, token)
-                val feed = Api.notifications(BuildConfig.API_BASE, token)
+                val profile = session.run { Api.profile(BuildConfig.API_BASE, it) }
+                val feed = session.run { Api.notifications(BuildConfig.API_BASE, it) }
                 render(profile, feed)
             } catch (failure: Api.Failure) {
                 if (failure.unauthorized) {

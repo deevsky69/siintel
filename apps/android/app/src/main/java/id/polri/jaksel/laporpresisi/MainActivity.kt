@@ -73,7 +73,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun submit() {
-        val loaded = options ?: return
+        // Pengiriman mustahil sebelum pilihan termuat: tanpa daftar kategori dan kecamatan
+        // dari server, tidak ada nilai sah yang bisa dikirim.
+        if (options == null) return
         val category = views.categorySpinner.selectedItem?.toString().orEmpty()
         val area = views.areaSpinner.selectedItem?.toString().orEmpty()
         val story = views.storyInput.text.toString().trim()
@@ -114,8 +116,6 @@ class MainActivity : AppCompatActivity() {
                 views.sendButton.text = getString(R.string.send)
             }
         }
-        // `loaded` sengaja dibaca di awal agar pengiriman tanpa pilihan termuat mustahil.
-        check(loaded.categories.isNotEmpty())
     }
 
     private fun showTicket(ticket: PublicApi.Ticket) {

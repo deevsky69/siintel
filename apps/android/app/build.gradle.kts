@@ -41,6 +41,15 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+
+    testOptions {
+        unitTests {
+            // Panggilan ke kerangka Android yang tidak diuji mengembalikan nilai bawaan
+            // alih-alih melemparkan galat. Yang diuji di sini adalah lapisan HTTP dan
+            // penguraian JSON — keduanya Kotlin murni.
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -49,4 +58,10 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+
+    testImplementation("junit:junit:4.13.2")
+    // org.json sungguhan untuk unit test JVM. Tanpa ini, `android.jar` tiruan milik Gradle
+    // mengembalikan nilai bawaan dari tiap panggilan JSON, dan test parsing akan lulus tanpa
+    // benar-benar mengurai apa pun.
+    testImplementation("org.json:json:20240303")
 }

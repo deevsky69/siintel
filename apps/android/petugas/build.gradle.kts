@@ -40,6 +40,15 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+
+    testOptions {
+        unitTests {
+            // Panggilan ke kerangka Android yang tidak diuji mengembalikan nilai bawaan
+            // alih-alih melemparkan galat. Yang diuji di sini adalah lapisan HTTP dan
+            // penguraian JSON — keduanya Kotlin murni.
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -51,4 +60,10 @@ dependencies {
     // token akses adalah kredensial: pada ponsel yang di-root, preferensi biasa terbaca
     // aplikasi lain.
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    testImplementation("junit:junit:4.13.2")
+    // org.json sungguhan untuk unit test JVM. Tanpa ini, `android.jar` tiruan milik Gradle
+    // mengembalikan nilai bawaan dari tiap panggilan JSON, dan test parsing akan lulus tanpa
+    // benar-benar mengurai apa pun.
+    testImplementation("org.json:json:20240303")
 }
