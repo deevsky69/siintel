@@ -146,9 +146,46 @@ tanpa jendela, `-gpu off`. Domain `siintel.awansurya.com` dipetakan ke `10.0.2.2
 | Mengirim laporan | tiket `RPT-0154`, tersimpan `RECEIVED` di basis data |
 | `location_text` kosong tidak dikirim | terbukti — kolomnya kosong di basis data |
 | PRESISI Petugas masuk sebagai Pimpinan | berhasil lewat HTTPS + CA satuan |
-| Antrean menurut peran | 20 rekomendasi menunggu keputusan |
+| Antrean Pimpinan | 20 rekomendasi menunggu keputusan |
+| Antrean Polsek | 4 peringatan dini + 3 laporan warga — antrean yang berbeda, ditentukan server |
+| Keluar lalu masuk sebagai peran lain | berhasil; kedua token terhapus |
+| **Pembaruan sesi setelah token benar-benar mati** | **berhasil, pengguna tidak melihat apa pun** |
 
-### 5.1 Cacat yang hanya terlihat di perangkat
+### 5.1 Pembaruan sesi diuji dengan kedaluwarsa yang sungguhan
+
+Bukan dengan memperpendek umur token, melainkan dengan menunggu token yang terbit pukul
+07:39:22 melewati 15 menitnya, lalu menekan "Muat ulang" pada 07:55:40. Log API mencatat:
+
+```text
+07:55:43,561  GET  /api/v1/auth/me        401
+07:55:43,572  POST /api/v1/auth/refresh   200
+07:55:43,584  GET  /api/v1/auth/me        200
+07:55:43,595  GET  /api/v1/notifications  200
+```
+
+Seluruhnya 34 milidetik. Layar tetap menampilkan antrean; tidak ada layar masuk, tidak ada
+pesan galat, tidak ada yang perlu dikerjakan petugas.
+
+### 5.2 Menjalankan emulatornya
+
+```sh
+export ANDROID_HOME=$HOME/android-tools/sdk
+# Mesin ini tidak punya libx11-xcb1 sistem; emulator menjatuhkan diri (SIGSEGV) tanpa itu.
+# Salinannya ada di dalam SDK sendiri.
+export LD_LIBRARY_PATH=$ANDROID_HOME/emulator/lib64/qt/lib:$ANDROID_HOME/emulator/lib64
+$ANDROID_HOME/emulator/emulator -avd presisi34 -no-window -no-audio -no-boot-anim \
+    -no-snapshot -writable-system -gpu off -port 5560
+
+adb root && adb remount && adb reboot          # `remount` baru berlaku setelah boot ulang
+adb root && adb remount
+adb shell 'echo "10.0.2.2 siintel.awansurya.com" >> /etc/hosts'
+adb shell wm size 1080x2340 && adb shell wm density 420
+```
+
+Pemetaan `/etc/hosts` itu yang membuat jalur HTTPS dan penyematan CA **ikut teruji**;
+tanpa itu pengujian hanya akan menyentuh HTTP polos yang justru dilarang aplikasi ini.
+
+### 5.3 Cacat yang hanya terlihat di perangkat
 
 Layar menampilkan nama petugas sebagai **`null`**.
 
