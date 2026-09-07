@@ -32,6 +32,11 @@ OUT="${OUT:-$HOME/siintel-cert}"
 PROXY="coolify-proxy"
 DAYS=3650
 
+# Alamat IP yang ikut dicantumkan pada sertifikat, dipisah koma. Boleh lebih dari satu:
+# satu server dapat dijangkau lewat beberapa jalur, dan IP publik dinamis dapat berganti.
+# Domainnya selalu ikut dan tidak perlu disebut di sini.
+PUBLIC_IPS="${PUBLIC_IPS:-111.68.123.134,202.56.161.114}"
+
 docker() { sg docker -c "docker $*"; }
 
 mkdir -p "$OUT"
@@ -47,15 +52,33 @@ mkdir -p "$OUT"
 #   ditandatanganinya. Yang disematkan di APK adalah **CA-nya**. Dengan begitu sertifikat
 #   server kelak dapat diperbarui tanpa membangun ulang APK, selama CA-nya tetap sama.
 
-echo "==> Membuat CA milik satuan (berlaku $DAYS hari)"
-openssl req -x509 -newkey rsa:2048 -sha256 -days "$DAYS" -nodes \
-    -keyout "$OUT/ca.key" -out "$OUT/ca.crt" \
-    -subj "/C=ID/ST=DKI Jakarta/O=Polres Metro Jakarta Selatan/CN=PREDIKSI PRESISI Internal CA" \
-    -addext "basicConstraints=critical,CA:TRUE,pathlen:0" \
-    -addext "keyUsage=critical,keyCertSign,cRLSign" 2>/dev/null
-chmod 600 "$OUT/ca.key"
+# CA DIPAKAI ULANG BILA SUDAH ADA — jangan pernah membuatnya ulang tanpa sadar.
+#
+#   Kedua aplikasi Android menyematkan CA ini. Membuat CA baru membuat keduanya berhenti
+#   bekerja seketika, di setiap ponsel yang sudah memasangnya, tanpa pesan yang menjelaskan
+#   apa pun kepada penggunanya. Sertifikat server boleh — dan memang perlu — diterbitkan
+#   ulang saat alamat berubah; CA-nya tidak.
+#
+#   Untuk sengaja mengganti CA (misalnya karena ca.key bocor), hapus dulu berkasnya, lalu
+#   bangun ulang kedua APK.
+if [ -f "$OUT/ca.crt" ] && [ -f "$OUT/ca.key" ]; then
+    echo "==> Memakai CA yang sudah ada"
+    openssl x509 -in "$OUT/ca.crt" -noout -subject -enddate | sed 's/^/    /'
+else
+    echo "==> Membuat CA milik satuan (berlaku $DAYS hari)"
+    openssl req -x509 -newkey rsa:2048 -sha256 -days "$DAYS" -nodes \
+        -keyout "$OUT/ca.key" -out "$OUT/ca.crt" \
+        -subj "/C=ID/ST=DKI Jakarta/O=Polres Metro Jakarta Selatan/CN=PREDIKSI PRESISI Internal CA" \
+        -addext "basicConstraints=critical,CA:TRUE,pathlen:0" \
+        -addext "keyUsage=critical,keyCertSign,cRLSign" 2>/dev/null
+    chmod 600 "$OUT/ca.key"
+fi
 
 echo "==> Membuat sertifikat server untuk $DOMAIN"
+# Daftar SAN disusun dari domain ditambah setiap IP pada PUBLIC_IPS.
+SAN="DNS:$DOMAIN,DNS:*.$DOMAIN"
+for ip in ${PUBLIC_IPS//,/ }; do SAN="$SAN,IP:$ip"; done
+echo "    SAN: $SAN"
 openssl req -newkey rsa:2048 -sha256 -nodes \
     -keyout "$OUT/siintel.key" -out "$OUT/siintel.csr" \
     -subj "/C=ID/ST=DKI Jakarta/L=Jakarta Selatan/O=Polres Metro Jakarta Selatan/CN=$DOMAIN" 2>/dev/null
@@ -64,7 +87,7 @@ chmod 600 "$OUT/siintel.key"
 openssl x509 -req -in "$OUT/siintel.csr" -CA "$OUT/ca.crt" -CAkey "$OUT/ca.key" \
     -CAcreateserial -days "$DAYS" -sha256 -out "$OUT/siintel.crt" \
     -extfile <(printf '%s\n' \
-        "subjectAltName=DNS:$DOMAIN,DNS:*.$DOMAIN,IP:111.68.123.134" \
+        "subjectAltName=$SAN" \
         "basicConstraints=critical,CA:FALSE" \
         "keyUsage=critical,digitalSignature,keyEncipherment" \
         "extendedKeyUsage=serverAuth") 2>/dev/null
