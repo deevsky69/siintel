@@ -50,7 +50,21 @@ services:
 
       # ---- HTTP (:80) — hanya untuk mengalihkan ke HTTPS dan melayani tantangan ACME
       traefik.http.routers.predpol-web-http.entrypoints: http
-      traefik.http.routers.predpol-web-http.rule: Host(`${DOMAIN:?DOMAIN belum diisi di .env.production}`)
+      # Melayani nama apa pun, bukan hanya ${DOMAIN}.
+      #
+      #   Aturan `Host(...)` membuat permintaan yang datang TANPA nama domain — lewat IP
+      #   langsung, lewat klien yang tidak mengirim Host, lewat DNS yang belum menyebar —
+      #   tidak cocok dengan router mana pun, dan Traefik menjawabnya "no available server".
+      #   Dari sisi pengguna itu tidak dapat dibedakan dari server yang mati, dan itulah
+      #   yang dilaporkan pemilik proyek pada 7 September 2026.
+      #
+      #   `PathPrefix(/)` dengan prioritas rendah menerima semuanya. Ini aman HANYA karena
+      #   proxy ini tidak melayani aplikasi lain — sudah diperiksa: satu-satunya container
+      #   berlabel traefik selain proxy-nya sendiri adalah web dan api milik aplikasi ini.
+      #   Bila kelak ada aplikasi kedua di proxy yang sama, aturan ini WAJIB dikembalikan
+      #   menjadi `Host(...)`, kalau tidak ia akan menelan lalu lintas milik aplikasi itu.
+      traefik.http.routers.predpol-web-http.rule: PathPrefix(`/`)
+      traefik.http.routers.predpol-web-http.priority: "1"
       traefik.http.routers.predpol-web-http.middlewares: predpol-https-redirect
       traefik.http.middlewares.predpol-https-redirect.redirectscheme.scheme: https
       traefik.http.middlewares.predpol-https-redirect.redirectscheme.permanent: "true"
@@ -62,7 +76,9 @@ services:
 
       # ---- HTTPS (:443) — rute sebenarnya
       traefik.http.routers.predpol-web.entrypoints: https
-      traefik.http.routers.predpol-web.rule: Host(`${DOMAIN}`)
+      # Lihat catatan pada router http di atas — alasan yang sama.
+      traefik.http.routers.predpol-web.rule: PathPrefix(`/`)
+      traefik.http.routers.predpol-web.priority: "1"
       traefik.http.routers.predpol-web.tls: "true"
       # Penerbitan sertifikat SENGAJA tidak dipasang di sini — lihat
       # `docker-compose.letsencrypt.yml`. Meminta sertifikat selagi port 80/443
@@ -132,7 +148,7 @@ services:
       traefik.enable: "true"
       traefik.docker.network: coolify
       traefik.http.routers.predpol-api.entrypoints: https
-      traefik.http.routers.predpol-api.rule: Host(`${DOMAIN}`) && PathPrefix(`/api/v1`)
+      traefik.http.routers.predpol-api.rule: PathPrefix(`/api/v1`)
       # Lebih tinggi daripada rute web, yang mencocokkan Host saja. Tanpa ini, Traefik
       # memilih menurut panjang aturan dan hasilnya bergantung pada kebetulan.
       traefik.http.routers.predpol-api.priority: "100"
