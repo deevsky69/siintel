@@ -179,6 +179,29 @@ memakai sebagian sumber daya server ini.
 
 ---
 
+> ### ⚠ IP PUBLIK BERUBAH — 7 September 2026
+>
+> IP publik server berganti dari `111.68.123.134` menjadi `202.56.161.114`, dan bersamaan
+> dengan itu **penerusan port 8997 dan 8998 berhenti bekerja pada kedua alamat**. Port 8999
+> (SSH) selamat. Aplikasinya sendiri tidak terpengaruh sama sekali — dari dalam server ia
+> tetap menjawab 200.
+>
+> Dua hal yang perlu dikerjakan di luar server ini:
+>
+> 1. **Pasang kembali penerusan port** `8997 → 80` dan `8998 → 443` pada router, mengarah
+>    ke alamat privat server ini.
+> 2. **Ubah A record** `siintel` ke IP yang berlaku. Saat catatan ini ditulis ia masih
+>    menunjuk `111.68.123.134`.
+>
+> Sertifikat sudah diterbitkan ulang mencakup **kedua** IP, jadi tidak perlu disentuh lagi
+> apa pun alamat yang akhirnya dipakai. Menjalankan ulang
+> `scripts/pasang-sertifikat-sendiri.sh` aman: CA-nya dipakai ulang, sehingga kedua APK
+> tetap bekerja.
+>
+> **Kejadian ini adalah alasan terkuat memindahkan sistem ke server ber-IP publik sendiri.**
+> Penerusan port pada IP dinamis akan terus putus tanpa peringatan, dan setiap kali putus
+> gejalanya sama: aplikasi sehat sempurna, tetapi tidak dapat dijangkau siapa pun.
+
 ## 3. MENGARAHKAN DOMAIN KE SERVER
 
 ### 3.0 Keadaan jaringan server ini — diperiksa 1 September 2026
