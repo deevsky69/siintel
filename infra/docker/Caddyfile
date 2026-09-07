@@ -32,6 +32,10 @@
 	header {
 		# HSTS hanya benar dipasang di sini — di tempat sertifikat berada.
 		# Aplikasi API sengaja tidak memasangnya (lihat api/middleware.py).
+		# HSTS dipasang penuh di sini karena Caddy SELALU memakai sertifikat
+		# Let's Encrypt yang tepercaya. Pada jalur Traefik dengan sertifikat
+		# swatandatangan, header ini justru mengunci pengguna di luar — lihat
+		# catatannya di docker-compose.coolify.yml.
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
 		X-Content-Type-Options "nosniff"

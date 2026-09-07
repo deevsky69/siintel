@@ -75,10 +75,26 @@ services:
       traefik.http.services.predpol-web.loadbalancer.server.port: "3000"
 
       # ---- Header keamanan.
-      # HSTS hanya benar dipasang di lapisan yang memegang sertifikat. Aplikasi API
-      # sengaja tidak memasangnya (apps/api/src/prediksi_presisi_api/api/middleware.py).
-      traefik.http.middlewares.predpol-security-headers.headers.stsSeconds: "31536000"
-      traefik.http.middlewares.predpol-security-headers.headers.stsIncludeSubdomains: "true"
+      #
+      # HSTS SENGAJA TIDAK DIPASANG SELAMA SERTIFIKATNYA SWATANDATANGAN.
+      #
+      #   HSTS memerintahkan peramban: "selama setahun, selalu pakai HTTPS untuk domain ini,
+      #   dan JANGAN PERNAH izinkan pengguna melewati peringatan sertifikat." Perintah kedua
+      #   itu benar ketika sertifikatnya tepercaya, dan berbahaya ketika tidak.
+      #
+      #   Pada 7 September 2026 kombinasi itu benar-benar mematikan situs: sertifikat diganti
+      #   (TRAEFIK DEFAULT CERT -> CA milik satuan), pengecualian yang sudah disetujui
+      #   pengguna menjadi batal, dan HSTS melarangnya menyetujui yang baru. Peramban menolak
+      #   membuka halaman tanpa menyediakan jalan keluar apa pun, dan dari sisi pengguna itu
+      #   tidak dapat dibedakan dari server yang mati.
+      #
+      #   `stsSeconds: 0` bukan sekadar "tidak memasang": ia MEMERINTAHKAN peramban melupakan
+      #   kebijakan yang sudah tersimpan. Tanpa itu, peramban yang terlanjur menyimpannya
+      #   tetap terkunci sampai setahun.
+      #
+      #   PASANG KEMBALI `31536000` begitu sertifikat Let's Encrypt terbit — di sanalah HSTS
+      #   memang seharusnya berada.
+      traefik.http.middlewares.predpol-security-headers.headers.stsSeconds: "0"
       traefik.http.middlewares.predpol-security-headers.headers.contentTypeNosniff: "true"
       traefik.http.middlewares.predpol-security-headers.headers.frameDeny: "true"
       traefik.http.middlewares.predpol-security-headers.headers.referrerPolicy: "no-referrer"
