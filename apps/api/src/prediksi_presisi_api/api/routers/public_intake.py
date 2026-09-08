@@ -23,10 +23,19 @@ EMPAT BATAS YANG MENENTUKAN BENTUK MODUL INI
    ejaan untuk satu hal, dan pada kanal publik ejaannya pasti bermacam-macam. Daftarnya
    dibaca dari `config/taxonomy/mappings.yaml`, bukan ditulis di sini.
 
-4. **Koordinat berasal dari master lokasi, bukan dari pelapor.** `latitude`/`longitude`
-   wajib pada tabelnya, tetapi meminta koordinat kepada pelapor berarti menerima titik yang
-   tidak dapat diperiksa siapa pun. Pelapor memilih kecamatan; koordinatnya diambil dari
-   `locations`. Ketepatannya sebatas kecamatan, dan respons menyatakannya.
+4. **Koordinat boleh datang dari pelapor, dan asalnya selalu dicatat.** Sampai 8 September
+   2026 koordinat selalu diambil dari titik pusat kecamatan. Pemilik proyek kemudian
+   memutuskan tombol "bagikan lokasi" boleh mengirim titik peranti, disimpan apa adanya
+   sebagai titik kejadian.
+
+   Yang tidak berubah: **sepasang angka tidak menyatakan asal-usulnya.** Titik pusat
+   kecamatan dan titik peranti terlihat persis sama padahal yang pertama berjarak kilometer
+   dari kejadian. Karena itu `coordinate_source` selalu diisi, dan respons menyebutnya.
+
+5. **Lampiran dilucuti metadatanya sebelum tersimpan.** Foto ponsel hampir selalu membawa
+   koordinat GPS di EXIF; pelapor yang tidak mengetik namanya tetap dikenali dari sana.
+   Lihat `services/attachments.py`. Berkas dihapus 90 hari setelah laporannya selesai, dan
+   hanya peran yang berwenang memverifikasi yang dapat membukanya.
 
 Kode status mengikuti kontrak `docs/05` §1: input yang tidak sah dijawab **400
 VALIDATION_ERROR**, dan pembanjiran dijawab **429**.
@@ -43,13 +52,20 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import yaml
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, File, Request, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ...models import CitizenReport, Location
+from ...models import (
+    COORDINATE_SOURCE_CENTROID,
+    COORDINATE_SOURCE_GPS,
+    CitizenReport,
+    CitizenReportAttachment,
+    Location,
+)
 from ...seeding.paths import TAXONOMY_FILE
+from ...services import attachments as attachment_store
 from ...services import audit, clock
 from ..deps import get_db
 from ..errors import ApiError
@@ -77,9 +93,16 @@ RATE_LIMIT_PER_HOUR = 10
 RATE_WINDOW_SECONDS = 3600
 
 COORDINATE_BASIS = (
-    "Koordinat laporan diambil dari titik pusat kecamatan pada master lokasi, BUKAN dari "
-    "tempat kejadian sebenarnya: pelapor hanya memilih kecamatan. Keterangan tempat yang "
-    "lebih rinci tersimpan sebagai teks pada location_text dan tidak diubah menjadi titik."
+    "Bila pelapor membagikan lokasinya, koordinat itu disimpan apa adanya sebagai titik "
+    "kejadian (coordinate_source = REPORTER_GPS). Bila tidak, koordinat diambil dari titik "
+    "pusat kecamatan pada master lokasi (coordinate_source = KECAMATAN_CENTROID) dan "
+    "ketepatannya sebatas kecamatan — BUKAN tempat kejadian sebenarnya."
+)
+
+ATTACHMENT_BASIS = (
+    "Metadata berkas — termasuk koordinat GPS yang ditanam kamera ponsel — dilucuti sebelum "
+    "berkas disimpan. Lampiran hanya dapat dibuka petugas yang berwenang memverifikasi "
+    "laporan, dan dihapus 90 hari setelah laporannya selesai."
 )
 
 INTAKE_BASIS = (
@@ -180,6 +203,20 @@ class ReportRequest(BaseModel):
         default=None, description="Waktu kejadian. Kosong berarti sekarang."
     )
 
+    # Lintang dan bujur harus datang berpasangan. Salah satu saja bukan lokasi, dan
+    # menerimanya berarti menyimpan titik yang separuhnya karangan.
+    latitude: float | None = Field(default=None, ge=-90, le=90)
+    longitude: float | None = Field(default=None, ge=-180, le=180)
+    accuracy_m: float | None = Field(
+        default=None, ge=0, le=100_000, description="Ketelitian yang dilaporkan peranti, meter."
+    )
+
+    attachments: list[str] = Field(
+        default_factory=list,
+        max_length=attachment_store.MAX_ATTACHMENTS_PER_REPORT,
+        description="Handle dari POST /public/attachments.",
+    )
+
 
 # ---------------------------------------------------------------------------
 # Endpoint
@@ -204,6 +241,56 @@ def report_options(session: Session = Depends(get_db)) -> dict[str, Any]:
         "max_description": MAX_DESCRIPTION,
         "coordinate_basis": COORDINATE_BASIS,
         "intake_basis": INTAKE_BASIS,
+        "attachment_basis": ATTACHMENT_BASIS,
+        "max_attachments": attachment_store.MAX_ATTACHMENTS_PER_REPORT,
+        "max_attachment_bytes": attachment_store.MAX_ATTACHMENT_BYTES,
+    }
+
+
+@router.post(
+    "/attachments",
+    status_code=status.HTTP_201_CREATED,
+    summary="Mengunggah satu lampiran sebelum mengirim laporan",
+)
+def upload_attachment(
+    request: Request,
+    berkas: UploadFile = File(description="Foto, rekaman suara, atau video."),
+) -> dict[str, Any]:
+    """Menerima satu berkas dan mengembalikan **handle** untuk disertakan saat mengirim.
+
+    ## Mengapa terpisah dari pengiriman laporan
+
+    Alternatifnya adalah satu permintaan multipart yang membawa isi laporan sekaligus
+    berkasnya. Itu memaksa kanal ini punya dua bentuk permintaan untuk satu hal yang sama —
+    JSON bagi pengirim tanpa lampiran, multipart bagi yang membawa lampiran — dan dua
+    bentuk untuk satu hal adalah dua tempat yang harus diperbaiki setiap kali aturannya
+    berubah. Dengan memisahkannya, kontrak `POST /citizen-reports` hanya bertambah satu
+    field opsional, dan aplikasi Android maupun web memakai jalur yang sama.
+
+    ## Handle-nya rahasia, bukan nomor
+
+    Ia acak 256 bit. Nomor urut dapat ditebak, dan menebaknya berarti dapat menempelkan
+    berkas orang lain ke laporan sendiri.
+
+    Titipan yang tidak pernah dipakai terhapus sendiri setelah 30 menit.
+    """
+    if not limiter.allow(_client_key(request)):
+        raise ApiError(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            "Terlalu banyak berkas dikirim dari jaringan ini dalam satu jam terakhir.",
+        )
+
+    try:
+        handle, stored = attachment_store.stage(berkas.file, clock.reference_now())
+    except attachment_store.AttachmentError as error:
+        raise ApiError(status.HTTP_400_BAD_REQUEST, str(error)) from error
+
+    return {
+        "handle": handle,
+        "kind": stored.kind,
+        "media_type": stored.media_type,
+        "byte_size": stored.byte_size,
+        "basis": ATTACHMENT_BASIS,
     }
 
 
@@ -281,18 +368,53 @@ def submit_report(
             details=[{"field": "incident_time", "issue": "terlalu lama"}],
         )
 
+    if (payload.latitude is None) != (payload.longitude is None):
+        raise ApiError(
+            status.HTTP_400_BAD_REQUEST,
+            "Lokasi harus berisi lintang dan bujur sekaligus.",
+            details=[{"field": "latitude", "issue": "harus berpasangan dengan longitude"}],
+        )
+    if payload.accuracy_m is not None and payload.latitude is None:
+        raise ApiError(
+            status.HTTP_400_BAD_REQUEST,
+            "Ketelitian hanya berlaku bila lokasi dibagikan.",
+            details=[{"field": "accuracy_m", "issue": "tanpa latitude/longitude tidak berarti"}],
+        )
+
+    # Master lokasi sudah disaring `is_not(None)` pada kueri di atas, tetapi tipenya tetap
+    # nullable. Penegasan ini yang membuat pembaca — dan pemeriksa tipe — tahu mengapa.
+    assert location.latitude is not None and location.longitude is not None  # noqa: S101
+
+    if payload.latitude is not None and payload.longitude is not None:
+        shared = True
+        latitude, longitude = float(payload.latitude), float(payload.longitude)
+    else:
+        shared = False
+        latitude, longitude = float(location.latitude), float(location.longitude)
+
+    staged = []
+    try:
+        for handle in payload.attachments:
+            staged.append(attachment_store.claim(handle))
+    except attachment_store.AttachmentError as error:
+        raise ApiError(status.HTTP_400_BAD_REQUEST, str(error)) from error
+
     report = CitizenReport(
         code=_next_code(session),
         reported_at=now,
         incident_time=incident_time,
         category=payload.category,
         description=payload.description.strip(),
-        # Koordinat dari master lokasi — lihat COORDINATE_BASIS.
-        latitude=location.latitude,
-        longitude=location.longitude,
-        geom=func.ST_SetSRID(
-            func.ST_MakePoint(float(location.longitude), float(location.latitude)), 4326
-        ),
+        # Titik peranti pelapor bila ia membagikannya; kalau tidak, titik pusat kecamatan.
+        # `coordinate_source` menyatakan yang mana — lihat COORDINATE_BASIS.
+        latitude=latitude,
+        longitude=longitude,
+        geom=func.ST_SetSRID(func.ST_MakePoint(longitude, latitude), 4326),
+        coordinate_source=COORDINATE_SOURCE_GPS if shared else COORDINATE_SOURCE_CENTROID,
+        gps_accuracy_m=payload.accuracy_m if shared else None,
+        # `location_id` tetap menunjuk master lokasi kecamatan meski koordinatnya dari
+        # peranti: ia yang menghubungkan laporan ke wilayah pada seluruh agregasi, dan
+        # memetakan titik bebas ke sel grid adalah pekerjaan geo-processing, bukan kanal ini.
         location_id=location.location_id,
         location_text=(payload.location_text or "").strip() or None,
         # Penilaian petugas, bukan pelapor: keduanya sengaja dibiarkan kosong.
@@ -301,6 +423,21 @@ def submit_report(
         status=INITIAL_STATUS,
     )
     session.add(report)
+    session.flush()
+
+    for stored in staged:
+        session.add(
+            CitizenReportAttachment(
+                report_id=report.report_id,
+                kind=stored.kind,
+                media_type=stored.media_type,
+                byte_size=stored.byte_size,
+                sha256=stored.sha256,
+                storage_key=stored.storage_key,
+                metadata_stripped_with=stored.metadata_stripped_with,
+                created_at=now,
+            )
+        )
 
     # `user_id` kosong karena memang tidak ada pengguna di balik peristiwa ini. Mengisinya
     # dengan akun sistem akan membuat jejak audit menyatakan sesuatu yang tidak terjadi.
@@ -311,7 +448,16 @@ def submit_report(
         result=audit.RESULT_SUCCESS,
         user_id=None,
         resource_id=report.code,
-        detail={"category": report.category, "kecamatan": payload.kecamatan, "channel": "PUBLIC"},
+        detail={
+            "category": report.category,
+            "kecamatan": payload.kecamatan,
+            "channel": "PUBLIC",
+            # Asal koordinat dan jumlah lampiran ikut dicatat: keduanya menentukan berapa
+            # banyak data pribadi yang masuk lewat peristiwa ini, dan itu justru yang perlu
+            # dapat ditelusuri kemudian. Isi lampirannya sendiri tidak pernah masuk audit.
+            "coordinate_source": report.coordinate_source,
+            "attachments": len(staged),
+        },
     )
     session.commit()
     session.refresh(report)
@@ -321,6 +467,8 @@ def submit_report(
         "status": report.status,
         "reported_at": report.reported_at,
         "kecamatan": payload.kecamatan,
+        "coordinate_source": report.coordinate_source,
+        "attachments": len(staged),
         "message": (
             "Laporan Anda tercatat. Simpan nomor tiket ini untuk menanyakan "
             "perkembangannya kepada petugas."

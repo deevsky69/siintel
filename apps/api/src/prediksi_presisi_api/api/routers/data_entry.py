@@ -43,6 +43,7 @@ from sqlalchemy.orm import Session
 
 from ...models import CitizenReport, CrimeIncident, IntelligenceReport, Location
 from ...seeding.taxonomy import Taxonomy, load_taxonomy
+from ...services import attachments as attachment_store
 from ...services import audit, clock
 from ..deps import (
     CurrentUser,
@@ -719,6 +720,14 @@ def update_report_status(
         )
 
     report.status = new_status
+
+    # `closed_at` menandai kapan laporan dinyatakan selesai — dari sinilah masa retensi
+    # lampirannya dihitung. Ia dikosongkan lagi bila laporan dibuka kembali: berkas yang
+    # dibutuhkan pemeriksaan yang berlanjut tidak boleh hilang karena hitungan lama.
+    if new_status == attachment_store.CLOSED_STATUS:
+        report.closed_at = clock.reference_now()
+    elif previous == attachment_store.CLOSED_STATUS:
+        report.closed_at = None
 
     detail: dict[str, Any] = {"status_before": previous, "status_after": new_status}
     if payload.note:

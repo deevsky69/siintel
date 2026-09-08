@@ -17,6 +17,12 @@ from pathlib import Path
 
 import pytest
 
+# Mengimpor `models` — bukan hanya `db` — dengan sengaja. `Base.metadata` baru terisi
+# ketika modul modelnya dimuat, dan tanpa impor ini seluruh test di bawah lulus dengan
+# `ALL_TABLES` kosong: ia memeriksa nol tabel dan tidak pernah gagal. Sebelumnya ia
+# kebetulan bekerja karena modul test LAIN memuat model lebih dulu — sampai urutan
+# test berubah.
+import prediksi_presisi_api.models  # noqa: F401
 from prediksi_presisi_api.db import Base
 
 API_ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +56,8 @@ EXPECTED_TABLES = {
     "commander_decisions",
     "operational_actions",
     "prediction_actual",
+    # Revisi 8 September 2026 — lampiran laporan masyarakat
+    "citizen_report_attachments",
 }
 
 
@@ -82,13 +90,26 @@ def _create_table_body(table: str) -> str:
 
 
 def _columns_from_sql(table: str) -> dict[str, bool]:
-    """Nama kolom -> boleh NULL."""
+    """Nama kolom -> boleh NULL, dari `CREATE TABLE` **dan** `ALTER TABLE ... ADD COLUMN`.
+
+    Keduanya perlu dibaca. Skema tumbuh lewat migrasi susulan, dan versi test yang hanya
+    membaca `CREATE TABLE` menganggap kolom yang ditambahkan kemudian tidak ada — ia lalu
+    melaporkan model "menyimpang" padahal migrasinya benar, dan yang sebaliknya (kolom
+    ditambahkan di migrasi tetapi tidak di model) justru lolos.
+    """
     columns: dict[str, bool] = {}
     for line in _create_table_body(table).splitlines():
         stripped = line.strip().rstrip(",")
         if not stripped or stripped.startswith(("CONSTRAINT", "PRIMARY KEY", "FOREIGN KEY")):
             continue
         columns[stripped.split()[0]] = "NOT NULL" not in stripped
+
+    for added in re.findall(rf"ALTER TABLE {table} ADD COLUMN (.+?);", _offline_sql()):
+        columns[added.split()[0]] = "NOT NULL" not in added
+
+    for dropped in re.findall(rf"ALTER TABLE {table} DROP COLUMN (\w+)", _offline_sql()):
+        columns.pop(dropped, None)
+
     return columns
 
 

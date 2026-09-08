@@ -130,7 +130,10 @@ def test_migrations_are_applied(engine: Engine) -> None:
     with engine.connect() as connection:
         revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
 
-    assert revision == "0007", "database belum di-migrate: jalankan `pnpm db:migrate`"
+    # Angkanya sengaja dipatok, bukan dibaca dari berkas migrasi. Membacanya dari sana
+    # membuat test ini selalu lulus — ia akan membandingkan migrasi dengan dirinya sendiri
+    # alih-alih dengan basis data yang benar-benar dipakai.
+    assert revision == "0008", "database belum di-migrate: jalankan `pnpm db:migrate`"
 
 
 def test_postgis_and_pgcrypto_are_installed(engine: Engine) -> None:

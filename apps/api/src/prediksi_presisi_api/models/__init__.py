@@ -14,7 +14,13 @@ terdaftar pada `Base.metadata` saat Alembic membandingkan schema.
 """
 
 from .audit_log import AuditLog
-from .citizen_report import CitizenReport
+from .citizen_report import (
+    ATTACHMENT_KINDS,
+    COORDINATE_SOURCE_CENTROID,
+    COORDINATE_SOURCE_GPS,
+    CitizenReport,
+    CitizenReportAttachment,
+)
 from .commander_decision import CommanderDecision
 from .community_feedback import CommunityFeedback
 from .crime_incident import CrimeIncident
@@ -32,8 +38,12 @@ from .recommendation import Recommendation
 from .risk_score import RiskScore
 
 __all__ = [
+    "ATTACHMENT_KINDS",
+    "COORDINATE_SOURCE_CENTROID",
+    "COORDINATE_SOURCE_GPS",
     "AuditLog",
     "CitizenReport",
+    "CitizenReportAttachment",
     "CommanderDecision",
     "CommunityFeedback",
     "CrimeIncident",

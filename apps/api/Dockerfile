@@ -57,6 +57,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN groupadd --system --gid 10001 predpol \
  && useradd --system --uid 10001 --gid predpol --create-home --shell /usr/sbin/nologin predpol
 
+# ffmpeg melucuti metadata dari lampiran suara dan video yang dikirim warga — termasuk
+# atom `©xyz` pada MP4 yang memuat koordinat GPS. Ia dipakai dengan `-c copy`, jadi tidak
+# mengodekan ulang apa pun dan tidak menuntut CPU. Tanpa paket ini, janji "metadata
+# dilucuti" hanya berlaku untuk foto.
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y ffmpeg \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /opt/venv /opt/venv
 
 WORKDIR /app
@@ -69,6 +77,11 @@ COPY data/sample ./data/sample
 COPY database/migrations ./database/migrations
 COPY apps/api/alembic.ini apps/api/pyproject.toml ./apps/api/
 COPY apps/api/src ./apps/api/src
+
+# Direktori lampiran. Dipasangkan ke volume di produksi; tanpa volume ia ikut hilang
+# bersama container, dan lampiran laporan warga bukan sesuatu yang boleh hilang begitu saja.
+ENV ATTACHMENT_DIR=/var/lib/predpol/lampiran
+RUN mkdir -p "${ATTACHMENT_DIR}" && chown -R predpol:predpol "${ATTACHMENT_DIR}"
 
 RUN chown -R predpol:predpol /app
 

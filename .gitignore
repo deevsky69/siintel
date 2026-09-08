@@ -43,3 +43,7 @@ test-results/
 # APK hasil build. Berkasnya besar dan dibangun ulang dari sumber; yang dibagikan adalah
 # berkas rilisnya, bukan riwayat git.
 /dist/
+
+# Berkas lampiran laporan masyarakat. Isinya foto, suara, dan video dari warga — data
+# pribadi yang tidak boleh masuk ke repositori dalam keadaan apa pun.
+var/lampiran/

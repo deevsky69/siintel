@@ -118,12 +118,19 @@ def test_the_public_options_leak_nothing_beyond_the_choices(client: TestClient) 
     """
     body = client.get("/api/v1/public/report-options").json()
 
+    # Tiga kunci ditambahkan 8 September 2026 bersama fitur lampiran. Ketiganya adalah
+    # BATAS dan KETERANGAN — apa yang boleh dikirim, seberapa besar, dan bagaimana
+    # berkasnya diperlakukan — bukan isi sistem. Formulir memerlukannya untuk menolak
+    # berkas terlalu besar sebelum jaringan dipakai sia-sia.
     assert set(body) == {
         "categories",
         "kecamatan",
         "max_description",
         "coordinate_basis",
         "intake_basis",
+        "attachment_basis",
+        "max_attachments",
+        "max_attachment_bytes",
     }
 
 
@@ -132,6 +139,9 @@ def test_the_response_returns_a_ticket_and_nothing_about_other_reports(
 ) -> None:
     body = client.post("/api/v1/public/citizen-reports", json=_payload(session)).json()
 
+    # `coordinate_source` dan `attachments` ditambahkan 8 September 2026. Keduanya hanya
+    # menggemakan apa yang baru saja DIKIRIM pelapor itu sendiri — dari mana koordinatnya
+    # dan berapa berkas yang ia lampirkan — bukan sesuatu tentang laporan orang lain.
     assert set(body) == {
         "ticket",
         "status",
@@ -139,6 +149,8 @@ def test_the_response_returns_a_ticket_and_nothing_about_other_reports(
         "kecamatan",
         "message",
         "basis",
+        "coordinate_source",
+        "attachments",
     }
 
 

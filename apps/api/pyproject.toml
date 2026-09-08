@@ -14,6 +14,12 @@ dependencies = [
   "pyyaml>=6.0",
   "argon2-cffi>=23.1",
   "pyjwt>=2.9",
+  # Melucuti EXIF dari foto yang dikirim warga. Foto ponsel hampir selalu membawa
+  # koordinat GPS di dalamnya, dan pelapor yang tidak mengetik namanya tetap dikenali
+  # dari sana bila metadatanya ikut tersimpan.
+  "pillow>=11.0",
+  # Menerima unggahan multipart pada kanal laporan masyarakat.
+  "python-multipart>=0.0.20",
 ]
 
 [dependency-groups]
@@ -68,6 +74,8 @@ extend-immutable-calls = [
   "fastapi.Path",
   "fastapi.Body",
   "fastapi.Header",
+  "fastapi.File",
+  "fastapi.Form",
   "fastapi.Cookie",
   "prediksi_presisi_api.api.deps.require_permission",
 ]

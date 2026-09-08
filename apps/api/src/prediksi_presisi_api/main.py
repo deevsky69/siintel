@@ -20,6 +20,7 @@ from .api.middleware import RequestContextMiddleware, SecurityHeadersMiddleware
 from .api.routers import (
     administration,
     analytics,
+    attachments,
     audit,
     auth,
     brief,
@@ -80,6 +81,7 @@ def create_app() -> FastAPI:
     api = APIRouter(prefix=API_PREFIX)
     api.include_router(health.router)
     api.include_router(auth.router)
+    api.include_router(attachments.router)
     api.include_router(audit.router)
     api.include_router(administration.router)
     api.include_router(catalog.router)
