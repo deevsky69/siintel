@@ -368,6 +368,36 @@ def test_a_handle_cannot_be_used_twice(client: TestClient, session: Session) -> 
     assert second.status_code == 400
 
 
+@pytest.mark.parametrize(
+    "handle",
+    [
+        # Sebelum handle diperiksa bentuknya, nilai-nilai ini dipakai sebagai POLA pada
+        # `glob` dan mencocoki titipan siapa pun yang sedang menunggu — cukup untuk
+        # menempelkan berkas orang lain ke laporan sendiri.
+        "*",
+        "?" * 43,
+        "[a-z]*",
+        "../lampiran/apa-saja",
+        "",
+    ],
+)
+def test_a_handle_is_a_name_and_never_a_pattern(
+    client: TestClient, session: Session, handle: str
+) -> None:
+    """Titipan orang lain tidak boleh dapat diklaim dengan pola."""
+    # Ada satu titipan menunggu — justru itu yang hendak dicuri.
+    client.post(
+        "/api/v1/public/attachments",
+        files={"berkas": ("bukti.jpg", _photo_with_exif(), "image/jpeg")},
+    )
+
+    response = client.post(
+        "/api/v1/public/citizen-reports", json=_payload(session, attachments=[handle])
+    )
+
+    assert response.status_code == 400, f"handle {handle!r} diterima"
+
+
 def test_more_attachments_than_allowed_are_refused(client: TestClient, session: Session) -> None:
     handles = [
         client.post(

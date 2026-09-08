@@ -4,22 +4,27 @@ import Link from "next/link";
 import { useActionState } from "react";
 import type { ReportOptions, SubmitState } from "./actions";
 import { submitReport } from "./actions";
+import { AttachFiles } from "./attach-files";
+import { ShareLocation } from "./share-location";
 
 /**
  * Formulir laporan masyarakat — tanpa akun, tanpa identitas.
  *
- * Tiga hal yang sengaja **tidak** ada di sini, dan ketiadaannya bukan kelalaian:
+ * Dua hal yang sengaja **tidak** ada di sini, dan ketiadaannya bukan kelalaian:
  *
  * - **Kolom nama, telepon, atau alamat pelapor.** Basis data memang tidak memiliki tempat
  *   untuk itu (`docs/02` §K, U-13). Menambahkan kolomnya di layar akan menampung data yang
  *   kemudian dibuang, dan pelapor tetap mengira datanya tersimpan.
- * - **Unggah foto atau video.** Menyimpan berkas warga menyentuh retensi dan klasifikasi
- *   data — keputusan kebijakan yang belum diambil (U-14), bukan pekerjaan yang belum sempat.
  * - **Penanda mendesak.** Tingkat urgensi ditetapkan petugas saat triase. Membiarkan
  *   pelapor mengisinya berarti membiarkan siapa pun menaikkan prioritas laporannya sendiri.
  *
  * Yang diberikan sebagai gantinya adalah **nomor tiket** — satu-satunya penanda yang
  * dipegang pelapor, dan ia tidak mengikat ke identitas siapa pun.
+ *
+ * Lampiran dan lokasi **ada** sejak 8 September 2026, setelah pemilik proyek menetapkan
+ * syaratnya: metadata dilucuti, berkas terhapus 90 hari setelah laporan selesai, dan hanya
+ * petugas yang berwenang memverifikasi yang dapat membukanya. Keduanya tetap opsional —
+ * laporan tanpa keduanya sama sahnya.
  */
 export function ReportForm({ options }: { options: ReportOptions }) {
   const [state, action, pending] = useActionState<SubmitState, FormData>(submitReport, {
@@ -118,6 +123,8 @@ export function ReportForm({ options }: { options: ReportOptions }) {
           />
         </label>
 
+        <ShareLocation />
+
         <label className="block">
           <span className="stat-label">Waktu kejadian (opsional)</span>
           <input
@@ -147,6 +154,8 @@ export function ReportForm({ options }: { options: ReportOptions }) {
             justru menaruh data pribadi di tempat yang tidak dirancang untuk itu.
           </span>
         </label>
+
+        <AttachFiles options={options} />
 
         <button
           type="submit"

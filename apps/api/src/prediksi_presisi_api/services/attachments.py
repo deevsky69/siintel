@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import secrets
 import shutil
 import subprocess
@@ -81,6 +82,16 @@ _SIGNATURES: tuple[tuple[bytes, int, str, str], ...] = (
     (b"ID3", 0, "AUDIO", "audio/mpeg"),
     (b"\xff\xfb", 0, "AUDIO", "audio/mpeg"),
 )
+
+
+#: Bentuk handle yang sah — persis keluaran `secrets.token_urlsafe(32)`.
+#:
+#: Diperiksa sebelum menyentuh cakram, dan itu bukan kehati-hatian berlebihan. Sebelum
+#: pemeriksaan ini ada, handle dipakai langsung sebagai pola `glob`, sehingga mengirim
+#: handle `*` akan cocok dengan titipan SIAPA PUN yang sedang menunggu — dan menempelkan
+#: berkas orang lain ke laporan sendiri. Rahasia 256 bit tidak menjaga apa-apa bila nilainya
+#: diperlakukan sebagai pola, bukan sebagai nama.
+_HANDLE = re.compile(r"^[A-Za-z0-9_-]{32,64}$")
 
 
 class AttachmentError(Exception):
@@ -272,7 +283,11 @@ def stage(upload: BinaryIO, now: datetime) -> tuple[str, StoredAttachment]:
         # titipan berarti berkas yang sudah bersih, tidak pernah yang sedang diproses.
         shutil.move(str(clean), str(staging / stored.storage_key))
 
-    (staging / f"{stored.storage_key}.tanda").write_text(
+    # Tanda dinamai `<handle>.tanda`, bukan `<handle>.<ext>.tanda`. Keduanya sama-sama
+    # bekerja saat pencarian memakai pola, tetapi pencarian dengan pola itulah yang
+    # membuat handle dapat dipalsukan. Dengan nama yang tepat, batang nama tanda dan berkas
+    # isinya sama-sama persis handle-nya.
+    (staging / f"{handle}.tanda").write_text(
         f"{now.isoformat()}\n{stored.kind}\n{stored.media_type}\n"
         f"{stored.byte_size}\n{stored.sha256}\n{stored.metadata_stripped_with}\n",
         encoding="utf-8",
@@ -286,11 +301,22 @@ def claim(handle: str) -> StoredAttachment:
     Handle yang tidak dikenal ditolak dengan pesan yang sama seperti handle yang sudah
     kedaluwarsa: membedakan keduanya akan memberi tahu penebak bahwa tebakannya mendekati.
     """
+    if not _HANDLE.fullmatch(handle):
+        raise AttachmentError("Lampiran tidak ditemukan atau sudah kedaluwarsa.")
+
     staging = _staging_root()
-    matches = list(staging.glob(f"{handle}.*"))
-    marker = next((path for path in matches if path.suffix == ".tanda"), None)
-    payload = next((path for path in matches if path.suffix != ".tanda"), None)
-    if marker is None or payload is None:
+    marker = staging / f"{handle}.tanda"
+    # Pencarian berkas isinya memakai perbandingan nama yang tepat, bukan pola. Sufiksnya
+    # bergantung jenis berkas dan tidak diketahui di sini, tetapi batang namanya pasti.
+    payload = next(
+        (
+            path
+            for path in staging.iterdir()
+            if path.is_file() and path.stem == handle and path.suffix != ".tanda"
+        ),
+        None,
+    )
+    if not marker.is_file() or payload is None:
         raise AttachmentError("Lampiran tidak ditemukan atau sudah kedaluwarsa.")
 
     _, kind, media_type, byte_size, sha256, tool = marker.read_text(encoding="utf-8").split("\n")[
@@ -325,11 +351,9 @@ def sweep_staging(now: datetime) -> int:
         except ValueError:
             created = cutoff - timedelta(days=1)  # tanda rusak: perlakukan sebagai basi
         if created <= cutoff:
-            marker.with_suffix("").unlink(missing_ok=True)
-            for sibling in marker.parent.glob(f"{marker.stem}.*"):
-                if sibling != marker:
+            for sibling in marker.parent.iterdir():
+                if sibling.is_file() and sibling.stem == marker.stem:
                     sibling.unlink(missing_ok=True)
-            marker.unlink(missing_ok=True)
             removed += 1
     return removed
 
