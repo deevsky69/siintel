@@ -64,7 +64,7 @@ function Row({
         className={`block rounded border px-3 py-2.5 transition-colors ${
           selected
             ? "border-accent/60 bg-accent/5"
-            : "border-base-800 bg-base-950/40 hover:border-base-600"
+            : "border-base-800 bg-base-850 hover:border-base-600"
         }`}
       >
         <div className="flex flex-wrap items-center gap-2">
@@ -202,7 +202,7 @@ function RoleCard({ role }: { role: RoleRow }) {
   const scopes = Object.entries(role.scopes).sort(([a], [b]) => a.localeCompare(b));
 
   return (
-    <li className="rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
+    <li className="rounded border border-base-800 bg-base-850 px-3 py-2.5">
       <div className="flex flex-wrap items-center gap-2">
         <span className="flex-1 font-heading text-sm font-semibold text-ink">{role.role_name}</span>
         {role.can_approve ? (

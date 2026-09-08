@@ -155,7 +155,7 @@ function WarningCard({ warning }: { warning: AreaWarning }) {
   const risk = severityRiskClass(warning.severity);
 
   return (
-    <li className="rounded border border-base-800 bg-base-950/40 p-2.5">
+    <li className="rounded border border-base-800 bg-base-850 p-2.5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="flex items-center gap-2">
@@ -191,7 +191,7 @@ function WarningCard({ warning }: { warning: AreaWarning }) {
 
 function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
   return (
-    <li className="rounded border border-base-800 bg-base-950/40 p-2.5">
+    <li className="rounded border border-base-800 bg-base-850 p-2.5">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           {/* WHAT */}

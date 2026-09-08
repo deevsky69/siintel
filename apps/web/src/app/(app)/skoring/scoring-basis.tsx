@@ -138,25 +138,25 @@ export function ScoringBasis({ config }: { config: ScoringConfig }) {
       <Panel title="Yang Dihitung Layar Ini">
         <p className="text-xs leading-relaxed text-ink-muted">{config.score_basis}</p>
         <dl className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
-          <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+          <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
             <dt className="stat-label">Versi Bobot</dt>
             <dd className="mt-1 font-heading text-sm font-bold text-ink">
               {config.active_version}
             </dd>
           </div>
-          <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+          <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
             <dt className="stat-label">Versi Ambang</dt>
             <dd className="mt-1 font-heading text-sm font-bold text-ink">
               {config.thresholds.version}
             </dd>
           </div>
-          <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+          <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
             <dt className="stat-label">Sel Grid</dt>
             <dd className="mt-1 font-heading text-sm font-bold text-ink">
               {config.coverage.locations}
             </dd>
           </div>
-          <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+          <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
             <dt className="stat-label">Jendela Waktu</dt>
             <dd className="mt-1 font-heading text-sm font-bold text-ink">
               {config.time_windows.length}
@@ -172,10 +172,7 @@ export function ScoringBasis({ config }: { config: ScoringConfig }) {
       >
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           {config.thresholds.risk_classes.map((band) => (
-            <div
-              key={band.class}
-              className="rounded border border-base-800 bg-base-950/40 px-3 py-2"
-            >
+            <div key={band.class} className="rounded border border-base-800 bg-base-850 px-3 py-2">
               <div className="stat-label">{band.class}</div>
               <div className="mt-1 font-heading text-sm font-bold tabular-nums text-ink">
                 {band.min}–{band.max}

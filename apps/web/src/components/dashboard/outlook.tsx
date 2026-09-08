@@ -21,7 +21,7 @@ export function OutlookPanel({ rows }: { rows: OutlookRow[] }) {
               <div className="stat-label mb-1.5">{HORIZON_LABEL[row.horizon] ?? row.horizon}</div>
               <div
                 className={`flex h-14 items-center justify-center rounded border border-base-800 ${
-                  risk ? `${RISK_BG[risk]}/15` : "bg-base-950/40"
+                  risk ? `${RISK_BG[risk]}/15` : "bg-base-850"
                 }`}
               >
                 <span

@@ -85,7 +85,7 @@ export function AttachFiles({ options }: { options: ReportOptions }) {
   };
 
   return (
-    <div className="rounded border border-base-800 bg-base-950/40 px-3 py-3">
+    <div className="rounded border border-base-800 bg-base-850 px-3 py-3">
       <p className="stat-label">Foto, suara, atau video (opsional)</p>
 
       <ul className="mt-2 space-y-1">

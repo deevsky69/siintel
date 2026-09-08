@@ -121,7 +121,7 @@ function ReportCard({
         className={`block rounded border px-3 py-2.5 transition-colors ${
           selected
             ? "border-accent/60 bg-accent/5"
-            : "border-base-800 bg-base-950/40 hover:border-base-600"
+            : "border-base-800 bg-base-850 hover:border-base-600"
         }`}
       >
         <div className="flex items-start gap-2">
@@ -206,7 +206,7 @@ function ReportDetail({
       </dl>
 
       {/* Ditempatkan tepat di bawah ketiga angka itu, bukan di kaki halaman. */}
-      <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-xs leading-relaxed text-ink-muted">
+      <p className="rounded border border-base-800 bg-base-850 p-2.5 text-xs leading-relaxed text-ink-muted">
         {assessmentBasis}
       </p>
     </Panel>

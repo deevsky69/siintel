@@ -112,7 +112,7 @@ function PredictionCard({
         className={`block rounded border px-3 py-2.5 transition-colors ${
           selected
             ? "border-accent/60 bg-accent/5"
-            : "border-base-800 bg-base-950/40 hover:border-base-600"
+            : "border-base-800 bg-base-850 hover:border-base-600"
         }`}
       >
         <div className="flex items-start gap-3">
@@ -149,11 +149,11 @@ function Detail({ prediction, canPublish }: { prediction: PredictionRow; canPubl
   return (
     <div className="space-y-3">
       <dl className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
           <dt className="stat-label">Apa (WHAT)</dt>
           <dd className="mt-1 font-heading text-sm font-bold text-ink">{prediction.threat_type}</dd>
         </div>
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
           <dt className="stat-label">Di mana (WHERE)</dt>
           <dd className="mt-1 text-xs text-ink">
             {prediction.kecamatan}
@@ -161,7 +161,7 @@ function Detail({ prediction, canPublish }: { prediction: PredictionRow; canPubl
             {prediction.grid_id ? ` · sel ${prediction.grid_id}` : ""}
           </dd>
         </div>
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2 md:col-span-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2 md:col-span-2">
           <dt className="stat-label">Kapan (WHEN)</dt>
           <dd className="mt-1 text-xs text-ink">
             {windowText(prediction.window_start, prediction.window_end)}
@@ -171,13 +171,13 @@ function Detail({ prediction, canPublish }: { prediction: PredictionRow; canPubl
             {horizonLabel(prediction.forecast_horizon)}) · dibuat {prediction.prediction_date}
           </dd>
         </div>
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
           <dt className="stat-label">Risiko (RISK)</dt>
           <dd className={`mt-1 font-heading text-2xl font-bold tabular-nums ${RISK_TEXT[risk]}`}>
             {prediction.risk_score}
           </dd>
         </div>
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
           <dt className="stat-label">Keyakinan (CONFIDENCE)</dt>
           <dd className="mt-1 font-heading text-2xl font-bold tabular-nums text-ink">
             {prediction.confidence ?? "—"}

@@ -38,7 +38,7 @@ const config: Config = {
         base: {
           950: "rgb(var(--surface-app) / <alpha-value>)", // latar aplikasi
           900: "rgb(var(--surface-panel) / <alpha-value>)", // latar panel
-          850: "rgb(var(--surface-raised) / <alpha-value>)", // latar yang ditinggikan
+          850: "rgb(var(--surface-inset) / <alpha-value>)", // kotak di dalam panel
           800: "rgb(var(--line) / <alpha-value>)", // garis panel / hover
           700: "rgb(var(--line-strong) / <alpha-value>)",
           600: "rgb(var(--line-stronger) / <alpha-value>)",

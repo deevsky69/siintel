@@ -23,7 +23,7 @@ function MetricCard({
   accent?: boolean;
 }) {
   return (
-    <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
+    <div className="rounded border border-base-800 bg-base-850 px-3 py-2.5">
       <div className="stat-label">{label}</div>
       <div
         className={`mt-1 font-heading text-2xl font-bold leading-none ${

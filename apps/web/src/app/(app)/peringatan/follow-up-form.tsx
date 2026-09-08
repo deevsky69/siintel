@@ -61,7 +61,7 @@ export function FollowUpForm({ code, offers }: { code: string; offers: WarningAc
             value={action}
             disabled={pending}
             onClick={() => setPressed(action)}
-            className={`flex-1 rounded border bg-base-950/40 px-3 py-2 font-heading text-xs font-semibold uppercase tracking-wider transition disabled:opacity-40 ${LABELS[action].tone}`}
+            className={`flex-1 rounded border bg-base-850 px-3 py-2 font-heading text-xs font-semibold uppercase tracking-wider transition disabled:opacity-40 ${LABELS[action].tone}`}
           >
             {pending && pressed === action ? LABELS[action].busy : LABELS[action].idle}
           </button>

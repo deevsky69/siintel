@@ -35,7 +35,7 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
       title="Jalankan Prediksi"
       action={<span className="panel-action">waktu acuan {referenceDate}</span>}
     >
-      <p className="mb-3 rounded border border-base-800 bg-base-950/40 px-3 py-2 text-2xs leading-relaxed text-ink-muted">
+      <p className="mb-3 rounded border border-base-800 bg-base-850 px-3 py-2 text-2xs leading-relaxed text-ink-muted">
         Prediksi di sini <strong>bukan keluaran model terlatih</strong>. Ia proyeksi persistensi
         berbasis aturan atas penilaian risiko yang sudah ada: <code>model_version</code> menyebut
         versi aturan, bukan nama model, dan setiap faktor penjelas berlabel <code>RULE</code> — sama

@@ -277,7 +277,7 @@ export function PatternDna({
 
         {/* Pernyataan ini berada di atas, bukan di kaki halaman: "DNA" terlalu mudah
             dibaca sebagai ramalan, dan koreksinya harus terbaca lebih dulu. */}
-        <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-xs leading-relaxed text-ink-muted">
+        <p className="rounded border border-base-800 bg-base-850 p-2.5 text-xs leading-relaxed text-ink-muted">
           {analysisBasis}
         </p>
         <p className="text-2xs leading-relaxed text-ink-faint">{scopeBasis}</p>

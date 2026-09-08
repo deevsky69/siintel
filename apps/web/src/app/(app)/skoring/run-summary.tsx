@@ -19,7 +19,7 @@ import { contributionText, factorLabel, factorValue, profileLabel, weightPercent
 
 function CellCard({ cell }: { cell: RunCell }) {
   return (
-    <li className="rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
+    <li className="rounded border border-base-800 bg-base-850 px-3 py-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
           <span className="font-heading text-xs font-semibold text-ink">{cell.grid_id}</span>
@@ -179,23 +179,23 @@ export function RunSummary({ result }: { result: RunResult }) {
       </div>
 
       <dl className="grid grid-cols-2 gap-2 md:grid-cols-4">
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
           <dt className="stat-label">Tanggal Penilaian</dt>
           <dd className="mt-1 font-heading text-sm font-bold text-ink">{result.assessment_date}</dd>
         </div>
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
           <dt className="stat-label">Baris Sudah Ada</dt>
           <dd className="mt-1 font-heading text-sm font-bold tabular-nums text-ink">
             {result.existing_rows}
           </dd>
         </div>
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
           <dt className="stat-label">Kejadian Ditimbang</dt>
           <dd className="mt-1 font-heading text-sm font-bold tabular-nums text-ink">
             {result.evidence.incidents}
           </dd>
         </div>
-        <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+        <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
           <dt className="stat-label">Rentang Data</dt>
           <dd className="mt-1 text-xs text-ink">
             {result.evidence.date_from ?? "—"} s.d. {result.evidence.date_to ?? "—"}

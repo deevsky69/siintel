@@ -20,25 +20,50 @@
   :root {
     color-scheme: light;
 
-    --surface-app: 241 245 250;
+    /*
+      Latar aplikasi sengaja DITURUNKAN dan garisnya DIGELAPKAN.
+
+      Nilai sebelumnya (latar 241/245/250 dengan panel putih) hanya berbeda 5% kecerahan.
+      Pada layar proyektor ruang paparan — yang kontrasnya selalu lebih rendah daripada
+      monitor — panel dan latar menyatu, dan pembaca kehilangan tepi setiap kotak. Selisih
+      sekarang sekitar 12%: cukup untuk memisahkan panel dari latarnya, masih jauh dari
+      hitam-putih yang melelahkan mata dibaca berjam-jam.
+
+      Tiga permukaan, tiga peran, urutan kecerahannya TIDAK monoton dan itu disengaja:
+      latar halaman (paling gelap) → panel (putih) → kotak di dalam panel (satu langkah
+      turun dari putih). Panel harus menonjol dari halaman; kotak di dalamnya harus
+      terbaca sebagai isi panel, bukan sebagai panel kedua. Sebelumnya kotak dalam dibuat
+      dari `bg-base-950/40` — latar halaman yang dilarutkan 40% di atas putih — sehingga di
+      mode terang hasilnya hanya 1,09:1 terhadap panel dan tepinya lenyap. Kini ia punya
+      tokennya sendiri, `--surface-inset`, yang di mode gelap tetap disetel pada warna yang
+      persis dihasilkan pelarutan lama supaya tampilan gelap tidak ikut berubah.
+    */
+    --surface-app: 226 232 241;
     --surface-panel: 255 255 255;
-    --surface-raised: 236 242 249;
-    --line: 213 222 234;
-    --line-strong: 190 203 220;
-    --line-stronger: 160 178 201;
+    --surface-inset: 233 239 246;
+    --line: 191 203 219;
+    --line-strong: 160 175 196;
+    --line-stronger: 125 145 172;
 
     --text: 15 28 46; /* 16,3:1 di atas panel */
-    --text-muted: 71 92 120; /* 7,4:1 */
-    --text-faint: 100 121 148; /* 4,6:1 */
+    --text-muted: 71 92 120; /* 6,8:1 di atas panel, 5,6:1 di atas latar */
+    --text-faint: 87 104 141; /* 5,6:1 di atas panel, 4,5:1 di atas latar */
 
-    --accent: 14 116 144;
+    /*
+      Aksen dan tangga risiko digelapkan secukupnya agar teks berwarna lulus WCAG AA
+      (4,5:1) BUKAN hanya di atas panel putih, tetapi juga di atas latar aplikasi yang
+      kini lebih gelap. Warna lama (aksen 14/116/144 dan risiko rendah 2/132/199) hanya
+      mencapai 4,35:1 dan 3,32:1 di atas latar — angka badge dan pranala akan pudar.
+      Urutan hue tangga risiko tidak berubah: biru → hijau → jingga → merah.
+    */
+    --accent: 13 106 131; /* 6,2:1 panel — 5,0:1 latar */
     --accent-soft: 8 145 178;
     --accent-deep: 21 94 117;
 
-    --risk-low: 2 132 199;
-    --risk-moderate: 21 128 61;
-    --risk-high: 194 65 12;
-    --risk-critical: 190 18 18;
+    --risk-low: 3 105 161; /* 5,9:1 panel — 4,8:1 latar */
+    --risk-moderate: 21 128 61; /* 5,0:1 panel */
+    --risk-high: 194 65 12; /* 5,2:1 panel */
+    --risk-critical: 190 18 18; /* 6,4:1 panel */
 
     /* Warna deret grafik. Dipisahkan dari warna risiko dengan sengaja: deret pada grafik
        tren adalah JENIS kejadian, bukan tingkat bahaya, dan memakai tangga risiko untuk
@@ -61,7 +86,7 @@
 
     --surface-app: 5 11 24;
     --surface-panel: 10 20 36;
-    --surface-raised: 14 27 46;
+    --surface-inset: 8 16 31;
     --line: 19 35 57;
     --line-strong: 27 47 74;
     --line-stronger: 39 67 107;

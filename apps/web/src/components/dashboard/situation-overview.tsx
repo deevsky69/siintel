@@ -4,7 +4,7 @@ import { RISK_TEXT, riskClassOf } from "@/lib/risk";
 
 function Stat({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
-    <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
+    <div className="rounded border border-base-800 bg-base-850 px-3 py-2.5">
       <div className="stat-label">{label}</div>
       <div className="mt-1 font-heading text-xl font-bold leading-none text-ink">{value}</div>
       {hint ? <div className="mt-1 text-2xs text-ink-muted">{hint}</div> : null}

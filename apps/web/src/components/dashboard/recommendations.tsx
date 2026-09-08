@@ -28,7 +28,7 @@ export function RecommendationPanel({
           {rows.map((row) => (
             <li
               key={row.code}
-              className="flex gap-3 rounded border border-base-800 bg-base-950/40 px-3 py-2"
+              className="flex gap-3 rounded border border-base-800 bg-base-850 px-3 py-2"
             >
               <span className="w-16 shrink-0 pt-0.5 font-heading text-xs font-bold uppercase tracking-wider text-accent">
                 {FUNCTION_LABEL[row.recommended_function] ?? row.recommended_function}

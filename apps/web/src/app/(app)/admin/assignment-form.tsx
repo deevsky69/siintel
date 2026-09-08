@@ -144,7 +144,7 @@ export function AssignmentForm({
         {pending ? "Menyimpan…" : "Simpan Penugasan"}
       </button>
 
-      <p className="mt-3 rounded border border-base-800 bg-base-950/40 px-3 py-2 text-2xs leading-relaxed text-ink-muted">
+      <p className="mt-3 rounded border border-base-800 bg-base-850 px-3 py-2 text-2xs leading-relaxed text-ink-muted">
         <span className="font-heading font-semibold uppercase tracking-wider text-ink">
           Password tidak ada di formulir ini.
         </span>{" "}

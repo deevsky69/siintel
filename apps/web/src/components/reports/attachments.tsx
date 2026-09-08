@@ -117,10 +117,10 @@ function Preview({ code, row }: { code: string; row: AttachmentRow }) {
 
   if (row.kind === "IMAGE") {
     return (
-      // biome-ignore lint/performance/noImgElement: berkas ini dilayani rute terautentikasi
-      // milik aplikasi sendiri, bukan aset statis — pengoptimal gambar Next tidak dapat
-      // mengambilnya tanpa token, dan memberinya token berarti menyalin data pribadi ke
-      // cache pengoptimal.
+      // Berkas ini dilayani rute terautentikasi milik aplikasi sendiri, bukan aset statis:
+      // pengoptimal gambar Next tidak dapat mengambilnya tanpa token, dan memberinya token
+      // berarti menyalin data pribadi warga ke cache pengoptimal.
+      // biome-ignore lint/performance/noImgElement: alasannya di baris-baris di atas
       <img
         src={href}
         alt={`Lampiran ${KIND_LABEL[row.kind] ?? row.kind} pada laporan ${code}`}

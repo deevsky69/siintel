@@ -46,7 +46,7 @@ function RecommendationCard({ row, selected }: { row: RecommendationRow; selecte
         className={`block rounded border px-3 py-2.5 transition-colors ${
           selected
             ? "border-accent/60 bg-accent/5"
-            : "border-base-800 bg-base-950/40 hover:border-base-600"
+            : "border-base-800 bg-base-850 hover:border-base-600"
         }`}
       >
         <div className="flex items-start gap-3">

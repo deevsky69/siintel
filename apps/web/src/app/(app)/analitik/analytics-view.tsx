@@ -531,7 +531,7 @@ function SpatialPanel({ spatial }: { spatial: SpatialPatternResponse }) {
 
           <p className="text-2xs leading-relaxed text-ink-faint">{spatial.share_basis}</p>
           <p className="text-2xs leading-relaxed text-ink-faint">{spatial.comparison_basis}</p>
-          <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-xs leading-relaxed text-ink-muted">
+          <p className="rounded border border-base-800 bg-base-850 p-2.5 text-xs leading-relaxed text-ink-muted">
             {spatial.rate_basis}
           </p>
         </>
@@ -573,7 +573,7 @@ export function AnalyticsView({
 
         {/* Bedanya dengan /pola dinyatakan di atas, bukan di kaki halaman: dua layar yang
             membaca tabel sama akan tertukar bila bedanya tidak terbaca lebih dulu. */}
-        <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-xs leading-relaxed text-ink-muted">
+        <p className="rounded border border-base-800 bg-base-850 p-2.5 text-xs leading-relaxed text-ink-muted">
           {trend.related_analysis_basis}{" "}
           <Link href="/pola" className="text-accent hover:text-accent-soft">
             Buka Crime Pattern DNA →

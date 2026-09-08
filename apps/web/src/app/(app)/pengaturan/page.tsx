@@ -169,7 +169,7 @@ export default async function PengaturanPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
+    <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
       <div className="stat-label">{label}</div>
       <div className="mt-1 font-mono text-sm text-ink">{value}</div>
     </div>
