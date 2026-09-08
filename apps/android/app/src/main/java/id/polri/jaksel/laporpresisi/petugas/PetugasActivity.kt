@@ -1,4 +1,4 @@
-package id.polri.jaksel.presisi
+package id.polri.jaksel.laporpresisi.petugas
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,8 +6,11 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import id.polri.jaksel.presisi.databinding.ActivityMainBinding
-import id.polri.jaksel.presisi.databinding.ItemQueueBinding
+import id.polri.jaksel.laporpresisi.BuildConfig
+import id.polri.jaksel.laporpresisi.R
+import id.polri.jaksel.laporpresisi.databinding.ActivityPetugasBinding
+import id.polri.jaksel.laporpresisi.databinding.ItemQueueBinding
+import id.polri.jaksel.laporpresisi.databinding.ItemReportBinding
 import kotlinx.coroutines.launch
 
 /**
@@ -40,15 +43,20 @@ import kotlinx.coroutines.launch
  * Kata sandi **tidak pernah disimpan**. Petugas yang kehilangan ponselnya kehilangan sesi,
  * bukan kata sandinya.
  */
-class MainActivity : AppCompatActivity() {
+class PetugasActivity : AppCompatActivity() {
 
-    private lateinit var views: ActivityMainBinding
+    private companion object {
+        /** Nilai `kind` dari `GET /notifications` untuk antrean laporan warga. */
+        const val KIND_CITIZEN_REPORT = "CITIZEN_REPORT"
+    }
+
+    private lateinit var views: ActivityPetugasBinding
     private lateinit var tokens: TokenStore
     private lateinit var session: Session
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        views = ActivityMainBinding.inflate(layoutInflater)
+        views = ActivityPetugasBinding.inflate(layoutInflater)
         setContentView(views.root)
         tokens = TokenStore(this)
         session = Session(BuildConfig.API_BASE, tokens)
@@ -156,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                 queueCount.text = queue.total.toString()
                 queueCount.setTextColor(
                     ContextCompat.getColor(
-                        this@MainActivity,
+                        this@PetugasActivity,
                         if (queue.total > 0) R.color.critical else R.color.ink_faint,
                     ),
                 )
@@ -166,12 +174,59 @@ class MainActivity : AppCompatActivity() {
                     // baik, dan menghilangkan barisnya membuat pembaca tidak dapat
                     // membedakan "tidak ada" dari "tidak diperiksa".
                     "Tidak ada yang menunggu."
+                } else if (queue.kind == KIND_CITIZEN_REPORT) {
+                    // Laporan warga digambar satu per satu di bawah, masing-masing dengan
+                    // tombolnya. Merangkumnya di sini akan menampilkan isi yang sama dua kali.
+                    ""
                 } else {
                     queue.items.joinToString("\n") { "• ${it.headline} — ${it.detail}" }
                 }
+                queueItems.visibility =
+                    if (queueItems.text.isNullOrBlank()) View.GONE else View.VISIBLE
             }
             views.queueList.addView(row)
+
+            if (queue.kind == KIND_CITIZEN_REPORT) {
+                for (item in queue.items) addReportRow(item)
+            }
         }
+    }
+
+    /**
+     * Satu laporan warga yang dapat diverifikasi langsung dari ponsel.
+     *
+     * Tombolnya dinonaktifkan begitu ditekan dan tidak dinyalakan kembali bila berhasil:
+     * laporan yang sudah berpindah status tidak lagi ada di antrean, dan menekannya kedua
+     * kali akan dijawab `409` oleh server. Antrean dimuat ulang sesudahnya supaya yang
+     * terlihat di layar adalah keadaan sesungguhnya, bukan tebakan aplikasi.
+     */
+    private fun addReportRow(item: Api.QueueItem) {
+        val row = LayoutInflater.from(this).inflate(R.layout.item_report, views.queueList, false)
+        ItemReportBinding.bind(row).apply {
+            reportCode.text = item.code
+            reportHeadline.text = item.headline
+            reportDetail.text = item.detail
+            verifyButton.setOnClickListener {
+                verifyButton.isEnabled = false
+                verifyButton.text = getString(R.string.verifying)
+                lifecycleScope.launch {
+                    try {
+                        session.run { Api.verifyReport(BuildConfig.API_BASE, it, item.code) }
+                        showLoginErrorOnHome(getString(R.string.verified_done, item.code))
+                        loadQueues()
+                    } catch (failure: Api.Failure) {
+                        verifyButton.isEnabled = true
+                        verifyButton.text = getString(R.string.verify)
+                        if (failure.unauthorized) {
+                            signOut(getString(R.string.err_session))
+                        } else {
+                            showLoginErrorOnHome(failure.readable)
+                        }
+                    }
+                }
+            }
+        }
+        views.queueList.addView(row)
     }
 
     private fun signOut(reason: String?) {

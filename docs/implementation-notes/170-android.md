@@ -1,25 +1,40 @@
 # 170 — Aplikasi Android
 
 > **Status:** TECHNICAL DECISION
-> **Fase:** PHASE 17 (TASK 170 dan TASK 171)
-> **Terakhir diperbarui:** 7 September 2026
+> **Fase:** PHASE 17 (TASK 170–172)
+> **Terakhir diperbarui:** 8 September 2026
 
 ---
 
-## 1. Dua aplikasi, bukan satu
+## 1. Satu aplikasi, dua pintu
 
-| Modul Gradle | Nama | `applicationId` | Untuk siapa | Autentikasi |
-|---|---|---|---|---|
-| `app` | LAPOR PRESISI | `id.polri.jaksel.laporpresisi` | Masyarakat | Tidak ada |
-| `petugas` | PRESISI Petugas | `id.polri.jaksel.presisi` | Personel | Ada |
+**PRESISI** — satu modul Gradle, `applicationId = id.polri.jaksel.laporpresisi`, versi 2.0.0.
+Layar mukanya menawarkan dua pintu:
 
-Keduanya dipisah karena pemakainya berbeda secara mendasar. Menggabungkannya berarti
-memasang kode berkewenangan di ponsel warga, dan meminta warga melewati layar masuk yang
-tidak akan pernah mereka pakai. `applicationId` yang berbeda juga membuat keduanya dapat
-terpasang berdampingan pada satu ponsel — berguna saat paparan.
+| Pintu | Layar | Autentikasi |
+|---|---|---|
+| Lapor kejadian | `LaporActivity` | Tidak ada |
+| Masuk sebagai petugas | `petugas/PetugasActivity` | Ada |
 
-Keduanya berbicara ke API yang sama lewat HTTPS. Tidak ada kode yang dibagi antara keduanya
-dan tidak ada yang dibagi dengan web; yang dibagi hanyalah kontrak API.
+### 1.1 Sebelumnya dua APK, dan mengapa disatukan
+
+Sampai 8 September 2026 ada dua aplikasi terpisah — `LAPOR PRESISI` untuk warga dan
+`PRESISI Petugas` untuk personel. Pemisahannya punya alasan: warga tidak perlu memasang
+kode berkewenangan di ponselnya.
+
+Pemilik proyek meminta keduanya disatukan, dan permintaannya masuk akal untuk paparan: satu
+tautan pemasangan, satu ikon, satu hal yang harus dijelaskan.
+
+**Yang tidak hilang: kewenangan.** Layar petugas tetap menuntut masuk, dan setiap
+permintaannya diperiksa server. Kode yang terpasang di ponsel tidak pernah menjadi
+kewenangan — yang menentukan adalah token, dan token hanya lahir dari kredensial.
+
+**Yang hilang:** jaminan bahwa ponsel warga tidak memuat layar masuk sama sekali. Sekarang
+ia memuatnya, dan yang menjaganya hanyalah bahwa layar itu tidak berguna tanpa akun.
+
+**Yang ikut hilang:** pemasangan berdampingan. `applicationId` yang dipertahankan adalah
+milik aplikasi warga, karena merekalah yang paling banyak sudah memasangnya. Pemasangan
+lama `id.polri.jaksel.presisi` tidak akan diperbarui sendiri dan perlu dicopot.
 
 ---
 
@@ -105,13 +120,13 @@ sertifikat Let's Encrypt dipasang tanpa menunggu APK baru.
 
 ## 4. Test
 
-26 unit test JVM, dijalankan dengan `gradle :petugas:testDebugUnitTest :app:testDebugUnitTest`.
+33 unit test JVM, dijalankan dengan `gradle :app:testDebugUnitTest`.
 
 | Berkas | Jumlah | Apa yang dijaga |
 |---|---|---|
-| `petugas/…/SessionTest.kt` | 8 | Aturan pembaruan sesi pada §2.3 |
-| `petugas/…/ApiTest.kt` | 11 | `Set-Cookie` terbaca, `Cookie` terkirim, `401` dibedakan |
-| `app/…/PublicApiTest.kt` | 7 | Tidak ada field identitas terkirim, galat terbaca warga |
+| `…/petugas/SessionTest.kt` | 8 | Aturan pembaruan sesi pada §2.3 |
+| `…/petugas/ApiTest.kt` | 13 | `Set-Cookie` terbaca, `Cookie` terkirim, `401` dibedakan, verifikasi |
+| `…/PublicApiTest.kt` | 12 | Tidak ada field identitas terkirim, lokasi hanya bila dibagikan, berkas benar-benar terkirim |
 
 Test berbicara ke **server HTTP sungguhan** (`FakeServer`, dibangun di atas `ServerSocket`)
 dan bukan ke tiruan `Api`. Alasannya: yang paling mungkin salah justru ada di lapisan HTTP —
@@ -200,11 +215,53 @@ kesalahan yang **tidak dapat** ditangkap unit test JVM.
 
 ---
 
-## 6. Yang belum dikerjakan
+## 6. Lokasi, lampiran, dan verifikasi (8 September 2026)
 
-- Aplikasi petugas hanya **membaca** antrean; ia belum dapat menyetujui, menolak, atau
-  mentriase. Itu memerlukan keputusan pemilik proyek tentang tindakan mana yang pantas
-  dilakukan dari ponsel.
+### 6.1 Warga: berbagi lokasi dan melampirkan berkas
+
+Izin lokasi diminta **saat tombolnya ditekan**, bukan saat layar dibuka. Dialog izin yang
+muncul sebelum pelapor tahu untuk apa lokasinya dipakai hanya memberinya dua pilihan buruk.
+
+Memakai `LocationManager` bawaan, bukan `play-services-location`: pustaka itu menuntut Google
+Play Services yang tidak ada pada sebagian perangkat maupun emulator baku, dan aplikasi yang
+dipasang warga sebaiknya membawa sesedikit mungkin yang tidak dapat mereka periksa.
+
+**Titik terakhir yang diketahui tidak dipakai.** Ia bisa berumur berjam-jam dan menunjuk
+tempat yang sudah lama ditinggalkan — titik yang salah lebih buruk daripada tidak ada titik,
+karena ia tetap dicatat sebagai "lokasi kejadian".
+
+Pemilih berkas memakai `OpenMultipleDocuments`, sehingga aplikasi **tidak pernah** meminta
+izin membaca penyimpanan: yang diberikan pengguna adalah berkas yang ia pilih sendiri, bukan
+hak membaca seluruh isi ponselnya. Badan `multipart/form-data` disusun sendiri di atas
+`HttpURLConnection` dan dialirkan potong demi potong — video puluhan megabita yang dibaca
+seluruhnya ke memori akan menjatuhkan aplikasi pada ponsel lama.
+
+### 6.2 Petugas: memverifikasi dari ponsel
+
+`POST /citizen-reports/{kode}/status` dengan `{"status": "VERIFIED"}` — **satu-satunya**
+tindakan yang dapat dilakukan dari ponsel, dan pembatasannya disengaja. Verifikasi adalah
+pernyataan bahwa laporan layak ditindaklanjuti, dan itu dapat diputuskan petugas yang baru
+saja melihat tempatnya. Meneruskan, menugaskan, dan menutup laporan menuntut konteks yang
+hanya ada di meja kerja; menyediakannya di layar sempit mengundang keputusan yang diambil
+terlalu cepat.
+
+### 6.3 Cacat yang hanya terlihat di perangkat
+
+Tombol verifikasi tergambar sebagai **blok sian kosong** yang tetap dapat ditekan. Sebabnya
+`MaterialButton` mewarnai dirinya lewat `backgroundTint` dari tema, dan tint itu menimpa
+`android:background` yang ditulis di XML — teks beraksen di atas latar aksen menjadi tak
+terlihat. Diperbaiki dengan gaya `OutlineButton` yang melepas tint (`backgroundTint = @null`).
+
+Ini cacat kedua dalam dua sesi yang hanya muncul di perangkat, setelah `optString` pada §5.3.
+Keduanya lolos kompilasi, lolos unit test, dan lolos build rilis.
+
+---
+
+## 7. Yang belum dikerjakan
+
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau
   "Muat ulang" ditekan.
 - Belum ada test instrumentasi (`androidTest`) yang berjalan di perangkat.
+- Petugas belum dapat **melihat lampiran** laporan dari ponsel — hanya mengetahui bahwa
+  laporan itu ada. Menampilkan foto warga di layar yang dibawa berkeliling adalah keputusan
+  yang pantas diambil pemilik proyek, bukan diambil diam-diam karena secara teknis mudah.

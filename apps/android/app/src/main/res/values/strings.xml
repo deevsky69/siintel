@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">LAPOR PRESISI</string>
+    <string name="app_name">PRESISI</string>
     <string name="subtitle">Polres Metro Jakarta Selatan</string>
 
     <string name="emergency_title">Sedang darurat? Hubungi 110.</string>
@@ -30,4 +30,49 @@
     <string name="err_options">Pilihan isian gagal dimuat. Periksa sambungan Anda, lalu buka ulang aplikasi.</string>
     <string name="err_incomplete">Lengkapi jenis kejadian, kecamatan, dan keterangan kejadiannya.</string>
     <string name="err_short">Keterangan kejadian terlalu pendek — tuliskan setidaknya satu kalimat.</string>
+
+    <!-- ===== Layar petugas =====
+         Dipindahkan dari modul `petugas` yang berdiri sendiri saat kedua aplikasi
+         disatukan (8 September 2026). `app_name` dan `subtitle` tidak ikut: aplikasi
+         gabungan hanya punya satu nama. -->
+    <string name="login_note">Akses terbatas untuk personel berwenang. Seluruh percobaan masuk dicatat pada jejak audit.</string>
+    <string name="username">Nama pengguna</string>
+    <string name="password">Kata sandi</string>
+    <string name="sign_in">Masuk</string>
+    <string name="signing_in">Masuk…</string>
+    <string name="sign_out">Keluar</string>
+    <string name="queue_title">Menunggu Anda</string>
+    <string name="queue_empty">Peran Anda tidak memiliki antrean pekerjaan. Itu bukan kekeliruan — kewenangan Anda membaca dan menganalisis, bukan menyetujui atau mentriase.</string>
+    <string name="queue_note">Daftar ini dihitung ulang setiap kali dibuka. Tidak ada penanda \"sudah dibaca\" — angkanya hanya turun ketika pekerjaannya selesai.</string>
+    <string name="refresh">Muat ulang</string>
+    <string name="err_credentials">Lengkapi nama pengguna dan kata sandi.</string>
+    <string name="err_session">Sesi Anda berakhir. Masuk kembali untuk melanjutkan.</string>
+    <string name="version_label">Versi</string>
+
+    <!-- ===== Layar muka ===== -->
+    <string name="home_lead">Kanal laporan masyarakat dan pemantauan kamtibmas Polres Metro Jakarta Selatan.</string>
+    <string name="home_report">Lapor kejadian</string>
+    <string name="home_report_hint">Tanpa akun dan tanpa identitas. Untuk keadaan mendesak, hubungi 110.</string>
+    <string name="home_officer">Masuk sebagai petugas</string>
+    <string name="home_officer_hint">Untuk personel berwenang. Melihat antrean pekerjaan dan memverifikasi laporan warga.</string>
+
+    <!-- ===== Lokasi dan lampiran pada laporan warga ===== -->
+    <string name="label_location">Lokasi kejadian (opsional)</string>
+    <string name="share_location">Bagikan lokasi saya</string>
+    <string name="sharing_location">Mengambil lokasi…</string>
+    <string name="clear_location">Hapus lokasi</string>
+    <string name="location_note">Yang dikirim adalah titik tempat Anda berada sekarang, dan itu dicatat sebagai lokasi kejadian. Jangan menekannya bila Anda sudah tidak berada di tempat kejadian.</string>
+    <string name="err_location_denied">Izin lokasi ditolak. Laporan tetap dapat dikirim tanpa lokasi.</string>
+    <string name="err_location">Lokasi tidak dapat diambil. Laporan tetap dapat dikirim tanpa lokasi.</string>
+
+    <string name="label_attachments">Foto, suara, atau video (opsional)</string>
+    <string name="pick_file">Pilih berkas</string>
+    <string name="uploading">Mengunggah…</string>
+    <string name="attachments_full">Sudah penuh</string>
+    <string name="attachment_note">Metadata berkas dihapus, wajah tidak. Koordinat dan merek kamera yang ditanam ponsel dilucuti sebelum disimpan — tetapi orang yang terlihat di dalam foto atau terdengar di dalam rekaman tetap dapat dikenali.</string>
+
+    <!-- ===== Verifikasi laporan oleh petugas ===== -->
+    <string name="verify">Verifikasi</string>
+    <string name="verifying">Memverifikasi…</string>
+    <string name="verified_done">Laporan %1$s ditandai terverifikasi.</string>
 </resources>

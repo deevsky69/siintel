@@ -1,4 +1,4 @@
-package id.polri.jaksel.presisi
+package id.polri.jaksel.laporpresisi.petugas
 
 /**
  * Apa yang dibutuhkan [Session] dari penyimpanan token.

@@ -127,6 +127,82 @@
                 android:textColor="@color/ink_faint"
                 android:textSize="11sp" />
 
+            <!-- ===== Lokasi kejadian ===== -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:letterSpacing="0.1"
+                android:text="@string/label_location"
+                android:textAllCaps="true"
+                android:textColor="@color/ink_muted"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/locationText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/ink"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/locationButton"
+                style="@style/OutlineButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/share_location" />
+
+            <TextView
+                android:id="@+id/locationNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:lineSpacingExtra="3dp"
+                android:text="@string/location_note"
+                android:textColor="@color/ink_faint"
+                android:textSize="12sp" />
+
+            <!-- ===== Lampiran ===== -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:letterSpacing="0.1"
+                android:text="@string/label_attachments"
+                android:textAllCaps="true"
+                android:textColor="@color/ink_muted"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/attachmentList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:lineSpacingExtra="3dp"
+                android:textColor="@color/ink"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/attachButton"
+                style="@style/OutlineButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/pick_file" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:lineSpacingExtra="3dp"
+                android:text="@string/attachment_note"
+                android:textColor="@color/ink_faint"
+                android:textSize="12sp" />
+
             <TextView
                 android:id="@+id/errorText"
                 android:layout_width="match_parent"

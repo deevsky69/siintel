@@ -23,7 +23,10 @@ class PublicApiTest {
     private val optionsBody = """
         {"categories":["Pencurian","Narkoba"],
          "kecamatan":["Tebet","Kebayoran Baru"],
-         "coordinate_basis":"Titik tengah kecamatan"}
+         "coordinate_basis":"Titik tengah kecamatan",
+         "attachment_basis":"Metadata berkas dilucuti sebelum disimpan.",
+         "max_attachments":3,
+         "max_attachment_bytes":26214400}
     """.trimIndent()
 
     private val ticketBody = """{"ticket":"CR-2026-0001","message":"Laporan Anda diterima."}"""
@@ -141,5 +144,114 @@ class PublicApiTest {
 
         // Keadaan mendesak tidak boleh berhenti pada aplikasi yang sedang tidak berfungsi.
         assertTrue((failure as PublicApi.ApiFailure).readable.contains("110"))
+    }
+
+
+    // --- Lokasi dan lampiran -------------------------------------------------------------
+
+    @Test
+    fun `lokasi hanya dikirim bila pelapor membagikannya`() = runBlocking {
+        FakeServer().use { server ->
+            server.on("/api/v1/public/citizen-reports", FakeServer.Reply(201, ticketBody))
+
+            PublicApi.submit(
+                server.base,
+                ReportDraft("Pencurian", "Tebet", "", "Sepeda motor hilang di depan rumah."),
+            )
+
+            val sent = JSONObject(server.requestsTo("/api/v1/public/citizen-reports").single().body)
+            // Mengirim nol saat pelapor tidak membagikan lokasinya akan menyimpan titik di
+            // lepas pantai Afrika dan menandainya sebagai tempat kejadian menurut pelapor.
+            assertFalse(sent.has("latitude"))
+            assertFalse(sent.has("longitude"))
+            assertFalse(sent.has("accuracy_m"))
+        }
+    }
+
+    @Test
+    fun `lokasi yang dibagikan dikirim lengkap dengan ketelitiannya`() = runBlocking {
+        FakeServer().use { server ->
+            server.on("/api/v1/public/citizen-reports", FakeServer.Reply(201, ticketBody))
+
+            PublicApi.submit(
+                server.base,
+                ReportDraft(
+                    category = "Pencurian",
+                    area = "Tebet",
+                    place = "",
+                    story = "Sepeda motor hilang di depan rumah.",
+                    latitude = -6.2411,
+                    longitude = 106.8032,
+                    accuracyMetres = 12.5,
+                ),
+            )
+
+            val sent = JSONObject(server.requestsTo("/api/v1/public/citizen-reports").single().body)
+            assertEquals(-6.2411, sent.getDouble("latitude"), 1e-6)
+            assertEquals(106.8032, sent.getDouble("longitude"), 1e-6)
+            assertEquals(12.5, sent.getDouble("accuracy_m"), 1e-6)
+        }
+    }
+
+    @Test
+    fun `handle lampiran disebut saat mengirim, bukan berkasnya lagi`() = runBlocking {
+        FakeServer().use { server ->
+            server.on("/api/v1/public/citizen-reports", FakeServer.Reply(201, ticketBody))
+
+            PublicApi.submit(
+                server.base,
+                ReportDraft(
+                    category = "Pencurian",
+                    area = "Tebet",
+                    place = "",
+                    story = "Sepeda motor hilang di depan rumah.",
+                    attachments = listOf("handle-satu", "handle-dua"),
+                ),
+            )
+
+            val sent = JSONObject(server.requestsTo("/api/v1/public/citizen-reports").single().body)
+            val handles = sent.getJSONArray("attachments")
+            assertEquals(2, handles.length())
+            assertEquals("handle-satu", handles.getString(0))
+        }
+    }
+
+    @Test
+    fun `berkas dititipkan sebagai multipart beserta isinya`() = runBlocking {
+        FakeServer().use { server ->
+            server.on(
+                "/api/v1/public/attachments",
+                FakeServer.Reply(201, """{"handle":"H-1","kind":"IMAGE","byte_size":9}"""),
+            )
+
+            val staged = PublicApi.stage(
+                server.base,
+                "isi-foto".byteInputStream(),
+                "bukti.jpg",
+                "image/jpeg",
+            )
+
+            assertEquals("H-1", staged.handle)
+            assertEquals("IMAGE", staged.kind)
+
+            val request = server.requestsTo("/api/v1/public/attachments").single()
+            assertTrue(request.header("Content-Type")?.startsWith("multipart/form-data") == true)
+            assertTrue(request.body.contains("""name="berkas""""))
+            assertTrue(request.body.contains("bukti.jpg"))
+            // Isi berkasnya benar-benar ikut terkirim — bukan hanya namanya.
+            assertTrue(request.body.contains("isi-foto"))
+        }
+    }
+
+    @Test
+    fun `batas lampiran dibaca dari server, bukan ditanam di aplikasi`() = runBlocking {
+        FakeServer().use { server ->
+            server.on("/api/v1/public/report-options", FakeServer.Reply(200, optionsBody))
+
+            val options = PublicApi.options(server.base)
+
+            assertEquals(3, options.maxAttachments)
+            assertEquals(26214400L, options.maxAttachmentBytes)
+        }
     }
 }

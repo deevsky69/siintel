@@ -1,4 +1,4 @@
-package id.polri.jaksel.presisi
+package id.polri.jaksel.laporpresisi.petugas
 
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals

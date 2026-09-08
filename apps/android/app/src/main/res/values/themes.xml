@@ -23,4 +23,29 @@
         <item name="android:textSize">10sp</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <!--
+      Tombol garis luar.
+
+      `android:background` SENDIRIAN tidak cukup pada tema Material3: MaterialButton
+      mewarnai dirinya lewat `backgroundTint` dari tema, dan tint itu menimpa latar yang
+      ditulis di XML. Akibatnya tombol tergambar berisi warna aksen — dan teks beraksen di
+      atasnya menjadi tidak terlihat sama sekali. Itu persis yang terjadi pada tombol
+      verifikasi sebelum gaya ini ada: sebuah blok sian kosong yang tetap dapat ditekan.
+
+      `backgroundTint = @null` melepas tint itu sehingga `android:background` kembali
+      berlaku.
+    -->
+    <style name="OutlineButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:background">@drawable/box_field</item>
+        <item name="android:backgroundTint">@null</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:paddingLeft">18dp</item>
+        <item name="android:paddingRight">18dp</item>
+        <item name="android:textColor">@color/accent</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
 </resources>

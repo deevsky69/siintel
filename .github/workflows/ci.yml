@@ -81,7 +81,7 @@ jobs:
           JWT_SECRET: ci-hanya-untuk-pengujian-minimal-tiga-puluh-dua-bytes
 
   android:
-    name: Android — unit test kedua aplikasi
+    name: Android — unit test dan build APK
     runs-on: ubuntu-latest
     # Pekerjaan terpisah, bukan langkah tambahan di `web`/`api`. Build Android menuntut SDK
     # yang tidak diperlukan keduanya, dan kegagalannya tidak boleh menghentikan pekerjaan
@@ -98,8 +98,8 @@ jobs:
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
       - name: Unit test
-        run: gradle --no-daemon :petugas:testDebugUnitTest :app:testDebugUnitTest
+        run: gradle --no-daemon :app:testDebugUnitTest
       # APK dibangun juga, karena test yang lulus pada kode yang tidak dapat dipaket tidak
       # membuktikan aplikasinya dapat dipasang.
-      - name: Bangun kedua APK
-        run: gradle --no-daemon :app:assembleRelease :petugas:assembleRelease
+      - name: Bangun APK
+        run: gradle --no-daemon :app:assembleRelease

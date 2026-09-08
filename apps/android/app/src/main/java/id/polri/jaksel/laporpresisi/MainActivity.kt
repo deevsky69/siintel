@@ -1,162 +1,55 @@
 package id.polri.jaksel.laporpresisi
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import id.polri.jaksel.laporpresisi.databinding.ActivityMainBinding
-import kotlinx.coroutines.launch
+import id.polri.jaksel.laporpresisi.databinding.ActivityHomeBinding
+import id.polri.jaksel.laporpresisi.petugas.PetugasActivity
 
 /**
- * LAPOR PRESISI — satu layar, satu pekerjaan (PHASE 17, TASK 170).
+ * Layar muka: dua pintu, dan tidak lebih.
  *
- * ## Mengapa hanya satu layar
+ * ## Mengapa satu aplikasi, bukan dua
  *
- * Aplikasi ini dipasang orang yang sedang ingin melaporkan sesuatu, sering dalam keadaan
- * tidak tenang. Setiap layar tambahan — beranda, menu, daftar riwayat — adalah satu langkah
- * lagi antara niat melapor dan laporan terkirim. Karena itu tidak ada beranda: aplikasi
- * dibuka langsung pada formulirnya.
+ * Sampai 8 September 2026 ada dua APK terpisah — satu untuk warga, satu untuk petugas.
+ * Pemisahan itu punya alasan: warga tidak perlu memasang kode berkewenangan di ponselnya.
+ * Pemilik proyek meminta keduanya disatukan, dan permintaannya masuk akal untuk paparan:
+ * satu tautan pemasangan, satu ikon, satu hal yang harus dijelaskan.
  *
- * ## Yang tidak ada di sini, dan mengapa
+ * Yang hilang dan yang tidak, dinyatakan terbuka:
  *
- * | Tidak ada | Alasannya |
- * |---|---|
- * | Pendaftaran dan akun | Kanal ini tanpa identitas (`docs/14` §3) |
- * | Izin lokasi | Lokasi sebatas kecamatan yang dipilih sendiri; izin GPS meminta kepercayaan untuk sesuatu yang tidak dipakai |
- * | Kamera dan lampiran | Menyimpan berkas warga menyentuh retensi dan klasifikasi data — keputusan kebijakan yang belum diambil |
- * | Riwayat laporan | Menampilkannya menuntut penyimpanan penanda di ponsel; nomor tiket sudah cukup, dan ia tidak mengikat ke siapa pun |
+ * - **Tidak hilang:** kewenangan. Layar petugas tetap menuntut masuk, dan setiap
+ *   permintaannya diperiksa server. Kode yang terpasang di ponsel tidak pernah menjadi
+ *   kewenangan — yang menentukan adalah token, dan token hanya lahir dari kredensial.
+ * - **Hilang:** jaminan bahwa ponsel warga tidak memuat layar masuk sama sekali. Sekarang
+ *   ia memuatnya, dan yang menjaganya hanyalah bahwa layar itu tidak berguna tanpa akun.
  *
- * Peringatan darurat diletakkan **di atas** formulir, bukan di bawah tombol kirim: orang
- * yang sedang panik tidak membaca catatan kaki.
+ * ## Mengapa layar ini ada sama sekali
+ *
+ * Membuka langsung ke formulir laporan akan menyembunyikan pintu petugas, dan membuka
+ * langsung ke layar masuk akan menyuruh warga memasukkan kredensial yang tidak ia punya.
+ * Dua tombol adalah harga terkecil yang dapat dibayar untuk melayani keduanya.
+ *
+ * Nomor darurat disebut di sini, bukan hanya di dalam formulir: orang yang salah membuka
+ * aplikasi ini saat keadaan mendesak harus membaca "110" sebelum ia menekan apa pun.
  */
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var views: ActivityMainBinding
-    private var options: PublicApi.Options? = null
+    private lateinit var views: ActivityHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        views = ActivityMainBinding.inflate(layoutInflater)
+        views = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(views.root)
 
-        views.sendButton.setOnClickListener { submit() }
-        views.againButton.setOnClickListener { resetForAnother() }
+        views.versionText.text =
+            getString(R.string.version_label) + " ${BuildConfig.VERSION_NAME}"
 
-        loadOptions()
-    }
-
-    /**
-     * Pilihan isian diambil dari server, tidak ditanam di aplikasi.
-     *
-     * Daftar kategori dan kecamatan hidup di `config/taxonomy/mappings.yaml` dan master
-     * lokasi. Menyalinnya ke dalam APK berarti setiap perubahan menuntut pemasangan ulang
-     * di setiap ponsel — dan sampai itu terjadi, warga mengirim kategori yang sudah tidak
-     * dikenal server.
-     */
-    private fun loadOptions() {
-        setBusy(true)
-        lifecycleScope.launch {
-            try {
-                val loaded = PublicApi.options(BuildConfig.API_BASE)
-                options = loaded
-                fill(views.categorySpinner, loaded.categories)
-                fill(views.areaSpinner, loaded.areas)
-                views.formGroup.visibility = View.VISIBLE
-            } catch (failure: PublicApi.ApiFailure) {
-                views.formGroup.visibility = View.GONE
-                showError(getString(R.string.err_options))
-            } finally {
-                setBusy(false)
-            }
+        views.reportButton.setOnClickListener {
+            startActivity(Intent(this, LaporActivity::class.java))
         }
-    }
-
-    private fun submit() {
-        // Pengiriman mustahil sebelum pilihan termuat: tanpa daftar kategori dan kecamatan
-        // dari server, tidak ada nilai sah yang bisa dikirim.
-        if (options == null) return
-        val category = views.categorySpinner.selectedItem?.toString().orEmpty()
-        val area = views.areaSpinner.selectedItem?.toString().orEmpty()
-        val story = views.storyInput.text.toString().trim()
-
-        if (category.isBlank() || area.isBlank() || story.isBlank()) {
-            showError(getString(R.string.err_incomplete))
-            return
+        views.officerButton.setOnClickListener {
+            startActivity(Intent(this, PetugasActivity::class.java))
         }
-        // Ambang yang sama dijaga backend (`min_length=10`). Diperiksa juga di sini bukan
-        // sebagai pengaman melainkan agar pelapor tahu sebelum menunggu perjalanan jaringan.
-        if (story.length < 10) {
-            showError(getString(R.string.err_short))
-            return
-        }
-
-        hideError()
-        setBusy(true)
-        views.sendButton.isEnabled = false
-        views.sendButton.text = getString(R.string.sending)
-
-        lifecycleScope.launch {
-            try {
-                val ticket = PublicApi.submit(
-                    BuildConfig.API_BASE,
-                    ReportDraft(
-                        category = category,
-                        area = area,
-                        place = views.placeInput.text.toString().trim(),
-                        story = story,
-                    ),
-                )
-                showTicket(ticket)
-            } catch (failure: PublicApi.ApiFailure) {
-                showError(failure.readable)
-            } finally {
-                setBusy(false)
-                views.sendButton.isEnabled = true
-                views.sendButton.text = getString(R.string.send)
-            }
-        }
-    }
-
-    private fun showTicket(ticket: PublicApi.Ticket) {
-        views.ticketText.text = ticket.code
-        views.formGroup.visibility = View.GONE
-        views.sentGroup.visibility = View.VISIBLE
-        hideError()
-    }
-
-    /**
-     * Menyiapkan formulir untuk laporan berikutnya.
-     *
-     * Isian dikosongkan seluruhnya. Membiarkan keterangan sebelumnya tertinggal akan
-     * membuat laporan kedua tidak sengaja mengulang isi laporan pertama — dan pada kanal
-     * tanpa identitas, laporan berulang tidak dapat dibedakan dari laporan sungguhan.
-     */
-    private fun resetForAnother() {
-        views.storyInput.text?.clear()
-        views.placeInput.text?.clear()
-        views.sentGroup.visibility = View.GONE
-        views.formGroup.visibility = View.VISIBLE
-    }
-
-    private fun fill(spinner: android.widget.Spinner, values: List<String>) {
-        spinner.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            values,
-        )
-    }
-
-    private fun setBusy(busy: Boolean) {
-        views.spinner.visibility = if (busy) View.VISIBLE else View.GONE
-    }
-
-    private fun showError(message: String) {
-        views.errorText.text = message
-        views.errorText.visibility = View.VISIBLE
-    }
-
-    private fun hideError() {
-        views.errorText.visibility = View.GONE
     }
 }

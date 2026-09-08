@@ -1,4 +1,4 @@
-package id.polri.jaksel.presisi
+package id.polri.jaksel.laporpresisi.petugas
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,6 +21,7 @@ import java.net.URL
  * POST /api/v1/auth/refresh   menukar refresh token dengan access token baru
  * GET  /api/v1/auth/me        identitas dan kewenangan efektif
  * GET  /api/v1/notifications  antrean pekerjaan menurut kewenangan itu
+ * POST /api/v1/citizen-reports/{kode}/status   menriase satu laporan warga
  * ```
  *
  * ## Dua token, dan mengapa keduanya diperlukan
@@ -58,7 +59,7 @@ object Api {
 
     data class Profile(val name: String, val role: String, val permissions: List<String>)
 
-    data class QueueItem(val headline: String, val detail: String)
+    data class QueueItem(val code: String, val headline: String, val detail: String)
 
     data class Queue(
         val kind: String,
@@ -109,6 +110,25 @@ object Api {
         parseProfile(call(base, "/api/v1/auth/me", "GET", null, token, null).body)
     }
 
+    /**
+     * Menandai satu laporan warga sudah diverifikasi.
+     *
+     * Satu-satunya tindakan yang dapat dilakukan dari ponsel, dan pembatasannya disengaja.
+     * Verifikasi adalah pernyataan bahwa laporan itu layak ditindaklanjuti — keputusan yang
+     * dapat diambil petugas yang baru saja melihat tempatnya. Meneruskan, menugaskan, dan
+     * menutup laporan menuntut konteks yang hanya ada di meja kerja, dan menyediakannya di
+     * layar sempit mengundang keputusan yang diambil terlalu cepat.
+     *
+     * Server tetap yang memutuskan boleh atau tidak: kewenangan `citizen_report:write` dan
+     * cakupan wilayah diperiksa di sana, dan setiap perpindahan status ditulis ke audit.
+     */
+    suspend fun verifyReport(base: String, token: String, code: String): String =
+        withContext(Dispatchers.IO) {
+            val payload = JSONObject().put("status", "VERIFIED").toString()
+            val reply = call(base, "/api/v1/citizen-reports/$code/status", "POST", payload, token, null)
+            JSONObject(reply.body).optString("status")
+        }
+
     suspend fun notifications(base: String, token: String): Feed = withContext(Dispatchers.IO) {
         parseFeed(call(base, "/api/v1/notifications", "GET", null, token, null).body)
     }
@@ -138,7 +158,7 @@ object Api {
                     total = group.optInt("total"),
                     items = (0 until items.length()).map {
                         val item = items.getJSONObject(it)
-                        QueueItem(item.text("headline"), item.text("detail"))
+                        QueueItem(item.text("code"), item.text("headline"), item.text("detail"))
                     },
                 )
             },

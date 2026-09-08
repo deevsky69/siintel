@@ -89,10 +89,23 @@ class FakeServer : AutoCloseable {
             headers.getOrPut(name) { mutableListOf() } += value
         }
 
+        // Dua bentuk badan permintaan, dan keduanya perlu.
+        //
+        // `Content-Length` dipakai permintaan JSON biasa. Unggahan berkas memakai
+        // `Transfer-Encoding: chunked` karena klien mengalirkannya tanpa menumpuknya di
+        // memori lebih dulu — video puluhan megabita pada ponsel lama akan menjatuhkan
+        // aplikasinya. Server uji yang hanya membaca `Content-Length` menerima badan KOSONG
+        // dari unggahan, lalu lulus dengan gembira tanpa memeriksa apa pun.
+        val chunked = headers.entries
+            .firstOrNull { it.key.equals("Transfer-Encoding", ignoreCase = true) }
+            ?.value?.firstOrNull()?.contains("chunked", ignoreCase = true) == true
         val length = headers.entries
             .firstOrNull { it.key.equals("Content-Length", ignoreCase = true) }
             ?.value?.firstOrNull()?.toIntOrNull() ?: 0
-        val body = ByteArray(length).also { if (length > 0) readFully(input, it) }
+
+        val body = if (chunked) readChunked(input) else {
+            ByteArray(length).also { if (length > 0) readFully(input, it) }
+        }
 
         received += Received(method, path, headers, String(body, Charsets.UTF_8))
 
@@ -127,6 +140,21 @@ class FakeServer : AutoCloseable {
             if (byte == '\n'.code) return buffer.toString().removeSuffix("\r")
             buffer.append(byte.toChar())
         }
+    }
+
+    /** Membaca badan ber-`Transfer-Encoding: chunked` sampai potongan berukuran nol. */
+    private fun readChunked(input: InputStream): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        while (true) {
+            val header = readLine(input) ?: break
+            val size = header.substringBefore(';').trim().toIntOrNull(16) ?: break
+            if (size == 0) break
+            val chunk = ByteArray(size)
+            readFully(input, chunk)
+            out.write(chunk)
+            readLine(input) // CRLF penutup potongan
+        }
+        return out.toByteArray()
     }
 
     private fun readFully(input: InputStream, into: ByteArray) {

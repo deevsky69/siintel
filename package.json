@@ -23,7 +23,7 @@
     "test": "pnpm test:web && pnpm test:api",
     "test:web": "pnpm --filter @prediksi-presisi/web test",
     "test:api": "cd apps/api && uv run pytest",
-    "test:android": "cd apps/android && gradle :petugas:testDebugUnitTest :app:testDebugUnitTest",
+    "test:android": "cd apps/android && gradle :app:testDebugUnitTest",
     "verify": "pnpm lint && pnpm typecheck && pnpm test",
     "db:up": "docker compose -f infra/docker/docker-compose.yml up -d db",
     "db:down": "docker compose -f infra/docker/docker-compose.yml down",

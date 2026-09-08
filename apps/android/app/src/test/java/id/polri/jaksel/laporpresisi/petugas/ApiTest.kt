@@ -1,4 +1,4 @@
-package id.polri.jaksel.presisi
+package id.polri.jaksel.laporpresisi.petugas
 
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -149,8 +149,8 @@ class ApiTest {
             {"role":"Pimpinan","total":3,"groups":[
               {"kind":"RECOMMENDATION","title":"Rekomendasi menunggu keputusan","action":"Putuskan",
                "total":2,"items":[
-                 {"headline":"Patroli Tebet","detail":"Prioritas tinggi"},
-                 {"headline":"Operasi Kebayoran","detail":"Prioritas sedang"}]},
+                 {"code":"REC-0001","headline":"Patroli Tebet","detail":"Prioritas tinggi"},
+                 {"code":"REC-0002","headline":"Operasi Kebayoran","detail":"Prioritas sedang"}]},
               {"kind":"EARLY_WARNING","title":"Peringatan dini","action":"Tinjau","total":1,"items":[]}
             ]}
             """.trimIndent(),
@@ -160,6 +160,9 @@ class ApiTest {
         assertEquals(3, feed.total)
         assertEquals(2, feed.queues.size)
         assertEquals("Patroli Tebet", feed.queues[0].items[0].headline)
+        // Kode ikut diurai: tanpa itu, tombol verifikasi tidak tahu laporan mana yang
+        // dimaksud, dan tindakan dari ponsel mustahil.
+        assertEquals("REC-0001", feed.queues[0].items[0].code)
         // Antrean berjumlah satu tetapi tanpa rincian tetap terbaca sebagai antrean, bukan
         // dibuang — angkanya yang penting bagi pembaca.
         assertEquals(1, feed.queues[1].total)
@@ -192,5 +195,44 @@ class ApiTest {
         assertEquals("Nama pengguna atau kata sandi salah.", Api.readable("", 401))
         assertEquals("Akun Anda tidak memiliki kewenangan untuk ini.", Api.readable("", 403))
         assertEquals("Permintaan gagal (418).", Api.readable("bukan json", 418))
+    }
+
+
+    @Test
+    fun `verifikasi mengirim status VERIFIED beserta token petugas`() = runBlocking {
+        FakeServer().use { server ->
+            server.on(
+                "/api/v1/citizen-reports/RPT-0042/status",
+                FakeServer.Reply(200, """{"code":"RPT-0042","status":"VERIFIED"}"""),
+            )
+
+            val status = Api.verifyReport(server.base, "A1", "RPT-0042")
+
+            assertEquals("VERIFIED", status)
+            val request = server.requestsTo("/api/v1/citizen-reports/RPT-0042/status").single()
+            assertEquals("POST", request.method)
+            assertEquals("Bearer A1", request.header("Authorization"))
+            // Hanya status yang dikirim. Aplikasi tidak menetapkan urgensi maupun skor
+            // verifikasi — keduanya penilaian yang tidak dapat diambil dari layar sempit.
+            assertEquals("""{"status":"VERIFIED"}""", request.body)
+        }
+    }
+
+    @Test
+    fun `laporan di luar wilayah petugas dijawab sebagai tidak ada`() = runBlocking {
+        FakeServer().use { server ->
+            server.on(
+                "/api/v1/citizen-reports/RPT-9999/status",
+                FakeServer.Reply(404, """{"error":{"message":"Laporan tidak ditemukan."}}"""),
+            )
+
+            val failure =
+                runCatching { Api.verifyReport(server.base, "A1", "RPT-9999") }.exceptionOrNull()
+
+            // Bukan `unauthorized`: sesi petugas masih sah, dan menjatuhkannya di sini akan
+            // memaksanya masuk kembali karena menekan laporan yang bukan wilayahnya.
+            assertEquals(false, (failure as Api.Failure).unauthorized)
+            assertEquals("Laporan tidak ditemukan.", failure.readable)
+        }
     }
 }

@@ -13,8 +13,10 @@ android {
         // dapat dipasang pada ponsel murah yang sudah lama, bukan hanya pada ponsel baru.
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        // Naik ke 2.0.0 karena aplikasinya berubah bentuk, bukan bertambah fitur: dua APK
+        // menjadi satu, dan layar mukanya kini bukan formulir laporan.
+        versionCode = 2
+        versionName = "2.0.0"
 
         // Alamat API dibaca dari sini, bukan ditanam di kode: server demo memakai port
         // tidak lazim, dan alamat produksi kelak berbeda lagi.
@@ -58,6 +60,13 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    // Penyimpanan token petugas. Dipakai daripada SharedPreferences biasa karena token
+    // adalah kredensial: pada ponsel yang di-root, preferensi biasa terbaca aplikasi lain.
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    // Tidak ada pustaka lokasi pihak ketiga. `play-services-location` lebih nyaman, tetapi
+    // ia menuntut Google Play Services — yang tidak ada pada sebagian perangkat, tidak ada
+    // pada emulator baku, dan menambah ketergantungan pada satu perusahaan untuk aplikasi
+    // yang dipasang warga. `LocationManager` bawaan sudah cukup untuk satu kali pengambilan.
 
     testImplementation("junit:junit:4.13.2")
     // org.json sungguhan untuk unit test JVM. Tanpa ini, `android.jar` tiruan milik Gradle

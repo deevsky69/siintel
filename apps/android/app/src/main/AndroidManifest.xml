@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Satu-satunya izin yang diminta.
-         Tidak ada izin lokasi, kamera, kontak, maupun penyimpanan — dan ketiadaannya
-         disengaja, bukan belum sempat. Aplikasi ini tidak meminta identitas maupun bukti,
-         sehingga izin yang tidak dipakai hanya memperbesar apa yang harus dipercaya warga
-         saat memasangnya. -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Lokasi diminta hanya bila warga menekan "Bagikan lokasi saya", dan hanya yang
+         KASAR maupun halus untuk satu pengambilan — bukan pemantauan di latar belakang.
+         Tanpa deklarasi ini tombolnya mustahil bekerja; dengan deklarasi ini pun Android
+         tetap menanyakan izinnya kepada pengguna pada saat tombol ditekan. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Perangkat tanpa GPS tetap boleh memasang aplikasi ini: melapor tanpa lokasi
+         adalah jalur yang sah, bukan versi yang lebih rendah. -->
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
     <application
         android:allowBackup="false"
@@ -17,14 +23,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LaporPresisi">
 
+        <!-- Layar muka: dua pintu. Ia yang menjadi LAUNCHER, bukan salah satu isinya. -->
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".LaporActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".petugas.PetugasActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 </manifest>

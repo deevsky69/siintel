@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Satu laporan warga di dalam antrean petugas, dengan tindakan yang dapat diambil.
+
+  Dipisahkan dari `item_queue.xml` karena keduanya memikul hal yang berbeda: yang itu
+  merangkum satu antrean, yang ini adalah satu perkara yang dapat ditindak. Menyatukan
+  keduanya akan menempelkan tombol pada baris yang tidak punya tindakan.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/box_field"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/reportCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:letterSpacing="0.08"
+        android:textColor="@color/ink_muted"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/reportHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/ink"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/reportDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:lineSpacingExtra="3dp"
+        android:textColor="@color/ink_muted"
+        android:textSize="13sp" />
+
+    <Button
+        android:id="@+id/verifyButton"
+        style="@style/OutlineButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/verify" />
+</LinearLayout>
