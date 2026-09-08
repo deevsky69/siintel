@@ -27,6 +27,8 @@ const mapped = {
   kelurahan: "Pulo",
   polsek: "Polsek Kebayoran Baru",
   grid_id: "JKS-005",
+  coordinate_source: "REPORTER_GPS",
+  attachments: 2,
 };
 
 const unmapped = {
@@ -43,6 +45,8 @@ const unmapped = {
   kelurahan: null,
   polsek: null,
   grid_id: null,
+  coordinate_source: "KECAMATAN_CENTROID",
+  attachments: 0,
 };
 
 const summary: CommunitySummary = {
@@ -229,5 +233,28 @@ describe("penyajian data masyarakat", () => {
   it("menampilkan nilai yang tidak dikenal apa adanya, bukan sebagai kosong", () => {
     expect(labelOf(REPORT_STATUS_LABELS, "FORWARDED")).toBe("Diteruskan");
     expect(labelOf(REPORT_STATUS_LABELS, "STATUS_BARU")).toBe("STATUS_BARU");
+  });
+
+  it("menandai laporan yang titiknya dibagikan pelapor", () => {
+    // Titik peranti dan titik pusat kecamatan terlihat sama sebagai sepasang angka, tetapi
+    // yang kedua berjarak kilometer dari tempat kejadian. Petugas yang menriase — dan yang
+    // memutuskan mengirim orang ke sana — perlu tahu yang mana.
+    render(<CommunityView summary={summary} reports={reports} filters={noFilter} />);
+
+    expect(screen.getByText("Titik dibagikan pelapor")).toBeTruthy();
+  });
+
+  it("tidak menggambar isi lampiran sampai petugas membukanya", () => {
+    // Isi lampiran adalah wajah dan suara orang. Menggambarnya pada setiap baris berarti
+    // memperlihatkannya kepada siapa pun yang melewati layar, dan mencatat jejak audit
+    // untuk pembukaan yang tidak pernah diminta siapa pun.
+    const { container } = render(
+      <CommunityView summary={summary} reports={reports} filters={noFilter} />,
+    );
+
+    expect(screen.getByRole("button", { name: /Lampiran \(2\)/ })).toBeTruthy();
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelector("video")).toBeNull();
+    expect(container.querySelector("audio")).toBeNull();
   });
 });

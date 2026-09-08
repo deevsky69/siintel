@@ -26,6 +26,17 @@ export type CrimeRow = {
   grid_id: string | null;
 };
 
+export type AttachmentRow = {
+  attachment_id: string;
+  kind: string;
+  media_type: string;
+  byte_size: number;
+  metadata_stripped_with: string;
+  created_at: string;
+  purged_at: string | null;
+  available: boolean;
+};
+
 export type CitizenRow = {
   code: string;
   category: string;
@@ -38,6 +49,10 @@ export type CitizenRow = {
   location_text: string | null;
   urgency_score: number | null;
   verification_score: number | null;
+  /** Dari mana koordinat laporan berasal — `KECAMATAN_CENTROID` atau `REPORTER_GPS`. */
+  coordinate_source: string;
+  /** Cacah lampiran yang berkasnya masih ada. Isinya diambil terpisah. */
+  attachments: number;
 };
 
 export type IntelRow = {

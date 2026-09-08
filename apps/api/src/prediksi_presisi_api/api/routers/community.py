@@ -24,13 +24,19 @@ laporan di luar wilayah pengguna.
 
 from __future__ import annotations
 
+import uuid
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session
 
-from ...models import CitizenReport, CommunityFeedback, Location
+from ...models import (
+    CitizenReport,
+    CitizenReportAttachment,
+    CommunityFeedback,
+    Location,
+)
 from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
 from ..pagination import PageParams, page_params, paginate
 
@@ -71,7 +77,9 @@ def _scoped_reports(polsek: str | None) -> Select[Any]:
     return query if polsek is None else query.where(Location.polsek == polsek)
 
 
-def _report_item(report: CitizenReport, location: Location | None) -> dict[str, Any]:
+def _report_item(
+    report: CitizenReport, location: Location | None, attachments: int = 0
+) -> dict[str, Any]:
     return {
         "code": report.code,
         "reported_at": report.reported_at,
@@ -87,6 +95,13 @@ def _report_item(report: CitizenReport, location: Location | None) -> dict[str, 
         "kelurahan": location.kelurahan if location else None,
         "polsek": location.polsek if location else None,
         "grid_id": location.grid_id if location else None,
+        # Dari mana koordinat laporan ini berasal. Tanpa ini, titik pusat kecamatan dan
+        # titik yang dibagikan pelapor tampil sebagai hal yang sama pada layar mana pun.
+        "coordinate_source": report.coordinate_source,
+        # Cacah lampiran, bukan isinya. Petugas perlu tahu ada bukti yang dapat dibuka
+        # sebelum memutuskan laporan mana yang ditriase lebih dulu; berkasnya sendiri
+        # menuntut kewenangan yang lebih sempit dan diambil lewat endpoint tersendiri.
+        "attachments": attachments,
     }
 
 
@@ -111,8 +126,32 @@ def list_citizen_reports(
     total = session.scalar(select(func.count()).select_from(query.subquery())) or 0
     rows = session.execute(query.offset(params.offset).limit(params.page_size)).all()
 
+    # Satu kueri untuk seluruh halaman, bukan satu per baris: mencacah lampiran di dalam
+    # perulangan menghasilkan N+1 kueri yang tidak terlihat sampai daftarnya panjang.
+    codes = [report.report_id for report, _ in rows]
+    counted: dict[uuid.UUID, int] = {}
+    if codes:
+        counted = {
+            report_id: int(total)
+            for report_id, total in session.execute(
+                select(CitizenReportAttachment.report_id, func.count())
+                .where(
+                    CitizenReportAttachment.report_id.in_(codes),
+                    CitizenReportAttachment.purged_at.is_(None),
+                )
+                .group_by(CitizenReportAttachment.report_id)
+            ).all()
+        }
+
     return {
-        **paginate([_report_item(report, location) for report, location in rows], total, params),
+        **paginate(
+            [
+                _report_item(report, location, counted.get(report.report_id, 0))
+                for report, location in rows
+            ],
+            total,
+            params,
+        ),
         "status": DATA_STATUS,
         "basis": BASIS,
     }

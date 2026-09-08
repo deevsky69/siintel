@@ -76,6 +76,15 @@ export type CitizenReportRow = {
   kelurahan: string | null;
   polsek: string | null;
   grid_id: string | null;
+  /**
+   * Dari mana koordinat laporan berasal — `KECAMATAN_CENTROID` atau `REPORTER_GPS`.
+   *
+   * Wajib ditampilkan di mana pun titiknya dipakai. Sepasang angka tidak menyatakan
+   * asal-usulnya, dan titik pusat kecamatan berjarak kilometer dari tempat kejadian.
+   */
+  coordinate_source: string;
+  /** Cacah lampiran yang berkasnya masih ada. Isinya diambil terpisah saat dibuka. */
+  attachments: number;
 };
 
 export type TopArea = { kecamatan: string; polsek: string | null; total: number };

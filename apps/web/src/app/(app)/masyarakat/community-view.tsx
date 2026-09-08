@@ -2,6 +2,7 @@ import Link from "next/link";
 import { changeReportStatus } from "@/app/(app)/masyarakat/actions";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
+import { Attachments } from "@/components/reports/attachments";
 import { StatusForm } from "@/components/reports/status-form";
 import { StatusNotice } from "@/components/warnings/status-notice";
 import {
@@ -105,6 +106,7 @@ function ReportTable({
                     {report.description}
                   </div>
                 ) : null}
+                <Attachments code={report.code} count={report.attachments} />
               </td>
               <td className="py-2 pr-3">
                 <div className={report.kecamatan ? "text-ink" : "text-ink-faint italic"}>
@@ -112,6 +114,12 @@ function ReportTable({
                 </div>
                 {report.location_text ? (
                   <div className="mt-0.5 text-2xs text-ink-muted">{report.location_text}</div>
+                ) : null}
+                {/* Titik peranti pelapor dan titik pusat kecamatan terlihat sama sebagai
+                    sepasang angka. Yang pertama menunjuk tempat kejadian; yang kedua
+                    berjarak kilometer darinya. Petugas yang menriase perlu tahu yang mana. */}
+                {report.coordinate_source === "REPORTER_GPS" ? (
+                  <div className="mt-0.5 text-2xs text-accent">Titik dibagikan pelapor</div>
                 ) : null}
               </td>
               <td className="py-2 pr-3 text-right font-mono text-ink">
