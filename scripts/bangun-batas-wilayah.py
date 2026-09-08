@@ -35,6 +35,7 @@ Jalankan:  uv run python scripts/bangun-batas-wilayah.py
 
 from __future__ import annotations
 
+import gzip
 import json
 import math
 import sys
@@ -84,10 +85,15 @@ EARTH_M_PER_DEG = 111_320.0
 
 def overpass(query: str, cache_name: str) -> dict:
     """Menjalankan kueri Overpass, dengan singgahan di cakram supaya tidak diulang."""
+    # Jawaban Overpass disimpan terkompresi. Isinya 3,6 MB JSON — seperempat berat
+    # repositori — sementara gzip memampatkannya ke sekitar sepersepuluh. Ia tetap disimpan,
+    # bukan diambil ulang tiap kali: OSM berubah dari hari ke hari, dan batas wilayah yang
+    # tidak dapat dibangun ulang persis sama bukan lagi asal-usul yang dapat diperiksa.
     CACHE.mkdir(parents=True, exist_ok=True)
-    path = CACHE / cache_name
+    path = CACHE / f"{cache_name}.gz"
     if path.exists():
-        return json.loads(path.read_text())
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            return json.load(handle)
 
     body = urllib.parse.urlencode({"data": query}).encode()
     # Overpass membatasi laju permintaan per alamat IP, dan menolak dengan galat yang sama
@@ -102,7 +108,8 @@ def overpass(query: str, cache_name: str) -> dict:
             ) as response:
                 payload = response.read().decode()
             if payload.lstrip().startswith("{"):
-                path.write_text(payload)
+                with gzip.open(path, "wt", encoding="utf-8") as handle:
+                    handle.write(payload)
                 print(f"  diambil dari {host}", file=sys.stderr)
                 return json.loads(payload)
         except Exception as error:  # noqa: BLE001 — cermin berikutnya yang dicoba

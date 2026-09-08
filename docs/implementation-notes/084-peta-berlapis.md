@@ -149,5 +149,9 @@ sembilan kecamatan.
 python3 scripts/bangun-batas-wilayah.py
 ```
 
-Menulis `apps/web/src/lib/wilayah.generated.ts` (113 KB). Jawaban Overpass disinggahkan di
-`data/batas-osm/`; hapus isinya untuk mengambil ulang dari OSM.
+Menulis `apps/web/src/lib/wilayah.generated.ts` (113 KB).
+
+Jawaban Overpass disinggahkan **terkompresi** di `data/batas-osm/` (3,6 MB JSON menjadi
+sekitar 350 KB). Ia disimpan dan bukan diambil ulang tiap kali karena OSM berubah dari hari
+ke hari: batas wilayah yang tidak dapat dibangun ulang persis sama bukan lagi asal-usul yang
+dapat diperiksa. Hapus isinya untuk sengaja mengambil data terbaru dari OSM.
