@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from ..models import EarlyWarning, Prediction, Recommendation, RiskScore
@@ -196,7 +196,25 @@ def seed_early_warnings(session: Session, taxonomy: Taxonomy, summary: SeedSumma
 
 
 def seed_recommendations(session: Session, taxonomy: Taxonomy, summary: SeedSummary) -> None:
-    existing = set(session.scalars(select(Recommendation.code)).all())
+    """Memuat usulan sistem, dan **menyegarkan kalimatnya** pada baris yang sudah ada.
+
+    Seed pada umumnya hanya menambah baris. Untuk `recommendation_text` itu tidak cukup:
+    kalimatnya dibangkitkan ulang dari prediksi yang dirujuk setiap kali `regenerate`
+    dijalankan, sehingga basis data yang sudah pernah di-seed akan menyimpan kalimat lama
+    selamanya sementara berkas sumbernya sudah berubah — persis jenis penyimpangan yang
+    membuat layar dan dataset bercerita berbeda.
+
+    Menyegarkannya aman terhadap jejak keputusan: `commander_decisions` menyimpan salinan
+    kalimat yang berlaku SAAT keputusan diambil pada `original_recommendation`, jadi
+    keputusan lama tetap menunjuk apa yang benar-benar dibaca pejabat waktu itu (U-07).
+    """
+    existing_rows = {
+        code: text
+        for code, text in session.execute(
+            select(Recommendation.code, Recommendation.recommendation_text)
+        ).all()
+    }
+    existing = set(existing_rows)
     predictions = {
         code: prediction_id
         for code, prediction_id in session.execute(
@@ -210,13 +228,22 @@ def seed_recommendations(session: Session, taxonomy: Taxonomy, summary: SeedSumm
         ).all()
     }
     inserted = 0
+    refreshed = 0
 
     for row in src.read_rows("recommendations.csv"):
         code = src.required_text(row, "recommendation_id", "recommendations.csv")
+        where = f"recommendations.csv:{code}"
         if code in existing:
+            fresh = src.required_text(row, "recommendation_text", where)
+            if existing_rows[code] != fresh:
+                session.execute(
+                    update(Recommendation)
+                    .where(Recommendation.code == code)
+                    .values(recommendation_text=fresh)
+                )
+                refreshed += 1
             continue
 
-        where = f"recommendations.csv:{code}"
         prediction_code = src.required_text(row, "prediction_id", where)
         prediction_id = predictions.get(prediction_code)
         if prediction_id is None:
@@ -241,6 +268,8 @@ def seed_recommendations(session: Session, taxonomy: Taxonomy, summary: SeedSumm
         inserted += 1
 
     summary.record("recommendations", inserted, len(existing))
+    if refreshed:
+        summary.note("recommendations", f"{refreshed} kalimat usulan disegarkan")
 
 
 def seed_analytics_data(session: Session, taxonomy: Taxonomy | None = None) -> SeedSummary:

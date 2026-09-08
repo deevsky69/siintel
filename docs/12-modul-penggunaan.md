@@ -340,6 +340,12 @@ tren bulanan, status patroli, dan peringatan teratas.
 Semuanya tetap ada dan masing-masing punya layarnya sendiri di menu. Yang berubah hanya:
 ia tidak lagi ikut dibaca pada pandangan pertama.
 
+Sejak 8 September 2026 tiap butir **Rekomendasi Kebijakan** dapat diklik dan membuka layar
+yang memuat angka asalnya: butir jam patroli membuka rincian kecamatan yang skornya
+dikutip, butir operasi khusus membuka Crime Analytics yang sudah tersaring ke jenis
+gangguan itu, dan butir verifikasi membuka daftar laporan masyarakat berstatus `RECEIVED`.
+Saran yang dasarnya tidak dapat diperiksa sama saja dengan saran tanpa dasar.
+
 > **Kebiasaan yang benar:** setiap angka turunan pada aplikasi ini membawa keterangan asal.
 > Bacalah keterangan itu sebelum mengutip angkanya. Angka tanpa konteks adalah cara
 > tercepat sebuah prototipe disalahpahami sebagai data resmi.
@@ -645,6 +651,19 @@ Menu **Recommendation**. **Bagian ini yang membuat sistem dapat dipertanggungjaw
 
 Terbagi dua: **Menunggu Keputusan** dan **Sudah Diputus**. Yang menunggu diletakkan
 lebih dulu, karena itulah yang menuntut tindakan.
+
+Kalimat usulan **dibangkitkan dari prediksi yang dirujuknya**, bukan diambil dari daftar
+kalimat siap pakai. Satu butir menyebut tindakan menurut fungsi yang diminta bertindak,
+kelurahan dan kecamatannya, jendela waktunya, jenis ancamannya, skor dan keyakinan
+prediksinya, serta faktor yang paling berkontribusi:
+
+> Tingkatkan patroli dan penjagaan di Karet Kuningan, Setiabudi pada 18:00-23:59 WIB
+> terhadap CURANMOR. Dasar: prediksi PRD-00061 berskor 70/100 dengan keyakinan 88%, faktor
+> terkuat kepadatan kejadian historis. Usulan, bukan perintah — keputusan tetap pada
+> pejabat berwenang.
+
+Kalimat penutupnya sama pada semua butir dengan sengaja: rekomendasi bukan perintah, dan
+pernyataan itu tidak boleh berubah-ubah.
 
 ### Memutuskan (Pimpinan)
 

@@ -46,6 +46,52 @@ def test_modified_decisions_carry_their_new_text() -> None:
             assert row["modified_text"], row["decision_id"]
 
 
+def test_recommendation_text_is_derived_from_its_own_prediction() -> None:
+    """Seluruh 94 usulan pernah memakai SATU kalimat yang sama persis.
+
+    Kalimat tetap tidak pernah salah dan tidak pernah berubah, sehingga layar rekomendasi
+    lolos setiap pemeriksaan sambil terbaca sebagai maket. Yang diperiksa di sini bukan
+    "apakah teksnya ada", melainkan apakah tiap kalimat benar-benar mengutip baris
+    `predictions.csv` yang dirujuknya.
+    """
+    predictions = {row["prediction_id"]: row for row in src.read_rows("predictions.csv")}
+    rows = src.read_rows("recommendations.csv")
+    assert rows
+
+    for row in rows:
+        prediction = predictions[row["prediction_id"]]
+        text = row["recommendation_text"]
+
+        assert prediction["prediction_id"] in text, row["recommendation_id"]
+        assert prediction["threat_type"] in text, row["recommendation_id"]
+        assert prediction["kecamatan"] in text, row["recommendation_id"]
+        assert prediction["time_window"] in text, row["recommendation_id"]
+        assert f"{prediction['risk_score']}/100" in text, row["recommendation_id"]
+        # Rekomendasi bukan perintah, dan pernyataan itu justru TIDAK boleh bervariasi.
+        assert "bukan perintah" in text, row["recommendation_id"]
+
+    # Satu kalimat untuk sembilan puluh empat baris adalah persis keadaan yang diperbaiki;
+    # ambang di bawah cukup longgar untuk perubahan dataset, cukup ketat untuk menangkap
+    # kemunduran ke kalimat tetap.
+    assert len({row["recommendation_text"] for row in rows}) > len(rows) // 2
+
+
+def test_every_function_asks_for_something_it_actually_does() -> None:
+    """Binmas dan Reskrim tidak melakukan hal yang sama terhadap prediksi yang sama."""
+    per_function: dict[str, set[str]] = {}
+    for row in src.read_rows("recommendations.csv"):
+        opening = row["recommendation_text"].split(" di ")[0]
+        per_function.setdefault(row["recommended_function"], set()).add(opening)
+
+    assert len(per_function) > 1
+    for function, openings in per_function.items():
+        assert len(openings) == 1, f"{function} memakai lebih dari satu kalimat pembuka"
+
+    # Kalimat pembuka tiap fungsi harus berbeda satu sama lain; bila semuanya sama, kolom
+    # `recommended_function` tidak lagi berpengaruh pada apa pun yang dibaca pejabat.
+    assert len({next(iter(v)) for v in per_function.values()}) == len(per_function)
+
+
 def test_actions_never_come_from_a_rejected_decision() -> None:
     """A-8: dataset semula memuat tindakan yang lahir dari keputusan Rejected."""
     decisions = {

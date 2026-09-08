@@ -684,6 +684,10 @@ def main() -> None:
     new_recommendation = next_code([row["recommendation_id"] for row in recommendations], "REC", 4)
     functions = learn(recommendations, "recommended_function")
     rec_statuses = learn(recommendations, "status")
+    # Isi sementara. `regenerate` menulis ulang SELURUH `recommendation_text` dari prediksi
+    # yang dirujuk tiap baris — termasuk baris yang baru dibuat di sini — jadi kalimat apa
+    # pun di tempat ini akan tergantikan. Yang penting kolomnya tidak kosong, karena
+    # skemanya melarang NULL.
     rec_text = recommendations[0]["recommendation_text"]
 
     new_recommendations: list[dict[str, Any]] = []

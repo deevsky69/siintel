@@ -382,6 +382,84 @@ _ACTION_RESULTS = {
 }
 
 
+#: Kalimat pembuka usulan menurut fungsi yang diminta bertindak.
+#:
+#: Setiap fungsi punya cara bertindak sendiri, dan satu kalimat yang sama untuk semuanya
+#: membuat kolom `recommended_function` kehilangan artinya: Binmas dan Reskrim tidak
+#: melakukan hal yang sama terhadap prediksi yang sama.
+_FUNCTION_ACTIONS: dict[str, str] = {
+    "SAMAPTA": "Tingkatkan patroli dan penjagaan",
+    "LANTAS": "Tingkatkan pengaturan dan penjagaan arus lalu lintas",
+    "RESKRIM": "Perkuat penyelidikan dan pengungkapan",
+    "BINMAS": "Perkuat sambang dan penyuluhan warga",
+    "INTELKAM": "Perkuat deteksi dini dan penggalangan informasi",
+}
+
+#: Nama faktor dalam bahasa yang dibaca pejabat, bukan nama kolom.
+_FACTOR_PHRASES: dict[str, str] = {
+    "historical_incident_density": "kepadatan kejadian historis",
+    "recent_incident_trend": "tren kejadian terkini",
+    "time_window_pattern": "pola jendela waktu",
+    "spatial_concentration": "konsentrasi spasial",
+    "contextual_activity": "aktivitas kontekstual",
+}
+
+
+def _dominant_factor(raw: str) -> str:
+    """Faktor berkontribusi terbesar pada sebuah prediksi, siap dibaca manusia.
+
+    Menjawab kalimat kosong bila `dominant_factors` tidak dapat dibaca. Mengarang faktor
+    pengganti akan menjadi penjelasan fiktif — persis yang dilarang CLAUDE.md §27, dan
+    justru pada kalimat yang dibaca sebagai saran tindakan.
+    """
+    try:
+        factors = json.loads(raw or "[]")
+    except json.JSONDecodeError:
+        return ""
+    if not factors:
+        return ""
+    top = max(factors, key=lambda row: float(row.get("contribution", 0)))
+    name = str(top.get("factor", ""))
+    return _FACTOR_PHRASES.get(name, name.replace("_", " "))
+
+
+def _recommendation_text(prediction: dict[str, str], function: str) -> str:
+    """Usulan tindakan yang menyebut prediksi asalnya, bukan kalimat tetap.
+
+    Sebelumnya seluruh 94 rekomendasi memakai satu kalimat yang sama persis. Kalimat itu
+    tidak pernah salah dan tidak pernah berubah — sehingga layar rekomendasi terbaca
+    sebagai maket, bukan sebagai keluaran sistem yang benar-benar membaca prediksi.
+
+    Setiap unsur kalimat di bawah diambil dari baris `predictions.csv` yang dirujuk
+    rekomendasi ini: WHAT (jenis ancaman), WHERE (kelurahan/kecamatan), WHEN (jendela
+    waktu), RISK (skor), CONFIDENCE, dan WHY (faktor terkuat) — enam hal yang memang
+    diwajibkan docs untuk setiap prediction (CLAUDE.md §10).
+
+    Kalimat penutup tetap sama untuk semua baris **dengan sengaja**: rekomendasi bukan
+    perintah, dan pernyataan itu tidak boleh bervariasi (CLAUDE.md §13).
+    """
+    action = _FUNCTION_ACTIONS.get(function.upper(), "Tingkatkan kegiatan preventif")
+    kelurahan = (prediction.get("kelurahan") or "").strip()
+    kecamatan = (prediction.get("kecamatan") or "").strip()
+    # Beberapa kelurahan bernama sama dengan kecamatannya (Jagakarsa, Pancoran, Tebet…),
+    # dan "di Jagakarsa, Jagakarsa" terbaca seperti kalimat yang dirakit mesin yang rusak.
+    tempat = (
+        f"{kelurahan}, {kecamatan}"
+        if kelurahan and kelurahan != kecamatan
+        else (kelurahan or kecamatan)
+    )
+    factor = _dominant_factor(prediction.get("dominant_factors", ""))
+    why = f", faktor terkuat {factor}" if factor else ""
+
+    return (
+        f"{action} di {tempat} pada {prediction['time_window']} WIB "
+        f"terhadap {prediction['threat_type']}. "
+        f"Dasar: prediksi {prediction['prediction_id']} berskor {prediction['risk_score']}/100 "
+        f"dengan keyakinan {prediction['confidence']}%{why}. "
+        "Usulan, bukan perintah — keputusan tetap pada pejabat berwenang."
+    )
+
+
 def _bin_for(hour: int) -> str:
     for label, (start, end) in WINDOW_BOUNDS.items():
         if start <= hour < end:
@@ -419,6 +497,16 @@ def regenerate_operational(directory: Path | None = None) -> dict[str, int]:
     units_by_function: dict[str, list[str]] = {}
     for unit in units:
         units_by_function.setdefault(unit["function"].upper(), []).append(unit["unit_id"])
+
+    # ---- Usulan menyebut prediksinya sendiri, bukan kalimat tetap --------------------
+    for proposal in recommendations:
+        source = prediction_by_code.get(proposal["prediction_id"])
+        if source is None:
+            message = f"recommendations.csv:{proposal['recommendation_id']}: prediksi tidak ada"
+            raise SeedError(message)
+        proposal["recommendation_text"] = _recommendation_text(
+            source, proposal["recommended_function"]
+        )
 
     # ---- A-1: keputusan menunjuk pengguna yang benar-benar ada -----------------------
     for row in decisions:
@@ -531,11 +619,13 @@ def regenerate_operational(directory: Path | None = None) -> dict[str, int]:
         next_number += 1
         false_negatives += 1
 
+    _write(target_dir / "recommendations.csv", recommendations)
     _write(target_dir / "commander_decisions.csv", decisions)
     _write(target_dir / "operational_actions.csv", actions)
     _write(target_dir / "prediction_actual.csv", kept)
 
     return {
+        "recommendations": len(recommendations),
         "commander_decisions": len(decisions),
         "operational_actions": len(actions),
         "prediction_actual": len(kept),
