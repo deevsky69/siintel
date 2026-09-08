@@ -59,7 +59,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 /** Keterangan asal angka dari backend — diteruskan apa adanya, tidak diringkas ulang. */
 function Basis({ children }: { children: React.ReactNode }) {
-  return <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">{children}</p>;
+  return <p className="mt-2 text-2xs leading-relaxed text-ink-faint">{children}</p>;
 }
 
 /**
@@ -91,13 +91,13 @@ function ScoreRow({
           style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
         />
       </span>
-      {note ? <span className="shrink-0 text-[10px] text-ink-faint">{note}</span> : null}
+      {note ? <span className="shrink-0 text-2xs text-ink-faint">{note}</span> : null}
       <span
         className={`w-7 text-right font-mono text-xs font-semibold ${risk ? RISK_TEXT[risk] : "text-ink"}`}
       >
         {score}
       </span>
-      <span className="w-11 text-right text-[10px] uppercase text-ink-muted">
+      <span className="w-11 text-right text-2xs uppercase text-ink-muted">
         {risk ? RISK_LABELS[risk] : "tanpa kelas"}
       </span>
     </li>
@@ -129,7 +129,7 @@ function PredictiveSummary({ area, horizon }: { area: PredictiveArea; horizon: s
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate font-heading text-sm font-semibold text-ink">{area.threat_type}</p>
-          <p className="truncate text-[11px] text-ink-muted">
+          <p className="truncate text-xs text-ink-muted">
             {area.time_window ?? "jendela tidak tercatat"} · {area.cell_count} sel ·{" "}
             {area.prediction_code}
           </p>
@@ -138,11 +138,11 @@ function PredictiveSummary({ area, horizon }: { area: PredictiveArea; horizon: s
           <span className="font-heading text-xl font-bold leading-none text-accent">
             {area.risk_score}
           </span>
-          <span className="ml-1 text-[10px] text-ink-faint">/100</span>
-          <p className="text-[10px] uppercase text-ink-faint">tanpa kelas</p>
+          <span className="ml-1 text-2xs text-ink-faint">/100</span>
+          <p className="text-2xs uppercase text-ink-faint">tanpa kelas</p>
         </div>
       </div>
-      <p className="mt-1.5 font-mono text-[10px] text-ink-faint">
+      <p className="mt-1.5 font-mono text-2xs text-ink-faint">
         Horizon {horizonLabel(horizon)} · confidence{" "}
         {area.confidence === null ? "tidak ada" : `${area.confidence}%`} ·{" "}
         {area.model_version ?? "versi model tidak tercatat"}
@@ -166,7 +166,7 @@ function WarningCard({ warning }: { warning: AreaWarning }) {
               {warning.threat_type}
             </span>
           </p>
-          <p className="mt-1 truncate text-[11px] text-ink-muted">
+          <p className="mt-1 truncate text-xs text-ink-muted">
             {warning.time_window ?? "jendela tidak tercatat"}
             {warning.grid_id ? ` · ${warning.grid_id}` : ""}
           </p>
@@ -175,13 +175,13 @@ function WarningCard({ warning }: { warning: AreaWarning }) {
           <span className={`font-heading text-lg font-bold leading-none ${RISK_TEXT[risk]}`}>
             {warning.risk_score}
           </span>
-          <span className="ml-1 text-[10px] text-ink-faint">/100</span>
-          <p className="text-[10px] text-ink-faint">
+          <span className="ml-1 text-2xs text-ink-faint">/100</span>
+          <p className="text-2xs text-ink-faint">
             {warning.confidence === null ? "confidence —" : `confidence ${warning.confidence}%`}
           </p>
         </div>
       </div>
-      <p className="mt-1.5 font-mono text-[10px] text-ink-faint">
+      <p className="mt-1.5 font-mono text-2xs text-ink-faint">
         {warning.code} · dari {warning.prediction_code} · ambang{" "}
         {warning.threshold_version ?? "tidak tercatat"}
       </p>
@@ -199,7 +199,7 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
             {prediction.threat_type}
           </p>
           {/* WHERE */}
-          <p className="truncate text-[11px] text-ink-muted">
+          <p className="truncate text-xs text-ink-muted">
             {prediction.kelurahan ? `${prediction.kelurahan} · ` : ""}
             {prediction.grid_id}
           </p>
@@ -209,12 +209,12 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
           <span className="font-heading text-xl font-bold leading-none text-accent">
             {prediction.risk_score}
           </span>
-          <span className="ml-1 text-[10px] text-ink-faint">/100</span>
-          <p className="text-[10px] uppercase text-ink-faint">tanpa kelas</p>
+          <span className="ml-1 text-2xs text-ink-faint">/100</span>
+          <p className="text-2xs uppercase text-ink-faint">tanpa kelas</p>
         </div>
       </div>
 
-      <dl className="mt-2 grid grid-cols-4 gap-2 text-[11px]">
+      <dl className="mt-2 grid grid-cols-4 gap-2 text-xs">
         <div>
           {/* WHEN */}
           <dt className="text-ink-faint">Jendela</dt>
@@ -241,13 +241,13 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
       <div className="mt-2.5 border-t border-base-800 pt-2">
         <p className="stat-label mb-1.5">Why</p>
         {prediction.dominant_factors.length === 0 ? (
-          <p className="text-[11px] text-ink-muted">Tidak ada faktor dominan yang tercatat.</p>
+          <p className="text-xs text-ink-muted">Tidak ada faktor dominan yang tercatat.</p>
         ) : (
           <ul className="space-y-1.5">
             {prediction.dominant_factors.map((factor) => (
               <li key={factor.factor} className="flex items-center gap-2">
                 <span className="badge bg-base-800 text-accent-soft">{factor.source}</span>
-                <span className="min-w-0 flex-1 truncate text-[11px] text-ink">
+                <span className="min-w-0 flex-1 truncate text-xs text-ink">
                   {factorLabel(factor.factor)}
                 </span>
                 <span className="h-1 w-14 shrink-0 overflow-hidden rounded-full bg-base-800">
@@ -256,7 +256,7 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
                     style={{ width: `${Math.min(100, Math.max(0, factor.contribution * 100))}%` }}
                   />
                 </span>
-                <span className="w-9 shrink-0 text-right font-mono text-[11px] text-ink-muted">
+                <span className="w-9 shrink-0 text-right font-mono text-xs text-ink-muted">
                   {Math.round(factor.contribution * 100)}%
                 </span>
               </li>
@@ -265,7 +265,7 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
         )}
       </div>
 
-      <p className="mt-2 font-mono text-[10px] text-ink-faint">
+      <p className="mt-2 font-mono text-2xs text-ink-faint">
         {prediction.code} · {formatDate(prediction.prediction_date)} ·{" "}
         {prediction.model_version ?? "versi model tidak tercatat"}
       </p>
@@ -328,10 +328,10 @@ export function DistrictDetail({
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 className="truncate font-heading text-base font-bold text-ink">{detail.kecamatan}</h2>
-          <p className="text-[11px] text-ink-muted">
+          <p className="text-xs text-ink-muted">
             {detail.polsek ?? "Polsek tidak tercatat"} · {detail.grid_count} grid
           </p>
-          <p className="text-[11px] text-ink-muted">
+          <p className="text-xs text-ink-muted">
             {detail.assessment_date
               ? `Penilaian ${formatDate(detail.assessment_date)}`
               : "Belum ada tanggal penilaian"}
@@ -349,15 +349,15 @@ export function DistrictDetail({
               >
                 {headline.risk_score}
               </span>
-              <span className="ml-1 text-[11px] text-ink-faint">/100</span>
+              <span className="ml-1 text-xs text-ink-faint">/100</span>
               <p
-                className={`text-[11px] font-semibold uppercase ${
+                className={`text-xs font-semibold uppercase ${
                   headlineRisk ? RISK_TEXT[headlineRisk] : "text-ink-muted"
                 }`}
               >
                 {headlineRisk ? RISK_LABELS[headlineRisk] : "tanpa kelas"}
               </p>
-              <p className="text-[10px] text-ink-faint">rata-rata {headline.average_risk_score}</p>
+              <p className="text-2xs text-ink-faint">rata-rata {headline.average_risk_score}</p>
             </>
           )}
         </div>
@@ -422,7 +422,7 @@ export function DistrictDetail({
             <p className="mb-2 text-sm text-ink">
               <span className="font-heading text-2xl font-bold">{history.total_incidents}</span>{" "}
               kejadian ·{" "}
-              <span className="font-mono text-[11px] text-ink-muted">
+              <span className="font-mono text-xs text-ink-muted">
                 {formatDate(history.date_from)} – {formatDate(history.date_to)}
               </span>
             </p>

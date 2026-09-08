@@ -80,19 +80,19 @@ export function NotificationBell({ feed }: { feed: NotificationFeed }) {
           <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" />
           <path d="M10.3 20a2 2 0 0 0 3.4 0" />
         </svg>
-        <span className="font-mono text-[11px] font-bold tabular-nums">{feed.total}</span>
+        <span className="font-mono text-xs font-bold tabular-nums">{feed.total}</span>
       </button>
 
       {open ? (
         <div className="absolute right-0 z-30 mt-1.5 w-[320px] rounded border border-base-700 bg-base-900 shadow-panel">
           <div className="flex items-baseline gap-2 border-b border-base-800 px-3 py-2">
             <span className="stat-label">Menunggu Anda</span>
-            <span className="ml-auto text-[10px] text-ink-faint">{feed.role}</span>
+            <span className="ml-auto text-2xs text-ink-faint">{feed.role}</span>
           </div>
 
           <div className="max-h-[62vh] overflow-y-auto">
             {feed.groups.length === 0 ? (
-              <p className="px-3 py-4 text-[11px] leading-relaxed text-ink-muted">
+              <p className="px-3 py-4 text-xs leading-relaxed text-ink-muted">
                 Peran Anda tidak memiliki antrean pekerjaan pada sistem ini. Itu bukan kekeliruan —
                 kewenangan Anda membaca dan menganalisis, bukan menyetujui atau menriase.
               </p>
@@ -105,7 +105,7 @@ export function NotificationBell({ feed }: { feed: NotificationFeed }) {
                     className="block px-3 py-2.5 transition-colors hover:bg-base-800/60"
                   >
                     <div className="flex items-baseline gap-2">
-                      <span className="text-[11px] font-semibold text-ink">{group.title}</span>
+                      <span className="text-xs font-semibold text-ink">{group.title}</span>
                       <span
                         className={`ml-auto font-mono text-xs font-bold tabular-nums ${
                           group.total > 0 ? "text-risk-critical" : "text-ink-faint"
@@ -114,12 +114,12 @@ export function NotificationBell({ feed }: { feed: NotificationFeed }) {
                         {group.total}
                       </span>
                     </div>
-                    <div className="text-[10px] text-ink-faint">{group.action}</div>
+                    <div className="text-2xs text-ink-faint">{group.action}</div>
 
                     {group.items.length > 0 ? (
                       <ul className="mt-1.5 space-y-1">
                         {group.items.map((item) => (
-                          <li key={item.code} className="text-[10px] leading-tight">
+                          <li key={item.code} className="text-2xs leading-tight">
                             <span className="text-ink-muted">{item.headline}</span>
                             <span className="block text-ink-faint">{item.detail}</span>
                           </li>
@@ -129,7 +129,7 @@ export function NotificationBell({ feed }: { feed: NotificationFeed }) {
                       // Antrean kosong tetap ditampilkan: "nol peringatan menunggu" adalah
                       // kabar baik, dan menghilangkan barisnya membuat pembaca tidak dapat
                       // membedakan "tidak ada" dari "tidak diperiksa".
-                      <p className="mt-1 text-[10px] text-ink-faint">Tidak ada yang menunggu.</p>
+                      <p className="mt-1 text-2xs text-ink-faint">Tidak ada yang menunggu.</p>
                     )}
                   </Link>
                 </div>
@@ -137,7 +137,7 @@ export function NotificationBell({ feed }: { feed: NotificationFeed }) {
             )}
           </div>
 
-          <p className="border-t border-base-800 px-3 py-2 text-[9px] leading-relaxed text-ink-faint">
+          <p className="border-t border-base-800 px-3 py-2 text-2xs leading-relaxed text-ink-faint">
             Daftar ini dihitung ulang setiap halaman dimuat. Tidak ada penanda "sudah dibaca" —
             angkanya hanya turun ketika pekerjaannya selesai.
           </p>

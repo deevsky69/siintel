@@ -32,8 +32,8 @@ function FactorRow({
     <tr className="border-t border-base-800 align-top">
       <th scope="row" className="py-2 pr-3 text-left font-normal">
         <span className="text-ink">{factorLabel(factor)}</span>
-        <span className="ml-2 font-mono text-[10px] text-ink-muted">{factor}</span>
-        {basis ? <p className="mt-1 text-[10px] leading-relaxed text-ink-muted">{basis}</p> : null}
+        <span className="ml-2 font-mono text-2xs text-ink-muted">{factor}</span>
+        {basis ? <p className="mt-1 text-2xs leading-relaxed text-ink-muted">{basis}</p> : null}
       </th>
       <td
         className={`py-2 pr-3 text-right font-heading text-sm font-bold tabular-nums ${
@@ -42,7 +42,7 @@ function FactorRow({
       >
         {weightPercent(weight)}
       </td>
-      <td className="py-2 text-right text-[10px] text-ink-muted">
+      <td className="py-2 text-right text-2xs text-ink-muted">
         {negative ? "mengurangi skor" : zero ? "tidak menyumbang" : "menyusun skor"}
         <span className="block">{persisted ? "tersimpan" : "tidak tersimpan"}</span>
       </td>
@@ -65,10 +65,10 @@ function VersionPanel({ version }: { version: ScoringVersion }) {
 
         {version.profiles.map((profile) => (
           <section key={profile.profile}>
-            <h3 className="font-heading text-[12px] font-semibold uppercase tracking-wider text-ink">
+            <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-ink">
               {profileLabel(profile.profile)}
             </h3>
-            <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
               {PROFILE_HINTS[profile.profile] ?? ""}
             </p>
 
@@ -81,7 +81,7 @@ function VersionPanel({ version }: { version: ScoringVersion }) {
             </div>
 
             <div className="mt-2 overflow-x-auto">
-              <table className="w-full min-w-[26rem] text-[11px]">
+              <table className="w-full min-w-[26rem] text-xs">
                 <caption className="sr-only">
                   Bobot faktor {profileLabel(profile.profile)} versi {version.version}
                 </caption>
@@ -112,7 +112,7 @@ function VersionPanel({ version }: { version: ScoringVersion }) {
               </table>
             </div>
 
-            <p className="mt-2 text-[10px] leading-relaxed text-ink-muted">
+            <p className="mt-2 text-2xs leading-relaxed text-ink-muted">
               Jumlah bobot positif {weightPercent(profile.positive_weight_total)}. Bila kurang dari
               100%, skor tertinggi yang mungkin dicapai ikut turun tanpa terlihat — dan kelas
               tertinggi tidak akan pernah tersentuh.
@@ -136,7 +136,7 @@ export function ScoringBasis({ config }: { config: ScoringConfig }) {
       </StatusNotice>
 
       <Panel title="Yang Dihitung Layar Ini">
-        <p className="text-[11px] leading-relaxed text-ink-muted">{config.score_basis}</p>
+        <p className="text-xs leading-relaxed text-ink-muted">{config.score_basis}</p>
         <dl className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
           <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
             <dt className="stat-label">Versi Bobot</dt>
@@ -163,9 +163,7 @@ export function ScoringBasis({ config }: { config: ScoringConfig }) {
             </dd>
           </div>
         </dl>
-        <p className="mt-3 text-[10px] leading-relaxed text-ink-muted">
-          {config.persistence_basis}
-        </p>
+        <p className="mt-3 text-2xs leading-relaxed text-ink-muted">{config.persistence_basis}</p>
       </Panel>
 
       <Panel
@@ -185,7 +183,7 @@ export function ScoringBasis({ config }: { config: ScoringConfig }) {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[10px] leading-relaxed text-ink-muted">
+        <p className="mt-2 text-2xs leading-relaxed text-ink-muted">
           Kelas dibaca dari <code>config/risk/warning-thresholds.yaml</code> versi{" "}
           {config.thresholds.version} dan tidak dihitung ulang di kode mana pun.
         </p>

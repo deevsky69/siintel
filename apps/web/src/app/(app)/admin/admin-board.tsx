@@ -71,7 +71,7 @@ function Row({
           <span className="flex-1 font-heading text-sm font-semibold text-ink">
             {user.full_name ?? user.username}
             {isSelf ? (
-              <span className="ml-2 font-sans text-[10px] font-normal uppercase tracking-wider text-accent">
+              <span className="ml-2 font-sans text-2xs font-normal uppercase tracking-wider text-accent">
                 akun Anda
               </span>
             ) : null}
@@ -89,14 +89,14 @@ function Row({
             {user.credential_locked ? "Kredensial terkunci" : "Kredensial aktif"}
           </span>
         </div>
-        <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+        <p className="mt-1 font-mono text-2xs uppercase tracking-wider text-ink-muted">
           {user.code} · {user.username}
         </p>
         <p className="mt-1 text-xs text-ink-muted">
           {user.role} · {assignmentSummary(user)}
         </p>
         {missing.length > 0 ? (
-          <p className="mt-1 text-[11px] text-risk-critical">
+          <p className="mt-1 text-xs text-risk-critical">
             Penugasan tidak lengkap: peran {user.role} membutuhkan {missing.join(" dan ")}.
           </p>
         ) : null}
@@ -208,7 +208,7 @@ function RoleCard({ role }: { role: RoleRow }) {
         {role.can_approve ? (
           <span className="badge shrink-0 bg-accent/15 text-accent">Menyetujui rekomendasi</span>
         ) : null}
-        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+        <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
           Level {role.level} · {role.code}
         </span>
       </div>
@@ -219,7 +219,7 @@ function RoleCard({ role }: { role: RoleRow }) {
       </p>
 
       {role.user_count === 0 ? (
-        <p className="mt-1 text-[11px] text-risk-moderate">
+        <p className="mt-1 text-xs text-risk-moderate">
           Tidak dipegang siapa pun — kewenangan ini tidak dapat dipakai selama peran kosong.
         </p>
       ) : null}
@@ -229,7 +229,7 @@ function RoleCard({ role }: { role: RoleRow }) {
           <li
             key={scope}
             title={SCOPE_HINTS[scope] ?? scope}
-            className="rounded bg-base-800 px-2 py-0.5 text-[10px] text-ink-muted"
+            className="rounded bg-base-800 px-2 py-0.5 text-2xs text-ink-muted"
           >
             {SCOPE_LABELS[scope] ?? scope}: {count}
           </li>
@@ -237,12 +237,12 @@ function RoleCard({ role }: { role: RoleRow }) {
       </ul>
 
       <details className="mt-2">
-        <summary className="cursor-pointer font-heading text-[11px] font-semibold uppercase tracking-wider text-ink-muted hover:text-accent">
+        <summary className="cursor-pointer font-heading text-xs font-semibold uppercase tracking-wider text-ink-muted hover:text-accent">
           Rincian kewenangan
         </summary>
         <ul className="mt-2 space-y-1">
           {groupByResource(role.permissions).map((group) => (
-            <li key={group.resource} className="flex gap-2 text-[11px]">
+            <li key={group.resource} className="flex gap-2 text-xs">
               <span className="w-36 shrink-0 font-mono text-ink-muted">{group.resource}</span>
               <span className="text-ink">
                 {group.actions
@@ -299,7 +299,7 @@ export function AdminBoard({
           </ul>
         )}
 
-        <div className="mt-4 space-y-2 border-t border-base-800 pt-4 text-[11px] leading-relaxed text-ink-muted">
+        <div className="mt-4 space-y-2 border-t border-base-800 pt-4 text-xs leading-relaxed text-ink-muted">
           {/* Pernyataan ini berdiri di layar, bukan hanya di dalam formulir: yang perlu tahu
               bahwa password ditetapkan lewat perintah di server adalah siapa pun yang membuka
               halaman ini, termasuk akun yang tidak berwenang mengubah penugasan. */}
@@ -334,7 +334,7 @@ export function AdminBoard({
           </ul>
         )}
 
-        <p className="mt-4 border-t border-base-800 pt-4 text-[11px] leading-relaxed text-ink-muted">
+        <p className="mt-4 border-t border-base-800 pt-4 text-xs leading-relaxed text-ink-muted">
           {catalogue.source_basis}
         </p>
       </Panel>

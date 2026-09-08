@@ -38,7 +38,7 @@ export function StatusForm({
         name="status"
         defaultValue=""
         aria-label={`Status baru untuk ${code}`}
-        className="rounded border border-base-700 bg-base-950 px-1.5 py-1 text-[10px] text-ink focus:border-accent/60 focus:outline-none"
+        className="rounded border border-base-700 bg-base-950 px-1.5 py-1 text-2xs text-ink focus:border-accent/60 focus:outline-none"
       >
         <option value="" disabled>
           Ubah ke…
@@ -56,16 +56,16 @@ export function StatusForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] uppercase tracking-wider text-accent transition-colors hover:bg-accent/20 disabled:opacity-50"
+        className="rounded border border-accent/40 bg-accent/10 px-2 py-1 text-2xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20 disabled:opacity-50"
       >
         {pending ? "…" : "Simpan"}
       </button>
       {state.error ? (
-        <span role="alert" className="text-[10px] text-risk-critical">
+        <span role="alert" className="text-2xs text-risk-critical">
           {state.error}
         </span>
       ) : null}
-      {state.done ? <span className="text-[10px] text-risk-moderate">Tersimpan</span> : null}
+      {state.done ? <span className="text-2xs text-risk-moderate">Tersimpan</span> : null}
     </form>
   );
 }

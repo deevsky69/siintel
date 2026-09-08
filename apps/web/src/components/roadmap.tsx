@@ -41,7 +41,7 @@ export function RoadmapPage({
           <ul className="mt-2 space-y-2">
             {tasks.map((task) => (
               <li key={task.code} className="flex gap-3 text-sm">
-                <span className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-ink-muted">
+                <span className="shrink-0 font-mono text-xs uppercase tracking-wider text-ink-muted">
                   {task.code}
                 </span>
                 <span className="text-ink">{task.detail}</span>

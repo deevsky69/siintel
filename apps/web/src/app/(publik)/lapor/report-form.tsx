@@ -35,19 +35,19 @@ export function ReportForm({ options }: { options: ReportOptions }) {
           <p className="mt-1 font-mono text-2xl font-bold tracking-wider text-ink">
             {state.ticket}
           </p>
-          <p className="mt-4 text-[11px] leading-relaxed text-ink-muted">{state.message}</p>
-          <p className="mt-3 text-[11px] leading-relaxed text-ink-faint">{state.basis}</p>
+          <p className="mt-4 text-xs leading-relaxed text-ink-muted">{state.message}</p>
+          <p className="mt-3 text-xs leading-relaxed text-ink-faint">{state.basis}</p>
 
           <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Link
               href="/lapor"
-              className="rounded border border-base-700 px-4 py-2 text-[11px] uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
+              className="rounded border border-base-700 px-4 py-2 text-xs uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
             >
               Kirim laporan lain
             </Link>
             <Link
               href="/"
-              className="rounded border border-base-700 px-4 py-2 text-[11px] uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
+              className="rounded border border-base-700 px-4 py-2 text-xs uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
             >
               Kembali ke halaman muka
             </Link>
@@ -125,7 +125,7 @@ export function ReportForm({ options }: { options: ReportOptions }) {
             name="incident_time"
             className="mt-1 w-full rounded border border-base-700 bg-base-950 px-3 py-2 text-sm text-ink focus:border-accent/60 focus:outline-none"
           />
-          <span className="mt-1 block text-[10px] text-ink-faint">
+          <span className="mt-1 block text-2xs text-ink-faint">
             Dikosongkan berarti kejadiannya sedang berlangsung atau baru saja terjadi.
           </span>
         </label>
@@ -141,7 +141,7 @@ export function ReportForm({ options }: { options: ReportOptions }) {
             placeholder="Ceritakan apa yang terjadi."
             className="mt-1 w-full rounded border border-base-700 bg-base-950 px-3 py-2 text-sm leading-relaxed text-ink placeholder:text-ink-faint focus:border-accent/60 focus:outline-none"
           />
-          <span className="mt-1 block text-[10px] leading-relaxed text-ink-faint">
+          <span className="mt-1 block text-2xs leading-relaxed text-ink-faint">
             <strong>Jangan menuliskan nama, nomor telepon, atau alamat siapa pun</strong> — termasuk
             nama Anda sendiri. Sistem ini tidak menyimpan identitas, dan keterangan yang memuatnya
             justru menaruh data pribadi di tempat yang tidak dirancang untuk itu.
@@ -156,7 +156,7 @@ export function ReportForm({ options }: { options: ReportOptions }) {
           {pending ? "Mengirim…" : "Kirim laporan"}
         </button>
 
-        <p className="text-[10px] leading-relaxed text-ink-faint">{options.coordinate_basis}</p>
+        <p className="text-2xs leading-relaxed text-ink-faint">{options.coordinate_basis}</p>
       </div>
     </form>
   );

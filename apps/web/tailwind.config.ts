@@ -1,45 +1,71 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Tema command-center PREDIKSI PRESISI.
+ * Tema PREDIKSI PRESISI.
  *
- * Palet dan tipografi mengikuti referensi visual pada `design/gambaran-website.png`
- * dan aplikasi acuan yang ditunjuk pemilik proyek: latar biru malam pekat, aksen sian,
- * dan tangga warna risiko yang dipakai konsisten di peta, badge, maupun grafik.
+ * ## Warna adalah variabel, bukan nilai
  *
- * Warna risiko sengaja diberi nama menurut **maknanya** (`risk.low` … `risk.critical`),
- * bukan menurut rupanya, supaya ambang yang belum final (U-01) dapat berubah tanpa
- * mengganti nama kelas di seluruh antarmuka.
+ * Tidak satu pun warna di bawah ini berupa nilai heks. Semuanya menunjuk variabel CSS yang
+ * didefinisikan dua kali di `globals.css` — sekali untuk mode terang, sekali untuk gelap.
+ * Akibatnya seluruh aplikasi berganti tema **tanpa satu kelas pun berubah**: `bg-base-900`
+ * berarti "latar panel", dan latar panel memang berbeda di kedua mode.
+ *
+ * Nilainya ditulis sebagai tiga bilangan `R G B` supaya penanda kelegapan Tailwind tetap
+ * bekerja: `bg-base-900/80` menghasilkan `rgb(var(--surface-panel) / 0.8)`.
+ *
+ * **Angka pada `base` adalah tingkat kedalaman, bukan tingkat kegelapan.** `base-950`
+ * berarti latar terjauh dan `base-600` garis terkuat; di mode terang urutannya sama
+ * meskipun warnanya justru menjadi terang. Nama lama dipertahankan karena mengubahnya
+ * berarti menyentuh 150 berkas tanpa menambah satu pun kejelasan.
+ *
+ * Warna risiko tetap dinamai menurut **maknanya** (`risk.low` … `risk.critical`), bukan
+ * rupanya, supaya ambang yang belum final (U-01) dapat berubah tanpa mengganti nama kelas.
+ *
+ * ## Tangga ukuran huruf
+ *
+ * Lantainya **12 px**. Sebelum ini antarmuka memakai 9, 10, dan 11 piksel di 435 tempat —
+ * ukuran yang dapat dibaca pada layar 27 inci di meja, tetapi tidak pada ponsel di lapangan
+ * maupun oleh mata yang tidak lagi muda. Ukuran di bawah `2xs` sengaja tidak disediakan.
  */
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
+  // Kelas `dark` pada <html>, bukan `prefers-color-scheme` langsung: pilihan pengguna harus
+  // dapat mengalahkan setelan sistem, dan itu mustahil bila mode gelap hanya media query.
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
         base: {
-          950: "#050b18", // latar aplikasi
-          900: "#0a1424", // latar panel
-          850: "#0e1b2e",
-          800: "#132339", // garis panel / hover
-          700: "#1b2f4a",
-          600: "#27436b",
+          950: "rgb(var(--surface-app) / <alpha-value>)", // latar aplikasi
+          900: "rgb(var(--surface-panel) / <alpha-value>)", // latar panel
+          850: "rgb(var(--surface-raised) / <alpha-value>)", // latar yang ditinggikan
+          800: "rgb(var(--line) / <alpha-value>)", // garis panel / hover
+          700: "rgb(var(--line-strong) / <alpha-value>)",
+          600: "rgb(var(--line-stronger) / <alpha-value>)",
         },
         ink: {
-          DEFAULT: "#e6f0ff",
-          muted: "#8ea6c8",
-          faint: "#5b7796",
+          DEFAULT: "rgb(var(--text) / <alpha-value>)",
+          muted: "rgb(var(--text-muted) / <alpha-value>)",
+          faint: "rgb(var(--text-faint) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "#22d3ee", // sian — aksen utama
-          soft: "#67e8f9",
-          deep: "#0891b2",
+          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          soft: "rgb(var(--accent-soft) / <alpha-value>)",
+          deep: "rgb(var(--accent-deep) / <alpha-value>)",
         },
         risk: {
-          low: "#38bdf8",
-          moderate: "#4ade80",
-          high: "#fb923c",
-          critical: "#ef4444",
+          low: "rgb(var(--risk-low) / <alpha-value>)",
+          moderate: "rgb(var(--risk-moderate) / <alpha-value>)",
+          high: "rgb(var(--risk-high) / <alpha-value>)",
+          critical: "rgb(var(--risk-critical) / <alpha-value>)",
         },
+      },
+      fontSize: {
+        // Lantai tangga. Untuk lencana dan label mikro — bukan untuk kalimat.
+        "2xs": ["0.75rem", { lineHeight: "1rem" }], // 12px
+        xs: ["0.8125rem", { lineHeight: "1.125rem" }], // 13px
+        sm: ["0.875rem", { lineHeight: "1.375rem" }], // 14px
+        base: ["1rem", { lineHeight: "1.625rem" }], // 16px
       },
       fontFamily: {
         heading: ["var(--font-heading)", "system-ui", "sans-serif"],
@@ -47,8 +73,8 @@ const config: Config = {
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       boxShadow: {
-        panel: "0 1px 0 0 rgba(148,197,255,0.06) inset, 0 8px 24px -12px rgba(0,0,0,0.8)",
-        glow: "0 0 24px -6px rgba(34,211,238,0.45)",
+        panel: "var(--shadow-panel)",
+        glow: "var(--shadow-glow)",
       },
     },
   },

@@ -17,7 +17,7 @@ export function PolicyRecommendations({ policy }: { policy: LeadershipBoard["pol
     <Panel
       title="Rekomendasi Kebijakan"
       action={
-        <span className="rounded border border-base-700 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-ink-faint">
+        <span className="rounded border border-base-700 px-1.5 py-0.5 text-2xs uppercase tracking-wider text-ink-faint">
           Diturunkan aturan
         </span>
       }
@@ -31,25 +31,25 @@ export function PolicyRecommendations({ policy }: { policy: LeadershipBoard["pol
         <ol className="space-y-2.5">
           {policy.recommendations.map((row, index) => (
             <li key={row.action} className="flex gap-2.5">
-              <span className="font-mono text-[10px] text-ink-faint">{index + 1}</span>
+              <span className="font-mono text-2xs text-ink-faint">{index + 1}</span>
               <div className="flex-1">
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span className="text-xs text-ink">{row.action}</span>
-                  <span className="rounded border border-base-700 px-1.5 py-0.5 text-[10px] text-ink-muted">
+                  <span className="rounded border border-base-700 px-1.5 py-0.5 text-2xs text-ink-muted">
                     {row.function}
                   </span>
                   {/* Label sumber sama dengan yang dipakai faktor dominan di peta: RULE
                       berarti aturan yang benar-benar dijalankan, bukan temuan model. */}
-                  <span className="font-mono text-[10px] text-ink-faint">{row.source}</span>
+                  <span className="font-mono text-2xs text-ink-faint">{row.source}</span>
                 </div>
-                <p className="mt-0.5 text-[10px] leading-relaxed text-ink-muted">{row.basis}</p>
+                <p className="mt-0.5 text-2xs leading-relaxed text-ink-muted">{row.basis}</p>
               </div>
             </li>
           ))}
         </ol>
       )}
 
-      <p className="mt-3 text-[10px] leading-relaxed text-ink-faint">{policy.basis}</p>
+      <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{policy.basis}</p>
     </Panel>
   );
 }

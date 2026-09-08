@@ -121,7 +121,7 @@ export default async function LaporanPetugasPage({
       <Panel
         title="Laporan Petugas"
         action={
-          <span className="text-[10px] text-ink-faint">
+          <span className="text-2xs text-ink-faint">
             {page.pagination.total_items} kejadian dalam cakupan Anda
           </span>
         }
@@ -138,7 +138,7 @@ export default async function LaporanPetugasPage({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="text-[10px] uppercase tracking-wider text-ink-faint">
+                <tr className="text-2xs uppercase tracking-wider text-ink-faint">
                   <th className="pb-1 font-normal">Kode</th>
                   <th className="pb-1 font-normal">Waktu</th>
                   <th className="pb-1 font-normal">Jenis</th>
@@ -151,10 +151,10 @@ export default async function LaporanPetugasPage({
               <tbody>
                 {rows.map((row) => (
                   <tr key={row.code} className="border-t border-base-800 align-top">
-                    <td className="py-1.5 pr-3 font-mono text-[10px] text-ink-muted">{row.code}</td>
+                    <td className="py-1.5 pr-3 font-mono text-2xs text-ink-muted">{row.code}</td>
                     <td className="py-1.5 pr-3 whitespace-nowrap">
                       <span className="text-ink">{row.incident_date}</span>{" "}
-                      <span className="font-mono text-[10px] text-ink-faint">
+                      <span className="font-mono text-2xs text-ink-faint">
                         {row.incident_time.slice(0, 5)}
                       </span>
                     </td>
@@ -162,7 +162,7 @@ export default async function LaporanPetugasPage({
                     <td className="py-1.5 pr-3 text-ink-muted">
                       {row.kecamatan}
                       {row.kelurahan ? (
-                        <span className="block text-[10px] text-ink-faint">{row.kelurahan}</span>
+                        <span className="block text-2xs text-ink-faint">{row.kelurahan}</span>
                       ) : null}
                     </td>
                     <td className="py-1.5 pr-3 text-ink-muted">{row.modus ?? "—"}</td>
@@ -178,7 +178,7 @@ export default async function LaporanPetugasPage({
                           action={changeCrimeStatus}
                         />
                       ) : (
-                        <span className="text-[10px] text-ink-faint">Perlu kewenangan menulis</span>
+                        <span className="text-2xs text-ink-faint">Perlu kewenangan menulis</span>
                       )}
                     </td>
                   </tr>
@@ -188,14 +188,14 @@ export default async function LaporanPetugasPage({
           </div>
         )}
 
-        <p className="mt-3 text-[10px] leading-relaxed text-ink-faint">
+        <p className="mt-3 text-2xs leading-relaxed text-ink-faint">
           Alur penanganan <strong>Dilaporkan → Penyelidikan → Penyidikan → Selesai</strong> boleh
           <strong> mundur dan melompat</strong>. Itu disengaja: belum ada SOP yang menetapkan
           urutannya wajib, dan melarang mundur berarti perkara yang keliru ditutup tidak akan pernah
           dapat dibuka kembali. Setiap perpindahan tercatat di jejak audit lengkap dengan status
           sebelum dan sesudahnya.
         </p>
-        <p className="mt-1.5 text-[10px] leading-relaxed text-ink-faint">
+        <p className="mt-1.5 text-2xs leading-relaxed text-ink-faint">
           Setiap baris di sini <strong>dicatat petugas</strong> dan karenanya sudah terverifikasi.
           Identitas korban, pelaku, dan saksi tidak disimpan pada sistem ini.
         </p>

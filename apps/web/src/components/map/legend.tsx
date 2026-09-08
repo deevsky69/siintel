@@ -41,7 +41,7 @@ function CurrentRiskLegend() {
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
       <span className="stat-label">Risk Level</span>
       {riskBands().map((band) => (
-        <span key={band.risk} className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+        <span key={band.risk} className="flex items-center gap-1.5 text-xs text-ink-muted">
           <span
             aria-hidden="true"
             className="h-2.5 w-2.5 rounded-full"
@@ -53,7 +53,7 @@ function CurrentRiskLegend() {
           <span className="uppercase">{RISK_LABELS[band.risk]}</span>
         </span>
       ))}
-      <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+      <span className="text-2xs uppercase tracking-wider text-ink-faint">
         Ambang DEMO / PROPOSED
       </span>
     </div>
@@ -65,7 +65,7 @@ function PredictiveLegend() {
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
       <span className="stat-label">Skor Prediksi</span>
       {PREDICTIVE_TICKS.map((tick) => (
-        <span key={tick} className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+        <span key={tick} className="flex items-center gap-1.5 text-xs text-ink-muted">
           <span
             aria-hidden="true"
             className="h-2.5 w-2.5 rounded-full"
@@ -74,7 +74,7 @@ function PredictiveLegend() {
           <span className="font-mono">{tick}</span>
         </span>
       ))}
-      <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+      <span className="text-2xs uppercase tracking-wider text-ink-faint">
         Skor mentah 0–100 · tanpa kelas risiko resmi
       </span>
     </div>
@@ -88,7 +88,7 @@ function HistoricalLegend({ peak, total }: { peak: number; total: number }) {
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
       <span className="stat-label">Cacah Kejadian</span>
       {ticks.map((tick) => (
-        <span key={tick} className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+        <span key={tick} className="flex items-center gap-1.5 text-xs text-ink-muted">
           <span
             aria-hidden="true"
             className="h-2.5 w-2.5 rounded-full"
@@ -97,7 +97,7 @@ function HistoricalLegend({ peak, total }: { peak: number; total: number }) {
           <span className="font-mono">{tick}</span>
         </span>
       ))}
-      <span className="flex items-center gap-1.5 text-[11px] text-ink-muted">
+      <span className="flex items-center gap-1.5 text-xs text-ink-muted">
         <span
           aria-hidden="true"
           className="h-2 w-2 rounded-full border border-base-950"
@@ -105,7 +105,7 @@ function HistoricalLegend({ peak, total }: { peak: number; total: number }) {
         />
         <span>titik = lokasi, luasnya sebanding cacah</span>
       </span>
-      <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+      <span className="text-2xs uppercase tracking-wider text-ink-faint">
         Skala relatif · {total} kejadian pada jendela ini · bukan kelas risiko
       </span>
     </div>

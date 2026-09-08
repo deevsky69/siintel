@@ -53,7 +53,14 @@ import {
  */
 
 /** Warna wilayah tanpa data — sewarna garis panel, jelas berbeda dari tangga risiko. */
-const NO_DATA_FILL = "#132339";
+// Warna peta menunjuk variabel tema. Peta adalah satu-satunya tempat warna digambar
+// lewat atribut SVG dan bukan kelas Tailwind, jadi ia perlu rujukannya sendiri.
+const NO_DATA_FILL = "rgb(var(--line))";
+const EDGE = "rgb(var(--surface-app))";
+const EDGE_SELECTED = "rgb(var(--accent))";
+const EDGE_ACTIVE = "rgb(var(--accent-soft))";
+const LABEL_TEXT = "rgb(var(--text))";
+const LABEL_TEXT_MUTED = "rgb(var(--text-faint))";
 
 /**
  * Angka besar di tengah wilayah pada layer yang sedang tampil; `null` bila tidak ada data.
@@ -308,35 +315,11 @@ export function MapCanvas({
                     isSelected ? "selected" : isActive ? "active" : "rest",
                     historical?.peakIncidents ?? 0,
                   )}
-                  stroke={isSelected ? "#22d3ee" : isActive ? "#67e8f9" : "#050b18"}
+                  stroke={isSelected ? EDGE_SELECTED : isActive ? EDGE_ACTIVE : EDGE}
                   strokeWidth={isSelected || isActive ? 6 : 3}
                   strokeLinejoin="round"
                 />
               </Link>
-              <text
-                x={shape.label[0]}
-                y={shape.label[1]}
-                textAnchor="middle"
-                pointerEvents="none"
-                className="fill-ink font-heading"
-                fontSize={26}
-                fontWeight={600}
-              >
-                {shape.kecamatan}
-              </text>
-              {showScores ? (
-                <text
-                  x={shape.label[0]}
-                  y={shape.label[1] + 40}
-                  textAnchor="middle"
-                  pointerEvents="none"
-                  fontSize={34}
-                  fontWeight={700}
-                  fill={score === null ? "#5b7796" : "#e6f0ff"}
-                >
-                  {score ?? "—"}
-                </text>
-              ) : null}
             </g>
           );
         })}
@@ -364,7 +347,7 @@ export function MapCanvas({
                   r={radius}
                   fill={HISTORICAL_HEX}
                   fillOpacity={0.55}
-                  stroke="#050b18"
+                  stroke={EDGE}
                   strokeWidth={2}
                 />
               );
@@ -372,6 +355,47 @@ export function MapCanvas({
           </g>
         ) : null}
       </svg>
+
+      {/*
+        Nama wilayah dan skornya digambar sebagai HTML di ATAS peta, bukan sebagai <text>
+        di dalamnya.
+
+        Alasannya ukuran huruf. Di dalam SVG, `font-size` adalah satuan gambar yang ikut
+        mengecil bersama viewBox: label 26 satuan pada bidang selebar 1000 yang dipaksa
+        masuk ke panel selebar 316 piksel tergambar 8,2 piksel — dan tetap 8,2 piksel di
+        layar mana pun, karena petanya selalu menyesuaikan lebar induknya. Tidak ada nilai
+        yang benar untuk semua ukuran layar.
+
+        Sebagai HTML, ukurannya piksel sungguhan: sama terbacanya di ponsel dan di layar
+        lebar. `pointer-events-none` menjaga klik tetap mengenai wilayah di bawahnya.
+      */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        {KECAMATAN_SHAPES.map((shape) => {
+          const district = byName.get(shape.kecamatan);
+          const score = district ? layerValue(district, layer) : null;
+
+          return (
+            <div
+              key={shape.kecamatan}
+              className="absolute -translate-x-1/2 -translate-y-1/2 text-center leading-tight"
+              style={toPercent(shape.label)}
+            >
+              <div className="font-heading text-2xs font-semibold text-ink drop-shadow-[0_1px_2px_rgb(var(--surface-app))] sm:text-xs">
+                {shape.kecamatan}
+              </div>
+              {showScores ? (
+                <div
+                  className={`font-heading text-sm font-bold drop-shadow-[0_1px_2px_rgb(var(--surface-app))] sm:text-base ${
+                    score === null ? "text-ink-faint" : "text-ink"
+                  }`}
+                >
+                  {score ?? "—"}
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
 
       {hoveredShape && hovered ? (
         <div
@@ -385,12 +409,12 @@ export function MapCanvas({
           <dl className="mt-1 space-y-0.5">
             {tooltipRows(hovered, layer).map((row) => (
               <div key={row.label} className="flex items-baseline gap-3">
-                <dt className="text-[10px] text-ink-faint">{row.label}</dt>
-                <dd className="ml-auto font-mono text-[11px] text-ink">{row.value}</dd>
+                <dt className="text-2xs text-ink-faint">{row.label}</dt>
+                <dd className="ml-auto font-mono text-xs text-ink">{row.value}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-1.5 border-t border-base-800 pt-1 text-[9px] uppercase tracking-wider text-ink-faint">
+          <p className="mt-1.5 border-t border-base-800 pt-1 text-2xs uppercase tracking-wider text-ink-faint">
             Klik untuk rincian
           </p>
         </div>

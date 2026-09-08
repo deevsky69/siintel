@@ -59,7 +59,7 @@ export function ResultForm({
               aria-pressed={choice === item.value}
               onClick={() => setChoice(choice === item.value ? null : item.value)}
               className={[
-                "rounded border px-3 py-1.5 font-heading text-[11px] font-semibold uppercase tracking-wider transition",
+                "rounded border px-3 py-1.5 font-heading text-xs font-semibold uppercase tracking-wider transition",
                 item.tone,
                 choice === item.value ? "bg-base-800" : "",
               ].join(" ")}
@@ -77,7 +77,7 @@ export function ResultForm({
               {choice === "CANCELLED" ? "Alasan Pembatalan" : "Hasil Nyata di Lapangan"}
             </span>
             <textarea name="result" rows={3} required className={FIELD} />
-            <span className="mt-1 block text-[10px] text-ink-muted">
+            <span className="mt-1 block text-2xs text-ink-muted">
               Uraikan apa yang benar-benar terjadi, termasuk bila tidak ada kejadian sama sekali.
               Hasil inilah yang dibandingkan dengan prediksi saat evaluasi.
             </span>
@@ -86,7 +86,7 @@ export function ResultForm({
           <label className="mt-3 block">
             <span className="stat-label">Waktu Selesai (WIB)</span>
             <input type="datetime-local" name="end_at" required className={FIELD} />
-            <span className="mt-1 block text-[10px] text-ink-muted">
+            <span className="mt-1 block text-2xs text-ink-muted">
               Wajib diisi dan harus setelah waktu mulai ({startHint}). Durasi penugasan tidak
               diisikan otomatis agar tidak ada waktu yang dikarang.
             </span>
@@ -103,11 +103,11 @@ export function ResultForm({
       <button
         type="submit"
         disabled={pending || choice === null}
-        className="mt-3 rounded bg-accent/20 px-4 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-40"
+        className="mt-3 rounded bg-accent/20 px-4 py-2 font-heading text-xs font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-40"
       >
         {pending ? "Mencatat…" : "Catat Hasil Nyata"}
       </button>
-      <p className="mt-2 text-[10px] text-ink-muted">
+      <p className="mt-2 text-2xs text-ink-muted">
         Hasil hanya dapat dicatat sekali; setelah tercatat, tindakan {code} berstatus akhir dan
         tidak dapat diubah dari layar ini.
       </p>

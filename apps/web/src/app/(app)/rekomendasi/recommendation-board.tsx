@@ -54,7 +54,7 @@ function RecommendationCard({ row, selected }: { row: RecommendationRow; selecte
           <span className="flex-1 font-heading text-sm font-semibold text-ink">
             {FUNCTION_LABELS[row.recommended_function] ?? row.recommended_function}
           </span>
-          <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+          <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
             {row.code}
           </span>
         </div>
@@ -98,10 +98,10 @@ function DecisionRecord({ decision }: { decision: DecisionRow }) {
     <div className="mt-4 border-t border-base-800 pt-4">
       <div className="flex items-center gap-3">
         <StatusBadge status={decision.decision} />
-        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+        <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
           {decision.code}
         </span>
-        <span className="text-[11px] text-ink-muted">{formatWib(decision.decided_at)}</span>
+        <span className="text-xs text-ink-muted">{formatWib(decision.decided_at)}</span>
       </div>
 
       {decision.modified_text ? (
@@ -134,10 +134,10 @@ function Detail({
     <Panel title="Usulan Sistem & Keputusan">
       <div className="flex flex-wrap items-center gap-3">
         <StatusBadge status={row.status} />
-        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+        <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
           {row.code}
         </span>
-        <span className="text-[11px] text-ink-muted">
+        <span className="text-xs text-ink-muted">
           Fungsi {FUNCTION_LABELS[row.recommended_function] ?? row.recommended_function}
           {row.priority ? ` · Prioritas ${PRIORITY_LABELS[row.priority] ?? row.priority}` : ""}
         </span>
@@ -146,7 +146,7 @@ function Detail({
       <div className="mt-4">
         <div className="stat-label">Usulan Sistem</div>
         <p className="mt-1 text-sm leading-relaxed text-ink">{row.recommendation_text}</p>
-        <p className="mt-2 text-[10px] text-ink-muted">
+        <p className="mt-2 text-2xs text-ink-muted">
           Bersumber dari prediksi{" "}
           <Link
             href={`/peringatan${row.warning_code ? `?dipilih=${encodeURIComponent(row.warning_code)}` : ""}`}

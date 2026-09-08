@@ -49,7 +49,7 @@ function DimensionPanel({
 
 function ScaleNote({ peak, label }: { peak: number; label: string }) {
   return (
-    <p className="text-[10px] leading-relaxed text-ink-faint">
+    <p className="text-2xs leading-relaxed text-ink-faint">
       Panjang batang relatif terhadap {label} terbanyak ({peak} kejadian), bukan terhadap 100%.
       Jumlah dan persentase tercantum pada tiap batang.
     </p>
@@ -87,7 +87,7 @@ function RankedDistribution({ distribution }: { distribution: PatternDistributio
             <span className="w-10 text-right font-mono text-xs font-semibold text-ink">
               {bucket.incidents}
             </span>
-            <span className="w-36 shrink-0 text-right text-[10px] text-ink-muted">
+            <span className="w-36 shrink-0 text-right text-2xs text-ink-muted">
               {shareText(bucket.share_percent, distribution.denominator)}
             </span>
           </li>
@@ -129,10 +129,7 @@ function NaturalDistribution({ distribution }: { distribution: PatternDistributi
       </ul>
       <ul className="mt-1 flex gap-1" aria-hidden="true">
         {distribution.buckets.map((bucket, index) => (
-          <li
-            key={bucket.key}
-            className="flex-1 text-center text-[9px] leading-tight text-ink-faint"
-          >
+          <li key={bucket.key} className="flex-1 text-center text-2xs leading-tight text-ink-faint">
             {/* Sebaran 24 jam hanya diberi label tiap tiga jam agar tetap terbaca. */}
             {compact && index % 3 !== 0 ? "" : bucket.label}
           </li>
@@ -140,12 +137,12 @@ function NaturalDistribution({ distribution }: { distribution: PatternDistributi
       </ul>
       {/* Daftar angka lengkap untuk pembaca layar dan untuk pembacaan teliti. */}
       <details className="mt-2">
-        <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-ink-muted hover:text-accent">
+        <summary className="cursor-pointer text-2xs uppercase tracking-wider text-ink-muted hover:text-accent">
           Angka {distribution.label.toLocaleLowerCase("id-ID")}
         </summary>
         <ul className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-0.5 sm:grid-cols-3">
           {distribution.buckets.map((bucket) => (
-            <li key={bucket.key} className="flex justify-between gap-2 text-[10px] text-ink-muted">
+            <li key={bucket.key} className="flex justify-between gap-2 text-2xs text-ink-muted">
               <span>{bucket.label}</span>
               <span className="font-mono text-ink">
                 {bucket.incidents} · {shareText(bucket.share_percent, distribution.denominator)}
@@ -208,10 +205,10 @@ function RepeatPanel({ repeat }: { repeat: RepeatProfile }) {
                   <td className="py-1.5 text-right font-mono font-semibold text-ink">
                     {grid.incidents}
                   </td>
-                  <td className="py-1.5 text-right text-[10px] text-ink-muted">
+                  <td className="py-1.5 text-right text-2xs text-ink-muted">
                     {shareText(grid.share_percent, repeat.denominator)}
                   </td>
-                  <td className="py-1.5 text-[10px] text-ink-muted">
+                  <td className="py-1.5 text-2xs text-ink-muted">
                     {formatDate(grid.first_date)} – {formatDate(grid.last_date)}
                     <span className="text-ink-faint"> ({grid.span_days} hari)</span>
                   </td>
@@ -222,7 +219,7 @@ function RepeatPanel({ repeat }: { repeat: RepeatProfile }) {
         </div>
       )}
 
-      <p className="text-[10px] leading-relaxed text-ink-faint">{repeat.basis}</p>
+      <p className="text-2xs leading-relaxed text-ink-faint">{repeat.basis}</p>
     </DimensionPanel>
   );
 }
@@ -248,7 +245,7 @@ export function PatternDna({
         title="Crime Pattern DNA"
         className="col-span-12"
         action={
-          <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+          <span className="text-2xs uppercase tracking-wider text-ink-faint">
             {source.incidents} kejadian · {formatDate(source.date_from)} –{" "}
             {formatDate(source.date_to)}
           </span>
@@ -267,8 +264,8 @@ export function PatternDna({
                 aria-current={selected === row.threat_type ? "true" : undefined}
                 className={
                   selected === row.threat_type
-                    ? "rounded border border-accent/60 bg-accent/10 px-2.5 py-1 text-[11px] uppercase tracking-wider text-accent"
-                    : "rounded border border-base-800 px-2.5 py-1 text-[11px] uppercase tracking-wider text-ink-muted transition-colors hover:text-ink"
+                    ? "rounded border border-accent/60 bg-accent/10 px-2.5 py-1 text-xs uppercase tracking-wider text-accent"
+                    : "rounded border border-base-800 px-2.5 py-1 text-xs uppercase tracking-wider text-ink-muted transition-colors hover:text-ink"
                 }
               >
                 {threatLabel(row.threat_type)}
@@ -280,12 +277,12 @@ export function PatternDna({
 
         {/* Pernyataan ini berada di atas, bukan di kaki halaman: "DNA" terlalu mudah
             dibaca sebagai ramalan, dan koreksinya harus terbaca lebih dulu. */}
-        <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-[11px] leading-relaxed text-ink-muted">
+        <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-xs leading-relaxed text-ink-muted">
           {analysisBasis}
         </p>
-        <p className="text-[10px] leading-relaxed text-ink-faint">{scopeBasis}</p>
+        <p className="text-2xs leading-relaxed text-ink-faint">{scopeBasis}</p>
         {profile ? (
-          <p className="text-[10px] leading-relaxed text-ink-faint">{profile.sample_note}</p>
+          <p className="text-2xs leading-relaxed text-ink-faint">{profile.sample_note}</p>
         ) : null}
       </Panel>
 
@@ -305,7 +302,7 @@ export function PatternDna({
             {profile.when.map((distribution) => (
               <Distribution key={distribution.id} distribution={distribution} />
             ))}
-            <p className="text-[10px] leading-relaxed text-ink-faint">{profile.time_basis}</p>
+            <p className="text-2xs leading-relaxed text-ink-faint">{profile.time_basis}</p>
           </DimensionPanel>
 
           <DimensionPanel code="HOW" name="Modus" className="col-span-12 xl:col-span-3">

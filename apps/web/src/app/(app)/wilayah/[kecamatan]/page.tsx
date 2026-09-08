@@ -36,13 +36,13 @@ export default async function WilayahDetailPage({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
-        <Link href="/wilayah" className="text-[11px] text-ink-muted hover:text-accent">
+        <Link href="/wilayah" className="text-xs text-ink-muted hover:text-accent">
           ← Wilayah Rawan
         </Link>
         <h1 className="font-heading text-lg font-bold text-ink">{kecamatan}</h1>
         <Link
           href={`/peta?wilayah=${encodeURIComponent(kecamatan)}`}
-          className="ml-auto rounded border border-base-700 px-2.5 py-1 text-[10px] uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
+          className="ml-auto rounded border border-base-700 px-2.5 py-1 text-2xs uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
         >
           Lihat di peta
         </Link>
@@ -77,7 +77,7 @@ export default async function WilayahDetailPage({
               action={
                 <Link
                   href={`/laporan-petugas?wilayah=${encodeURIComponent(kecamatan)}`}
-                  className="text-[10px] text-ink-faint hover:text-accent"
+                  className="text-2xs text-ink-faint hover:text-accent"
                 >
                   seluruhnya →
                 </Link>
@@ -92,7 +92,7 @@ export default async function WilayahDetailPage({
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="text-[10px] uppercase tracking-wider text-ink-faint">
+                      <tr className="text-2xs uppercase tracking-wider text-ink-faint">
                         <th className="pb-1 font-normal">Waktu</th>
                         <th className="pb-1 font-normal">Jenis</th>
                         <th className="pb-1 font-normal">Kelurahan</th>
@@ -104,7 +104,7 @@ export default async function WilayahDetailPage({
                         <tr key={row.code} className="border-t border-base-800">
                           <td className="py-1.5 pr-3 whitespace-nowrap text-ink-muted">
                             {row.incident_date}{" "}
-                            <span className="font-mono text-[10px] text-ink-faint">
+                            <span className="font-mono text-2xs text-ink-faint">
                               {row.incident_time.slice(0, 5)}
                             </span>
                           </td>

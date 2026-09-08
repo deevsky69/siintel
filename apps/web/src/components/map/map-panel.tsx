@@ -49,7 +49,7 @@ export function MapPanel({ data }: { data: MapData }) {
           />
           <RiskLegend />
           {top ? (
-            <p className="text-[11px] text-ink-muted">
+            <p className="text-xs text-ink-muted">
               Tertinggi:{" "}
               <Link
                 href={mapHref(top.kecamatan)}
@@ -63,7 +63,7 @@ export function MapPanel({ data }: { data: MapData }) {
               </span>
             </p>
           ) : null}
-          <p className="text-[10px] leading-relaxed text-ink-faint">{data.currentRiskBasis}</p>
+          <p className="text-2xs leading-relaxed text-ink-faint">{data.currentRiskBasis}</p>
         </>
       )}
     </Panel>

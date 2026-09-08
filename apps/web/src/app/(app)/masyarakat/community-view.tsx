@@ -35,7 +35,7 @@ function MetricCard({ label, value, hint }: { label: string; value: string; hint
     <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
       <div className="stat-label">{label}</div>
       <div className="mt-1 font-heading text-2xl font-bold leading-none text-ink">{value}</div>
-      <div className="mt-1.5 text-[10px] leading-relaxed text-ink-muted">{hint}</div>
+      <div className="mt-1.5 text-2xs leading-relaxed text-ink-muted">{hint}</div>
     </div>
   );
 }
@@ -66,7 +66,7 @@ function FilterChip({
       }`}
     >
       <span className="min-w-0 truncate">{label}</span>
-      <span className="shrink-0 font-mono text-[11px] text-ink-muted">{count}</span>
+      <span className="shrink-0 font-mono text-xs text-ink-muted">{count}</span>
     </Link>
   );
 }
@@ -96,12 +96,12 @@ function ReportTable({
         <tbody>
           {reports.map((report) => (
             <tr key={report.code} className="border-b border-base-800/60 align-top last:border-0">
-              <td className="py-2 pr-3 font-mono text-[11px] text-ink-muted">{report.code}</td>
+              <td className="py-2 pr-3 font-mono text-xs text-ink-muted">{report.code}</td>
               <td className="py-2 pr-3 text-ink">{formatMoment(report.reported_at)}</td>
               <td className="py-2 pr-3">
                 <div className="text-ink">{report.category}</div>
                 {report.description ? (
-                  <div className="mt-0.5 max-w-md text-[10px] leading-relaxed text-ink-muted">
+                  <div className="mt-0.5 max-w-md text-2xs leading-relaxed text-ink-muted">
                     {report.description}
                   </div>
                 ) : null}
@@ -111,7 +111,7 @@ function ReportTable({
                   {areaOf(report)}
                 </div>
                 {report.location_text ? (
-                  <div className="mt-0.5 text-[10px] text-ink-muted">{report.location_text}</div>
+                  <div className="mt-0.5 text-2xs text-ink-muted">{report.location_text}</div>
                 ) : null}
               </td>
               <td className="py-2 pr-3 text-right font-mono text-ink">
@@ -138,7 +138,7 @@ function ReportTable({
                     action={changeReportStatus}
                   />
                 ) : (
-                  <span className="text-[10px] text-ink-faint">Perlu kewenangan menulis</span>
+                  <span className="text-2xs text-ink-faint">Perlu kewenangan menulis</span>
                 )}
               </td>
             </tr>
@@ -272,7 +272,7 @@ export function CommunityView({
                 </tbody>
               </table>
             )}
-            <p className="mt-3 border-t border-base-800 pt-3 text-[10px] leading-relaxed text-ink-muted">
+            <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
               Urutan ini menggambarkan <strong>di mana warga melapor</strong>, bukan di mana
               risikonya tertinggi. Keduanya tidak selalu sejalan: wilayah yang warganya aktif
               melapor akan tampak menonjol meskipun kejadiannya tidak lebih banyak.
@@ -291,7 +291,7 @@ export function CommunityView({
           </span>
         }
       >
-        <div className="mb-3 flex flex-wrap items-center gap-2 text-[11px] text-ink-muted">
+        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
           {filtered ? (
             <>
               <span>Disaring:</span>
@@ -324,7 +324,7 @@ export function CommunityView({
           <ReportTable reports={reports.data} statusLabels={statusLabels} />
         )}
 
-        <p className="mt-3 border-t border-base-800 pt-3 text-[10px] leading-relaxed text-ink-muted">
+        <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
           <strong>Urgensi</strong> dan <strong>verifikasi</strong> pada tabel ini adalah nilai
           sintetis berstatus {summary.status} — bukan hasil penilaian model, dan bukan dasar
           tindakan. Deteksi duplikasi dan deteksi spam yang disyaratkan spesifikasi §4 belum

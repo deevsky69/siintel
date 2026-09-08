@@ -2,7 +2,15 @@ import { Panel } from "@/components/panel";
 import type { TrendSeries } from "@/lib/dashboard";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-const COLORS = ["#38bdf8", "#4ade80", "#fbbf24", "#f87171", "#a78bfa"];
+// Menunjuk variabel tema, bukan nilai: grafik yang warnanya dipatok akan tetap gelap
+// di mode terang, dan garis kuning muda di atas kertas putih praktis tak terlihat.
+const COLORS = [
+  "rgb(var(--series-1))",
+  "rgb(var(--series-2))",
+  "rgb(var(--series-3))",
+  "rgb(var(--series-4))",
+  "rgb(var(--series-5))",
+];
 
 /**
  * Grafik tren digambar sebagai SVG langsung.
@@ -38,7 +46,7 @@ export function TrendChart({ series }: { series: TrendSeries[] }) {
       action={
         <div className="flex gap-2.5">
           {series.map((row, index) => (
-            <span key={row.year} className="flex items-center gap-1 text-[10px] text-ink-muted">
+            <span key={row.year} className="flex items-center gap-1 text-2xs text-ink-muted">
               <span
                 className="h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: COLORS[index % COLORS.length] }}
@@ -50,7 +58,7 @@ export function TrendChart({ series }: { series: TrendSeries[] }) {
       }
     >
       <svg
-        viewBox={`0 0 ${width} ${height + 14}`}
+        viewBox={`0 0 ${width} ${height + 20}`}
         className="w-full"
         role="img"
         aria-label={`Tren kejadian bulanan ${series.map((s) => s.year).join(", ")}`}
@@ -70,16 +78,18 @@ export function TrendChart({ series }: { series: TrendSeries[] }) {
           <text
             key={month}
             x={(index / (MONTHS.length - 1)) * width}
-            y={height + 11}
+            y={height + 15}
             textAnchor="middle"
             className="fill-ink-muted"
-            style={{ fontSize: 7 }}
+            // Satuan gambar, bukan piksel. Lebar viewBox 300 kira-kira sama dengan lebar
+            // panelnya, jadi 12 satuan tergambar mendekati 12 piksel.
+            style={{ fontSize: 14 }}
           >
             {month}
           </text>
         ))}
       </svg>
-      <p className="mt-1 text-[10px] text-ink-muted">Puncak bulanan: {peak} kejadian</p>
+      <p className="mt-1 text-2xs text-ink-muted">Puncak bulanan: {peak} kejadian</p>
     </Panel>
   );
 }

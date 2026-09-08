@@ -58,7 +58,7 @@ function WarningCard({ warning, selected }: { warning: WarningDetail; selected: 
           <span className="flex-1 font-heading text-sm font-semibold text-ink">
             {warning.threat_type}
           </span>
-          <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+          <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
             {warning.code}
           </span>
         </div>
@@ -70,7 +70,7 @@ function WarningCard({ warning, selected }: { warning: WarningDetail; selected: 
               {warning.kecamatan}
               {warning.kelurahan ? ` — ${warning.kelurahan}` : ""}
               {warning.grid_id ? (
-                <span className="ml-1 font-mono text-[10px] text-ink-muted">{warning.grid_id}</span>
+                <span className="ml-1 font-mono text-2xs text-ink-muted">{warning.grid_id}</span>
               ) : null}
             </div>
           </div>
@@ -78,7 +78,7 @@ function WarningCard({ warning, selected }: { warning: WarningDetail; selected: 
             <div className="stat-label">Risk</div>
             <div className={`font-heading text-xl font-bold leading-none ${RISK_TEXT[risk]}`}>
               {warning.risk_score}
-              <span className="text-[10px] text-ink-muted">/100</span>
+              <span className="text-2xs text-ink-muted">/100</span>
             </div>
           </div>
           <div className="text-right">
@@ -92,17 +92,15 @@ function WarningCard({ warning, selected }: { warning: WarningDetail; selected: 
         <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 border-t border-base-800 pt-2">
           <div>
             <span className="stat-label">Jendela Waktu</span>
-            <span className="ml-1 font-mono text-[11px] text-ink">
-              {warning.time_window ?? "—"}
-            </span>
+            <span className="ml-1 font-mono text-xs text-ink">{warning.time_window ?? "—"}</span>
           </div>
           <div className="text-right">
             <span className="stat-label">Ambang</span>
-            <span className="ml-1 font-mono text-[11px] text-ink">
+            <span className="ml-1 font-mono text-xs text-ink">
               {warning.threshold_version ?? "tidak ada"}
             </span>
           </div>
-          <div className="col-span-2 text-[10px] text-ink-muted">
+          <div className="col-span-2 text-2xs text-ink-muted">
             {formatWib(warning.window_start)} → {formatWib(warning.window_end)}
           </div>
         </div>
@@ -121,7 +119,7 @@ function GroupPanel({ group, selectedCode }: { group: WarningGroup; selectedCode
         </span>
       }
     >
-      <p className="mb-2 text-[10px] text-ink-muted">{STATUS_HINTS[group.status]}</p>
+      <p className="mb-2 text-2xs text-ink-muted">{STATUS_HINTS[group.status]}</p>
       {group.rows.length === 0 ? (
         // Keadaan kosong dinyatakan dengan kata, bukan angka nol.
         <EmptyState
@@ -139,7 +137,7 @@ function GroupPanel({ group, selectedCode }: { group: WarningGroup; selectedCode
             ))}
           </ul>
           {group.total > group.rows.length ? (
-            <p className="mt-2 text-[10px] text-ink-muted">
+            <p className="mt-2 text-2xs text-ink-muted">
               Menampilkan {group.rows.length} dari {group.total} peringatan.
             </p>
           ) : null}
@@ -187,7 +185,7 @@ function FollowUpPanel({
 
   return (
     <Panel title="Tindak Lanjut">
-      <p className="mb-3 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mb-3 text-2xs leading-relaxed text-ink-muted">
         Peringatan terpilih <span className="font-mono text-ink">{warning.code}</span> berstatus{" "}
         <span className="text-ink">{STATUS_LABELS[warning.status] ?? warning.status}</span>.
       </p>
@@ -208,7 +206,7 @@ function FollowUpPanel({
       )}
 
       {/* CLAUDE.md §13: peringatan bukan perintah operasional. */}
-      <p className="mt-3 border-t border-base-800 pt-3 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
         Peringatan dini bukan perintah. Tindakan operasional hanya lahir setelah keputusan pejabat
         berwenang.
       </p>

@@ -32,7 +32,7 @@ function MetricCard({
       >
         {value}
       </div>
-      <div className="mt-1.5 text-[10px] leading-relaxed text-ink-muted">{hint}</div>
+      <div className="mt-1.5 text-2xs leading-relaxed text-ink-muted">{hint}</div>
     </div>
   );
 }
@@ -169,7 +169,7 @@ export function EvaluationView({
                 </table>
               </div>
             )}
-            <p className="mt-3 border-t border-base-800 pt-3 text-[10px] leading-relaxed text-ink-muted">
+            <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
               Baris positif palsu tidak memiliki kejadian nyata sebagai pasangannya, sehingga
               terkumpul pada baris tanpa jenis ancaman.
             </p>

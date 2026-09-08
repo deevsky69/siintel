@@ -20,7 +20,7 @@ import { ASSIGNMENT_IDLE } from "./assignment-state";
 const FIELD =
   "mt-1.5 w-full rounded border border-base-700 bg-base-950/60 px-3 py-2 text-sm text-ink outline-none focus:border-accent disabled:opacity-50";
 
-const HINT = "mt-1 block text-[10px] leading-relaxed text-ink-muted";
+const HINT = "mt-1 block text-2xs leading-relaxed text-ink-muted";
 
 export function AssignmentForm({
   user,
@@ -139,12 +139,12 @@ export function AssignmentForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-3 rounded bg-accent/20 px-4 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-40"
+        className="mt-3 rounded bg-accent/20 px-4 py-2 font-heading text-xs font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-40"
       >
         {pending ? "Menyimpan…" : "Simpan Penugasan"}
       </button>
 
-      <p className="mt-3 rounded border border-base-800 bg-base-950/40 px-3 py-2 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-3 rounded border border-base-800 bg-base-950/40 px-3 py-2 text-2xs leading-relaxed text-ink-muted">
         <span className="font-heading font-semibold uppercase tracking-wider text-ink">
           Password tidak ada di formulir ini.
         </span>{" "}

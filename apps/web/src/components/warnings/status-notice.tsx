@@ -34,7 +34,7 @@ export function StatusNotice({
   return (
     <div className={`flex flex-wrap items-start gap-3 rounded border px-3 py-2.5 ${palette.box}`}>
       <span className={`badge shrink-0 ${palette.badge}`}>{status}</span>
-      <p className={`flex-1 text-[11px] leading-relaxed ${palette.text}`}>{children}</p>
+      <p className={`flex-1 text-xs leading-relaxed ${palette.text}`}>{children}</p>
     </div>
   );
 }

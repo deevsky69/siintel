@@ -74,7 +74,7 @@ export function MapHero({
                 linkTo="home"
               />
               <RiskLegend />
-              <p className="text-[10px] leading-relaxed text-ink-faint">
+              <p className="text-2xs leading-relaxed text-ink-faint">
                 Arahkan kursor untuk ringkasan, klik untuk rincian. Layer historis dan prediktif ada
                 di peta lengkap.
               </p>
@@ -131,9 +131,7 @@ function AreaSummary({
             {top.risk_score}
           </span>
           <span className="text-xs text-ink-muted">/100</span>
-          <span className="ml-auto text-[11px] text-ink-muted">
-            {risk ? RISK_LABELS[risk] : ""}
-          </span>
+          <span className="ml-auto text-xs text-ink-muted">{risk ? RISK_LABELS[risk] : ""}</span>
         </div>
       ) : null}
 
@@ -154,7 +152,7 @@ function AreaSummary({
           <p className="stat-label">Ancaman lain</p>
           <ul className="mt-1 space-y-0.5">
             {detail.threats.slice(1, 4).map((threat) => (
-              <li key={threat.threat_type} className="flex items-baseline gap-2 text-[11px]">
+              <li key={threat.threat_type} className="flex items-baseline gap-2 text-xs">
                 <span className="text-ink-muted">{threat.threat_type}</span>
                 <span className="ml-auto font-mono text-ink">{threat.risk_score}</span>
               </li>
@@ -194,13 +192,13 @@ function AreaSummary({
       <div className="mt-auto flex flex-wrap gap-2 pt-3">
         <Link
           href={`/wilayah/${encodeURIComponent(kecamatan)}`}
-          className="rounded border border-accent/40 bg-accent/10 px-2.5 py-1 text-[10px] uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+          className="rounded border border-accent/40 bg-accent/10 px-2.5 py-1 text-2xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
         >
           Rincian lengkap
         </Link>
         <Link
           href={`/peta?wilayah=${encodeURIComponent(kecamatan)}`}
-          className="rounded border border-base-700 px-2.5 py-1 text-[10px] uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
+          className="rounded border border-base-700 px-2.5 py-1 text-2xs uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
         >
           Buka di peta
         </Link>
@@ -235,22 +233,22 @@ function RecentList({
     <div className="mt-3">
       <p className="stat-label">{title}</p>
       {rows === undefined ? (
-        <p className="mt-1 text-[10px] text-ink-faint">{denied}</p>
+        <p className="mt-1 text-2xs text-ink-faint">{denied}</p>
       ) : rows.length === 0 ? (
-        <p className="mt-1 text-[10px] text-ink-faint">{empty}</p>
+        <p className="mt-1 text-2xs text-ink-faint">{empty}</p>
       ) : (
         <ul className="mt-1 space-y-1">
           {rows.slice(0, 4).map((row) => (
-            <li key={row.key} className="text-[11px] leading-tight">
+            <li key={row.key} className="text-xs leading-tight">
               <div className="flex items-baseline gap-2">
                 <span className="text-ink">{row.headline}</span>
                 {row.tail ? (
-                  <span className="ml-auto shrink-0 text-[9px] uppercase tracking-wider text-ink-faint">
+                  <span className="ml-auto shrink-0 text-2xs uppercase tracking-wider text-ink-faint">
                     {row.tail}
                   </span>
                 ) : null}
               </div>
-              <div className="text-[10px] text-ink-faint">{row.meta}</div>
+              <div className="text-2xs text-ink-faint">{row.meta}</div>
             </li>
           ))}
         </ul>
@@ -262,7 +260,7 @@ function RecentList({
 function Fact({ label, value, alarm }: { label: string; value: string; alarm?: boolean }) {
   return (
     <div className="flex items-baseline gap-3 border-t border-base-800 pt-1.5 first:border-t-0 first:pt-0">
-      <dt className="text-[11px] text-ink-muted">{label}</dt>
+      <dt className="text-xs text-ink-muted">{label}</dt>
       <dd
         className={`ml-auto font-mono text-xs ${alarm ? "font-bold text-risk-critical" : "text-ink"}`}
       >

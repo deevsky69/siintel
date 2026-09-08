@@ -58,7 +58,7 @@ export function DecisionForm({ code }: { code: string }) {
               aria-pressed={choice === item.value}
               onClick={() => setChoice(choice === item.value ? null : item.value)}
               className={[
-                "rounded border px-3 py-1.5 font-heading text-[11px] font-semibold uppercase tracking-wider transition",
+                "rounded border px-3 py-1.5 font-heading text-xs font-semibold uppercase tracking-wider transition",
                 item.tone,
                 choice === item.value ? "bg-base-800" : "",
               ].join(" ")}
@@ -78,7 +78,7 @@ export function DecisionForm({ code }: { code: string }) {
             required
             className="mt-1.5 w-full rounded border border-base-700 bg-base-950/60 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
           />
-          <span className="mt-1 block text-[10px] text-ink-muted">
+          <span className="mt-1 block text-2xs text-ink-muted">
             Usulan asli sistem tidak ditimpa — keduanya tersimpan berdampingan.
           </span>
         </label>
@@ -104,11 +104,11 @@ export function DecisionForm({ code }: { code: string }) {
       <button
         type="submit"
         disabled={pending || choice === null}
-        className="mt-3 rounded bg-accent/20 px-4 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-40"
+        className="mt-3 rounded bg-accent/20 px-4 py-2 font-heading text-xs font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-40"
       >
         {pending ? "Mencatat…" : "Catat Keputusan"}
       </button>
-      <p className="mt-2 text-[10px] text-ink-muted">
+      <p className="mt-2 text-2xs text-ink-muted">
         Keputusan tercatat beserta nama pejabat dan waktunya, serta tidak dapat diubah kemudian.
       </p>
     </form>

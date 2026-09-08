@@ -145,7 +145,7 @@ export function IntelligenceForm({
         {pending ? "Menyimpan…" : "Catat Laporan Intelijen"}
       </button>
 
-      <p className="mt-2 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-2 text-2xs leading-relaxed text-ink-muted">
         Laporan intelijen tidak menyimpan identitas sumber maupun orang yang dilaporkan. Yang
         tersimpan adalah kerawanan pada satu wilayah, bukan penilaian terhadap individu (CLAUDE.md
         §10, §16).

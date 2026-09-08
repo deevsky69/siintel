@@ -53,8 +53,8 @@ function Detail({ detail }: { detail: Record<string, unknown> | null }) {
     <dl className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
       {Object.entries(detail).map(([key, value]) => (
         <div key={key} className="flex gap-1.5">
-          <dt className="font-mono text-[10px] uppercase tracking-wider text-ink-faint">{key}</dt>
-          <dd className="font-mono text-[10px] text-ink-muted">
+          <dt className="font-mono text-2xs uppercase tracking-wider text-ink-faint">{key}</dt>
+          <dd className="font-mono text-2xs text-ink-muted">
             {typeof value === "object" ? JSON.stringify(value) : String(value)}
           </dd>
         </div>
@@ -69,11 +69,11 @@ function Entry({ row }: { row: AuditRow }) {
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <Badge result={row.result} />
         <span className="font-heading text-sm font-semibold text-ink">{row.action}</span>
-        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+        <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
           {row.resource_type}
           {row.resource_id ? ` · ${row.resource_id}` : ""}
         </span>
-        <span className="ml-auto font-mono text-[10px] text-ink-faint">
+        <span className="ml-auto font-mono text-2xs text-ink-faint">
           {formatWib(row.timestamp_wib)}
         </span>
       </div>
@@ -99,14 +99,12 @@ function Counts({ title, rows }: { title: string; rows: { key: string; count: nu
         <ul className="mt-2 space-y-1.5">
           {rows.map((row) => (
             <li key={row.key} className="flex items-center gap-2">
-              <span className="w-44 shrink-0 truncate font-mono text-[11px] text-ink">
-                {row.key}
-              </span>
+              <span className="w-44 shrink-0 truncate font-mono text-xs text-ink">{row.key}</span>
               <span
                 className="h-2 rounded-sm bg-accent/40"
                 style={{ width: `${Math.round((100 * row.count) / highest)}%` }}
               />
-              <span className="ml-auto font-mono text-[11px] tabular-nums text-ink-muted">
+              <span className="ml-auto font-mono text-xs tabular-nums text-ink-muted">
                 {row.count}
               </span>
             </li>
@@ -180,7 +178,7 @@ export function AuditBoard({
           <Link
             href={filterHref(filters, "hasil", undefined)}
             aria-current={filters.result ? undefined : "true"}
-            className={`rounded border px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors ${
+            className={`rounded border px-2.5 py-1 text-xs uppercase tracking-wider transition-colors ${
               filters.result
                 ? "border-base-800 text-ink-muted hover:text-ink"
                 : "border-accent/60 bg-accent/10 text-accent"
@@ -193,7 +191,7 @@ export function AuditBoard({
               key={value}
               href={filterHref(filters, "hasil", value)}
               aria-current={filters.result === value ? "true" : undefined}
-              className={`rounded border px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors ${
+              className={`rounded border px-2.5 py-1 text-xs uppercase tracking-wider transition-colors ${
                 filters.result === value
                   ? "border-accent/60 bg-accent/10 text-accent"
                   : "border-base-800 text-ink-muted hover:text-ink"
@@ -208,7 +206,7 @@ export function AuditBoard({
           <EmptyState label="Tidak ada catatan yang cocok dengan penyaring ini." />
         ) : (
           <>
-            <p className="mb-2 text-[11px] text-ink-faint">
+            <p className="mb-2 text-xs text-ink-faint">
               Menampilkan {page.data.length} dari {page.pagination.total_items} catatan, terbaru
               lebih dulu.
             </p>
@@ -220,7 +218,7 @@ export function AuditBoard({
           </>
         )}
 
-        <p className="mt-4 border-t border-base-800 pt-3 text-[11px] leading-relaxed text-ink-faint">
+        <p className="mt-4 border-t border-base-800 pt-3 text-xs leading-relaxed text-ink-faint">
           {page.append_only_basis} {page.scope_basis} {page.filter_basis}
         </p>
       </Panel>

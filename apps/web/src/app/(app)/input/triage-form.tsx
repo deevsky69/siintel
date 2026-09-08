@@ -100,7 +100,7 @@ export function TriageForm({
         </span>
       </label>
 
-      <p className="mt-4 rounded border border-base-800 bg-base-950/40 px-3 py-2 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-4 rounded border border-base-800 bg-base-950/40 px-3 py-2 text-2xs leading-relaxed text-ink-muted">
         <strong className="text-ink">Verifikasi bukan sekadar label.</strong> {verificationBasis}
       </p>
 

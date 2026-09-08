@@ -27,7 +27,7 @@ export default function BerandaPublik() {
         <h1 className="font-heading text-3xl font-bold tracking-wide text-ink sm:text-4xl">
           PREDIKSI PRESISI
         </h1>
-        <p className="mt-2 text-[11px] uppercase tracking-[0.2em] text-accent-soft">
+        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-accent-soft">
           Polres Metro Jakarta Selatan
         </p>
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-ink-muted">
@@ -49,7 +49,7 @@ export default function BerandaPublik() {
           </Link>
         </div>
 
-        <p className="mt-8 text-[11px] leading-relaxed text-ink-faint">
+        <p className="mt-8 text-xs leading-relaxed text-ink-faint">
           Untuk keadaan darurat yang sedang berlangsung, hubungi <strong>110</strong>. Laporan
           melalui halaman ini dibaca petugas pada jam kerja dan <strong>bukan pengganti</strong>{" "}
           laporan polisi resmi.
@@ -78,7 +78,7 @@ function AnimatedBackdrop() {
         className="absolute inset-0 opacity-[0.09]"
         style={{
           backgroundImage:
-            "linear-gradient(#22d3ee 1px, transparent 1px), linear-gradient(90deg, #22d3ee 1px, transparent 1px)",
+            "linear-gradient(rgb(var(--accent)) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--accent)) 1px, transparent 1px)",
           backgroundSize: "56px 56px",
         }}
       />

@@ -65,8 +65,8 @@ function ThreatFilter({
         aria-current={selection.threatType === null ? "true" : undefined}
         className={
           selection.threatType === null
-            ? "rounded border border-accent/60 bg-accent/10 px-2.5 py-1 text-[11px] uppercase tracking-wider text-accent"
-            : "rounded border border-base-800 px-2.5 py-1 text-[11px] uppercase tracking-wider text-ink-muted transition-colors hover:text-ink"
+            ? "rounded border border-accent/60 bg-accent/10 px-2.5 py-1 text-xs uppercase tracking-wider text-accent"
+            : "rounded border border-base-800 px-2.5 py-1 text-xs uppercase tracking-wider text-ink-muted transition-colors hover:text-ink"
         }
       >
         Semua
@@ -80,8 +80,8 @@ function ThreatFilter({
           aria-current={selection.threatType === row.threat_type ? "true" : undefined}
           className={
             selection.threatType === row.threat_type
-              ? "rounded border border-accent/60 bg-accent/10 px-2.5 py-1 text-[11px] uppercase tracking-wider text-accent"
-              : "rounded border border-base-800 px-2.5 py-1 text-[11px] uppercase tracking-wider text-ink-muted transition-colors hover:text-ink"
+              ? "rounded border border-accent/60 bg-accent/10 px-2.5 py-1 text-xs uppercase tracking-wider text-accent"
+              : "rounded border border-base-800 px-2.5 py-1 text-xs uppercase tracking-wider text-ink-muted transition-colors hover:text-ink"
           }
         >
           {threatLabel(row.threat_type)}
@@ -124,7 +124,7 @@ function RangeFilter({ selection }: { selection: AnalyticsSelection }) {
       </label>
       <button
         type="submit"
-        className="rounded border border-base-800 px-3 py-1.5 font-heading text-[11px] font-semibold uppercase tracking-wider text-ink hover:border-accent/60 hover:text-accent"
+        className="rounded border border-base-800 px-3 py-1.5 font-heading text-xs font-semibold uppercase tracking-wider text-ink hover:border-accent/60 hover:text-accent"
       >
         Terapkan
       </button>
@@ -150,7 +150,7 @@ function TrendPanel({ trend }: { trend: TrendResponse }) {
       title="Tren Bulanan"
       className="col-span-12 xl:col-span-7"
       action={
-        <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+        <span className="text-2xs uppercase tracking-wider text-ink-faint">
           {trend.months_counted} bulan · {trend.incidents} kejadian
         </span>
       }
@@ -162,7 +162,7 @@ function TrendPanel({ trend }: { trend: TrendResponse }) {
         <>
           <div className="flex flex-wrap gap-x-4 gap-y-1">
             {trend.series.map((row, index) => (
-              <span key={row.threat_type} className="flex items-center gap-1.5 text-[10px]">
+              <span key={row.threat_type} className="flex items-center gap-1.5 text-2xs">
                 <span
                   className="h-1.5 w-3 rounded-full"
                   style={{ backgroundColor: seriesColor(index) }}
@@ -175,55 +175,62 @@ function TrendPanel({ trend }: { trend: TrendResponse }) {
             ))}
           </div>
 
-          <svg
-            viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT + 16}`}
-            className="w-full"
-            role="img"
-            aria-label={`Tren kejadian per bulan menurut jenis gangguan, ${trend.months.length} bulan`}
-          >
-            <title>Kejadian per bulan menurut jenis gangguan</title>
-            {trend.series.map((row, index) => (
-              <path
-                key={row.threat_type}
-                d={linePath(row.monthly, peak, CHART_WIDTH, CHART_HEIGHT)}
-                fill="none"
-                stroke={seriesColor(index)}
-                strokeWidth={1.6}
-                strokeLinejoin="round"
-              />
-            ))}
-            {ticks.map((index) => (
-              <text
-                key={trend.months[index].key}
-                x={(index / Math.max(trend.months.length - 1, 1)) * CHART_WIDTH}
-                y={CHART_HEIGHT + 12}
-                textAnchor={
-                  index === 0 ? "start" : index === trend.months.length - 1 ? "end" : "middle"
-                }
-                className="fill-ink-muted"
-                style={{ fontSize: 9 }}
-              >
-                {trend.months[index].label}
-              </text>
-            ))}
-          </svg>
+          {/*
+        Ukuran huruf di dalam SVG adalah SATUAN GAMBAR, bukan piksel: ia ikut mengecil
+        ketika viewBox diperkecil agar muat. Label 9 satuan pada grafik selebar 720 yang
+        dipaksa masuk ke layar 390 piksel tergambar 4,2 piksel — tulisan yang secara harfiah
+        tidak dapat dibaca. Karena itu grafik ini TIDAK dikecilkan; ia digulung ke samping
+        pada layar sempit dan tetap digambar pada ukuran aslinya.
+      */}
+          <div className="table-scroll">
+            <svg
+              viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT + 20}`}
+              width={CHART_WIDTH}
+              className="max-w-none"
+              role="img"
+              aria-label={`Tren kejadian per bulan menurut jenis gangguan, ${trend.months.length} bulan`}
+            >
+              <title>Kejadian per bulan menurut jenis gangguan</title>
+              {trend.series.map((row, index) => (
+                <path
+                  key={row.threat_type}
+                  d={linePath(row.monthly, peak, CHART_WIDTH, CHART_HEIGHT)}
+                  fill="none"
+                  stroke={seriesColor(index)}
+                  strokeWidth={1.6}
+                  strokeLinejoin="round"
+                />
+              ))}
+              {ticks.map((index) => (
+                <text
+                  key={trend.months[index].key}
+                  x={(index / Math.max(trend.months.length - 1, 1)) * CHART_WIDTH}
+                  y={CHART_HEIGHT + 15}
+                  textAnchor={
+                    index === 0 ? "start" : index === trend.months.length - 1 ? "end" : "middle"
+                  }
+                  className="fill-ink-muted"
+                  style={{ fontSize: 13 }}
+                >
+                  {trend.months[index].label}
+                </text>
+              ))}
+            </svg>
+          </div>
 
-          <p className="text-[10px] leading-relaxed text-ink-faint">
+          <p className="text-2xs leading-relaxed text-ink-faint">
             Tinggi garis relatif terhadap bulan terbanyak satu jenis ({peak} kejadian), bukan
             terhadap total. Rata-rata seluruh jenis {decimalText(trend.mean_per_month)} kejadian per
             bulan.
           </p>
 
           <details>
-            <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-ink-muted hover:text-accent">
+            <summary className="cursor-pointer text-2xs uppercase tracking-wider text-ink-muted hover:text-accent">
               Angka per bulan
             </summary>
             <ul className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-0.5 sm:grid-cols-3">
               {trend.months.map((month) => (
-                <li
-                  key={month.key}
-                  className="flex justify-between gap-2 text-[10px] text-ink-muted"
-                >
+                <li key={month.key} className="flex justify-between gap-2 text-2xs text-ink-muted">
                   <span>{month.label}</span>
                   <span className="font-mono text-ink">
                     {month.incidents} · {shareText(month.share_percent, trend.denominator)}
@@ -233,8 +240,8 @@ function TrendPanel({ trend }: { trend: TrendResponse }) {
             </ul>
           </details>
 
-          <p className="text-[10px] leading-relaxed text-ink-faint">{trend.mean_basis}</p>
-          <p className="text-[10px] leading-relaxed text-ink-faint">{trend.peak_basis}</p>
+          <p className="text-2xs leading-relaxed text-ink-faint">{trend.mean_basis}</p>
+          <p className="text-2xs leading-relaxed text-ink-faint">{trend.peak_basis}</p>
         </>
       )}
     </Panel>
@@ -278,13 +285,13 @@ function CompositionPanel({ trend }: { trend: TrendResponse }) {
                 <span className="w-10 text-right font-mono text-xs font-semibold text-ink">
                   {row.incidents}
                 </span>
-                <span className="w-36 shrink-0 text-right text-[10px] text-ink-muted">
+                <span className="w-36 shrink-0 text-right text-2xs text-ink-muted">
                   {shareText(row.share_percent, trend.denominator)}
                 </span>
               </li>
             ))}
           </ul>
-          <p className="text-[10px] leading-relaxed text-ink-faint">
+          <p className="text-2xs leading-relaxed text-ink-faint">
             Panjang batang relatif terhadap jenis terbanyak ({peak} kejadian), bukan terhadap 100%.
             Jumlah dan persentase tercantum pada tiap batang.
           </p>
@@ -303,7 +310,7 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
       title="Hari & Jam Rawan"
       className="col-span-12"
       action={
-        <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+        <span className="text-2xs uppercase tracking-wider text-ink-faint">
           {pattern.cells} sel · {pattern.incidents} kejadian
         </span>
       }
@@ -325,7 +332,7 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
                     <th
                       key={hour.hour}
                       scope="col"
-                      className="text-center text-[9px] font-normal text-ink-faint"
+                      className="text-center text-2xs font-normal text-ink-faint"
                     >
                       {hour.hour % 3 === 0 ? String(hour.hour).padStart(2, "0") : ""}
                     </th>
@@ -336,7 +343,7 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
               <tbody>
                 {pattern.days.map((day) => (
                   <tr key={day.day}>
-                    <th scope="row" className="pr-1 text-[11px] font-normal text-ink-muted">
+                    <th scope="row" className="pr-1 text-xs font-normal text-ink-muted">
                       {day.label}
                     </th>
                     {day.cells.map((cell) => (
@@ -347,9 +354,7 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
                         />
                       </td>
                     ))}
-                    <td className="pl-1 text-right font-mono text-[11px] text-ink">
-                      {day.incidents}
-                    </td>
+                    <td className="pl-1 text-right font-mono text-xs text-ink">{day.incidents}</td>
                   </tr>
                 ))}
               </tbody>
@@ -357,7 +362,7 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <span className="flex items-center gap-1 text-[10px] text-ink-faint">
+            <span className="flex items-center gap-1 text-2xs text-ink-faint">
               <span className="stat-label">Skala</span>
               {HEAT_CLASSES.map((className, index) => (
                 <span key={className} className={`h-3 w-4 rounded-sm ${className}`}>
@@ -372,7 +377,7 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
           </div>
 
           {pattern.peak_cell ? (
-            <p className="text-[11px] leading-relaxed text-ink-muted">
+            <p className="text-xs leading-relaxed text-ink-muted">
               Sel terbanyak: <span className="text-ink">{pattern.peak_cell.label}</span> dengan{" "}
               {pattern.peak_cell.incidents} kejadian (
               {shareText(pattern.peak_cell.share_percent, pattern.denominator)}).
@@ -380,15 +385,12 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
           ) : null}
 
           <details>
-            <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-ink-muted hover:text-accent">
+            <summary className="cursor-pointer text-2xs uppercase tracking-wider text-ink-muted hover:text-accent">
               Angka per jam, seluruh hari
             </summary>
             <ul className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-0.5 sm:grid-cols-4">
               {pattern.hours.map((hour) => (
-                <li
-                  key={hour.hour}
-                  className="flex justify-between gap-2 text-[10px] text-ink-muted"
-                >
+                <li key={hour.hour} className="flex justify-between gap-2 text-2xs text-ink-muted">
                   <span>{hour.label}</span>
                   <span className="font-mono text-ink">
                     {hour.incidents} · {shareText(hour.share_percent, pattern.denominator)}
@@ -398,8 +400,8 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
             </ul>
           </details>
 
-          <p className="text-[10px] leading-relaxed text-ink-faint">{pattern.cell_basis}</p>
-          <p className="text-[10px] leading-relaxed text-ink-faint">{pattern.time_basis}</p>
+          <p className="text-2xs leading-relaxed text-ink-faint">{pattern.cell_basis}</p>
+          <p className="text-2xs leading-relaxed text-ink-faint">{pattern.time_basis}</p>
         </>
       )}
     </Panel>
@@ -415,7 +417,7 @@ function SpatialPanel({ spatial }: { spatial: SpatialPatternResponse }) {
       title="Perbandingan Antarwilayah"
       className="col-span-12"
       action={
-        <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+        <span className="text-2xs uppercase tracking-wider text-ink-faint">
           {spatial.areas_compared} kecamatan · {spatial.incidents} kejadian
         </span>
       }
@@ -427,7 +429,7 @@ function SpatialPanel({ spatial }: { spatial: SpatialPatternResponse }) {
         <>
           <div className="flex flex-wrap gap-x-4 gap-y-1">
             {spatial.threat_types.map((row, index) => (
-              <span key={row.threat_type} className="flex items-center gap-1.5 text-[10px]">
+              <span key={row.threat_type} className="flex items-center gap-1.5 text-2xs">
                 <span
                   className="h-1.5 w-3 rounded-full"
                   style={{ backgroundColor: seriesColor(index) }}
@@ -445,10 +447,10 @@ function SpatialPanel({ spatial }: { spatial: SpatialPatternResponse }) {
                   <span className="text-xs text-ink">
                     {area.kecamatan}
                     {area.polsek ? (
-                      <span className="ml-1.5 text-[10px] text-ink-faint">{area.polsek}</span>
+                      <span className="ml-1.5 text-2xs text-ink-faint">{area.polsek}</span>
                     ) : null}
                   </span>
-                  <span className="shrink-0 text-[10px] text-ink-muted">
+                  <span className="shrink-0 text-2xs text-ink-muted">
                     {area.incidents} kejadian · {shareText(area.share_percent, spatial.denominator)}
                   </span>
                 </div>
@@ -472,7 +474,7 @@ function SpatialPanel({ spatial }: { spatial: SpatialPatternResponse }) {
           </ul>
 
           <details>
-            <summary className="cursor-pointer text-[10px] uppercase tracking-wider text-ink-muted hover:text-accent">
+            <summary className="cursor-pointer text-2xs uppercase tracking-wider text-ink-muted hover:text-accent">
               Tabel wilayah × jenis
             </summary>
             <div className="mt-2 overflow-x-auto">
@@ -527,9 +529,9 @@ function SpatialPanel({ spatial }: { spatial: SpatialPatternResponse }) {
             </div>
           </details>
 
-          <p className="text-[10px] leading-relaxed text-ink-faint">{spatial.share_basis}</p>
-          <p className="text-[10px] leading-relaxed text-ink-faint">{spatial.comparison_basis}</p>
-          <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-[11px] leading-relaxed text-ink-muted">
+          <p className="text-2xs leading-relaxed text-ink-faint">{spatial.share_basis}</p>
+          <p className="text-2xs leading-relaxed text-ink-faint">{spatial.comparison_basis}</p>
+          <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-xs leading-relaxed text-ink-muted">
             {spatial.rate_basis}
           </p>
         </>
@@ -555,7 +557,7 @@ export function AnalyticsView({
         title="Crime Analytics"
         className="col-span-12"
         action={
-          <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+          <span className="text-2xs uppercase tracking-wider text-ink-faint">
             {trend.source.incidents} kejadian · {formatDate(trend.source.date_from)} –{" "}
             {formatDate(trend.source.date_to)}
           </span>
@@ -571,16 +573,16 @@ export function AnalyticsView({
 
         {/* Bedanya dengan /pola dinyatakan di atas, bukan di kaki halaman: dua layar yang
             membaca tabel sama akan tertukar bila bedanya tidak terbaca lebih dulu. */}
-        <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-[11px] leading-relaxed text-ink-muted">
+        <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-xs leading-relaxed text-ink-muted">
           {trend.related_analysis_basis}{" "}
           <Link href="/pola" className="text-accent hover:text-accent-soft">
             Buka Crime Pattern DNA →
           </Link>
         </p>
-        <p className="text-[10px] leading-relaxed text-ink-faint">{trend.analysis_basis}</p>
-        <p className="text-[10px] leading-relaxed text-ink-faint">{trend.scope_basis}</p>
+        <p className="text-2xs leading-relaxed text-ink-faint">{trend.analysis_basis}</p>
+        <p className="text-2xs leading-relaxed text-ink-faint">{trend.scope_basis}</p>
         {selection.threatType ? (
-          <p className="text-[10px] leading-relaxed text-ink-faint">
+          <p className="text-2xs leading-relaxed text-ink-faint">
             Penyaring jenis <span className="text-ink">{threatLabel(selection.threatType)}</span>{" "}
             berlaku untuk tren dan matriks hari × jam. Perbandingan antarwilayah tetap menampilkan
             seluruh jenis, karena justru jenis itulah kolom perbandingannya.

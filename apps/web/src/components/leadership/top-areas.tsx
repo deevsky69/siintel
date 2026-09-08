@@ -20,7 +20,7 @@ export function TopReportAreas({ top }: { top: LeadershipBoard["top_report_areas
     <Panel
       title="Top Area Menurut Jumlah Laporan"
       action={
-        <span className="text-[10px] text-ink-faint">
+        <span className="text-2xs text-ink-faint">
           {top.days} hari · {top.window_from} s.d. {top.window_to}
         </span>
       }
@@ -33,7 +33,7 @@ export function TopReportAreas({ top }: { top: LeadershipBoard["top_report_areas
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="text-[10px] uppercase tracking-wider text-ink-faint">
+              <tr className="text-2xs uppercase tracking-wider text-ink-faint">
                 <th className="pb-1 font-normal">#</th>
                 <th className="pb-1 font-normal">Kecamatan</th>
                 <th className="pb-1 text-right font-normal">Kejadian</th>
@@ -46,7 +46,7 @@ export function TopReportAreas({ top }: { top: LeadershipBoard["top_report_areas
             <tbody>
               {top.areas.map((area, index) => (
                 <tr key={area.kecamatan} className="border-t border-base-800">
-                  <td className="py-1.5 font-mono text-[10px] text-ink-faint">{index + 1}</td>
+                  <td className="py-1.5 font-mono text-2xs text-ink-faint">{index + 1}</td>
                   <td className="py-1.5">
                     <Link
                       href={`/peta?wilayah=${encodeURIComponent(area.kecamatan)}&layer=historical`}
@@ -69,7 +69,7 @@ export function TopReportAreas({ top }: { top: LeadershipBoard["top_report_areas
                   </td>
                   <td className="py-1.5 text-right">
                     <span
-                      className={`rounded border px-1.5 py-0.5 text-[10px] ${toneOf(
+                      className={`rounded border px-1.5 py-0.5 text-2xs ${toneOf(
                         REPORT_LEVEL_TONE,
                         area.level,
                       )}`}
@@ -85,13 +85,13 @@ export function TopReportAreas({ top }: { top: LeadershipBoard["top_report_areas
       )}
 
       {top.unattributed_reports > 0 ? (
-        <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">
+        <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
           {top.unattributed_reports} laporan masyarakat pada jendela ini tidak memiliki lokasi yang
           cocok dengan master lokasi, sehingga tidak terhitung pada baris mana pun di atas.
         </p>
       ) : null}
 
-      <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">{top.basis}</p>
+      <p className="mt-2 text-2xs leading-relaxed text-ink-faint">{top.basis}</p>
     </Panel>
   );
 }

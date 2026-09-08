@@ -50,7 +50,7 @@ export function Sidebar({
   return (
     <nav
       aria-label="Navigasi utama"
-      className="flex w-[196px] shrink-0 flex-col gap-0.5 overflow-y-auto border-r border-base-800 bg-base-900/60 px-2 py-3"
+      className="flex w-full flex-col gap-0.5 overflow-y-auto border-r border-base-800 bg-base-900 px-2 py-3 lg:bg-base-900/60"
     >
       {groups.map((group) => {
         const open = group.id === activeGroup ? !opened.has(group.id) : opened.has(group.id);
@@ -71,7 +71,7 @@ export function Sidebar({
               }`}
             >
               <NavIcon name={group.icon} className="h-4 w-4 shrink-0" />
-              <span className="flex-1 font-heading text-[11px] font-semibold uppercase tracking-wider">
+              <span className="flex-1 font-heading text-xs font-semibold uppercase tracking-wider">
                 {group.label}
               </span>
               {/* Lencana pindah ke judul kelompok saat submenunya tertutup, supaya
@@ -79,14 +79,14 @@ export function Sidebar({
               {badge > 0 && !open ? (
                 <span
                   aria-hidden="true"
-                  className="min-w-[16px] rounded-full bg-risk-critical px-1 text-center font-mono text-[9px] font-bold leading-4 text-base-950"
+                  className="min-w-[18px] rounded-full bg-risk-critical px-1 text-center font-mono text-2xs font-bold leading-4 text-base-950"
                 >
                   {badge > 99 ? "99+" : badge}
                 </span>
               ) : null}
               <span
                 aria-hidden="true"
-                className={`text-[9px] transition-transform ${open ? "rotate-90" : ""}`}
+                className={`text-2xs transition-transform ${open ? "rotate-90" : ""}`}
               >
                 &#9656;
               </span>
@@ -118,7 +118,7 @@ function SubmenuLink({ item, active, badge }: { item: NavItem; active: boolean; 
       href={item.href}
       title={item.hint}
       aria-current={active ? "page" : undefined}
-      className={`flex items-center gap-2 rounded px-2 py-1.5 text-[11px] leading-tight transition-colors ${
+      className={`flex items-center gap-2 rounded px-2 py-2 text-xs leading-tight transition-colors ${
         active
           ? "bg-accent/10 font-semibold text-accent"
           : "text-ink-muted hover:bg-base-800/70 hover:text-ink"
@@ -129,7 +129,7 @@ function SubmenuLink({ item, active, badge }: { item: NavItem; active: boolean; 
         <>
           <span
             aria-hidden="true"
-            className="min-w-[16px] rounded-full bg-risk-critical px-1 text-center font-mono text-[9px] font-bold leading-4 text-base-950"
+            className="min-w-[18px] rounded-full bg-risk-critical px-1 text-center font-mono text-2xs font-bold leading-4 text-base-950"
           >
             {badge > 99 ? "99+" : badge}
           </span>

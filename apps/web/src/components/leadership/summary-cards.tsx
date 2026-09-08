@@ -38,7 +38,7 @@ function Figure({ value, unit }: { value: number | string; unit?: string }) {
 
 function Row({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="flex items-center justify-between border-t border-base-800 py-1 text-[11px]">
+    <div className="flex items-center justify-between border-t border-base-800 py-1 text-xs">
       <span className="text-ink-muted">{label}</span>
       <span className="font-mono text-ink">{value}</span>
     </div>
@@ -49,7 +49,7 @@ export function ReportsCard({ reports }: { reports: Reports24h }) {
   return (
     <Card title="Laporan Masuk">
       <Figure value={reports.total} unit="laporan" />
-      <p className="mt-1 text-[10px] text-ink-faint">24 jam terakhir</p>
+      <p className="mt-1 text-2xs text-ink-faint">24 jam terakhir</p>
 
       {/* Rincian tidak boleh disembunyikan di balik total: ketiganya berbeda asal dan
           berbeda keandalan, dan pembaca yang hanya melihat total akan menyimpulkan hal
@@ -61,13 +61,13 @@ export function ReportsCard({ reports }: { reports: Reports24h }) {
       </div>
 
       {reports.citizen_reports_without_location > 0 ? (
-        <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">
+        <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
           {reports.citizen_reports_without_location} laporan masyarakat di antaranya tanpa lokasi
           yang cocok dengan master lokasi, sehingga tidak muncul di peta.
         </p>
       ) : null}
 
-      <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">
+      <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
         Laporan intelijen dicacah per hari ({reports.intelligence_date}) karena hanya bertanggal,
         tanpa jam.
       </p>
@@ -85,7 +85,7 @@ export function AreaStatusCard({ areaStatus }: { areaStatus: AreaStatus }) {
     <Card
       title="Status Wilayah"
       action={
-        <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+        <span className="text-2xs uppercase tracking-wider text-ink-faint">
           {areaStatus.mapping_status}
         </span>
       }
@@ -98,7 +98,7 @@ export function AreaStatusCard({ areaStatus }: { areaStatus: AreaStatus }) {
             {areaStatus.tally.map((row) => (
               <span
                 key={row.status}
-                className={`rounded border px-2 py-1 text-[11px] ${toneOf(
+                className={`rounded border px-2 py-1 text-xs ${toneOf(
                   AREA_STATUS_TONE,
                   row.status,
                 )}`}
@@ -114,7 +114,7 @@ export function AreaStatusCard({ areaStatus }: { areaStatus: AreaStatus }) {
             {areaStatus.assessment_date ?? "terakhir"}.
           </p>
 
-          <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">
+          <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
             Status mengikuti sel dengan skor tertinggi di kecamatan itu, sama seperti peta. Pemetaan
             empat kelas risiko ke tiga nama status masih{" "}
             <strong>{areaStatus.mapping_status}</strong> dan belum disetujui.
@@ -138,7 +138,7 @@ export function AttentionCard({ items }: { items: AttentionItem[] }) {
       ) : (
         <>
           <Figure value={items.length} unit="butir" />
-          <p className="mt-1 text-[10px] text-ink-faint">
+          <p className="mt-1 text-2xs text-ink-faint">
             {warnings} peringatan belum diterima · {decisions} menunggu keputusan Anda
           </p>
 
@@ -149,8 +149,8 @@ export function AttentionCard({ items }: { items: AttentionItem[] }) {
                   href={item.href}
                   className="block rounded border border-base-800 px-2 py-1.5 transition-colors hover:border-accent/40"
                 >
-                  <span className="block text-[11px] text-ink">{item.headline}</span>
-                  <span className="block text-[10px] text-ink-faint">
+                  <span className="block text-xs text-ink">{item.headline}</span>
+                  <span className="block text-2xs text-ink-faint">
                     {item.kecamatan ?? "lintas wilayah"} · {item.why}
                   </span>
                 </Link>
@@ -172,7 +172,7 @@ export function PriorityAreasCard({ areas }: { areas: AreaStatusRow[] }) {
         <ol className="space-y-2">
           {areas.map((area, index) => (
             <li key={area.kecamatan} className="flex items-center gap-2.5">
-              <span className="font-mono text-[10px] text-ink-faint">{index + 1}</span>
+              <span className="font-mono text-2xs text-ink-faint">{index + 1}</span>
               <Link
                 href={`/peta?wilayah=${encodeURIComponent(area.kecamatan)}`}
                 className="flex-1 text-xs text-ink hover:text-accent"
@@ -180,7 +180,7 @@ export function PriorityAreasCard({ areas }: { areas: AreaStatusRow[] }) {
                 {area.kecamatan}
               </Link>
               <span
-                className={`rounded border px-1.5 py-0.5 text-[10px] ${toneOf(
+                className={`rounded border px-1.5 py-0.5 text-2xs ${toneOf(
                   AREA_STATUS_TONE,
                   area.status,
                 )}`}
@@ -195,7 +195,7 @@ export function PriorityAreasCard({ areas }: { areas: AreaStatusRow[] }) {
           ))}
         </ol>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-ink-faint">
+      <p className="mt-3 text-2xs leading-relaxed text-ink-faint">
         Angka menunjukkan <span className="font-mono">sel tertinggi</span> /{" "}
         <span className="font-mono">rata-rata seluruh sel</span>. Keduanya menjawab pertanyaan yang
         berbeda: yang terburuk, dan keadaan menyeluruh.

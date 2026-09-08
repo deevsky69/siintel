@@ -22,8 +22,8 @@ function CellCard({ cell }: { cell: RunCell }) {
     <li className="rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
-          <span className="font-heading text-[12px] font-semibold text-ink">{cell.grid_id}</span>
-          <span className="ml-2 text-[11px] text-ink-muted">
+          <span className="font-heading text-xs font-semibold text-ink">{cell.grid_id}</span>
+          <span className="ml-2 text-xs text-ink-muted">
             {cell.kecamatan}
             {cell.kelurahan ? ` · ${cell.kelurahan}` : ""} · {cell.threat_type} · {cell.time_window}
           </span>
@@ -32,25 +32,25 @@ function CellCard({ cell }: { cell: RunCell }) {
           <span className="font-heading text-xl font-bold tabular-nums text-ink">
             {cell.risk_score === null ? "—" : cell.risk_score}
           </span>
-          <span className="ml-2 text-[10px] uppercase tracking-wider text-ink-muted">
+          <span className="ml-2 text-2xs uppercase tracking-wider text-ink-muted">
             {cell.risk_class ?? "tidak dinilai"}
           </span>
         </div>
       </div>
 
       {cell.unscored_reason ? (
-        <p className="mt-1.5 text-[10px] leading-relaxed text-risk-high">{cell.unscored_reason}</p>
+        <p className="mt-1.5 text-2xs leading-relaxed text-risk-high">{cell.unscored_reason}</p>
       ) : null}
 
       <ul className="mt-2 space-y-1">
         {cell.factors.map((factor) => (
           <li
             key={factor.factor}
-            className="flex flex-wrap items-baseline justify-between gap-x-3 text-[11px]"
+            className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs"
           >
             <span className="text-ink-muted">
               {factorLabel(factor.factor)}
-              <span className="ml-1.5 rounded bg-base-800 px-1 py-px text-[9px] uppercase tracking-wider text-ink-muted">
+              <span className="ml-1.5 rounded bg-base-800 px-1 py-px text-2xs uppercase tracking-wider text-ink-muted">
                 {factor.source}
               </span>
               {factor.reason ? (
@@ -76,14 +76,14 @@ function ProfileBlock({ profile }: { profile: RunProfile }) {
 
   return (
     <section className="rounded border border-base-800 px-3 py-2.5">
-      <h3 className="font-heading text-[12px] font-semibold uppercase tracking-wider text-ink">
+      <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-ink">
         {profileLabel(profile.profile)}
       </h3>
 
       {profile.not_computed_reason ? (
         // Profil yang tidak menghasilkan apa pun menyatakan alasannya, bukan menghilang
         // begitu saja — dan tidak diisi dengan contoh yang dikarang.
-        <p className="mt-1.5 text-[11px] leading-relaxed text-risk-high">
+        <p className="mt-1.5 text-xs leading-relaxed text-risk-high">
           {profile.not_computed_reason}
         </p>
       ) : null}
@@ -128,15 +128,13 @@ function ProfileBlock({ profile }: { profile: RunProfile }) {
           <p className="stat-label">Mengapa sebagian tidak dinilai</p>
           <ul className="mt-1 space-y-1">
             {profile.unscored_reasons.map((item) => (
-              <li key={item.reason} className="text-[10px] leading-relaxed text-ink-muted">
+              <li key={item.reason} className="text-2xs leading-relaxed text-ink-muted">
                 <span className="tabular-nums text-ink">{item.combinations}</span> kombinasi —{" "}
                 {item.reason}
               </li>
             ))}
           </ul>
-          <p className="mt-1 text-[10px] leading-relaxed text-ink-muted">
-            {profile.unscored_basis}
-          </p>
+          <p className="mt-1 text-2xs leading-relaxed text-ink-muted">{profile.unscored_basis}</p>
         </div>
       ) : null}
 
@@ -161,7 +159,7 @@ export function RunSummary({ result }: { result: RunResult }) {
   return (
     <div className="space-y-3">
       <div
-        className={`rounded border px-3 py-2.5 text-[11px] leading-relaxed ${
+        className={`rounded border px-3 py-2.5 text-xs leading-relaxed ${
           result.dry_run
             ? "border-accent/25 bg-accent/5 text-accent-soft"
             : "border-risk-low/40 bg-risk-low/10 text-risk-low"
@@ -199,7 +197,7 @@ export function RunSummary({ result }: { result: RunResult }) {
         </div>
         <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
           <dt className="stat-label">Rentang Data</dt>
-          <dd className="mt-1 text-[11px] text-ink">
+          <dd className="mt-1 text-xs text-ink">
             {result.evidence.date_from ?? "—"} s.d. {result.evidence.date_to ?? "—"}
           </dd>
         </div>
@@ -209,8 +207,8 @@ export function RunSummary({ result }: { result: RunResult }) {
         <ProfileBlock key={profile.profile} profile={profile} />
       ))}
 
-      <p className="text-[10px] leading-relaxed text-ink-muted">{result.score_basis}</p>
-      <p className="text-[10px] leading-relaxed text-ink-muted">{result.persistence_basis}</p>
+      <p className="text-2xs leading-relaxed text-ink-muted">{result.score_basis}</p>
+      <p className="text-2xs leading-relaxed text-ink-muted">{result.persistence_basis}</p>
     </div>
   );
 }

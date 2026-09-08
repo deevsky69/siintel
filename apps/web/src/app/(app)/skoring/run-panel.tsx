@@ -42,7 +42,7 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
               onChange={(event) => setAssessmentDate(event.target.value)}
               className="mt-1.5 w-full rounded border border-base-700 bg-base-950/60 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
             />
-            <span className="mt-1 block text-[10px] text-ink-muted">
+            <span className="mt-1 block text-2xs text-ink-muted">
               Kosong berarti tanggal pada waktu acuan aplikasi ({referenceDate}).
             </span>
           </label>
@@ -53,7 +53,7 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
               name="mode"
               value="uji"
               disabled={pending}
-              className="rounded border border-accent/50 px-4 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/10 disabled:opacity-40"
+              className="rounded border border-accent/50 px-4 py-2 font-heading text-xs font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/10 disabled:opacity-40"
             >
               {pending ? "Menghitung…" : "Uji Coba"}
             </button>
@@ -62,20 +62,20 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
               name="mode"
               value="tulis"
               disabled={pending || !previewMatchesDate}
-              className="rounded border border-risk-high/50 px-4 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-risk-high transition hover:bg-risk-high/10 disabled:opacity-40"
+              className="rounded border border-risk-high/50 px-4 py-2 font-heading text-xs font-semibold uppercase tracking-wider text-risk-high transition hover:bg-risk-high/10 disabled:opacity-40"
             >
               Tulis Penilaian
             </button>
           </div>
 
-          <p className="text-[10px] leading-relaxed text-ink-muted">
+          <p className="text-2xs leading-relaxed text-ink-muted">
             {previewMatchesDate
               ? "Hasil uji coba di bawah belum tersimpan. Menulis akan menambah baris penilaian baru dan tidak dapat menimpa tanggal penilaian yang sudah terpakai."
               : "Jalankan uji coba lebih dulu. Hasilnya ditampilkan sebelum ada satu baris pun yang ditulis."}
           </p>
         </form>
       ) : (
-        <p className="text-[11px] leading-relaxed text-ink-muted">
+        <p className="text-xs leading-relaxed text-ink-muted">
           Akun Anda tidak memiliki kewenangan <code>risk_score:run</code>, sehingga penilaian hanya
           dapat dibaca dari layar ini. Dasar perhitungan di atas tetap terbuka untuk diperiksa.
         </p>

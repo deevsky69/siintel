@@ -1,6 +1,6 @@
 import { NotificationBell } from "@/components/shell/notification-bell";
+import { ShellFrame } from "@/components/shell/shell-frame";
 import { Sidebar } from "@/components/shell/sidebar";
-import { Topbar } from "@/components/shell/topbar";
 import { getPendingDecisionCount, getProfile } from "@/lib/dashboard";
 import { getNotifications } from "@/lib/notifications";
 
@@ -29,17 +29,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
-      <Topbar
-        name={profile.full_name ?? profile.username}
-        roleName={profile.role}
-        notifications={feed ? <NotificationBell feed={feed} /> : null}
-      />
-      <div className="flex min-h-0 flex-1">
-        <Sidebar permissions={profile.permissions} pendingDecisions={pendingDecisions} />
-        <main className="min-w-0 flex-1 overflow-auto p-4">{children}</main>
-      </div>
-    </div>
+    <ShellFrame
+      name={profile.full_name ?? profile.username}
+      roleName={profile.role}
+      notifications={feed ? <NotificationBell feed={feed} /> : null}
+      sidebar={<Sidebar permissions={profile.permissions} pendingDecisions={pendingDecisions} />}
+    >
+      {children}
+    </ShellFrame>
   );
 }
 

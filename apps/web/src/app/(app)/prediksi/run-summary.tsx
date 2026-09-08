@@ -30,10 +30,8 @@ function ForecastCard({ forecast }: { forecast: RunForecast }) {
     <li className="rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
-          <span className="font-heading text-[12px] font-semibold text-ink">
-            {forecast.grid_id}
-          </span>
-          <span className="ml-2 text-[11px] text-ink-muted">
+          <span className="font-heading text-xs font-semibold text-ink">{forecast.grid_id}</span>
+          <span className="ml-2 text-xs text-ink-muted">
             {forecast.kecamatan}
             {forecast.kelurahan ? ` · ${forecast.kelurahan}` : ""} · {forecast.threat_type} ·{" "}
             {forecast.time_window}
@@ -43,23 +41,23 @@ function ForecastCard({ forecast }: { forecast: RunForecast }) {
           <span className="font-heading text-xl font-bold tabular-nums text-ink">
             {forecast.risk_score === null ? "—" : forecast.risk_score}
           </span>
-          <span className="ml-2 text-[10px] uppercase tracking-wider text-ink-muted">
+          <span className="ml-2 text-2xs uppercase tracking-wider text-ink-muted">
             {forecast.risk_class ?? "tidak diprediksi"}
           </span>
         </div>
       </div>
 
-      <p className="mt-1 text-[10px] text-ink-muted">
+      <p className="mt-1 text-2xs text-ink-muted">
         {formatWib(forecast.window_start)} s.d. {formatWib(forecast.window_end)}
       </p>
 
       {forecast.not_predicted_reason ? (
-        <p className="mt-1.5 text-[10px] leading-relaxed text-risk-high">
+        <p className="mt-1.5 text-2xs leading-relaxed text-risk-high">
           {forecast.not_predicted_reason}
         </p>
       ) : null}
 
-      <p className="mt-1.5 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-1.5 text-2xs leading-relaxed text-ink-muted">
         Keyakinan{" "}
         <span className="tabular-nums text-ink">
           {forecast.confidence === null ? "—" : forecast.confidence}
@@ -68,7 +66,7 @@ function ForecastCard({ forecast }: { forecast: RunForecast }) {
       </p>
 
       {forecast.baseline_code ? (
-        <p className="mt-1 text-[10px] leading-relaxed text-ink-muted">
+        <p className="mt-1 text-2xs leading-relaxed text-ink-muted">
           Dasar: penilaian <span className="text-ink">{forecast.baseline_code}</span> tanggal{" "}
           {forecast.baseline_assessment_date} ({baselineAgeText(forecast.baseline_age_days)}), versi
           bobot {forecast.weights_version ?? "—"}.
@@ -80,11 +78,11 @@ function ForecastCard({ forecast }: { forecast: RunForecast }) {
           {forecast.dominant_factors.map((factor) => (
             <li
               key={factor.factor}
-              className="flex flex-wrap items-baseline justify-between gap-x-3 text-[11px]"
+              className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs"
             >
               <span className="text-ink-muted">
                 {factorLabel(factor.factor)}
-                <span className="ml-1.5 rounded bg-base-800 px-1 py-px text-[9px] uppercase tracking-wider text-ink-muted">
+                <span className="ml-1.5 rounded bg-base-800 px-1 py-px text-2xs uppercase tracking-wider text-ink-muted">
                   {factor.source}
                 </span>
               </span>
@@ -108,7 +106,7 @@ export function RunSummary({ result }: { result: RunResult }) {
   return (
     <div className="space-y-3">
       <div
-        className={`rounded border px-3 py-2.5 text-[11px] leading-relaxed ${
+        className={`rounded border px-3 py-2.5 text-xs leading-relaxed ${
           result.dry_run
             ? "border-accent/25 bg-accent/5 text-accent-soft"
             : "border-risk-low/40 bg-risk-low/10 text-risk-low"
@@ -129,7 +127,7 @@ export function RunSummary({ result }: { result: RunResult }) {
       </div>
 
       {result.not_computed_reason ? (
-        <p className="rounded border border-risk-high/40 bg-risk-high/5 px-3 py-2 text-[11px] leading-relaxed text-risk-high">
+        <p className="rounded border border-risk-high/40 bg-risk-high/5 px-3 py-2 text-xs leading-relaxed text-risk-high">
           {result.not_computed_reason}
         </p>
       ) : null}
@@ -155,7 +153,7 @@ export function RunSummary({ result }: { result: RunResult }) {
         </div>
         <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2">
           <dt className="stat-label">Hari Diprediksi</dt>
-          <dd className="mt-1 text-[11px] text-ink">
+          <dd className="mt-1 text-xs text-ink">
             {formatWib(result.window_from)} s.d. {formatWib(result.window_to)}
           </dd>
         </div>
@@ -178,7 +176,7 @@ export function RunSummary({ result }: { result: RunResult }) {
             {result.by_threat_type.map((item) => (
               <li
                 key={item.threat_type}
-                className="flex flex-wrap items-baseline justify-between gap-x-3 text-[11px]"
+                className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs"
               >
                 <span className="text-ink">{item.threat_type}</span>
                 <span className="tabular-nums text-ink-muted">
@@ -196,13 +194,13 @@ export function RunSummary({ result }: { result: RunResult }) {
           <p className="stat-label">Mengapa sebagian tidak diprediksi</p>
           <ul className="mt-1 space-y-1">
             {result.not_predicted_reasons.map((item) => (
-              <li key={item.reason} className="text-[10px] leading-relaxed text-ink-muted">
+              <li key={item.reason} className="text-2xs leading-relaxed text-ink-muted">
                 <span className="tabular-nums text-ink">{item.combinations}</span> kombinasi —{" "}
                 {item.reason}
               </li>
             ))}
           </ul>
-          <p className="mt-1 text-[10px] leading-relaxed text-ink-muted">
+          <p className="mt-1 text-2xs leading-relaxed text-ink-muted">
             {result.not_predicted_basis}
           </p>
         </div>
@@ -222,9 +220,9 @@ export function RunSummary({ result }: { result: RunResult }) {
         </div>
       ) : null}
 
-      <p className="text-[10px] leading-relaxed text-ink-muted">{result.horizon_basis}</p>
-      <p className="text-[10px] leading-relaxed text-ink-muted">{result.projection_basis}</p>
-      <p className="text-[10px] leading-relaxed text-ink-muted">{result.confidence_basis}</p>
+      <p className="text-2xs leading-relaxed text-ink-muted">{result.horizon_basis}</p>
+      <p className="text-2xs leading-relaxed text-ink-muted">{result.projection_basis}</p>
+      <p className="text-2xs leading-relaxed text-ink-muted">{result.confidence_basis}</p>
     </div>
   );
 }

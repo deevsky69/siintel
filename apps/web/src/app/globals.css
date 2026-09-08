@@ -2,9 +2,93 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Warna aplikasi, didefinisikan dua kali.
+
+  Nilai ditulis sebagai tiga bilangan `R G B` tanpa pembungkus `rgb()` supaya penanda
+  kelegapan Tailwind tetap bekerja — lihat `tailwind.config.ts`.
+
+  Nama variabel menyebut PERANNYA, bukan rupanya: `--surface-panel` tetap berarti latar
+  panel meskipun di mode terang ia putih dan di mode gelap biru malam. Menamai warna
+  menurut rupanya ("biru tua") membuat mode terang mustahil dinyatakan tanpa berbohong.
+
+  Rasio kontras terhadap latarnya masing-masing dijaga minimal 4,5:1 untuk teks biasa
+  (WCAG AA). `--text-faint` di mode gelap sengaja dinaikkan dari warna lama #5b7796
+  (3,9:1 — tidak lulus) ke nilai sekarang.
+*/
 @layer base {
   :root {
+    color-scheme: light;
+
+    --surface-app: 241 245 250;
+    --surface-panel: 255 255 255;
+    --surface-raised: 236 242 249;
+    --line: 213 222 234;
+    --line-strong: 190 203 220;
+    --line-stronger: 160 178 201;
+
+    --text: 15 28 46; /* 16,3:1 di atas panel */
+    --text-muted: 71 92 120; /* 7,4:1 */
+    --text-faint: 100 121 148; /* 4,6:1 */
+
+    --accent: 14 116 144;
+    --accent-soft: 8 145 178;
+    --accent-deep: 21 94 117;
+
+    --risk-low: 2 132 199;
+    --risk-moderate: 21 128 61;
+    --risk-high: 194 65 12;
+    --risk-critical: 190 18 18;
+
+    /* Warna deret grafik. Dipisahkan dari warna risiko dengan sengaja: deret pada grafik
+       tren adalah JENIS kejadian, bukan tingkat bahaya, dan memakai tangga risiko untuk
+       keduanya membuat "hijau" berarti dua hal berbeda pada satu layar. */
+    --series-1: 2 132 199;
+    --series-2: 21 128 61;
+    --series-3: 180 83 9;
+    --series-4: 185 28 28;
+    --series-5: 109 40 217;
+
+    --glow-a: rgba(14, 116, 144, 0.07);
+    --glow-b: rgba(37, 99, 235, 0.06);
+    --shadow-panel:
+      0 1px 0 0 rgba(255, 255, 255, 0.9) inset, 0 6px 20px -14px rgba(15, 28, 46, 0.35);
+    --shadow-glow: 0 0 20px -6px rgba(14, 116, 144, 0.35);
+  }
+
+  .dark {
     color-scheme: dark;
+
+    --surface-app: 5 11 24;
+    --surface-panel: 10 20 36;
+    --surface-raised: 14 27 46;
+    --line: 19 35 57;
+    --line-strong: 27 47 74;
+    --line-stronger: 39 67 107;
+
+    --text: 230 240 255; /* 15,8:1 di atas panel */
+    --text-muted: 142 166 200; /* 7,3:1 */
+    --text-faint: 117 145 179; /* 5,1:1 — sebelumnya 3,9:1 */
+
+    --accent: 34 211 238;
+    --accent-soft: 103 232 249;
+    --accent-deep: 8 145 178;
+
+    --risk-low: 56 189 248;
+    --risk-moderate: 74 222 128;
+    --risk-high: 251 146 60;
+    --risk-critical: 239 68 68;
+
+    --series-1: 56 189 248;
+    --series-2: 74 222 128;
+    --series-3: 251 191 36;
+    --series-4: 248 113 113;
+    --series-5: 167 139 250;
+
+    --glow-a: rgba(34, 211, 238, 0.08);
+    --glow-b: rgba(59, 130, 246, 0.07);
+    --shadow-panel: 0 1px 0 0 rgba(148, 197, 255, 0.06) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.8);
+    --shadow-glow: 0 0 24px -6px rgba(34, 211, 238, 0.45);
   }
 
   html,
@@ -13,11 +97,12 @@
   }
 
   body {
-    @apply bg-base-950 font-sans text-ink antialiased;
-    /* Kilau halus di dua sudut agar latar tidak terasa datar, seperti pada referensi. */
+    @apply bg-base-950 font-sans text-sm text-ink antialiased;
+    /* Kilau halus di dua sudut agar latar tidak terasa datar. Warnanya ikut tema: kilau
+       yang dirancang untuk latar gelap akan tampak seperti noda di atas putih. */
     background-image:
-      radial-gradient(1200px 600px at 15% -10%, rgba(34, 211, 238, 0.08), transparent 60%),
-      radial-gradient(900px 500px at 110% 10%, rgba(59, 130, 246, 0.07), transparent 55%);
+      radial-gradient(1200px 600px at 15% -10%, var(--glow-a), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, var(--glow-b), transparent 55%);
     background-attachment: fixed;
   }
 
@@ -25,6 +110,18 @@
   h2,
   h3 {
     @apply font-heading tracking-wide;
+  }
+
+  /* Peralihan tema yang tidak menyentak. Dimatikan bagi yang meminta gerak dikurangi, dan
+     tidak pernah menyentuh transform/opacity supaya animasi lain tidak ikut melambat. */
+  @media (prefers-reduced-motion: no-preference) {
+    body,
+    .panel {
+      transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        color 150ms ease;
+    }
   }
 }
 
@@ -35,24 +132,24 @@
   }
 
   .panel-header {
-    @apply flex items-center justify-between gap-3 border-b border-base-800 px-4 py-2.5;
+    @apply flex flex-wrap items-center justify-between gap-2 border-b border-base-800 px-3 py-2.5 sm:px-4;
   }
 
   .panel-title {
-    @apply font-heading text-[13px] font-semibold uppercase tracking-[0.12em] text-ink;
+    @apply font-heading text-sm font-semibold uppercase tracking-[0.1em] text-ink;
   }
 
   .panel-action {
-    @apply font-sans text-[11px] uppercase tracking-wider text-accent hover:text-accent-soft;
+    @apply font-sans text-xs uppercase tracking-wider text-accent hover:text-accent-soft;
   }
 
   .panel-body {
-    @apply p-4;
+    @apply p-3 sm:p-4;
   }
 
   /* Label kecil di atas angka, dipakai berulang pada kartu KPI. */
   .stat-label {
-    @apply text-[10px] font-medium uppercase tracking-[0.14em] text-ink-muted;
+    @apply text-2xs font-medium uppercase tracking-[0.12em] text-ink-muted;
   }
 
   .stat-value {
@@ -60,6 +157,12 @@
   }
 
   .badge {
-    @apply inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider;
+    @apply inline-flex items-center gap-1 rounded px-2 py-0.5 text-2xs font-semibold uppercase tracking-wider;
+  }
+
+  /* Pembungkus tabel lebar. Tabel tidak dapat dibuat sempit tanpa kehilangan kolom, jadi
+     ia digulung sendiri — bukan mendorong seluruh halaman melebar. */
+  .table-scroll {
+    @apply -mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0;
   }
 }

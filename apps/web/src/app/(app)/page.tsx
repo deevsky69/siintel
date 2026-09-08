@@ -100,7 +100,7 @@ export default async function DashboardPage({
       {summary.demo_clock ? (
         // Dinyatakan terbuka: "24 jam terakhir" dihitung terhadap waktu acuan dataset,
         // bukan waktu sebenarnya. Menyembunyikannya akan menyesatkan pembaca layar.
-        <div className="rounded border border-accent/25 bg-accent/5 px-3 py-2 text-[11px] text-accent-soft">
+        <div className="rounded border border-accent/25 bg-accent/5 px-3 py-2 text-xs text-accent-soft">
           Mode demo — waktu acuan{" "}
           <span className="font-mono">
             {new Date(summary.reference_time).toLocaleString("id-ID", {
@@ -127,7 +127,7 @@ export default async function DashboardPage({
           `details` dipakai apa adanya: ia bekerja tanpa JavaScript dan sudah dikenali
           pembaca layar sebagai bagian yang dapat dibuka. */}
       <details className="group space-y-3">
-        <summary className="flex cursor-pointer list-none items-center gap-3 py-1 text-[10px] uppercase tracking-wider text-ink-faint transition-colors hover:text-ink-muted">
+        <summary className="flex cursor-pointer list-none items-center gap-3 py-1 text-2xs uppercase tracking-wider text-ink-faint transition-colors hover:text-ink-muted">
           <span className="transition-transform group-open:rotate-90" aria-hidden="true">
             &#9656;
           </span>

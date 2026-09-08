@@ -57,7 +57,7 @@ export function ReportFilters({
     <Panel
       title="Cari dan Saring"
       action={
-        <span className="text-[10px] text-ink-faint">
+        <span className="text-2xs text-ink-faint">
           {resultCount} baris{filtered ? " setelah disaring" : ""}
         </span>
       }
@@ -119,7 +119,7 @@ export function ReportFilters({
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="submit"
-            className="rounded border border-accent/50 bg-accent/10 px-4 py-1.5 font-heading text-[11px] font-semibold uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
+            className="rounded border border-accent/50 bg-accent/10 px-4 py-1.5 font-heading text-xs font-semibold uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
           >
             Terapkan
           </button>
@@ -129,12 +129,12 @@ export function ReportFilters({
             // pengguna mengira penyaringnya rusak.
             <a
               href={action}
-              className="rounded border border-base-700 px-4 py-1.5 text-[11px] uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
+              className="rounded border border-base-700 px-4 py-1.5 text-xs uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
             >
               Hapus saringan
             </a>
           ) : null}
-          <span className="text-[10px] leading-relaxed text-ink-faint">
+          <span className="text-2xs leading-relaxed text-ink-faint">
             Hasil saringan tersimpan di alamat halaman — tautannya dapat dibagikan.
           </span>
         </div>

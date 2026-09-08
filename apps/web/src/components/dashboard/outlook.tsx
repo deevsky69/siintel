@@ -30,13 +30,10 @@ export function OutlookPanel({ rows }: { rows: OutlookRow[] }) {
                   {row.risk_score ?? "—"}
                 </span>
               </div>
-              <div
-                className="mt-1.5 truncate text-[10px] text-ink-muted"
-                title={row.kecamatan ?? ""}
-              >
+              <div className="mt-1.5 truncate text-2xs text-ink-muted" title={row.kecamatan ?? ""}>
                 {row.kecamatan ?? "tidak ada"}
               </div>
-              <div className="truncate text-[9px] uppercase tracking-wider text-ink-muted">
+              <div className="truncate text-2xs uppercase tracking-wider text-ink-muted">
                 {row.threat_type ?? ""}
               </div>
             </div>

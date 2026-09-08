@@ -35,7 +35,7 @@ export function RiskMap({
         <Panel
           title="Live Kamtibmas Map"
           action={
-            <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+            <span className="text-2xs uppercase tracking-wider text-ink-faint">
               9 Kecamatan · Polres Metro Jakarta Selatan
             </span>
           }
@@ -48,7 +48,7 @@ export function RiskMap({
                 href={mapHref(selected, option.id, months)}
                 scroll={false}
                 aria-current={layer === option.id ? "true" : undefined}
-                className={`rounded border px-2.5 py-1 text-[11px] uppercase tracking-wider transition-colors ${
+                className={`rounded border px-2.5 py-1 text-xs uppercase tracking-wider transition-colors ${
                   layer === option.id
                     ? "border-accent/60 bg-accent/10 text-accent"
                     : "border-base-800 text-ink-muted hover:text-ink"
@@ -57,7 +57,7 @@ export function RiskMap({
                 {option.label}
               </Link>
             ))}
-            <span className="text-[10px] text-ink-faint">
+            <span className="text-2xs text-ink-faint">
               {layer === "historical"
                 ? `${data.historical.windowFrom} s.d. ${data.historical.windowTo}`
                 : layer === "current"
@@ -84,7 +84,7 @@ export function RiskMap({
                   href={mapHref(selected, "historical", option)}
                   scroll={false}
                   aria-current={months === option ? "true" : undefined}
-                  className={`rounded border px-2 py-0.5 text-[11px] transition-colors ${
+                  className={`rounded border px-2 py-0.5 text-xs transition-colors ${
                     months === option
                       ? "border-risk-high/60 bg-risk-high/10 text-risk-high"
                       : "border-base-800 text-ink-muted hover:text-ink"
@@ -94,11 +94,11 @@ export function RiskMap({
                 </Link>
               ))}
               {data.historical.observedFrom === null ? (
-                <span className="text-[10px] text-ink-faint">
+                <span className="text-2xs text-ink-faint">
                   Tidak ada kejadian tercatat pada jendela ini
                 </span>
               ) : (
-                <span className="text-[10px] text-ink-faint">
+                <span className="text-2xs text-ink-faint">
                   Data ditemukan {data.historical.observedFrom} s.d. {data.historical.observedTo}
                 </span>
               )}
@@ -121,12 +121,12 @@ export function RiskMap({
             }}
           />
 
-          <p className="text-[10px] leading-relaxed text-ink-faint">
+          <p className="text-2xs leading-relaxed text-ink-faint">
             Bentuk wilayah pada peta ini adalah <strong>perkiraan</strong> yang diturunkan dari
             koordinat titik lokasi, <strong>bukan batas administratif resmi</strong>.
           </p>
 
-          <p className="text-[10px] leading-relaxed text-ink-faint">
+          <p className="text-2xs leading-relaxed text-ink-faint">
             {layer === "historical"
               ? data.historicalBasis
               : layer === "current"

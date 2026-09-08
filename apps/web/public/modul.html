@@ -258,8 +258,12 @@
   p { margin: 0 0 15px; max-width: var(--measure); }
   ul, ol.body { margin: 0 0 15px; padding-left: 20px; max-width: var(--measure); }
   li { margin-bottom: 7px; }
+  /* Dua aturan berikut ditulis sesudah `ol.body` yang lebih spesifik. Urutannya tidak
+     berbahaya di sini: keduanya menyasar elemen lain, jadi tidak ada yang saling menimpa. */
+  /* biome-ignore lint/style/noDescendingSpecificity: lihat catatan di atas. */
   strong { font-weight: 600; }
 
+  /* biome-ignore lint/style/noDescendingSpecificity: lihat catatan di atas. */
   a { color: var(--accent); }
 
   code, .mono {
@@ -482,6 +486,9 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* biome-ignore lint/complexity/noImportantStyles: menghormati permintaan pengguna untuk
+       mengurangi gerak harus mengalahkan SETIAP aturan lain, termasuk yang ditulis kemudian.
+       Tanpa `!important` jaminan itu bergantung pada urutan penulisan. */
     * { animation: none !important; transition: none !important; }
   }
 </style>

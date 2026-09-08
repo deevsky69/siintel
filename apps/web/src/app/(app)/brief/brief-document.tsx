@@ -76,14 +76,14 @@ function Section({
 }) {
   return (
     <section className="border-t border-base-800 pt-5">
-      <h2 className="font-heading text-[13px] font-bold uppercase tracking-[0.14em] text-accent">
+      <h2 className="font-heading text-sm font-bold uppercase tracking-[0.14em] text-accent">
         {number}. {title}
       </h2>
-      {lead ? <p className="mt-2 text-[15px] leading-relaxed text-ink">{lead}</p> : null}
+      {lead ? <p className="mt-2 text-base leading-relaxed text-ink">{lead}</p> : null}
       {children ? <div className="mt-3">{children}</div> : null}
       <div className="mt-3 space-y-1">
         {bases.map((basis) => (
-          <p key={basis} className="text-[10px] leading-relaxed text-ink-faint">
+          <p key={basis} className="text-2xs leading-relaxed text-ink-faint">
             Dasar: {basis}
           </p>
         ))}
@@ -96,10 +96,10 @@ function Section({
 function Figure({ label, value, note }: { label: string; value: ReactNode; note?: string }) {
   return (
     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 border-b border-base-800/60 py-1.5 last:border-0">
-      <dt className="text-[12px] text-ink-muted">{label}</dt>
+      <dt className="text-xs text-ink-muted">{label}</dt>
       <dd className="text-right">
-        <span className="font-heading text-[15px] font-semibold text-ink">{value}</span>
-        {note ? <span className="ml-2 text-[11px] text-ink-muted">{note}</span> : null}
+        <span className="font-heading text-base font-semibold text-ink">{value}</span>
+        {note ? <span className="ml-2 text-xs text-ink-muted">{note}</span> : null}
       </dd>
     </div>
   );
@@ -107,7 +107,7 @@ function Figure({ label, value, note }: { label: string; value: ReactNode; note?
 
 /** Keterangan bagian yang tidak dapat diisi — dinyatakan dengan kata, bukan angka nol. */
 function Unavailable({ reason }: { reason: string }) {
-  return <p className="text-[13px] italic leading-relaxed text-ink-muted">{reason}</p>;
+  return <p className="text-sm italic leading-relaxed text-ink-muted">{reason}</p>;
 }
 
 function RiskWord({ riskClass }: { riskClass: string }) {
@@ -135,13 +135,13 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
       <style>{PRINT_CSS}</style>
 
       <div className="border-b-2 border-ink/20 pb-5">
-        <p className="font-heading text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
+        <p className="font-heading text-2xs font-semibold uppercase tracking-[0.22em] text-accent">
           Executive Brief — Prediksi Presisi
         </p>
         <h1 className="mt-2 font-heading text-2xl font-bold leading-tight text-ink md:text-3xl">
           Ringkasan Situasi Kamtibmas
         </h1>
-        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-[12px] md:grid-cols-4">
+        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-xs md:grid-cols-4">
           <div>
             <dt className="stat-label">Tanggal</dt>
             <dd className="mt-0.5 font-heading font-semibold text-ink">
@@ -165,9 +165,9 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
             </dd>
           </div>
         </dl>
-        <p className="mt-4 text-[11px] leading-relaxed text-ink-muted">{brief.scope_basis}</p>
+        <p className="mt-4 text-xs leading-relaxed text-ink-muted">{brief.scope_basis}</p>
         {brief.demo_clock ? (
-          <p className="mt-2 rounded border border-accent/25 bg-accent/5 px-3 py-2 text-[11px] leading-relaxed text-accent-soft">
+          <p className="mt-2 rounded border border-accent/25 bg-accent/5 px-3 py-2 text-xs leading-relaxed text-accent-soft">
             <span className="badge mr-2 bg-accent/15 text-accent">Waktu Acuan</span>
             {brief.clock_basis}
           </p>
@@ -222,7 +222,7 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
             <Unavailable reason="Tidak ada jenis ancaman yang dapat dirangkum untuk cakupan ini." />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-[12px]">
+              <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-base-800">
                     <th className="stat-label pb-1.5">Jenis Ancaman</th>
@@ -292,14 +292,14 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
               {brief.pending_action_items.map((item) => (
                 <li
                   key={item.decision_code}
-                  className="border-l-2 border-base-700 pl-3 text-[12px] leading-relaxed"
+                  className="border-l-2 border-base-700 pl-3 text-xs leading-relaxed"
                 >
                   <p className="font-heading font-semibold text-ink">
                     {item.recommended_function} · {item.kecamatan}
                     {item.priority ? ` · prioritas ${item.priority}` : ""}
                   </p>
                   <p className="mt-0.5 text-ink">{effectiveInstruction(item)}</p>
-                  <p className="mt-0.5 text-[10px] text-ink-faint">
+                  <p className="mt-0.5 text-2xs text-ink-faint">
                     {item.decision_code} ({item.decision}) atas {item.recommendation_code} — diputus{" "}
                     {formatWib(item.decided_at)}
                     {item.modified_text ? " · isi perintah adalah hasil modifikasi pimpinan" : ""}
@@ -324,7 +324,7 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
             <Unavailable reason="Bagian ini tidak disertakan untuk akun ini." />
           ) : (
             <>
-              <p className="mb-3 rounded border border-risk-high/40 bg-risk-high/10 px-3 py-2 text-[11px] leading-relaxed text-risk-high">
+              <p className="mb-3 rounded border border-risk-high/40 bg-risk-high/10 px-3 py-2 text-xs leading-relaxed text-risk-high">
                 <span className="badge mr-2 bg-risk-high/20 text-risk-high">{accuracy.status}</span>
                 Angka ini <strong>belum final</strong> dan tidak boleh dibacakan sebagai capaian
                 resmi.
@@ -355,10 +355,10 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
         </Section>
 
         <section className="border-t border-base-800 pt-5">
-          <h2 className="font-heading text-[13px] font-bold uppercase tracking-[0.14em] text-ink-muted">
+          <h2 className="font-heading text-sm font-bold uppercase tracking-[0.14em] text-ink-muted">
             Catatan Penyusunan
           </h2>
-          <ul className="mt-2 list-disc space-y-1.5 pl-5 text-[11px] leading-relaxed text-ink-muted">
+          <ul className="mt-2 list-disc space-y-1.5 pl-5 text-xs leading-relaxed text-ink-muted">
             <li>
               Seluruh angka berasal dari basis data dan dihitung ulang setiap halaman ini dibuka.
               Kalimat pembuka tiap bagian disusun dari template tetap atas angka yang sama —{" "}
@@ -373,7 +373,7 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
               tanpa keputusan pejabat yang berwenang.
             </li>
           </ul>
-          <p className="brief-hide-print mt-4 text-[11px] text-ink-faint">
+          <p className="brief-hide-print mt-4 text-xs text-ink-faint">
             Tekan Ctrl+P (atau Cmd+P) untuk mencetak brief ini.
           </p>
         </section>

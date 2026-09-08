@@ -99,11 +99,9 @@ function Card({
         <div className="flex items-start gap-3">
           {badge}
           <span className="flex-1 font-heading text-sm font-semibold text-ink">{heading}</span>
-          <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
-            {code}
-          </span>
+          <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">{code}</span>
         </div>
-        <p className="mt-1 text-[11px] text-ink-muted">{meta}</p>
+        <p className="mt-1 text-xs text-ink-muted">{meta}</p>
         <p className="mt-1 line-clamp-2 text-xs text-ink-muted">{summary}</p>
       </Link>
     </li>
@@ -128,7 +126,7 @@ function Group({
       <h3 className="stat-label">
         {title} <span className="text-ink-muted">({count})</span>
       </h3>
-      {note ? <p className="mt-1 text-[10px] text-ink-muted">{note}</p> : null}
+      {note ? <p className="mt-1 text-2xs text-ink-muted">{note}</p> : null}
       {count === 0 ? (
         <EmptyState label={emptyLabel} />
       ) : (
@@ -156,7 +154,7 @@ function OrderTrail({
       <div className="mt-4">
         <div className="stat-label">Perintah yang Berlaku</div>
         <p className="mt-1 text-sm leading-relaxed text-ink">{order.text}</p>
-        <p className="mt-1 text-[10px] text-ink-muted">
+        <p className="mt-1 text-2xs text-ink-muted">
           {order.adjusted
             ? "Pejabat menyesuaikan usulan sistem; yang dijalankan di lapangan adalah teks di atas."
             : "Usulan sistem disetujui apa adanya oleh pejabat berwenang."}
@@ -169,7 +167,7 @@ function OrderTrail({
           <p className="mt-1 text-sm leading-relaxed text-ink-muted">
             {row.original_recommendation}
           </p>
-          <p className="mt-1 text-[10px] text-ink-muted">
+          <p className="mt-1 text-2xs text-ink-muted">
             Tidak ditimpa — disimpan berdampingan agar jejak usulan dan keputusan tetap dapat
             ditelusuri.
           </p>
@@ -194,17 +192,17 @@ function QueueDetail({
     <Panel title="Rincian Penugasan">
       <div className="flex flex-wrap items-center gap-3">
         <DecisionBadge decision={row.decision} />
-        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+        <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
           {row.decision_code}
         </span>
-        <span className="text-[11px] text-ink-muted">
+        <span className="text-xs text-ink-muted">
           Fungsi {functionLabel(row.recommended_function)}
           {row.priority ? ` · Prioritas ${PRIORITY_LABELS[row.priority] ?? row.priority}` : ""}
           {` · ${area(row)}`}
         </span>
       </div>
 
-      <p className="mt-2 text-[11px] text-ink-muted">
+      <p className="mt-2 text-xs text-ink-muted">
         Diputus {formatWib(row.decision_at)} atas rekomendasi{" "}
         <Link
           href={`/rekomendasi?dipilih=${encodeURIComponent(row.recommendation_code)}`}
@@ -245,10 +243,10 @@ function ActionDetail({ row, canWrite }: { row: OperationRow; canWrite: boolean 
     <Panel title="Rincian Penugasan">
       <div className="flex flex-wrap items-center gap-3">
         <StatusBadge status={row.status} />
-        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+        <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
           {row.code}
         </span>
-        <span className="text-[11px] text-ink-muted">
+        <span className="text-xs text-ink-muted">
           {ACTION_STATUS_HINTS[row.status] ?? "Status tidak dikenali"}
         </span>
       </div>
@@ -258,7 +256,7 @@ function ActionDetail({ row, canWrite }: { row: OperationRow; canWrite: boolean 
           <dt className="stat-label">Satuan Ditugaskan</dt>
           <dd className="mt-0.5 text-sm text-ink">
             {row.unit_name}{" "}
-            <span className="text-[11px] text-ink-muted">
+            <span className="text-xs text-ink-muted">
               ({row.unit_code} · {functionLabel(row.unit_function)})
             </span>
           </dd>
@@ -268,7 +266,7 @@ function ActionDetail({ row, canWrite }: { row: OperationRow; canWrite: boolean 
           <dd className="mt-0.5 text-sm text-ink">
             {area(row)}
             {row.kelurahan ? (
-              <span className="text-[11px] text-ink-muted"> · {row.kelurahan}</span>
+              <span className="text-xs text-ink-muted"> · {row.kelurahan}</span>
             ) : null}
           </dd>
         </div>
@@ -282,7 +280,7 @@ function ActionDetail({ row, canWrite }: { row: OperationRow; canWrite: boolean 
         </div>
       </dl>
 
-      <p className="mt-3 text-[11px] text-ink-muted">
+      <p className="mt-3 text-xs text-ink-muted">
         Lahir dari keputusan <span className="font-mono text-ink">{row.decision_code}</span> (
         {DECISION_LABELS[row.decision] ?? row.decision}, {formatWib(row.decision_at)}) atas
         rekomendasi{" "}
@@ -303,7 +301,7 @@ function ActionDetail({ row, canWrite }: { row: OperationRow; canWrite: boolean 
           {row.result ?? (closed ? "Tidak diuraikan." : "Belum ada catatan.")}
         </p>
         {closed ? null : (
-          <p className="mt-1 text-[10px] text-ink-muted">
+          <p className="mt-1 text-2xs text-ink-muted">
             Ini catatan rencana, bukan hasil. Hasil nyata belum tercatat, sehingga penugasan ini
             belum dapat ikut dievaluasi.
           </p>

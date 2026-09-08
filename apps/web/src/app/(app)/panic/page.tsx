@@ -49,7 +49,7 @@ export default async function PanicPage() {
           <strong>komitmen respons</strong>: siapa yang menerima, dalam berapa lama, dan apa yang
           terjadi bila tidak ada yang menjawab.
         </p>
-        <p className="mt-1.5 text-[11px] leading-relaxed text-ink-muted">
+        <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">
           Yang kedua bukan pekerjaan teknis, dan tidak boleh diputuskan dari sisi ini. Tombol
           darurat yang menjanjikan bantuan tanpa ada yang berkewajiban datang lebih berbahaya
           daripada tidak ada tombol sama sekali — ia membuat orang berhenti mencari pertolongan
@@ -60,7 +60,7 @@ export default async function PanicPage() {
       <Panel
         title="Laporan Mendesak yang Belum Tertangani"
         action={
-          <span className="text-[10px] text-ink-faint">
+          <span className="text-2xs text-ink-faint">
             urgensi ≥ {URGENT_FROM} · dari {page.data.length} laporan terbaru
           </span>
         }
@@ -79,15 +79,15 @@ export default async function PanicPage() {
                     {row.urgency_score}
                   </span>
                   <span className="text-xs text-ink">{row.category}</span>
-                  <span className="rounded border border-base-700 px-1.5 py-0.5 text-[10px] text-ink-muted">
+                  <span className="rounded border border-base-700 px-1.5 py-0.5 text-2xs text-ink-muted">
                     {row.status}
                   </span>
-                  <span className="ml-auto font-mono text-[10px] text-ink-faint">{row.code}</span>
+                  <span className="ml-auto font-mono text-2xs text-ink-faint">{row.code}</span>
                 </div>
-                <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
+                <p className="mt-1 text-xs leading-relaxed text-ink-muted">
                   {row.description ?? "Tanpa keterangan."}
                 </p>
-                <p className="mt-0.5 text-[10px] text-ink-faint">
+                <p className="mt-0.5 text-2xs text-ink-faint">
                   {row.reported_at.slice(0, 16).replace("T", " ")} ·{" "}
                   {row.kecamatan ?? "tanpa lokasi"}
                   {row.location_text ? ` · ${row.location_text}` : ""}
@@ -97,12 +97,12 @@ export default async function PanicPage() {
           </ul>
         )}
 
-        <p className="mt-3 text-[10px] leading-relaxed text-ink-faint">
+        <p className="mt-3 text-2xs leading-relaxed text-ink-faint">
           Ambang urgensi {URGENT_FROM} adalah <strong>ambang tampilan</strong>, bukan ambang resmi —
           dan skor urgensinya sendiri berstatus DEMO, bukan hasil penilaian model. Daftar ini
           menyaring laporan yang sudah masuk; ia <strong>bukan</strong> antrean panggilan darurat.
         </p>
-        <p className="mt-1.5 text-[10px] leading-relaxed text-ink-faint">
+        <p className="mt-1.5 text-2xs leading-relaxed text-ink-faint">
           Seluruh laporan masyarakat, termasuk yang tidak mendesak, ada di{" "}
           <Link href="/masyarakat" className="underline hover:text-ink-muted">
             Laporan Masyarakat

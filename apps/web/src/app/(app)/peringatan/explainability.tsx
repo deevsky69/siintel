@@ -114,7 +114,7 @@ export function ExplainabilityPanel({
       {sources.length > 0 ? (
         <div className="mt-3 space-y-1 border-t border-base-800 pt-3">
           {sources.map((source) => (
-            <p key={source} className="text-[10px] leading-relaxed text-ink-muted">
+            <p key={source} className="text-2xs leading-relaxed text-ink-muted">
               <span className="font-mono text-ink">{source}</span> —{" "}
               {SOURCE_NOTE[source] ?? "Asal penjelasan tidak dikenali."}
             </p>
@@ -122,7 +122,7 @@ export function ExplainabilityPanel({
         </div>
       ) : null}
 
-      <p className="mt-2 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-2 text-2xs leading-relaxed text-ink-muted">
         Jendela prediksi {prediction.time_window ?? "—"} · lokasi {prediction.kecamatan}
         {prediction.kelurahan ? ` — ${prediction.kelurahan}` : ""} · peringatan terbit{" "}
         {formatWib(warning.created_at)}.

@@ -159,7 +159,7 @@ export function CrimeForm({
         {pending ? "Menyimpan…" : "Catat Kejadian"}
       </button>
 
-      <p className="mt-2 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-2 text-2xs leading-relaxed text-ink-muted">
         Formulir ini <strong>tidak meminta identitas korban, pelaku, maupun saksi</strong>. Data itu
         tidak diperlukan untuk prototipe (spesifikasi §6.1) dan tabelnya memang tidak memiliki
         kolomnya. Pencatatan tersimpan beserta nama petugas dan waktunya di audit trail.

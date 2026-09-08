@@ -134,7 +134,7 @@ export default async function DataEntryPage({
             key={tab.key}
             href={`/input?formulir=${tab.key}`}
             aria-current={tab.key === active ? "page" : undefined}
-            className={`rounded border px-3 py-1.5 font-heading text-[11px] font-semibold uppercase tracking-wider transition ${
+            className={`rounded border px-3 py-1.5 font-heading text-xs font-semibold uppercase tracking-wider transition ${
               tab.key === active ? TAB_ACTIVE : TAB_IDLE
             }`}
           >
@@ -143,7 +143,7 @@ export default async function DataEntryPage({
         ))}
       </nav>
 
-      <p className="mt-3 border-b border-base-800 pb-3 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-3 border-b border-base-800 pb-3 text-2xs leading-relaxed text-ink-muted">
         Nilai taksonomi mengikuti <code>config/taxonomy/mappings.yaml</code> versi{" "}
         <span className="font-mono">{options.taxonomy_version}</span> dan berstatus PROPOSED (U-16).{" "}
         {options.demo_clock

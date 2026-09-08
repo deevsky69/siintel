@@ -98,7 +98,7 @@ export default async function InformasiPage() {
         </Channel>
       </div>
 
-      <p className="text-[10px] leading-relaxed text-ink-faint">
+      <p className="text-2xs leading-relaxed text-ink-faint">
         Ketiga kanal sengaja <strong>tidak digabung</strong> menjadi satu aliran. Aliran tunggal
         lebih enak dibaca sekilas, tetapi ia menyamakan tiga hal yang keandalannya berbeda — dan
         pembaca yang membacanya sambil lalu akan memperlakukan laporan yang belum diverifikasi sama
@@ -150,7 +150,7 @@ function Channel({
       title={title}
       action={
         state === "ok" ? (
-          <Link href={href} className="text-[10px] text-ink-faint hover:text-accent">
+          <Link href={href} className="text-2xs text-ink-faint hover:text-accent">
             {total} seluruhnya →
           </Link>
         ) : null
@@ -164,7 +164,7 @@ function Channel({
       ) : (
         <ul className="space-y-1.5">{children}</ul>
       )}
-      <p className="mt-3 text-[10px] leading-relaxed text-ink-faint">{note}</p>
+      <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{note}</p>
     </Panel>
   );
 }
@@ -185,10 +185,10 @@ function Row({
   return (
     <li className="border-t border-base-800 pt-1.5 first:border-t-0 first:pt-0">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[11px] text-ink">{headline}</span>
-        <span className="shrink-0 font-mono text-[9px] text-ink-faint">{code}</span>
+        <span className="text-xs text-ink">{headline}</span>
+        <span className="shrink-0 font-mono text-2xs text-ink-faint">{code}</span>
       </div>
-      <div className="text-[10px] text-ink-faint">
+      <div className="text-2xs text-ink-faint">
         {when} · {where}
         {detail ? ` · ${detail}` : ""}
       </div>

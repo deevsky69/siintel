@@ -7,7 +7,7 @@ function Stat({ label, value, hint }: { label: string; value: string | number; h
     <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
       <div className="stat-label">{label}</div>
       <div className="mt-1 font-heading text-xl font-bold leading-none text-ink">{value}</div>
-      {hint ? <div className="mt-1 text-[10px] text-ink-muted">{hint}</div> : null}
+      {hint ? <div className="mt-1 text-2xs text-ink-muted">{hint}</div> : null}
     </div>
   );
 }
@@ -21,7 +21,7 @@ export function SituationOverview({ summary }: { summary: DashboardSummary }) {
       title="Situation Overview"
       action={
         summary.assessment_date ? (
-          <span className="text-[10px] text-ink-muted">Penilaian {summary.assessment_date}</span>
+          <span className="text-2xs text-ink-muted">Penilaian {summary.assessment_date}</span>
         ) : null
       }
     >
@@ -35,7 +35,7 @@ export function SituationOverview({ summary }: { summary: DashboardSummary }) {
             <span className="text-sm text-ink-muted">/100</span>
           </div>
         </div>
-        <p className="flex-1 text-[10px] leading-relaxed text-ink-muted">
+        <p className="flex-1 text-2xs leading-relaxed text-ink-muted">
           {summary.security_index_basis}
         </p>
       </div>

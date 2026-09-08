@@ -26,7 +26,7 @@ export default async function LaporPage() {
           </span>
         </Link>
         <h1 className="font-heading text-xl font-bold tracking-wide text-ink">Lapor Kejadian</h1>
-        <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-ink-muted">
+        <p className="mt-1 text-xs uppercase tracking-[0.14em] text-ink-muted">
           Polres Metro Jakarta Selatan
         </p>
       </div>
@@ -41,7 +41,7 @@ export default async function LaporPage() {
 
       <ReportForm options={options} />
 
-      <div className="mt-5 space-y-2 text-[11px] leading-relaxed text-ink-faint">
+      <div className="mt-5 space-y-2 text-xs leading-relaxed text-ink-faint">
         <p>
           <strong className="text-ink-muted">Tanpa akun dan tanpa identitas.</strong> Sistem ini
           tidak meminta dan tidak menyimpan nama, nomor telepon, maupun alamat pelapor.

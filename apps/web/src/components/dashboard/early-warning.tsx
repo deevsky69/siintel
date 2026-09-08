@@ -33,9 +33,7 @@ export function EarlyWarningPanel({
           <span className={`font-heading text-sm font-bold ${RISK_TEXT[risk]}`}>
             {SEVERITY_LABEL[warning.severity] ?? warning.severity}
           </span>
-          <span className="text-[10px] uppercase tracking-wider text-ink-muted">
-            {warning.code}
-          </span>
+          <span className="text-2xs uppercase tracking-wider text-ink-muted">{warning.code}</span>
         </div>
 
         <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">

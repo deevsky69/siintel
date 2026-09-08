@@ -61,7 +61,7 @@ export function FollowUpForm({ code, offers }: { code: string; offers: WarningAc
             value={action}
             disabled={pending}
             onClick={() => setPressed(action)}
-            className={`flex-1 rounded border bg-base-950/40 px-3 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider transition disabled:opacity-40 ${LABELS[action].tone}`}
+            className={`flex-1 rounded border bg-base-950/40 px-3 py-2 font-heading text-xs font-semibold uppercase tracking-wider transition disabled:opacity-40 ${LABELS[action].tone}`}
           >
             {pending && pressed === action ? LABELS[action].busy : LABELS[action].idle}
           </button>
@@ -81,7 +81,7 @@ export function FollowUpForm({ code, offers }: { code: string; offers: WarningAc
         </p>
       ) : null}
 
-      <p className="mt-2 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mt-2 text-2xs leading-relaxed text-ink-muted">
         Tindak lanjut tercatat beserta nama petugas dan waktunya pada jejak audit.
       </p>
     </form>

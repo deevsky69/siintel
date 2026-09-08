@@ -79,19 +79,19 @@ export function AssignmentForm({
             </option>
           ))}
         </select>
-        <span className="mt-1 block text-[10px] text-ink-muted">
+        <span className="mt-1 block text-2xs text-ink-muted">
           Satuan berstatus Standby tetap dapat ditugaskan; statusnya ditampilkan agar pilihan
           diambil dengan sadar, bukan disembunyikan dari daftar.
         </span>
         {scopeBasis ? (
-          <span className="mt-1 block text-[10px] text-ink-muted">{scopeBasis}</span>
+          <span className="mt-1 block text-2xs text-ink-muted">{scopeBasis}</span>
         ) : null}
       </label>
 
       <label className="mt-3 block">
         <span className="stat-label">Waktu Mulai (WIB)</span>
         <input type="datetime-local" name="start_at" className={FIELD} />
-        <span className="mt-1 block text-[10px] text-ink-muted">
+        <span className="mt-1 block text-2xs text-ink-muted">
           Boleh dikosongkan; sistem memakai waktu acuan aplikasi — jam demo yang beku pada dataset,
           bukan jam dinding.
         </span>
@@ -111,11 +111,11 @@ export function AssignmentForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-3 rounded bg-accent/20 px-4 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-40"
+        className="mt-3 rounded bg-accent/20 px-4 py-2 font-heading text-xs font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-40"
       >
         {pending ? "Mencatat…" : "Catat Penugasan"}
       </button>
-      <p className="mt-2 text-[10px] text-ink-muted">
+      <p className="mt-2 text-2xs text-ink-muted">
         Penugasan terikat pada keputusan {decisionCode} dan lokasi prediksi asalnya, serta tercatat
         beserta nama petugas dan waktunya.
       </p>

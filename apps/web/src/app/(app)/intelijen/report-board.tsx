@@ -61,8 +61,8 @@ function FilterChip({
       aria-current={active ? "true" : undefined}
       className={
         active
-          ? "flex items-center gap-2 rounded border border-accent/60 bg-accent/10 px-2.5 py-1 text-[11px] text-accent"
-          : "flex items-center gap-2 rounded border border-base-800 px-2.5 py-1 text-[11px] text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
+          ? "flex items-center gap-2 rounded border border-accent/60 bg-accent/10 px-2.5 py-1 text-xs text-accent"
+          : "flex items-center gap-2 rounded border border-base-800 px-2.5 py-1 text-xs text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
       }
     >
       <span className="truncate">{label}</span>
@@ -133,11 +133,11 @@ function ReportCard({
           <span className="flex-1 truncate font-heading text-sm font-semibold text-ink">
             {report.category}
           </span>
-          <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+          <span className="shrink-0 font-mono text-2xs uppercase tracking-wider text-ink-muted">
             {report.code}
           </span>
         </div>
-        <div className="mt-1.5 flex items-center justify-between gap-3 text-[11px]">
+        <div className="mt-1.5 flex items-center justify-between gap-3 text-xs">
           <span className="min-w-0 truncate text-ink-muted">{areaOf(report)}</span>
           <span className="shrink-0 text-ink-faint">{formatDate(report.report_date)}</span>
         </div>
@@ -151,7 +151,7 @@ function DetailRow({ label, value, hint }: { label: string; value: string; hint?
     <div>
       <dt className="stat-label">{label}</dt>
       <dd className="mt-0.5 text-sm text-ink">{value}</dd>
-      {hint ? <dd className="text-[10px] leading-relaxed text-ink-faint">{hint}</dd> : null}
+      {hint ? <dd className="text-2xs leading-relaxed text-ink-faint">{hint}</dd> : null}
     </div>
   );
 }
@@ -168,7 +168,7 @@ function ReportDetail({
       title="Rincian Laporan"
       className="col-span-12 xl:col-span-5"
       action={
-        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+        <span className="font-mono text-2xs uppercase tracking-wider text-ink-muted">
           {report.code}
         </span>
       }
@@ -183,7 +183,7 @@ function ReportDetail({
             Dampak {labelOf(IMPACT_LABELS, report.impact)}
           </span>
         ) : null}
-        <span className="text-[10px] text-ink-faint">
+        <span className="text-2xs text-ink-faint">
           {INTELLIGENCE_STATUS_HINTS[report.status ?? ""] ?? ""}
         </span>
       </div>
@@ -206,7 +206,7 @@ function ReportDetail({
       </dl>
 
       {/* Ditempatkan tepat di bawah ketiga angka itu, bukan di kaki halaman. */}
-      <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-[11px] leading-relaxed text-ink-muted">
+      <p className="rounded border border-base-800 bg-base-950/60 p-2.5 text-xs leading-relaxed text-ink-muted">
         {assessmentBasis}
       </p>
     </Panel>
@@ -260,15 +260,15 @@ export function ReportBoard({
           }
         />
 
-        <p className="text-[10px] leading-relaxed text-ink-faint">{page.filter_basis}</p>
-        <p className="text-[10px] leading-relaxed text-ink-faint">{page.scope_basis}</p>
+        <p className="text-2xs leading-relaxed text-ink-faint">{page.filter_basis}</p>
+        <p className="text-2xs leading-relaxed text-ink-faint">{page.scope_basis}</p>
       </Panel>
 
       <Panel
         title="Daftar"
         className="col-span-12 xl:col-span-7"
         action={
-          <span className="text-[10px] uppercase tracking-wider text-ink-faint">
+          <span className="text-2xs uppercase tracking-wider text-ink-faint">
             {page.source.reports_in_scope} laporan dalam cakupan
           </span>
         }
@@ -298,7 +298,7 @@ export function ReportBoard({
             {pagination.total_pages > 1 ? (
               <nav
                 aria-label="Halaman laporan"
-                className="flex items-center justify-between border-t border-base-800 pt-2 text-[11px]"
+                className="flex items-center justify-between border-t border-base-800 pt-2 text-xs"
               >
                 {previous ? (
                   <Link href={previous} className="panel-action">

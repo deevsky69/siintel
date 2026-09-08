@@ -15,7 +15,7 @@ export function ProminentIssues({ issues }: { issues: LeadershipBoard["prominent
     <Panel
       title="Isu Menonjol Sepekan"
       action={
-        <span className="text-[10px] text-ink-faint">
+        <span className="text-2xs text-ink-faint">
           {issues.window_from} s.d. {issues.window_to}
         </span>
       }
@@ -51,7 +51,7 @@ export function ProminentIssues({ issues }: { issues: LeadershipBoard["prominent
                   style={{ width: `${peak === 0 ? 0 : (row.incidents / peak) * 100}%` }}
                 />
               </div>
-              <p className="mt-0.5 text-[10px] text-ink-faint">
+              <p className="mt-0.5 text-2xs text-ink-faint">
                 Pekan sebelumnya {row.previous_incidents} kejadian
               </p>
             </li>
@@ -59,7 +59,7 @@ export function ProminentIssues({ issues }: { issues: LeadershipBoard["prominent
         </ul>
       )}
 
-      <p className="mt-3 text-[10px] leading-relaxed text-ink-faint">{issues.basis}</p>
+      <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{issues.basis}</p>
     </Panel>
   );
 }

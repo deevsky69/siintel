@@ -35,7 +35,7 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
       title="Jalankan Prediksi"
       action={<span className="panel-action">waktu acuan {referenceDate}</span>}
     >
-      <p className="mb-3 rounded border border-base-800 bg-base-950/40 px-3 py-2 text-[10px] leading-relaxed text-ink-muted">
+      <p className="mb-3 rounded border border-base-800 bg-base-950/40 px-3 py-2 text-2xs leading-relaxed text-ink-muted">
         Prediksi di sini <strong>bukan keluaran model terlatih</strong>. Ia proyeksi persistensi
         berbasis aturan atas penilaian risiko yang sudah ada: <code>model_version</code> menyebut
         versi aturan, bukan nama model, dan setiap faktor penjelas berlabel <code>RULE</code> — sama
@@ -54,7 +54,7 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
                 onChange={(event) => setPredictionDate(event.target.value)}
                 className="mt-1.5 w-full rounded border border-base-700 bg-base-950/60 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
               />
-              <span className="mt-1 block text-[10px] text-ink-muted">
+              <span className="mt-1 block text-2xs text-ink-muted">
                 Kosong berarti tanggal pada waktu acuan aplikasi ({referenceDate}).
               </span>
             </label>
@@ -73,7 +73,7 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
                   </option>
                 ))}
               </select>
-              <span className="mt-1 block text-[10px] text-ink-muted">
+              <span className="mt-1 block text-2xs text-ink-muted">
                 Jarak dari tanggal prediksi ke hari yang diprediksi — bukan panjang rentang. Setiap
                 horizon menghasilkan keempat jendela 6 jam pada hari sasarannya, sehingga jumlah
                 barisnya sama untuk semua horizon.
@@ -87,7 +87,7 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
               name="mode"
               value="uji"
               disabled={pending}
-              className="rounded border border-accent/50 px-4 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/10 disabled:opacity-40"
+              className="rounded border border-accent/50 px-4 py-2 font-heading text-xs font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/10 disabled:opacity-40"
             >
               {pending ? "Menghitung…" : "Uji Coba"}
             </button>
@@ -96,20 +96,20 @@ export function RunPanel({ canRun, referenceDate }: { canRun: boolean; reference
               name="mode"
               value="tulis"
               disabled={pending || !previewMatches}
-              className="rounded border border-risk-high/50 px-4 py-2 font-heading text-[11px] font-semibold uppercase tracking-wider text-risk-high transition hover:bg-risk-high/10 disabled:opacity-40"
+              className="rounded border border-risk-high/50 px-4 py-2 font-heading text-xs font-semibold uppercase tracking-wider text-risk-high transition hover:bg-risk-high/10 disabled:opacity-40"
             >
               Tulis Prediksi
             </button>
           </div>
 
-          <p className="text-[10px] leading-relaxed text-ink-muted">
+          <p className="text-2xs leading-relaxed text-ink-muted">
             {previewMatches
               ? "Hasil uji coba di bawah belum tersimpan. Menulis akan menambah baris berstatus DRAFT — belum terbit, dan belum melahirkan peringatan apa pun."
               : "Jalankan uji coba lebih dulu untuk tanggal dan horizon yang dipilih. Hasilnya ditampilkan sebelum ada satu baris pun yang ditulis."}
           </p>
         </form>
       ) : (
-        <p className="text-[11px] leading-relaxed text-ink-muted">
+        <p className="text-xs leading-relaxed text-ink-muted">
           Akun Anda tidak memiliki kewenangan <code>prediction:run</code>, sehingga prediksi hanya
           dapat dibaca dari layar ini. Dasar setiap prediksi tetap terbuka untuk diperiksa.
         </p>

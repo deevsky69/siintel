@@ -50,8 +50,40 @@ const SRC = join(process.cwd(), "src");
  * longgarkan aturannya.
  */
 
-/** Komponen klien yang memang hanya dipanggil komponen klien lain. */
-const CALLBACK_ALLOWED: Record<string, string> = {};
+/**
+ * Komponen klien yang memang hanya dipanggil komponen klien lain.
+ *
+ * Masuk daftar ini **tidak** membuat pemeriksaannya hilang. Ia diganti pemeriksaan yang
+ * lebih tepat: seluruh berkas yang mengimpornya wajib ikut bertanda `"use client"`. Daftar
+ * putih yang hanya berisi janji akan menjadi tempat menyembunyikan pelanggaran; yang ini
+ * gagal begitu sebuah komponen server mengimpornya.
+ */
+const CALLBACK_ALLOWED: Record<string, string> = {
+  "components/shell/topbar.tsx":
+    "prop `onMenu` datang dari ShellFrame, yang juga komponen klien — laci navigasi " +
+    "memerlukan keadaan, dan keadaan tidak dapat hidup di komponen server.",
+};
+
+/** Jalur modul yang diimpor sebuah berkas, dinyatakan relatif terhadap `src`. */
+function importedModules(path: string, source: string): string[] {
+  const specifiers = [...source.matchAll(/from\s+"([^"]+)"/g)].map((match) => match[1]);
+  const here = path
+    .slice(SRC.length + 1)
+    .split("/")
+    .slice(0, -1);
+
+  return specifiers.flatMap((specifier) => {
+    if (specifier.startsWith("@/")) return [specifier.slice(2)];
+    if (!specifier.startsWith(".")) return [];
+    const parts = [...here];
+    for (const segment of specifier.split("/")) {
+      if (segment === ".") continue;
+      else if (segment === "..") parts.pop();
+      else parts.push(segment);
+    }
+    return [parts.join("/")];
+  });
+}
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((entry) => {
@@ -91,6 +123,36 @@ describe("batas komponen server dan klien", () => {
     // Tanpa penegasan ini, kesalahan pada penelusuran berkas menghasilkan daftar kosong
     // dan seluruh pemeriksaan di bawah lulus tanpa memeriksa apa pun.
     expect(clientFiles.length).toBeGreaterThan(2);
+  });
+
+  it("hanya komponen klien yang mengimpor komponen ber-callback", () => {
+    const violations: string[] = [];
+
+    for (const allowed of Object.keys(CALLBACK_ALLOWED)) {
+      const target = allowed.replace(/\.tsx$/, "");
+      const importers = walk(SRC).filter((path) =>
+        importedModules(path, readFileSync(path, "utf8")).includes(target),
+      );
+
+      // Tidak ada yang mengimpornya berarti daftar putihnya sudah basi — dan daftar putih
+      // basi adalah pengecualian yang tidak lagi diawasi siapa pun.
+      expect(
+        importers,
+        `tidak ada yang mengimpor ${allowed}; hapus dari CALLBACK_ALLOWED`,
+      ).not.toHaveLength(0);
+
+      for (const importer of importers) {
+        const head = readFileSync(importer, "utf8").slice(0, 200);
+        if (!head.includes('"use client"')) {
+          violations.push(`${importer.slice(SRC.length + 1)} mengimpor ${allowed}`);
+        }
+      }
+    }
+
+    expect(
+      violations,
+      "komponen server mengimpor komponen klien yang menerima callback sinkron",
+    ).toEqual([]);
   });
 
   it("tidak menerima prop bertipe fungsi pada komponen klien", () => {

@@ -40,7 +40,7 @@ export function ScoreList({
               <span className={`w-8 text-right font-mono text-xs font-semibold ${RISK_TEXT[risk]}`}>
                 {row.score}
               </span>
-              <span className="w-12 text-right text-[10px] uppercase text-ink-muted">
+              <span className="w-12 text-right text-2xs uppercase text-ink-muted">
                 {RISK_LABELS[risk]}
               </span>
             </li>

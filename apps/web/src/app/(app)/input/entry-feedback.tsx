@@ -34,7 +34,7 @@ export function EntryFeedback({ state, noun }: { state: EntryState; noun: string
     >
       <span>{noun} tersimpan dengan kode </span>
       <span className="font-mono font-semibold">{state.done.code}</span>
-      <span className="mt-1 block text-[10px] text-ink-muted">{state.done.detail}</span>
+      <span className="mt-1 block text-2xs text-ink-muted">{state.done.detail}</span>
     </div>
   );
 }

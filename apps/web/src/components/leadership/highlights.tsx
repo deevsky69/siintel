@@ -42,10 +42,10 @@ function Card({
         <p className={`mt-1.5 font-heading text-3xl font-bold leading-none ${tone ?? "text-ink"}`}>
           {value}
         </p>
-        <p className="mt-2 flex-1 text-[11px] leading-relaxed text-ink-muted">{note}</p>
+        <p className="mt-2 flex-1 text-xs leading-relaxed text-ink-muted">{note}</p>
         <Link
           href={href}
-          className="mt-2.5 text-[10px] uppercase tracking-wider text-ink-faint transition-colors hover:text-accent"
+          className="mt-2.5 text-2xs uppercase tracking-wider text-ink-faint transition-colors hover:text-accent"
         >
           {linkLabel} →
         </Link>
