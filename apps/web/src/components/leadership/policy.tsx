@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Panel } from "@/components/panel";
 import type { LeadershipBoard } from "@/lib/leadership";
 
@@ -28,22 +29,38 @@ export function PolicyRecommendations({ policy }: { policy: LeadershipBoard["pol
           dibiarkan kosong alih-alih diisi saran umum yang tidak bersandar pada apa pun.
         </p>
       ) : (
-        <ol className="space-y-2.5">
+        <ol className="space-y-2">
           {policy.recommendations.map((row, index) => (
-            <li key={row.action} className="flex gap-2.5">
-              <span className="font-mono text-2xs text-ink-faint">{index + 1}</span>
-              <div className="flex-1">
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-xs text-ink">{row.action}</span>
-                  <span className="rounded border border-base-700 px-1.5 py-0.5 text-2xs text-ink-muted">
-                    {row.function}
-                  </span>
-                  {/* Label sumber sama dengan yang dipakai faktor dominan di peta: RULE
-                      berarti aturan yang benar-benar dijalankan, bukan temuan model. */}
-                  <span className="font-mono text-2xs text-ink-faint">{row.source}</span>
+            <li key={row.action}>
+              {/* Seluruh butir menjadi satu sasaran klik, bukan hanya kata terakhirnya.
+                  Judul DAN dasarnya ikut di dalam tautan karena keduanya bagian dari
+                  kalimat yang sama; memisahkan dasar ke luar tautan akan membuat pembaca
+                  mengarahkan kursor ke kalimat yang justru menjelaskan tujuannya dan
+                  tidak menemukan apa pun. */}
+              <Link
+                href={row.href}
+                className="group flex gap-2.5 rounded border border-base-800 bg-base-850 px-3 py-2.5 transition hover:border-accent/60 hover:bg-base-800/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+              >
+                <span className="font-mono text-2xs text-ink-faint">{index + 1}</span>
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <span className="text-xs text-ink group-hover:text-accent">{row.action}</span>
+                    <span className="rounded border border-base-700 px-1.5 py-0.5 text-2xs text-ink-muted">
+                      {row.function}
+                    </span>
+                    {/* Label sumber sama dengan yang dipakai faktor dominan di peta: RULE
+                        berarti aturan yang benar-benar dijalankan, bukan temuan model. */}
+                    <span className="font-mono text-2xs text-ink-faint">{row.source}</span>
+                  </div>
+                  <p className="mt-0.5 text-2xs leading-relaxed text-ink-muted">{row.basis}</p>
                 </div>
-                <p className="mt-0.5 text-2xs leading-relaxed text-ink-muted">{row.basis}</p>
-              </div>
+                <span
+                  aria-hidden
+                  className="self-center text-xs text-ink-faint transition group-hover:translate-x-0.5 group-hover:text-accent"
+                >
+                  →
+                </span>
+              </Link>
             </li>
           ))}
         </ol>

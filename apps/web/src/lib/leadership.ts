@@ -84,6 +84,8 @@ export type PolicyItem = {
   basis: string;
   /** Selalu `RULE` selama belum ada model — lihat CLAUDE.md §27. */
   source: string;
+  /** Layar yang memuat angka asal butir ini — bukan sekadar layar yang berkaitan. */
+  href: string;
 };
 
 export type LeadershipBoard = {

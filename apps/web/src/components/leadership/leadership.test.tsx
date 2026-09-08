@@ -159,6 +159,18 @@ describe("rekomendasi kebijakan", () => {
     expect(screen.getByText("Pasar Minggu berstatus Siaga dengan skor 88.")).toBeDefined();
   });
 
+  it("menjadikan tiap butir tautan ke layar yang memuat angka asalnya", () => {
+    render(<PolicyRecommendations policy={board.policy} />);
+
+    // Yang diperiksa adalah TUJUANNYA, bukan sekadar keberadaan tautan: butir yang
+    // mengutip skor Pasar Minggu harus mendarat di rincian Pasar Minggu, bukan di daftar
+    // wilayah pada umumnya.
+    const link = screen.getByRole("link", {
+      name: /Tambah patroli pukul 20.00 s.d. 23.00 WIB di Pasar Minggu/,
+    });
+    expect(link.getAttribute("href")).toBe("/wilayah/Pasar%20Minggu");
+  });
+
   it("membiarkan panel kosong alih-alih mengisinya dengan saran umum", () => {
     render(<PolicyRecommendations policy={{ ...board.policy, recommendations: [] }} />);
 

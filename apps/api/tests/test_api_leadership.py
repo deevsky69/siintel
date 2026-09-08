@@ -19,6 +19,7 @@ import os
 import uuid
 from collections.abc import Iterator
 from datetime import date, datetime
+from urllib.parse import quote
 
 import pytest
 from fastapi.testclient import TestClient
@@ -372,6 +373,8 @@ def test_policy_recommendations_are_derived_from_the_numbers_on_the_same_screen(
     for row in policy["recommendations"]:
         assert row["source"] == "RULE", "belum ada model — menyebutnya keluaran AI itu fiktif"
         assert row["basis"], row
+        # Saran yang dasarnya tidak dapat diperiksa sama saja dengan saran tanpa dasar.
+        assert str(row["href"]).startswith("/"), row
 
     issues = body["prominent_issues"]
     assert isinstance(issues, dict)
@@ -384,6 +387,17 @@ def test_policy_recommendations_are_derived_from_the_numbers_on_the_same_screen(
         assert operations, "kenaikan terbesar tidak menghasilkan rekomendasi apa pun"
         assert str(biggest["threat_type"]) in str(operations[0]["action"])
         assert str(biggest["incidents"]) in str(operations[0]["basis"])
+        # Tautannya harus membawa penyaring ke jenis yang sama dengan yang disebut butir
+        # ini — bukan ke analitik tanpa penyaring, yang justru menyembunyikan angkanya.
+        assert operations[0]["href"] == f"/analitik?jenis={biggest['threat_type']}"
+
+    top_area = body["priority_areas"][0] if body["priority_areas"] else None
+    if top_area is not None:
+        patrols = [
+            row for row in policy["recommendations"] if "Tambah patroli" in str(row["action"])
+        ]
+        if patrols:
+            assert patrols[0]["href"] == f"/wilayah/{quote(str(top_area['kecamatan']))}"
 
 
 def test_prominent_issues_compare_against_the_previous_window_of_equal_length(

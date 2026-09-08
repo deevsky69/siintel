@@ -40,6 +40,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 from typing import Any
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import Select, func, select
@@ -594,6 +595,19 @@ def _policy_recommendations(
     issues: dict[str, Any],
     attention: list[dict[str, Any]],
 ) -> dict[str, Any]:
+    """Rekomendasi kebijakan yang diturunkan aturan, masing-masing dengan tujuannya.
+
+    Setiap butir membawa `href` ke layar yang memuat ANGKA ASALNYA — bukan ke layar yang
+    sekadar berkaitan. Butir jam patroli menunjuk rincian kecamatan yang skornya dikutip,
+    butir operasi khusus menunjuk analitik yang sudah tersaring ke jenis gangguan itu, dan
+    butir verifikasi menunjuk daftar laporan berstatus RECEIVED yang jumlahnya disebut.
+    Tanpa itu, pembaca yang ingin memeriksa dasar sebuah saran harus menebak sendiri ke
+    mana harus pergi — dan saran yang dasarnya tak dapat diperiksa adalah persis yang
+    dilarang CLAUDE.md §27.
+
+    Alamat web muncul di respons API mengikuti kebiasaan yang sudah ada pada daftar
+    `needs_attention` di berkas yang sama; keduanya melayani konsumen yang sama.
+    """
     items: list[dict[str, Any]] = []
 
     top_area = priority_areas[0] if priority_areas else None
@@ -614,6 +628,7 @@ def _policy_recommendations(
                         "rentang tersibuk dari 24 rentang tiga jam yang diperiksa."
                     ),
                     "source": "RULE",
+                    "href": f"/wilayah/{quote(str(top_area['kecamatan']))}",
                 }
             )
 
@@ -630,6 +645,7 @@ def _policy_recommendations(
                     f"kenaikan terbesar di antara seluruh jenis gangguan pekan ini."
                 ),
                 "source": "RULE",
+                "href": f"/analitik?jenis={quote(str(top_issue['threat_type']))}",
             }
         )
 
@@ -648,6 +664,7 @@ def _policy_recommendations(
                     "masuk ke penilaian risiko."
                 ),
                 "source": "RULE",
+                "href": "/masyarakat?status=RECEIVED",
             }
         )
 

@@ -156,6 +156,7 @@ export const board: LeadershipBoard = {
         function: "Samapta",
         basis: "Pasar Minggu berstatus Siaga dengan skor 88.",
         source: "RULE",
+        href: "/wilayah/Pasar%20Minggu",
       },
     ],
   },
