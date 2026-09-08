@@ -1,5 +1,5 @@
 import { EmptyState } from "@/components/data-state";
-import { toHistoricalMonths, toMapLayer } from "@/components/map/area";
+import { toHistoricalMonths, toMapLayer, toMapLevel } from "@/components/map/area";
 import { RiskMap } from "@/components/map/risk-map";
 import { Panel } from "@/components/panel";
 import { getAreaDetail, getMapData, resolveSelectedDistrict } from "@/lib/map-data";
@@ -12,10 +12,10 @@ export const dynamic = "force-dynamic";
  * Seluruh warna dan angka berasal dari endpoint peta (`/map/historical`,
  * `/map/current-risk`, `/map/predictive-heatmap`, `/map/area/{kecamatan}`). Tidak ada nilai
  * yang ditanam di kode; yang ditanam hanyalah **bentuk** wilayah, dan itu pun dinyatakan
- * terbuka sebagai perkiraan (lihat `lib/geo.ts`).
+ * terbuka apa adanya (lihat `lib/wilayah.ts`).
  *
- * Wilayah terpilih (`?wilayah=`), layer (`?layer=`), dan jendela historis (`?bulan=`)
- * adalah parameter alamat supaya
+ * Wilayah terpilih (`?wilayah=`), layer (`?layer=`), jendela historis (`?bulan=`), dan
+ * tingkat penyelaman (`?tingkat=`) adalah parameter alamat supaya
  * rinciannya diambil di server dan keadaan peta dapat dibagikan sebagai tautan saat
  * paparan. Nama wilayah yang tidak dikenal jatuh kembali ke wilayah berisiko tertinggi,
  * sehingga halaman tidak pernah terbuka kosong; nama yang dikenal tetapi di luar kewenangan
@@ -29,12 +29,14 @@ export default async function PetaPage({
     wilayah?: string | string[];
     layer?: string | string[];
     bulan?: string | string[];
+    tingkat?: string | string[];
   }>;
 }) {
   const params = await searchParams;
   const requested = typeof params.wilayah === "string" ? params.wilayah : null;
   const layer = toMapLayer(typeof params.layer === "string" ? params.layer : null);
   const months = toHistoricalMonths(typeof params.bulan === "string" ? params.bulan : null);
+  const level = toMapLevel(typeof params.tingkat === "string" ? params.tingkat : null);
 
   const data = await getMapData(undefined, months);
   const hasData = data.districts.some(
@@ -53,5 +55,14 @@ export default async function PetaPage({
   const selected = resolveSelectedDistrict(data, requested);
   const detail = selected === null ? null : await getAreaDetail(selected);
 
-  return <RiskMap data={data} selected={selected} detail={detail} layer={layer} months={months} />;
+  return (
+    <RiskMap
+      data={data}
+      selected={selected}
+      detail={detail}
+      layer={layer}
+      months={months}
+      level={level}
+    />
+  );
 }

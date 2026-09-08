@@ -2,18 +2,21 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import type { DistrictShape } from "@/lib/geo";
-import {
-  isWithinMap,
-  KECAMATAN_SHAPES,
-  MAP_VIEWBOX,
-  polygonPoints,
-  projectLatLon,
-  toPercent,
-} from "@/lib/geo";
 import type { HistoricalPoint, MapDistrict } from "@/lib/map-data";
 import { RISK_HEX, RISK_LABELS } from "@/lib/risk";
-import type { HistoricalMonths, MapLayer } from "./area";
+import type { AreaShape } from "@/lib/wilayah";
+import {
+  boundsOf,
+  framingShapes,
+  HOME_AREA,
+  isWithin,
+  polygonPoints,
+  projectLatLon,
+  shapesAt,
+  toPercent,
+  viewBoxOf,
+} from "@/lib/wilayah";
+import type { HistoricalMonths, MapLayer, MapLevel } from "./area";
 import {
   DEFAULT_HISTORICAL_MONTHS,
   HISTORICAL_HEX,
@@ -59,8 +62,6 @@ const NO_DATA_FILL = "rgb(var(--line))";
 const EDGE = "rgb(var(--surface-app))";
 const EDGE_SELECTED = "rgb(var(--accent))";
 const EDGE_ACTIVE = "rgb(var(--accent-soft))";
-const LABEL_TEXT = "rgb(var(--text))";
-const LABEL_TEXT_MUTED = "rgb(var(--text-faint))";
 
 /**
  * Angka besar di tengah wilayah pada layer yang sedang tampil; `null` bila tidak ada data.
@@ -164,27 +165,27 @@ export function districtSummary(district: MapDistrict, layer: MapLayer): string 
   return risk ? `${area.risk_score}/100 · ${RISK_LABELS[risk]}` : `${area.risk_score}/100`;
 }
 
-function ariaLabel(shape: DistrictShape, district: MapDistrict | undefined, layer: MapLayer) {
-  if (!district) return `${shape.kecamatan} — tidak ada data`;
+function ariaLabel(shape: AreaShape, district: MapDistrict | undefined, layer: MapLayer) {
+  if (!district) return `${shape.name} — tidak ada data`;
 
   if (layer === "historical") {
     const incidents = district.historical?.incidents;
-    if (incidents === undefined) return `${shape.kecamatan} — tidak ada kejadian tercatat`;
-    return `${shape.kecamatan} — ${incidents} kejadian pada jendela yang ditampilkan`;
+    if (incidents === undefined) return `${shape.name} — tidak ada kejadian tercatat`;
+    return `${shape.name} — ${incidents} kejadian pada jendela yang ditampilkan`;
   }
 
   if (layer === "predictive") {
     const area = district.predictive;
-    if (!area) return `${shape.kecamatan} — tidak ada prediksi`;
-    return `${shape.kecamatan} — skor prediksi ${area.risk_score} dari 100, tanpa kelas risiko`;
+    if (!area) return `${shape.name} — tidak ada prediksi`;
+    return `${shape.name} — skor prediksi ${area.risk_score} dari 100, tanpa kelas risiko`;
   }
 
   const area = district.current;
-  if (!area) return `${shape.kecamatan} — tidak ada data risiko`;
+  if (!area) return `${shape.name} — tidak ada data risiko`;
   const risk = toRiskClass(area.risk_class);
   return risk
-    ? `${shape.kecamatan} — skor risiko ${area.risk_score} dari 100, kelas ${RISK_LABELS[risk]}`
-    : `${shape.kecamatan} — skor risiko ${area.risk_score} dari 100, kelas tidak dikenali`;
+    ? `${shape.name} — skor risiko ${area.risk_score} dari 100, kelas ${RISK_LABELS[risk]}`
+    : `${shape.name} — skor risiko ${area.risk_score} dari 100, kelas tidak dikenali`;
 }
 
 function fillOf(district: MapDistrict | undefined, layer: MapLayer): string {
@@ -227,6 +228,8 @@ export function MapCanvas({
   historical,
   months = DEFAULT_HISTORICAL_MONTHS,
   linkTo = "map",
+  level = "kecamatan",
+  focus = null,
 }: {
   districts: MapDistrict[];
   layer: MapLayer;
@@ -256,6 +259,14 @@ export function MapCanvas({
    * - `home` — membuka rincian di beranda tanpa meninggalkan halamannya.
    */
   linkTo?: "map" | "home";
+  /**
+   * Tingkat penyelaman. Ketiganya digambar dari data batas yang sama pada satu sistem
+   * koordinat, jadi berpindah tingkat hanya mengubah `viewBox` — bukan menghitung ulang
+   * bentuk, dan titik kejadian tetap jatuh di tempat yang sama.
+   */
+  level?: MapLevel;
+  /** Kecamatan yang kelurahannya digambar; hanya berarti pada tingkat `kelurahan`. */
+  focus?: string | null;
 }) {
   const byName = useMemo(
     () => new Map(districts.map((district) => [district.kecamatan, district])),
@@ -264,62 +275,133 @@ export function MapCanvas({
 
   /** Wilayah yang sedang disentuh tetikus **atau** sedang menerima fokus papan ketik. */
   const [active, setActive] = useState<string | null>(null);
+
+  const shapes = useMemo(() => shapesAt(level, focus ?? undefined), [level, focus]);
+
+  // Bidang gambar mengikuti wilayah yang sedang tampil. Pada tingkat kelurahan, kecamatan
+  // induknya ikut menentukan bidang supaya penyelaman tidak melompat: pembaca melihat
+  // wilayah yang sama, diperbesar.
+  const bounds = useMemo(() => boundsOf(framingShapes(shapes)), [shapes]);
+  const viewBox = useMemo(() => viewBoxOf(shapes), [shapes]);
+
+  // Tebal garis dan jari-jari titik dinyatakan sebagai pecahan dari bentang bidang gambar,
+  // bukan angka tetap. Satuan gambar adalah meter: garis setebal 3 satuan wajar untuk peta
+  // selebar 50 kilometer dan menjadi pita selebar 30 meter pada peta satu kelurahan.
+  const span = Math.max(bounds.width, bounds.height);
+  const strokeWidth = span / 500;
+  const pointScale = span / 1500;
+
   const hovered = active === null ? undefined : byName.get(active);
-  const hoveredShape = KECAMATAN_SHAPES.find((shape) => shape.kecamatan === active);
+  const hoveredShape = shapes.find((shape) => shape.name === active);
+
+  /** Wilayah yang dapat diklik pada tingkat ini, dan ke mana perginya. */
+  const hrefOf = (name: string): string | null => {
+    if (level === "polda") {
+      // Hanya Jakarta Selatan yang dapat diselami: sebelas wilayah lain berada di luar
+      // wilayah hukum Polres ini, dan sistem tidak memegang datanya.
+      if (name !== HOME_AREA) return null;
+      return linkTo === "home" ? "/?tingkat=kecamatan" : mapHref(null, layer, months, "kecamatan");
+    }
+    // Kelurahan tidak dapat diselami lebih jauh: tidak ada tingkat di bawahnya, dan tidak
+    // ada data yang menunggu di sana.
+    if (level === "kelurahan") return null;
+    return linkTo === "home"
+      ? `/?tingkat=kecamatan&wilayah=${encodeURIComponent(name)}`
+      : mapHref(name, layer, months, "kelurahan");
+  };
 
   return (
     <div className="relative">
       {/* biome-ignore lint/a11y/useSemanticElements: peta adalah SVG; tidak ada
           elemen HTML semantik yang dapat menggantikan wadah wilayah di dalamnya. */}
       <svg
-        viewBox={`0 0 ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`}
+        viewBox={viewBox}
         role="group"
         aria-label={
-          layer === "historical"
-            ? "Peta cacah kejadian kamtibmas per kecamatan"
-            : layer === "predictive"
-              ? "Peta skor prediksi kamtibmas per kecamatan"
-              : "Peta risiko kamtibmas per kecamatan"
+          level === "polda"
+            ? "Peta wilayah hukum Polda Metro Jaya, Jakarta Selatan disorot"
+            : level === "kelurahan"
+              ? `Peta kelurahan di Kecamatan ${focus ?? ""}`
+              : layer === "historical"
+                ? "Peta cacah kejadian kamtibmas per kecamatan"
+                : layer === "predictive"
+                  ? "Peta skor prediksi kamtibmas per kecamatan"
+                  : "Peta risiko kamtibmas per kecamatan"
         }
         className={className}
       >
-        {KECAMATAN_SHAPES.map((shape) => {
-          const district = byName.get(shape.kecamatan);
-          const isSelected = selected === shape.kecamatan;
-          const isActive = active === shape.kecamatan;
-          const score = district ? layerValue(district, layer) : null;
+        {shapes.map((shape) => {
+          const district = byName.get(shape.name);
+          const isSelected = selected === shape.name;
+          const isActive = active === shape.name;
+          const href = hrefOf(shape.name);
 
-          return (
-            <g key={shape.kecamatan}>
-              <Link
-                href={
-                  linkTo === "home"
-                    ? `/?wilayah=${encodeURIComponent(shape.kecamatan)}`
-                    : mapHref(shape.kecamatan, layer, months)
-                }
-                scroll={false}
-                aria-label={ariaLabel(shape, district, layer)}
-                aria-current={isSelected ? "true" : undefined}
-                onMouseEnter={() => setActive(shape.kecamatan)}
-                onMouseLeave={() => setActive(null)}
-                onFocus={() => setActive(shape.kecamatan)}
-                onBlur={() => setActive(null)}
-              >
-                <polygon
-                  points={polygonPoints(shape)}
-                  className="cursor-pointer transition-[fill-opacity]"
-                  fill={fillOf(district, layer)}
-                  fillOpacity={opacityOf(
-                    district,
-                    layer,
-                    isSelected ? "selected" : isActive ? "active" : "rest",
-                    historical?.peakIncidents ?? 0,
-                  )}
-                  stroke={isSelected ? EDGE_SELECTED : isActive ? EDGE_ACTIVE : EDGE}
-                  strokeWidth={isSelected || isActive ? 6 : 3}
-                  strokeLinejoin="round"
-                />
-              </Link>
+          // Di luar wilayah hukum Polres ini, wilayah digambar tembus pandang: tidak ada
+          // datanya, dan warna apa pun akan menyiratkan pengetahuan yang tidak ada.
+          const outside = level === "polda" && shape.name !== HOME_AREA;
+          const flat = outside || level === "kelurahan";
+          // Satuan sendiri diwarnai aksen, bukan warna risiko: pada tingkat ini tidak ada
+          // satu skor untuk seluruh Jakarta Selatan, dan memberinya warna dari tangga
+          // risiko akan menyatakan penilaian yang tidak pernah dihitung.
+          const home = level === "polda" && shape.name === HOME_AREA;
+
+          const polygons = shape.rings.map((ring) => (
+            // Kunci diambil dari simpul pertama cincin, bukan dari indeksnya: dua cincin
+            // pada satu wilayah tidak pernah berawal di titik yang sama, dan kunci
+            // berbasis koordinat tetap benar seandainya urutan cincin berubah.
+            <polygon
+              key={`${shape.name}-${ring[0][0]},${ring[0][1]}`}
+              points={polygonPoints(ring)}
+              className={
+                href ? "cursor-pointer transition-[fill-opacity]" : "transition-[fill-opacity]"
+              }
+              fill={home ? EDGE_SELECTED : flat ? NO_DATA_FILL : fillOf(district, layer)}
+              fillOpacity={
+                home
+                  ? isActive
+                    ? 0.75
+                    : 0.6
+                  : flat
+                    ? isActive
+                      ? 0.45
+                      : 0.18
+                    : opacityOf(
+                        district,
+                        layer,
+                        isSelected ? "selected" : isActive ? "active" : "rest",
+                        historical?.peakIncidents ?? 0,
+                      )
+              }
+              stroke={isSelected || home ? EDGE_SELECTED : isActive ? EDGE_ACTIVE : EDGE}
+              strokeWidth={strokeWidth * (isSelected || isActive || home ? 2 : 1)}
+              strokeLinejoin="round"
+            />
+          ));
+
+          const hover = {
+            onMouseEnter: () => setActive(shape.name),
+            onMouseLeave: () => setActive(null),
+            onFocus: () => setActive(shape.name),
+            onBlur: () => setActive(null),
+          };
+
+          // Wilayah tanpa tujuan bukan tautan. Membungkusnya dalam <Link> yang tidak
+          // membawa ke mana-mana akan menjanjikan sesuatu kepada pembaca papan ketik yang
+          // tidak dapat ditepati.
+          return href ? (
+            <Link
+              key={shape.name}
+              href={href}
+              scroll={false}
+              aria-label={ariaLabel(shape, district, layer)}
+              aria-current={isSelected ? "true" : undefined}
+              {...hover}
+            >
+              {polygons}
+            </Link>
+          ) : (
+            <g key={shape.name} aria-label={shape.name} {...hover}>
+              {polygons}
             </g>
           );
         })}
@@ -336,7 +418,7 @@ export function MapCanvas({
               const position = projectLatLon(point.latitude, point.longitude);
               // Titik di luar bidang gambar dibuang, bukan dijepitkan ke tepi: menjepitkan
               // akan menaruhnya di wilayah yang bukan wilayahnya.
-              if (!isWithinMap(position)) return null;
+              if (!isWithin(position, bounds)) return null;
               const radius = pointRadius(point.incidents, historical.peakPointIncidents);
 
               return (
@@ -344,11 +426,11 @@ export function MapCanvas({
                   key={point.location_code}
                   cx={position[0]}
                   cy={position[1]}
-                  r={radius}
+                  r={radius * pointScale}
                   fill={HISTORICAL_HEX}
                   fillOpacity={0.55}
                   stroke={EDGE}
-                  strokeWidth={2}
+                  strokeWidth={strokeWidth}
                 />
               );
             })}
@@ -370,20 +452,33 @@ export function MapCanvas({
         lebar. `pointer-events-none` menjaga klik tetap mengenai wilayah di bawahnya.
       */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        {KECAMATAN_SHAPES.map((shape) => {
-          const district = byName.get(shape.kecamatan);
+        {shapes.map((shape) => {
+          const district = byName.get(shape.name);
           const score = district ? layerValue(district, layer) : null;
+          const outside = level === "polda" && shape.name !== HOME_AREA;
+
+          // Dua belas nama pada bingkai selebar seratus kilometer saling menimpa sampai
+          // tidak satu pun terbaca. Pada tingkat ini hanya satuan sendiri yang bernama
+          // tetap; nama tetangga muncul saat disorot — persis yang diminta pemilik proyek.
+          if (outside && active !== shape.name) return null;
 
           return (
             <div
-              key={shape.kecamatan}
+              key={shape.name}
               className="absolute -translate-x-1/2 -translate-y-1/2 text-center leading-tight"
-              style={toPercent(shape.label)}
+              style={toPercent(shape.label, bounds)}
             >
-              <div className="font-heading text-2xs font-semibold text-ink drop-shadow-[0_1px_2px_rgb(var(--surface-app))] sm:text-xs">
-                {shape.kecamatan}
+              <div
+                className={`font-heading text-2xs font-semibold drop-shadow-[0_1px_2px_rgb(var(--surface-app))] sm:text-xs ${
+                  outside ? "text-ink-faint" : "text-ink"
+                }`}
+              >
+                {shape.name}
               </div>
-              {showScores ? (
+              {/* Angka hanya bermakna pada tingkat kecamatan — hanya di situ ada skor per
+                  wilayah. Pada tingkat wilayah hukum, Jakarta Selatan tidak punya satu skor,
+                  dan menggambar "—" di bawah namanya membuat pembaca mengira datanya hilang. */}
+              {showScores && level === "kecamatan" ? (
                 <div
                   className={`font-heading text-sm font-bold drop-shadow-[0_1px_2px_rgb(var(--surface-app))] sm:text-base ${
                     score === null ? "text-ink-faint" : "text-ink"
@@ -397,15 +492,35 @@ export function MapCanvas({
         })}
       </div>
 
+      {/* Wilayah di luar wilayah hukum Polres ini tetap menjawab sorotan — dengan menyebut
+          namanya dan menyatakan mengapa ia kosong. Wilayah yang diam saat disorot terbaca
+          seperti peta yang rusak. */}
+      {hoveredShape && !hovered ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[135%] whitespace-nowrap rounded border border-base-700 bg-base-950/95 px-2.5 py-1.5 shadow-panel"
+          style={toPercent(hoveredShape.label, bounds)}
+        >
+          <p className="font-heading text-xs font-semibold text-ink">{hoveredShape.name}</p>
+          <p className="mt-0.5 text-2xs text-ink-faint">
+            {level === "polda"
+              ? "Di luar wilayah hukum Polres Metro Jakarta Selatan"
+              : level === "kelurahan"
+                ? "Belum ada data setingkat kelurahan"
+                : "Tidak ada data"}
+          </p>
+        </div>
+      ) : null}
+
       {hoveredShape && hovered ? (
         <div
           // Tooltip hanya penguat visual: keterangan yang sama sudah ada pada
           // `aria-label` tiap wilayah, sehingga pembaca layar tidak kehilangan apa pun.
           aria-hidden="true"
           className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[135%] whitespace-nowrap rounded border border-base-700 bg-base-950/95 px-2.5 py-1.5 shadow-panel"
-          style={toPercent(hoveredShape.label)}
+          style={toPercent(hoveredShape.label, bounds)}
         >
-          <p className="font-heading text-xs font-semibold text-ink">{hoveredShape.kecamatan}</p>
+          <p className="font-heading text-xs font-semibold text-ink">{hoveredShape.name}</p>
           <dl className="mt-1 space-y-0.5">
             {tooltipRows(hovered, layer).map((row) => (
               <div key={row.label} className="flex items-baseline gap-3">

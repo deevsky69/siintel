@@ -1,6 +1,6 @@
 import { DEFAULT_HISTORICAL_MONTHS } from "@/components/map/area";
 import { ApiError, apiGet } from "./api";
-import { KECAMATAN_SHAPES } from "./geo";
+import { shapesAt } from "./wilayah";
 
 /**
  * Data untuk halaman peta (TASK 080–084).
@@ -260,7 +260,7 @@ export type MapData = {
  * Menggabungkan dua layer menjadi satu daftar kecamatan.
  *
  * Fungsi murni tanpa pemanggilan jaringan, sehingga dapat diuji langsung. Daftar
- * kecamatan diambil dari `KECAMATAN_SHAPES` supaya seluruh wilayah tetap muncul di peta;
+ * kecamatan diambil dari batas wilayah (`lib/wilayah`) supaya seluruh wilayah tetap muncul di peta;
  * yang tanpa data ditandai "tidak ada data", bukan diberi angka nol.
  */
 export function buildMapData(
@@ -280,11 +280,11 @@ export function buildMapData(
     // memakai bobot yang sama, dan backend sudah menyatakannya bila ternyata bercampur.
     weightsVersion: current.areas.find((area) => area.weights_version)?.weights_version ?? null,
     horizon: predictive.horizon,
-    districts: KECAMATAN_SHAPES.map((shape) => ({
-      kecamatan: shape.kecamatan,
-      historical: historicalByName.get(shape.kecamatan) ?? null,
-      current: currentByName.get(shape.kecamatan) ?? null,
-      predictive: predictiveByName.get(shape.kecamatan) ?? null,
+    districts: shapesAt("kecamatan").map((shape) => ({
+      kecamatan: shape.name,
+      historical: historicalByName.get(shape.name) ?? null,
+      current: currentByName.get(shape.name) ?? null,
+      predictive: predictiveByName.get(shape.name) ?? null,
     })),
     historical: {
       months: historical.months,

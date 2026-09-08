@@ -10,6 +10,7 @@ import { ProminentIssues } from "@/components/leadership/issues";
 import { MapHero } from "@/components/leadership/map-hero";
 import { PolicyRecommendations } from "@/components/leadership/policy";
 import { TopReportAreas } from "@/components/leadership/top-areas";
+import { toMapLevel } from "@/components/map/area";
 import {
   getActiveWarnings,
   getOutlook,
@@ -57,10 +58,18 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ wilayah?: string | string[] }>;
+  searchParams: Promise<{ wilayah?: string | string[]; tingkat?: string | string[] }>;
 }) {
   const params = await searchParams;
   const requested = typeof params.wilayah === "string" ? params.wilayah : null;
+  // Beranda membuka pada wilayah hukum Polda Metro Jaya. Meminta wilayah tertentu berarti
+  // pembaca sudah menyelam ke kecamatan, jadi tingkatnya ikut turun tanpa perlu disebut.
+  const level =
+    typeof params.tingkat === "string"
+      ? toMapLevel(params.tingkat)
+      : requested !== null
+        ? "kecamatan"
+        : "polda";
 
   const [summary, trends, outlook, warnings, map, board] = await Promise.all([
     getSummary(),
@@ -114,7 +123,14 @@ export default async function DashboardPage({
 
       <Highlights board={board} />
 
-      <MapHero data={map} selected={selected} detail={detail} crimes={crimes} reports={reports} />
+      <MapHero
+        data={map}
+        selected={selected}
+        detail={detail}
+        crimes={crimes}
+        reports={reports}
+        level={level}
+      />
 
       <Notables board={board} />
 

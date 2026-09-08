@@ -14,6 +14,27 @@ import { RISK_LABELS } from "@/lib/risk";
 export type MapLayer = "historical" | "current" | "predictive";
 
 /**
+ * Tingkat penyelaman peta.
+ *
+ * ```text
+ * polda      12 kota/kabupaten wilayah hukum Polda Metro Jaya — Jakarta Selatan disorot
+ * kecamatan  10 kecamatan Jakarta Selatan, diwarnai menurut layer yang tampil
+ * kelurahan  kelurahan satu kecamatan, digambar TANPA warna risiko
+ * ```
+ *
+ * Kelurahan sengaja tidak diwarnai: sistem ini tidak memegang data setingkat kelurahan.
+ * Basis datanya menyimpan lokasi sampai kecamatan, dan mewarnai kelurahan berarti
+ * memperlihatkan pengetahuan yang tidak dimiliki siapa pun di sini (CLAUDE.md §24).
+ */
+export type MapLevel = "polda" | "kecamatan" | "kelurahan";
+
+export const MAP_LEVELS: readonly MapLevel[] = ["polda", "kecamatan", "kelurahan"];
+
+export function toMapLevel(value: string | null | undefined): MapLevel {
+  return value === "polda" || value === "kelurahan" ? value : "kecamatan";
+}
+
+/**
  * Urutannya mengikuti arah waktu — sudah terjadi, sedang berjalan, diperkirakan — supaya
  * peta terbaca sebagai satu garis waktu dan bukan tiga tampilan yang kebetulan bertetangga.
  */
@@ -78,9 +99,13 @@ export function mapHref(
   kecamatan: string | null,
   layer: MapLayer = "current",
   months: HistoricalMonths = DEFAULT_HISTORICAL_MONTHS,
+  level: MapLevel = "kecamatan",
 ): string {
   const params = new URLSearchParams();
   if (kecamatan !== null) params.set("wilayah", kecamatan);
+  // Tingkat kecamatan tidak ditulis: ia bawaan, dan parameter yang hanya mengulang nilai
+  // bawaan memanjangkan tautan yang dibagikan saat paparan tanpa mengubah apa pun.
+  if (level !== "kecamatan") params.set("tingkat", level);
   if (layer !== "current") params.set("layer", layer);
   // Jendela hanya ditulis bila layer historis sedang tampil **dan** bukan jendela bawaan:
   // parameter yang tidak berpengaruh pada layer lain hanya memanjangkan tautan paparan.

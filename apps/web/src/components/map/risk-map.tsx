@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Panel } from "@/components/panel";
 import type { AreaDetail, MapData } from "@/lib/map-data";
-import type { HistoricalMonths, MapLayer } from "./area";
+import { HOME_AREA, shapesAt } from "@/lib/wilayah";
+import type { HistoricalMonths, MapLayer, MapLevel } from "./area";
 import { HISTORICAL_MONTH_LABELS, HISTORICAL_MONTHS, MAP_LAYERS, mapHref } from "./area";
 import { DistrictDetail } from "./district-detail";
 import { RiskLegend } from "./legend";
@@ -20,14 +21,17 @@ export function RiskMap({
   detail,
   layer,
   months,
+  level,
 }: {
   data: MapData;
   selected: string | null;
   detail: AreaDetail | null;
   layer: MapLayer;
   months: HistoricalMonths;
+  level: MapLevel;
 }) {
   const district = data.districts.find((row) => row.kecamatan === selected) ?? null;
+  const kelurahan = level === "kelurahan" && selected ? shapesAt("kelurahan", selected) : [];
 
   return (
     <div className="grid grid-cols-12 gap-3">
@@ -36,11 +40,42 @@ export function RiskMap({
           title="Live Kamtibmas Map"
           action={
             <span className="text-2xs uppercase tracking-wider text-ink-faint">
-              9 Kecamatan · Polres Metro Jakarta Selatan
+              {level === "polda"
+                ? "12 Kota/Kabupaten · Wilayah Hukum Polda Metro Jaya"
+                : level === "kelurahan"
+                  ? `${kelurahan.length} Kelurahan · Kecamatan ${selected}`
+                  : `${shapesAt("kecamatan").length} Kecamatan · Polres Metro Jakarta Selatan`}
             </span>
           }
           bodyClassName="flex flex-col gap-3"
         >
+          {/* Remah jejak. Peta yang dapat diselami tanpa jalan naik adalah perangkap:
+              tombol mundur peramban memang bekerja, tetapi ia tidak terlihat di layar dan
+              tidak berguna bagi orang yang membuka tautan langsung ke tingkat terdalam. */}
+          <nav aria-label="Tingkat wilayah" className="flex flex-wrap items-center gap-1.5">
+            <BreadcrumbLink
+              href={mapHref(null, layer, months, "polda")}
+              current={level === "polda"}
+            >
+              Polda Metro Jaya
+            </BreadcrumbLink>
+            <Chevron />
+            <BreadcrumbLink
+              href={mapHref(selected, layer, months, "kecamatan")}
+              current={level === "kecamatan"}
+            >
+              {HOME_AREA}
+            </BreadcrumbLink>
+            {level === "kelurahan" && selected ? (
+              <>
+                <Chevron />
+                <BreadcrumbLink href={mapHref(selected, layer, months, "kelurahan")} current>
+                  {selected}
+                </BreadcrumbLink>
+              </>
+            ) : null}
+          </nav>
+
           <nav aria-label="Layer peta" className="flex flex-wrap items-center gap-2">
             {MAP_LAYERS.map((option) => (
               <Link
@@ -111,6 +146,8 @@ export function RiskMap({
             selected={selected}
             historical={data.historical}
             months={months}
+            level={level}
+            focus={selected}
           />
 
           <RiskLegend
@@ -121,9 +158,37 @@ export function RiskMap({
             }}
           />
 
+          {level === "kelurahan" ? (
+            <p className="text-2xs leading-relaxed text-ink-faint">
+              Kelurahan digambar <strong>tanpa warna risiko</strong>. Basis data menyimpan lokasi
+              sampai tingkat kecamatan; mewarnai kelurahan berarti menampilkan penilaian yang belum
+              pernah dibuat. Titik yang tampak pada layer historis adalah lokasi kejadian
+              sesungguhnya.
+            </p>
+          ) : null}
+
+          {level === "polda" ? (
+            <p className="text-2xs leading-relaxed text-ink-faint">
+              Hanya <strong>{HOME_AREA}</strong> yang diwarnai. Sebelas wilayah lain berada di luar
+              wilayah hukum Polres ini dan sistem tidak memegang datanya — mewarnainya akan
+              menyiratkan penilaian yang tidak ada. Namanya muncul saat disorot.{" "}
+              <strong>Kepulauan Seribu</strong> termasuk wilayah hukum Polda Metro Jaya tetapi
+              berada di luar bingkai: gugusannya membentang puluhan kilometer ke utara, dan
+              memuatnya akan mengerutkan daratan tempat seluruh data berada.
+            </p>
+          ) : null}
+
           <p className="text-2xs leading-relaxed text-ink-faint">
-            Bentuk wilayah pada peta ini adalah <strong>perkiraan</strong> yang diturunkan dari
-            koordinat titik lokasi, <strong>bukan batas administratif resmi</strong>.
+            Batas wilayah bersumber dari{" "}
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent underline-offset-2 hover:underline"
+            >
+              © Kontributor OpenStreetMap
+            </a>{" "}
+            (ODbL), disederhanakan untuk keperluan gambar.
           </p>
 
           <p className="text-2xs leading-relaxed text-ink-faint">
@@ -142,5 +207,36 @@ export function RiskMap({
         </Panel>
       </div>
     </div>
+  );
+}
+
+function BreadcrumbLink({
+  href,
+  current,
+  children,
+}: {
+  href: string;
+  current: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      scroll={false}
+      aria-current={current ? "page" : undefined}
+      className={`rounded px-1.5 py-0.5 text-xs transition-colors ${
+        current ? "font-semibold text-ink" : "text-ink-muted hover:text-accent"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
+function Chevron() {
+  return (
+    <span aria-hidden="true" className="text-2xs text-ink-faint">
+      &#8250;
+    </span>
   );
 }

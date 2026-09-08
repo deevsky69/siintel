@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
+import type { MapLevel } from "@/components/map/area";
 import { RiskLegend } from "@/components/map/legend";
 import { MapCanvas } from "@/components/map/map-canvas";
 import { Panel } from "@/components/panel";
 import type { AreaDetail, MapData } from "@/lib/map-data";
 import type { CitizenRow, CrimeRow } from "@/lib/reports";
 import { RISK_LABELS, RISK_TEXT, riskClassOf } from "@/lib/risk";
+import { HOME_AREA } from "@/lib/wilayah";
 
 /**
  * Peta sebagai isi utama beranda, beserta panel rincian yang terisi saat wilayah diklik.
@@ -37,10 +39,18 @@ export function MapHero({
   detail,
   crimes,
   reports,
+  level,
 }: {
   data: MapData;
   selected: string | null;
   detail: AreaDetail | null;
+  /**
+   * Beranda membuka pada tingkat wilayah hukum Polda Metro Jaya, bukan langsung pada
+   * kecamatan. Alasannya bukan hiasan: pimpinan membaca posisi satuannya **di antara**
+   * satuan lain, dan peta yang langsung menampilkan sembilan poligon tanpa konteks tidak
+   * pernah menjawab pertanyaan itu.
+   */
+  level: MapLevel;
   /** Kejadian terbaru di wilayah terpilih; `null` bila di luar kewenangan pembaca. */
   crimes: CrimeRow[] | null;
   /** Laporan masyarakat terbaru di wilayah terpilih; `null` bila di luar kewenangan. */
@@ -64,19 +74,51 @@ export function MapHero({
             <EmptyState label="Tidak ada penilaian risiko yang dapat ditampilkan untuk kewenangan Anda." />
           ) : (
             <>
+              <nav aria-label="Tingkat wilayah" className="flex flex-wrap items-center gap-1.5">
+                <Link
+                  href="/?tingkat=polda"
+                  scroll={false}
+                  aria-current={level === "polda" ? "page" : undefined}
+                  className={`rounded px-1.5 py-0.5 text-xs transition-colors ${
+                    level === "polda"
+                      ? "font-semibold text-ink"
+                      : "text-ink-muted hover:text-accent"
+                  }`}
+                >
+                  Polda Metro Jaya
+                </Link>
+                <span aria-hidden="true" className="text-2xs text-ink-faint">
+                  &#8250;
+                </span>
+                <Link
+                  href="/?tingkat=kecamatan"
+                  scroll={false}
+                  aria-current={level === "kecamatan" ? "page" : undefined}
+                  className={`rounded px-1.5 py-0.5 text-xs transition-colors ${
+                    level === "kecamatan"
+                      ? "font-semibold text-ink"
+                      : "text-ink-muted hover:text-accent"
+                  }`}
+                >
+                  {HOME_AREA}
+                </Link>
+              </nav>
+
               <MapCanvas
                 districts={data.districts}
                 layer="current"
                 selected={selected}
                 className="mx-auto max-h-[54vh] w-full"
+                level={level}
                 // Klik tetap di beranda: rinciannya muncul di panel sebelah, bukan dengan
                 // meninggalkan halaman yang baru saja dibuka pengguna.
                 linkTo="home"
               />
-              <RiskLegend />
+              {level === "kecamatan" ? <RiskLegend /> : null}
               <p className="text-2xs leading-relaxed text-ink-faint">
-                Arahkan kursor untuk ringkasan, klik untuk rincian. Layer historis dan prediktif ada
-                di peta lengkap.
+                {level === "polda"
+                  ? `Hanya ${HOME_AREA} yang diwarnai — sebelas wilayah lain di luar wilayah hukum Polres ini. Klik untuk membuka peta kecamatannya.`
+                  : "Arahkan kursor untuk ringkasan, klik untuk rincian. Layer historis dan prediktif ada di peta lengkap."}
               </p>
             </>
           )}
@@ -86,7 +128,13 @@ export function MapHero({
       <div className="col-span-12 xl:col-span-4">
         <Panel title={selected ?? "Rincian Wilayah"} className="h-full">
           {selected === null ? (
-            <EmptyState label="Klik salah satu kecamatan pada peta untuk melihat rinciannya." />
+            <EmptyState
+              label={
+                level === "polda"
+                  ? `Klik ${HOME_AREA} pada peta untuk membuka kecamatannya.`
+                  : "Klik salah satu kecamatan pada peta untuk melihat rinciannya."
+              }
+            />
           ) : detail === null ? (
             <EmptyState
               label={`Tidak ada rincian untuk ${selected}. Wilayah ini mungkin berada di luar kewenangan akun Anda.`}

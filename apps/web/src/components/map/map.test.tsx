@@ -4,7 +4,6 @@ import { historicalOpacity, toHistoricalMonths, toRiskClass } from "@/components
 import { DistrictDetail } from "@/components/map/district-detail";
 import { RiskLegend, riskBands } from "@/components/map/legend";
 import { RiskMap } from "@/components/map/risk-map";
-import { isWithinMap, KECAMATAN_SHAPES, projectLatLon } from "@/lib/geo";
 import type {
   AreaDetail,
   CurrentRiskResponse,
@@ -13,6 +12,7 @@ import type {
   PredictiveResponse,
 } from "@/lib/map-data";
 import { buildMapData, resolveSelectedDistrict } from "@/lib/map-data";
+import { boundsOf, isWithin, projectLatLon, shapesAt } from "@/lib/wilayah";
 
 /**
  * Peta membaca `/map/*`, yang sudah mengagregasi di backend. Uji di bawah karena itu
@@ -250,7 +250,7 @@ const districtOf = (kecamatan: string) =>
 
 describe("penyusunan data peta", () => {
   it("menyertakan seluruh kecamatan pada peta, termasuk yang tanpa data", () => {
-    expect(data.districts).toHaveLength(KECAMATAN_SHAPES.length);
+    expect(data.districts).toHaveLength(shapesAt("kecamatan").length);
 
     const kosong = districtOf("Cilandak");
     expect(kosong?.current).toBeNull();
@@ -351,15 +351,16 @@ describe("peta risiko", () => {
     detail: areaDetail,
     layer: "current" as const,
     months: 12 as const,
+    level: "kecamatan" as const,
   };
 
   it("menggambar seluruh kecamatan sebagai tautan yang dapat dibagikan", () => {
     render(<RiskMap {...mapProps} />);
 
     const areas = screen.getAllByRole("link", { name: /—/ });
-    expect(areas).toHaveLength(KECAMATAN_SHAPES.length);
+    expect(areas).toHaveLength(shapesAt("kecamatan").length);
     expect(screen.getByRole("link", { name: /^Tebet —/ }).getAttribute("href")).toBe(
-      "/peta?wilayah=Tebet",
+      "/peta?wilayah=Tebet&tingkat=kelurahan",
     );
   });
 
@@ -446,7 +447,7 @@ describe("peta risiko", () => {
     ).toBeDefined();
     expect(
       screen.getByRole("link", { name: "Tebet — tidak ada prediksi" }).getAttribute("href"),
-    ).toBe("/peta?wilayah=Tebet&layer=predictive");
+    ).toBe("/peta?wilayah=Tebet&tingkat=kelurahan&layer=predictive");
     expect(screen.getByText(/tanpa kelas risiko resmi/i)).toBeDefined();
   });
 
@@ -541,26 +542,78 @@ describe("rincian wilayah", () => {
 
 describe("proyeksi titik ke bidang peta", () => {
   /**
-   * Titik acuan diambil dari `locations` yang menjadi simpul terluar saat bentuk wilayah
-   * dihitung. Nilai harapnya bukan angka yang dikarang untuk mencocokkan kode: ia keluar
-   * dari menjalankan ulang pipeline pada `lib/geo.ts` dan terbukti menghasilkan kesepuluh
-   * simpul `KECAMATAN_SHAPES` sampai satu angka di belakang koma.
+   * Proyeksi diuji terhadap **kebenaran di luar kode ini**: setiap lokasi pada
+   * `data/sample/locations.csv` menyebut kecamatannya sendiri, dan batas kecamatan datang
+   * dari OpenStreetMap. Bila proyeksinya benar, titik itu jatuh di dalam kecamatan yang
+   * disebutnya.
    *
-   * Test ini yang menahan tetapan proyeksi agar tidak diubah tanpa sadar — pergeseran
-   * kecil di sini tidak menimbulkan galat apa pun, hanya titik yang "agak meleset".
+   * Cara ini dipilih menggantikan tabel koordinat harapan yang dibekukan. Tabel semacam itu
+   * hanya membuktikan bahwa kode masih menghasilkan angka yang sama seperti kemarin — ia
+   * lulus dengan gembira meski proyeksinya salah sejak awal.
+   *
+   * TOLERANSI 500 METER, DAN MENGAPA BUKAN NOL
+   *
+   *   Koordinat pada data contoh dibulatkan ke tiga angka desimal, yaitu ±111 meter, dan
+   *   letaknya sintetis. Lima dari 33 titik karena itu jatuh 38–484 meter di luar
+   *   kecamatannya — bukan karena proyeksinya meleset, melainkan karena titiknya memang
+   *   dekat batas dan pembulatannya melewatinya.
+   *
+   *   Proyeksi yang benar-benar rusak tidak menghasilkan simpangan ratusan meter. Ia
+   *   memindahkan titik berkilo-kilometer, dan test ini menangkapnya.
    */
-  const REFERENSI = [
-    { code: "LOC-023", latitude: -6.209, longitude: 106.85, x: 875.2, y: 97.9 },
-    { code: "LOC-033", latitude: -6.345, longitude: 106.824, x: 623.3, y: 1423.1 },
-    { code: "LOC-006", latitude: -6.276, longitude: 106.767, x: 71.2, y: 750.8 },
-    { code: "LOC-019", latitude: -6.257, longitude: 106.856, x: 933.3, y: 565.6 },
+  const LOKASI = [
+    { code: "LOC-002", kecamatan: "Kebayoran Baru", latitude: -6.237, longitude: 106.793 },
+    { code: "LOC-014", kecamatan: "Tebet", latitude: -6.226, longitude: 106.856 },
+    { code: "LOC-019", kecamatan: "Pancoran", latitude: -6.257, longitude: 106.856 },
+    { code: "LOC-023", kecamatan: "Setiabudi", latitude: -6.209, longitude: 106.85 },
+    { code: "LOC-028", kecamatan: "Pasar Minggu", latitude: -6.29, longitude: 106.83 },
+    { code: "LOC-033", kecamatan: "Jagakarsa", latitude: -6.345, longitude: 106.824 },
   ] as const;
 
-  it("menempatkan titik acuan tepat di koordinat yang menghasilkan bentuk wilayah", () => {
-    for (const titik of REFERENSI) {
-      const [x, y] = projectLatLon(titik.latitude, titik.longitude);
-      expect(x).toBeCloseTo(titik.x, 1);
-      expect(y).toBeCloseTo(titik.y, 1);
+  /** Jarak titik ke tepi poligon, dalam meter. Nol bila titiknya di dalam. */
+  function metresOutside(point: readonly [number, number], kecamatan: string): number {
+    const shape = shapesAt("kecamatan").find((row) => row.name === kecamatan);
+    if (!shape) return Number.POSITIVE_INFINITY;
+
+    const contains = shape.rings.some((ring) => {
+      let hit = false;
+      for (let i = 0; i < ring.length - 1; i += 1) {
+        const [x1, y1] = ring[i];
+        const [x2, y2] = ring[i + 1];
+        if (y1 > point[1] !== y2 > point[1]) {
+          const cut = ((x2 - x1) * (point[1] - y1)) / (y2 - y1) + x1;
+          if (point[0] < cut) hit = !hit;
+        }
+      }
+      return hit;
+    });
+    if (contains) return 0;
+
+    let nearest = Number.POSITIVE_INFINITY;
+    for (const ring of shape.rings) {
+      for (let i = 0; i < ring.length - 1; i += 1) {
+        const [x1, y1] = ring[i];
+        const [x2, y2] = ring[i + 1];
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const t =
+          dx === 0 && dy === 0
+            ? 0
+            : Math.max(
+                0,
+                Math.min(1, ((point[0] - x1) * dx + (point[1] - y1) * dy) / (dx * dx + dy * dy)),
+              );
+        nearest = Math.min(nearest, Math.hypot(point[0] - (x1 + t * dx), point[1] - (y1 + t * dy)));
+      }
+    }
+    // Satu satuan gambar = 10 meter.
+    return nearest * 10;
+  }
+
+  it("menaruh tiap lokasi contoh di dalam kecamatan yang disebutnya", () => {
+    for (const lokasi of LOKASI) {
+      const point = projectLatLon(lokasi.latitude, lokasi.longitude);
+      expect(metresOutside(point, lokasi.kecamatan), lokasi.code).toBeLessThanOrEqual(500);
     }
   });
 
@@ -571,9 +624,33 @@ describe("proyeksi titik ke bidang peta", () => {
     expect(utara[1]).toBeLessThan(selatan[1]);
   });
 
+  it("menaruh timur di kanan", () => {
+    const barat = projectLatLon(-6.26, 106.75);
+    const timur = projectLatLon(-6.26, 106.86);
+
+    expect(barat[0]).toBeLessThan(timur[0]);
+  });
+
   it("mengenali titik di luar bidang gambar alih-alih menjepitkannya ke tepi", () => {
-    expect(isWithinMap(projectLatLon(-6.24, 106.8))).toBe(true);
-    expect(isWithinMap(projectLatLon(-5.0, 110.0))).toBe(false);
+    const jaksel = boundsOf(shapesAt("kecamatan"));
+
+    expect(isWithin(projectLatLon(-6.24, 106.8), jaksel)).toBe(true);
+    // Bandung — jauh di luar wilayah hukum mana pun pada peta ini.
+    expect(isWithin(projectLatLon(-6.9, 107.6), jaksel)).toBe(false);
+  });
+
+  it("meletakkan Jakarta Selatan di dalam bidang wilayah hukum Polda Metro Jaya", () => {
+    const polda = boundsOf(shapesAt("polda"));
+    const jaksel = boundsOf(shapesAt("kecamatan"));
+
+    // Kalau tiap lapisan punya sistem koordinatnya sendiri, penegasan ini gagal — dan satu
+    // titik kejadian akan berpindah tempat ketika pengguna menyelam.
+    expect(jaksel.x).toBeGreaterThanOrEqual(polda.x);
+    expect(jaksel.y).toBeGreaterThanOrEqual(polda.y);
+    expect(jaksel.x + jaksel.width).toBeLessThanOrEqual(polda.x + polda.width);
+    expect(jaksel.y + jaksel.height).toBeLessThanOrEqual(polda.y + polda.height);
+    // Dan ia harus jauh lebih kecil: satu kota di antara dua belas.
+    expect(jaksel.width).toBeLessThan(polda.width / 3);
   });
 });
 
@@ -584,6 +661,7 @@ describe("layer historis", () => {
     detail: areaDetail,
     layer: "historical" as const,
     months: 12 as const,
+    level: "kecamatan" as const,
   };
 
   it("memberi label wilayah berisi cacah kejadian, bukan skor", () => {
