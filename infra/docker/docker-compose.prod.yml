@@ -95,6 +95,20 @@ services:
       CORS_ALLOWED_ORIGINS: https://${DOMAIN:?DOMAIN belum diisi di .env.production}
       APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Jakarta}
       DEMO_REFERENCE_TIME: ${DEMO_REFERENCE_TIME:-}
+      # Direktori lampiran laporan masyarakat. NILAINYA HARUS SAMA dengan titik pasang
+      # volume di bawah — kalau berbeda, aplikasi menulis ke lapisan container yang hilang
+      # begitu container dibangun ulang, dan tidak ada galat apa pun yang menandainya.
+      ATTACHMENT_DIR: /var/lib/predpol/lampiran
+    volumes:
+      # Foto, rekaman suara, dan video yang dikirim warga.
+      #
+      # TANPA volume ini, berkasnya hidup di lapisan container dan LENYAP pada setiap
+      # `docker compose up --build` — sementara barisnya di basis data tetap ada, sehingga
+      # layar triase menampilkan lampiran yang tidak dapat dibuka siapa pun.
+      #
+      # Volume bernama, bukan bind mount ke host: isinya data pribadi, dan menaruhnya di
+      # dalam pohon repository mengundangnya ikut ter-commit suatu hari.
+      - attachments:/var/lib/predpol/lampiran
     # `expose` menyatakan port yang dapat dijangkau SESAMA container di jaringan
     # `internal`. Ini bukan `ports:` — tidak ada satu pun port yang dibuka ke host.
     expose:
@@ -135,3 +149,4 @@ networks:
 
 volumes:
   db-data:
+  attachments:
