@@ -116,14 +116,17 @@ def test_the_whole_chain_runs_in_a_single_transaction(empty_database: Session) -
 
     # Setiap kelompok bergantung pada kelompok sebelumnya lewat kode, bukan lewat id —
     # jadi angka bukan nol di baris terakhir berarti seluruh rantai benar-benar tersambung.
-    assert _count(session, Location) == 33
+    # Angka ini naik pada 8 September 2026 ketika Kecamatan Pesanggrahan ditambahkan
+    # (`scripts/tambah-pesanggrahan.py`). Jakarta Selatan memiliki sepuluh kecamatan; dataset
+    # peragaan sebelumnya hanya memuat sembilan.
+    assert _count(session, Location) == 37
     assert _count(session, User) == 6
-    assert _count(session, CrimeIncident) == 1200
-    assert _count(session, Prediction) == 180
-    assert _count(session, Recommendation) == 84
-    assert _count(session, CommanderDecision) == 63
-    assert _count(session, OperationalAction) == 52
-    assert _count(session, PredictionActual) == 241
+    assert _count(session, CrimeIncident) == 1345
+    assert _count(session, Prediction) == 202
+    assert _count(session, Recommendation) == 94
+    assert _count(session, CommanderDecision) == 68
+    assert _count(session, OperationalAction) == 56
+    assert _count(session, PredictionActual) == 252
 
 
 def test_every_group_leaves_its_rows_visible_to_the_next(empty_database: Session) -> None:

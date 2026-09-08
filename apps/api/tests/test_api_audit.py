@@ -118,9 +118,32 @@ def test_the_audit_trail_offers_no_way_to_write() -> None:
     )
 
 
+def _a_refusal(client: TestClient, session: Session) -> None:
+    """Menimbulkan satu penolakan sungguhan, lalu memastikan ia tercatat.
+
+    Percobaan masuk dengan kata sandi yang salah adalah jalur penolakan yang benar-benar
+    ada di aplikasi, bukan baris yang disisipkan langsung ke tabel. Yang diuji karena itu
+    tetap rantai penuhnya: permintaan ditolak → audit menulisnya → daftar audit
+    menampilkannya.
+
+    Sebelum pembantu ini ada, ketiga uji di bawah bergantung pada penolakan yang KEBETULAN
+    sudah ada di basis data. Keduanya lulus selama seseorang pernah salah memasukkan kata
+    sandi, dan gagal pada basis data yang baru di-seed — `data/sample/audit_logs.csv`
+    tidak dimuat perintah seed mana pun, dan seluruh 400 barisnya pun berstatus SUCCESS.
+    Uji yang hasilnya bergantung pada riwayat pemakaian tidak menguji apa pun.
+    """
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"username": "akun.tidak.ada", "password": "kata-sandi-yang-salah"},
+    )
+    assert response.status_code == 401, response.text
+    session.flush()
+
+
 def test_refusals_are_visible_not_just_successes(client: TestClient, session: Session) -> None:
     """Inilah yang membuat audit dapat dipakai menilai RBAC."""
     reader = _make_user(session, "Administrator")
+    _a_refusal(client, session)
 
     response = client.get(
         "/api/v1/audit-logs?result=DENIED&page_size=5", headers=_auth(client, reader)
@@ -174,6 +197,9 @@ def test_a_single_day_range_includes_that_whole_day(client: TestClient, session:
     akan menyimpulkan tidak ada aktivitas pada hari itu.
     """
     reader = _make_user(session, "Administrator")
+    # Satu peristiwa dipastikan ada lebih dulu; tanpa itu uji ini hanya berlaku pada basis
+    # data yang kebetulan sudah dipakai.
+    _a_refusal(client, session)
     latest = session.scalar(select(AuditLog.timestamp).order_by(AuditLog.timestamp.desc()))
     assert latest is not None
     day = latest.date()
@@ -200,6 +226,7 @@ def test_an_inverted_range_is_refused(client: TestClient, session: Session) -> N
 
 def test_the_summary_leads_with_refusals(client: TestClient, session: Session) -> None:
     reader = _make_user(session, "Administrator")
+    _a_refusal(client, session)
 
     response = client.get("/api/v1/audit-logs/summary", headers=_auth(client, reader))
 

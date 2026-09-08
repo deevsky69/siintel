@@ -175,7 +175,8 @@ def test_analytics_seed_loads_expected_volumes(session: Session) -> None:
             select(func.count()).select_from(model).where(model.code.in_(codes))
         )
         assert loaded == len(codes), f"{name}: {loaded} dari {len(codes)} baris termuat"
-    assert session.scalar(select(func.count()).select_from(Recommendation)) == 84
+    # Naik pada 8 September 2026 bersama penambahan Kecamatan Pesanggrahan.
+    assert session.scalar(select(func.count()).select_from(Recommendation)) == 94
 
 
 @requires_database

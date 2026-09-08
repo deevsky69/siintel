@@ -448,20 +448,43 @@ def test_time_pattern_uses_local_time_not_utc(client: TestClient, session: Sessi
     body = _get(client, session, TIME_PATTERN)
 
     busiest = max(body["hours"], key=lambda row: row["incidents"])["hour"]
-    local_peak, utc_peak = session.execute(
+
+    # Jam tersibuk dibandingkan sebagai HIMPUNAN, bukan satu nilai.
+    #
+    # Dua jam dapat memiliki cacah kejadian yang sama persis — dan sejak Pesanggrahan
+    # ditambahkan, jam 18 dan 21 memang seri. "Jam tersibuk" karena itu tidak bermakna
+    # tunggal, sementara `max()` di Python dan `order by ... limit 1` di SQL memutus seri
+    # dengan cara yang berbeda. Membandingkan satu nilai membuat uji ini gagal karena
+    # aritmetika pemutus seri, bukan karena yang hendak dibuktikannya.
+    #
+    # Yang dibuktikan tetap sama: jam dihitung dari `incident_time` (WIB), bukan
+    # `occurred_at` (UTC).
+    local_peaks, utc_peaks = session.execute(
         text(
             """
             select
-              (select extract(hour from incident_time)::int from crime_incidents
-                group by 1 order by count(*) desc limit 1),
-              (select extract(hour from occurred_at)::int from crime_incidents
-                group by 1 order by count(*) desc limit 1)
+              (select array_agg(hour order by hour) from (
+                 select extract(hour from incident_time)::int as hour, count(*) as total
+                 from crime_incidents group by 1
+                 having count(*) = (select max(total) from (
+                   select count(*) as total from crime_incidents
+                   group by extract(hour from incident_time)) as counted)
+               ) as peaks),
+              (select array_agg(hour order by hour) from (
+                 select extract(hour from occurred_at)::int as hour, count(*) as total
+                 from crime_incidents group by 1
+                 having count(*) = (select max(total) from (
+                   select count(*) as total from crime_incidents
+                   group by extract(hour from occurred_at)) as counted)
+               ) as peaks)
             """
         )
     ).one()
 
-    assert busiest == local_peak
-    assert local_peak != utc_peak, "dataset tidak lagi membedakan WIB dan UTC — uji ini tumpul"
+    assert busiest in local_peaks, f"{busiest} bukan jam tersibuk menurut WIB ({local_peaks})"
+    assert set(local_peaks) != set(utc_peaks), (
+        "dataset tidak lagi membedakan WIB dan UTC — uji ini tumpul"
+    )
 
 
 def test_time_pattern_peak_cell_is_the_maximum_not_a_verdict(

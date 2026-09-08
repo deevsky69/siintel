@@ -128,18 +128,16 @@ meter — ia memindahkan titik berkilo-kilometer, dan test ini menangkapnya.
 
 ---
 
-## 7. Temuan: satu kecamatan hilang dari data contoh
+## 7. Temuan: satu kecamatan hilang dari data contoh — SUDAH DILENGKAPI
 
-Jakarta Selatan memiliki **10 kecamatan**. `data/sample/locations.csv` hanya memuat
-sembilan — **Pesanggrahan tidak ada**, beserta kelima kelurahannya.
+Jakarta Selatan memiliki **10 kecamatan**. Sampai 8 September 2026 `data/sample/` hanya
+memuat sembilan; Pesanggrahan beserta kelima kelurahannya tidak ada sama sekali. Batas
+wilayah sungguhan pada peta inilah yang membuatnya terlihat — sebuah kecamatan tergambar
+kosong tanpa alasan (temuan audit S-12, terbuka sejak audit spesifikasi awal).
 
-Peta tetap menggambar Pesanggrahan, dengan warna "tidak ada data". Itu jawaban yang jujur
-dan lebih baik daripada menghilangkannya, yang akan menggambarkan Jakarta Selatan bertubuh
-sembilan kecamatan.
-
-> **MENUNGGU KEPUTUSAN PEMILIK PROYEK.** Menambahkan lokasi, kejadian, dan penilaian untuk
-> Pesanggrahan berarti membangkitkan data sintetis baru. Itu keputusan tentang isi dataset
-> peragaan, bukan keputusan teknis (CLAUDE.md §17).
+Pemilik proyek memutuskan melengkapinya pada hari yang sama. Datanya dibangkitkan
+`scripts/tambah-pesanggrahan.py`; alasan dan cara kerjanya di
+`docs/implementation-notes/025-data-pesanggrahan.md`.
 
 ---
 

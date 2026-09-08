@@ -1199,3 +1199,148 @@ INC-01197,CURANMOR,2023-02-20,14:55,Polsek Tebet,Tebet,Manggarai,JKS-023,-6.2094
 INC-01198,CURAT,2025-02-15,23:49,Polsek Setiabudi,Setiabudi,Menteng Atas,JKS-029,-6.215711,106.838214,Jalan,congkel,kantor,Penyidikan,True
 INC-01199,CURANMOR,2025-08-03,00:32,Polsek Setiabudi,Setiabudi,Karet Kuningan,JKS-027,-6.215603,106.830415,Permukiman,kunci_t,mobil,Penyelidikan,True
 INC-01200,TAWURAN,2023-08-22,06:24,Polsek Tebet,Tebet,Tebet Timur,JKS-021,-6.22914,106.854656,Jalan,lainnya,kelompok_pelajar,Dilaporkan,True
+INC-01201,TAWURAN,2024-12-22,00:12,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229774,106.750732,Pertokoan,kelompok_pemuda,pengguna_jalan,Penyelidikan,True
+INC-01202,CURANMOR,2024-03-09,11:27,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235337,106.763682,Permukiman,lainnya,motor,Selesai,True
+INC-01203,CURANMOR,2025-03-20,22:02,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269585,106.764725,Pusat Aktivitas,duplikasi_kunci,mobil,Penyelidikan,True
+INC-01204,CURAT,2025-10-26,10:03,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269153,106.763313,Pusat Aktivitas,pecah_kaca,kantor,Dilaporkan,True
+INC-01205,CURAT,2023-06-30,23:48,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255277,106.759799,Jalan,congkel,kantor,Selesai,True
+INC-01206,CURAT,2023-11-25,10:17,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236364,106.762168,Permukiman,lainnya,toko,Penyidikan,True
+INC-01207,KEJAHATAN_JALANAN,2025-01-17,16:39,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255843,106.758454,Jalan,pemalakan,pedagang,Selesai,True
+INC-01208,CURAS,2025-09-19,19:07,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229751,106.751202,Pertokoan,lainnya,pengendara,Penyelidikan,True
+INC-01209,KEJAHATAN_JALANAN,2024-09-03,00:50,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235402,106.763790,Permukiman,jambret,pejalan_kaki,Dilaporkan,True
+INC-01210,CURAT,2023-09-17,12:19,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230129,106.751057,Pertokoan,lainnya,toko,Dilaporkan,True
+INC-01211,CURANMOR,2023-08-08,17:00,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229388,106.750346,Pertokoan,kelalaian_pengguna,motor,Penyelidikan,True
+INC-01212,CURANMOR,2025-06-03,09:02,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270265,106.763186,Pusat Aktivitas,lainnya,motor,Selesai,True
+INC-01213,CURANMOR,2025-03-15,00:31,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230575,106.751117,Pertokoan,kunci_t,motor,Penyidikan,True
+INC-01214,CURANMOR,2023-07-11,20:29,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255168,106.758535,Jalan,lainnya,mobil,Dilaporkan,True
+INC-01215,KEJAHATAN_JALANAN,2023-09-26,17:34,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270665,106.763307,Pusat Aktivitas,pemalakan,pengendara,Penyidikan,True
+INC-01216,KEJAHATAN_JALANAN,2023-04-15,13:53,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255806,106.759268,Jalan,lainnya,pengendara,Dilaporkan,True
+INC-01217,CURAT,2023-04-02,11:52,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256153,106.758358,Jalan,lainnya,toko,Penyelidikan,True
+INC-01218,CURAT,2024-06-10,01:38,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255457,106.759483,Jalan,pecah_kaca,toko,Selesai,True
+INC-01219,CURAT,2023-12-15,02:04,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229784,106.751658,Pertokoan,lainnya,kantor,Dilaporkan,True
+INC-01220,CURAS,2024-06-09,01:11,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229902,106.750227,Pertokoan,lainnya,toko,Penyidikan,True
+INC-01221,CURAT,2024-04-05,17:07,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270326,106.764256,Pusat Aktivitas,congkel,kantor,Selesai,True
+INC-01222,CURANMOR,2024-07-18,00:37,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270491,106.764470,Pusat Aktivitas,duplikasi_kunci,motor,Selesai,True
+INC-01223,CURANMOR,2025-11-11,19:14,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236593,106.763166,Permukiman,kunci_t,motor,Penyelidikan,True
+INC-01224,KEJAHATAN_JALANAN,2024-10-23,19:09,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230672,106.751177,Pertokoan,pencurian_ringan,pedagang,Penyelidikan,True
+INC-01225,CURANMOR,2023-04-07,02:29,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229796,106.750921,Pertokoan,kelalaian_pengguna,motor,Selesai,True
+INC-01226,CURAT,2023-09-30,11:24,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235658,106.762217,Permukiman,lainnya,rumah,Selesai,True
+INC-01227,CURANMOR,2023-05-23,20:05,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270059,106.763386,Pusat Aktivitas,kelalaian_pengguna,mobil,Penyidikan,True
+INC-01228,CURANMOR,2025-06-15,14:16,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230478,106.751450,Pertokoan,kelalaian_pengguna,mobil,Selesai,True
+INC-01229,KEJAHATAN_JALANAN,2024-04-03,20:05,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256521,106.759040,Jalan,jambret,pejalan_kaki,Selesai,True
+INC-01230,CURAS,2023-01-12,21:18,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255134,106.759515,Jalan,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-01231,CURAS,2025-01-12,21:02,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235203,106.763182,Permukiman,ancaman,toko,Selesai,True
+INC-01232,CURANMOR,2023-06-29,22:28,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235702,106.762744,Permukiman,duplikasi_kunci,mobil,Penyidikan,True
+INC-01233,CURANMOR,2023-05-23,23:23,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230617,106.751892,Pertokoan,lainnya,motor,Selesai,True
+INC-01234,TAWURAN,2023-07-02,23:02,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236134,106.763445,Permukiman,konflik_spontan,pengguna_jalan,Dilaporkan,True
+INC-01235,CURAS,2024-08-30,05:23,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230344,106.751225,Pertokoan,senjata_tajam,pejalan_kaki,Selesai,True
+INC-01236,CURAS,2024-12-01,20:17,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236662,106.762625,Permukiman,ancaman,toko,Penyidikan,True
+INC-01237,TAWURAN,2025-01-28,17:15,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235652,106.763278,Permukiman,lainnya,kelompok_pelajar,Selesai,True
+INC-01238,CURANMOR,2025-04-22,18:36,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256792,106.758103,Jalan,lainnya,motor,Selesai,True
+INC-01239,CURAS,2024-12-24,23:01,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255756,106.759878,Jalan,senjata_tajam,toko,Dilaporkan,True
+INC-01240,CURAT,2023-06-29,04:09,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235875,106.762450,Permukiman,rusak_kunci,toko,Selesai,True
+INC-01241,TAWURAN,2025-08-11,18:28,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256767,106.759029,Jalan,konflik_spontan,kelompok_pelajar,Selesai,True
+INC-01242,KEJAHATAN_JALANAN,2024-10-03,00:27,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269651,106.763508,Pusat Aktivitas,jambret,pengendara,Selesai,True
+INC-01243,CURAS,2025-01-12,21:22,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229609,106.750303,Pertokoan,lainnya,pejalan_kaki,Penyelidikan,True
+INC-01244,CURAT,2023-01-22,04:58,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235950,106.762808,Permukiman,pecah_kaca,kantor,Penyelidikan,True
+INC-01245,TAWURAN,2023-12-17,15:19,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270676,106.764502,Pusat Aktivitas,lainnya,kelompok_pemuda,Selesai,True
+INC-01246,CURAT,2023-09-22,03:05,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256570,106.759186,Jalan,congkel,kantor,Penyidikan,True
+INC-01247,KEJAHATAN_JALANAN,2024-11-15,13:30,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255982,106.758267,Jalan,lainnya,pengendara,Penyelidikan,True
+INC-01248,CURAS,2023-08-16,21:20,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270396,106.763923,Pusat Aktivitas,ancaman,pejalan_kaki,Selesai,True
+INC-01249,CURAT,2023-09-25,18:51,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256553,106.759477,Jalan,pecah_kaca,kantor,Dilaporkan,True
+INC-01250,CURAS,2024-06-18,22:39,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270221,106.763257,Pusat Aktivitas,senjata_tajam,pejalan_kaki,Penyelidikan,True
+INC-01251,CURANMOR,2023-03-31,15:51,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235467,106.763452,Permukiman,duplikasi_kunci,motor,Selesai,True
+INC-01252,CURAS,2023-04-16,22:48,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256866,106.759650,Jalan,senjata_tajam,pengendara,Selesai,True
+INC-01253,TAWURAN,2024-02-25,23:48,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236696,106.762210,Permukiman,lainnya,kelompok_pemuda,Dilaporkan,True
+INC-01254,CURANMOR,2024-04-01,21:15,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269926,106.763732,Pusat Aktivitas,kunci_t,motor,Selesai,True
+INC-01255,CURAS,2023-11-26,02:48,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256251,106.759583,Jalan,lainnya,pejalan_kaki,Selesai,True
+INC-01256,CURAS,2025-04-09,21:49,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256807,106.758952,Jalan,ancaman,toko,Selesai,True
+INC-01257,TAWURAN,2025-11-08,21:38,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229692,106.751559,Pertokoan,lainnya,pengguna_jalan,Selesai,True
+INC-01258,CURANMOR,2023-12-30,00:44,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255217,106.758548,Jalan,kunci_t,motor,Penyidikan,True
+INC-01259,CURANMOR,2023-02-24,19:30,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256255,106.758109,Jalan,kelalaian_pengguna,motor,Selesai,True
+INC-01260,KEJAHATAN_JALANAN,2024-06-02,07:41,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229411,106.751407,Pertokoan,pencurian_ringan,pejalan_kaki,Penyelidikan,True
+INC-01261,CURANMOR,2023-05-30,22:51,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235809,106.762840,Permukiman,kelalaian_pengguna,mobil,Penyidikan,True
+INC-01262,TAWURAN,2025-02-21,16:28,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235455,106.762567,Permukiman,konflik_spontan,kelompok_pemuda,Selesai,True
+INC-01263,KEJAHATAN_JALANAN,2025-12-22,21:33,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255379,106.759107,Jalan,jambret,pengendara,Selesai,True
+INC-01264,CURAT,2025-12-07,22:12,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269944,106.763371,Pusat Aktivitas,rusak_kunci,toko,Selesai,True
+INC-01265,KEJAHATAN_JALANAN,2025-10-19,18:21,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235390,106.763690,Permukiman,pemalakan,pejalan_kaki,Penyelidikan,True
+INC-01266,CURAT,2025-09-25,03:21,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255478,106.759812,Jalan,pecah_kaca,kantor,Selesai,True
+INC-01267,CURAT,2025-04-24,08:54,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236157,106.763734,Permukiman,congkel,toko,Selesai,True
+INC-01268,CURANMOR,2025-03-10,20:05,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269239,106.763851,Pusat Aktivitas,kelalaian_pengguna,mobil,Penyelidikan,True
+INC-01269,CURANMOR,2024-11-12,22:07,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270214,106.763592,Pusat Aktivitas,lainnya,mobil,Selesai,True
+INC-01270,CURANMOR,2025-04-04,21:20,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256473,106.759875,Jalan,duplikasi_kunci,motor,Selesai,True
+INC-01271,CURANMOR,2023-12-07,01:19,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255468,106.758163,Jalan,kunci_t,motor,Penyelidikan,True
+INC-01272,CURANMOR,2023-02-01,18:58,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270557,106.763267,Pusat Aktivitas,duplikasi_kunci,mobil,Selesai,True
+INC-01273,CURANMOR,2025-12-29,18:11,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256689,106.759356,Jalan,duplikasi_kunci,mobil,Dilaporkan,True
+INC-01274,CURAT,2023-04-27,20:55,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269893,106.763703,Pusat Aktivitas,congkel,kantor,Penyidikan,True
+INC-01275,CURAT,2024-12-20,15:17,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269184,106.764048,Pusat Aktivitas,rusak_kunci,toko,Penyelidikan,True
+INC-01276,CURANMOR,2025-07-31,14:04,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269105,106.763960,Pusat Aktivitas,kunci_t,mobil,Penyelidikan,True
+INC-01277,CURAT,2023-12-22,21:55,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236664,106.762672,Permukiman,congkel,toko,Penyelidikan,True
+INC-01278,TAWURAN,2025-08-04,19:37,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270434,106.764801,Pusat Aktivitas,lainnya,kelompok_pemuda,Dilaporkan,True
+INC-01279,CURAS,2025-03-27,05:16,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255503,106.759788,Jalan,lainnya,toko,Penyelidikan,True
+INC-01280,TAWURAN,2025-03-02,08:28,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256439,106.759790,Jalan,kelompok_pemuda,kelompok_pemuda,Penyidikan,True
+INC-01281,TAWURAN,2024-01-01,08:16,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269555,106.764841,Pusat Aktivitas,konflik_spontan,pengguna_jalan,Dilaporkan,True
+INC-01282,CURAS,2025-12-30,01:32,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255368,106.759697,Jalan,perampasan_jalanan,pengendara,Selesai,True
+INC-01283,CURANMOR,2025-02-06,20:37,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236528,106.762684,Permukiman,kunci_t,mobil,Penyidikan,True
+INC-01284,TAWURAN,2023-09-02,13:09,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255797,106.759444,Jalan,kelompok_pelajar,kelompok_pemuda,Selesai,True
+INC-01285,CURAT,2025-05-29,04:40,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236636,106.763166,Permukiman,pecah_kaca,toko,Selesai,True
+INC-01286,CURANMOR,2024-05-17,21:15,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270339,106.763947,Pusat Aktivitas,lainnya,motor,Dilaporkan,True
+INC-01287,CURAT,2023-12-12,16:25,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255861,106.758741,Jalan,congkel,rumah,Penyidikan,True
+INC-01288,CURANMOR,2024-12-24,20:51,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269549,106.764806,Pusat Aktivitas,kelalaian_pengguna,motor,Penyelidikan,True
+INC-01289,CURAT,2023-09-18,19:22,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235340,106.763021,Permukiman,pecah_kaca,toko,Penyelidikan,True
+INC-01290,CURAT,2024-07-07,23:48,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255822,106.759154,Jalan,rusak_kunci,toko,Selesai,True
+INC-01291,CURAS,2024-01-08,17:55,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256377,106.759405,Jalan,perampasan_jalanan,toko,Penyelidikan,True
+INC-01292,CURAT,2025-12-10,05:16,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270032,106.763556,Pusat Aktivitas,congkel,rumah,Selesai,True
+INC-01293,CURANMOR,2024-11-26,20:48,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230829,106.750456,Pertokoan,duplikasi_kunci,motor,Selesai,True
+INC-01294,TAWURAN,2024-04-24,15:10,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256029,106.759706,Jalan,kelompok_pelajar,pengguna_jalan,Penyelidikan,True
+INC-01295,CURAS,2024-10-24,21:51,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255228,106.759293,Jalan,perampasan_jalanan,pengendara,Dilaporkan,True
+INC-01296,KEJAHATAN_JALANAN,2024-05-14,20:40,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230547,106.750608,Pertokoan,lainnya,pedagang,Penyidikan,True
+INC-01297,TAWURAN,2024-03-01,22:07,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235560,106.762896,Permukiman,konflik_spontan,kelompok_pemuda,Penyelidikan,True
+INC-01298,CURANMOR,2023-06-19,18:53,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236034,106.762645,Permukiman,lainnya,motor,Selesai,True
+INC-01299,CURANMOR,2025-12-03,18:27,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230115,106.750175,Pertokoan,kunci_t,motor,Penyidikan,True
+INC-01300,CURAS,2025-09-25,05:25,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270518,106.763442,Pusat Aktivitas,perampasan_jalanan,pengendara,Dilaporkan,True
+INC-01301,CURANMOR,2025-03-01,20:22,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256127,106.758119,Jalan,kunci_t,motor,Dilaporkan,True
+INC-01302,TAWURAN,2023-10-05,12:20,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270073,106.764702,Pusat Aktivitas,konflik_spontan,pengguna_jalan,Dilaporkan,True
+INC-01303,CURANMOR,2025-11-20,22:15,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270593,106.764169,Pusat Aktivitas,lainnya,mobil,Dilaporkan,True
+INC-01304,TAWURAN,2025-08-09,22:41,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270217,106.764086,Pusat Aktivitas,lainnya,kelompok_pelajar,Penyelidikan,True
+INC-01305,KEJAHATAN_JALANAN,2024-12-06,01:33,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236441,106.763103,Permukiman,jambret,pengendara,Dilaporkan,True
+INC-01306,KEJAHATAN_JALANAN,2024-03-18,14:32,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270703,106.764360,Pusat Aktivitas,pemalakan,pejalan_kaki,Selesai,True
+INC-01307,CURAT,2023-05-13,06:20,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230221,106.751124,Pertokoan,rusak_kunci,kantor,Penyelidikan,True
+INC-01308,CURAS,2024-01-17,04:44,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230821,106.750778,Pertokoan,senjata_tajam,pejalan_kaki,Penyidikan,True
+INC-01309,KEJAHATAN_JALANAN,2023-07-16,21:44,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236748,106.763332,Permukiman,lainnya,pejalan_kaki,Dilaporkan,True
+INC-01310,CURAT,2024-06-18,16:01,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236378,106.763068,Permukiman,lainnya,toko,Selesai,True
+INC-01311,CURAT,2024-05-19,18:07,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235505,106.763410,Permukiman,rusak_kunci,toko,Penyidikan,True
+INC-01312,CURANMOR,2025-05-21,16:49,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229121,106.751740,Pertokoan,duplikasi_kunci,mobil,Dilaporkan,True
+INC-01313,CURANMOR,2024-06-19,19:47,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255254,106.759057,Jalan,kunci_t,motor,Selesai,True
+INC-01314,CURAT,2023-11-07,09:10,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270019,106.763645,Pusat Aktivitas,rusak_kunci,kantor,Dilaporkan,True
+INC-01315,CURAS,2023-03-04,01:32,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255335,106.758486,Jalan,perampasan_jalanan,pejalan_kaki,Penyidikan,True
+INC-01316,CURAT,2023-05-25,01:35,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236404,106.763170,Permukiman,rusak_kunci,toko,Penyidikan,True
+INC-01317,CURAS,2025-07-29,18:23,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256336,106.759271,Jalan,senjata_tajam,toko,Penyelidikan,True
+INC-01318,TAWURAN,2023-05-25,02:50,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270027,106.764244,Pusat Aktivitas,kelompok_pemuda,kelompok_pelajar,Penyidikan,True
+INC-01319,CURAS,2025-12-19,08:48,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.230175,106.751157,Pertokoan,perampasan_jalanan,toko,Selesai,True
+INC-01320,CURANMOR,2025-05-22,04:38,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256826,106.758590,Jalan,lainnya,mobil,Penyelidikan,True
+INC-01321,TAWURAN,2024-05-28,14:07,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255923,106.758258,Jalan,konflik_spontan,kelompok_pelajar,Penyelidikan,True
+INC-01322,CURANMOR,2023-02-23,23:58,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255210,106.759780,Jalan,kunci_t,motor,Penyelidikan,True
+INC-01323,CURANMOR,2023-02-01,20:37,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235148,106.763564,Permukiman,duplikasi_kunci,mobil,Dilaporkan,True
+INC-01324,CURAS,2025-07-24,18:23,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270280,106.764351,Pusat Aktivitas,ancaman,toko,Dilaporkan,True
+INC-01325,TAWURAN,2024-12-19,15:34,Polsek Pesanggrahan,Pesanggrahan,Petukangan Utara,JKS-035,-6.229103,106.750636,Pertokoan,kelompok_pelajar,kelompok_pelajar,Penyelidikan,True
+INC-01326,TAWURAN,2023-10-23,08:40,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235323,106.762923,Permukiman,kelompok_pelajar,kelompok_pemuda,Selesai,True
+INC-01327,CURAT,2025-11-06,23:02,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256577,106.758604,Jalan,congkel,kantor,Penyelidikan,True
+INC-01328,CURAS,2023-07-06,18:13,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255451,106.758123,Jalan,senjata_tajam,pengendara,Penyidikan,True
+INC-01329,CURANMOR,2023-04-12,15:56,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236803,106.763299,Permukiman,lainnya,motor,Penyelidikan,True
+INC-01330,CURANMOR,2025-05-27,20:34,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256650,106.758817,Jalan,kunci_t,motor,Selesai,True
+INC-01331,CURANMOR,2023-05-06,01:17,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256448,106.758179,Jalan,kelalaian_pengguna,motor,Selesai,True
+INC-01332,CURAT,2023-01-18,07:31,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270188,106.764272,Pusat Aktivitas,lainnya,toko,Dilaporkan,True
+INC-01333,CURANMOR,2024-09-09,01:36,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235556,106.763050,Permukiman,kelalaian_pengguna,motor,Dilaporkan,True
+INC-01334,CURANMOR,2024-07-07,21:39,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269985,106.763301,Pusat Aktivitas,kunci_t,motor,Penyelidikan,True
+INC-01335,CURANMOR,2025-11-04,21:45,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270172,106.764466,Pusat Aktivitas,kelalaian_pengguna,mobil,Dilaporkan,True
+INC-01336,KEJAHATAN_JALANAN,2025-09-29,10:56,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.236613,106.763283,Permukiman,jambret,pedagang,Penyelidikan,True
+INC-01337,TAWURAN,2023-01-23,19:17,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.256009,106.758682,Jalan,konflik_spontan,kelompok_pemuda,Selesai,True
+INC-01338,CURANMOR,2025-06-13,09:03,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270506,106.764068,Pusat Aktivitas,duplikasi_kunci,mobil,Dilaporkan,True
+INC-01339,CURAT,2024-06-29,20:31,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255206,106.759685,Jalan,lainnya,toko,Penyelidikan,True
+INC-01340,CURANMOR,2024-01-15,21:58,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.269168,106.763284,Pusat Aktivitas,duplikasi_kunci,motor,Dilaporkan,True
+INC-01341,CURAS,2023-04-09,07:17,Polsek Pesanggrahan,Pesanggrahan,Pesanggrahan,JKS-036,-6.255477,106.759377,Jalan,senjata_tajam,pejalan_kaki,Penyidikan,True
+INC-01342,TAWURAN,2025-04-26,13:56,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235646,106.763483,Permukiman,lainnya,kelompok_pelajar,Penyidikan,True
+INC-01343,CURAT,2025-06-11,13:18,Polsek Pesanggrahan,Pesanggrahan,Bintaro,JKS-037,-6.270326,106.763484,Pusat Aktivitas,pecah_kaca,rumah,Penyidikan,True
+INC-01344,KEJAHATAN_JALANAN,2024-10-22,21:10,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235120,106.763713,Permukiman,lainnya,pejalan_kaki,Selesai,True
+INC-01345,CURAT,2024-04-16,12:40,Polsek Pesanggrahan,Pesanggrahan,Ulujami,JKS-034,-6.235904,106.763514,Permukiman,congkel,rumah,Selesai,True

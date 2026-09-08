@@ -155,6 +155,7 @@ def test_patrol_activity_is_linked_to_units_and_locations(session: Session) -> N
 
 def test_dataset_row_counts_match_the_source_files() -> None:
     """Menjaga agar berkas sumber tidak berubah diam-diam."""
-    assert len(src.read_rows("crime_incidents.csv")) == 1200
-    assert len(src.read_rows("intelligence_reports.csv")) == 120
-    assert len(src.read_rows("patrol_activity.csv")) == 180
+    # Naik pada 8 September 2026 bersama penambahan Kecamatan Pesanggrahan.
+    assert len(src.read_rows("crime_incidents.csv")) == 1345
+    assert len(src.read_rows("intelligence_reports.csv")) == 135
+    assert len(src.read_rows("patrol_activity.csv")) == 202
