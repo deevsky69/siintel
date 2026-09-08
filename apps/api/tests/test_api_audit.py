@@ -22,6 +22,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.api.deps import get_db
+from prediksi_presisi_api.api.routers.audit import WIB
 from prediksi_presisi_api.main import app
 from prediksi_presisi_api.models import AuditLog, Role, User
 from prediksi_presisi_api.security.passwords import hash_password
@@ -202,7 +203,11 @@ def test_a_single_day_range_includes_that_whole_day(client: TestClient, session:
     _a_refusal(client, session)
     latest = session.scalar(select(AuditLog.timestamp).order_by(AuditLog.timestamp.desc()))
     assert latest is not None
-    day = latest.date()
+    # Harinya harus dibaca dalam WIB, sama seperti yang dilakukan endpoint-nya. Kolomnya
+    # `timestamptz` dan psycopg menjawabnya dalam UTC, sehingga antara pukul 00.00 dan
+    # 07.00 WIB `.date()` menunjuk hari KEMARIN — dan uji ini gagal setiap dini hari
+    # walau perilaku aplikasinya benar.
+    day = latest.astimezone(WIB).date()
 
     response = client.get(
         f"/api/v1/audit-logs?date_from={day}&date_to={day}", headers=_auth(client, reader)
