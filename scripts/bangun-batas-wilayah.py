@@ -36,6 +36,7 @@ Jalankan:  uv run python scripts/bangun-batas-wilayah.py
 from __future__ import annotations
 
 import gzip
+import heapq
 import json
 import math
 import sys
@@ -221,6 +222,110 @@ def interior_point(ring: list[tuple[float, float]]) -> tuple[float, float]:
     return ((crossings[index] + crossings[index + 1]) / 2, y)
 
 
+def _distance_to_edge(
+    point: tuple[float, float], rings: list[list[tuple[float, float]]]
+) -> float:
+    """Jarak titik ke tepi terdekat; positif di dalam wilayah, negatif di luarnya.
+
+    Cincin dalam (lubang) ikut dihitung dengan aturan ganjil-genap, sehingga titik di dalam
+    lubang dinyatakan berada di luar wilayah — sebagaimana seharusnya.
+    """
+    x, y = point
+    best = float("inf")
+    contained = False
+
+    for ring in rings:
+        for i in range(len(ring) - 1):
+            x1, y1 = ring[i]
+            x2, y2 = ring[i + 1]
+            if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
+                contained = not contained
+
+            dx, dy = x2 - x1, y2 - y1
+            if dx or dy:
+                t = ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy)
+                t = 0.0 if t < 0 else 1.0 if t > 1 else t
+                px, py = x1 + t * dx, y1 + t * dy
+            else:
+                px, py = x1, y1
+            best = min(best, math.hypot(x - px, y - py))
+
+    return best if contained else -best
+
+
+def label_anchor(
+    rings: list[list[tuple[float, float]]], precision: float = 1.0
+) -> tuple[float, float]:
+    """Titik TERJAUH dari tepi wilayah — tempat paling lapang untuk menaruh namanya.
+
+    Pusat massa hanya menjawab "di mana tengahnya", bukan "di mana ada ruang". Pada
+    kecamatan bertakik seperti Mampang Prapatan dan Kebayoran Lama keduanya berbeda jauh:
+    pusat massanya jatuh pada bagian yang sempit, sehingga nama dua kata yang digambar di
+    sana menjulur ke wilayah tetangga dan terbaca sebagai nama milik tetangga itu.
+
+    Yang dicari di sini adalah pusat lingkaran terbesar yang muat di dalam wilayah — kutub
+    ketakteraksesan. Caranya membelah bidang menjadi sel-sel, menaksir batas atas jarak
+    setiap sel ke tepi (jarak pusatnya ditambah setengah diagonalnya), dan hanya membelah
+    sel yang batas atasnya masih melampaui jawaban terbaik sejauh ini. Sel yang tidak
+    mungkin lebih baik tidak pernah dibelah, jadi pencarian ini bukan sapuan menyeluruh.
+
+    `precision` dalam satuan proyeksi; 1 satuan = 10 meter. Ketelitian di bawah itu tidak
+    mengubah satu piksel pun pada peta yang digambar.
+    """
+    outer = rings[0]
+    min_x = min(p[0] for p in outer)
+    max_x = max(p[0] for p in outer)
+    min_y = min(p[1] for p in outer)
+    max_y = max(p[1] for p in outer)
+    width, height = max_x - min_x, max_y - min_y
+    cell = min(width, height)
+    if cell <= 0:
+        return centroid_of(outer)
+
+    half = cell / 2
+    # Antrean prioritas memakai jarak NEGATIF karena `heapq` selalu mengeluarkan yang
+    # terkecil; penghitung berurut memutus seri agar tuple tidak pernah membandingkan
+    # elemen ketiganya.
+    queue: list[tuple[float, int, float, float, float]] = []
+    counter = 0
+
+    def push(cx: float, cy: float, h: float) -> None:
+        nonlocal counter
+        d = _distance_to_edge((cx, cy), rings)
+        heapq.heappush(queue, (-(d + h * math.sqrt(2)), counter, cx, cy, h))
+        counter += 1
+
+    x = min_x
+    while x < max_x:
+        y = min_y
+        while y < max_y:
+            push(x + half, y + half, half)
+            y += cell
+        x += cell
+
+    best_point = interior_point(outer)
+    best = _distance_to_edge(best_point, rings)
+
+    centre = (min_x + width / 2, min_y + height / 2)
+    if _distance_to_edge(centre, rings) > best:
+        best_point, best = centre, _distance_to_edge(centre, rings)
+
+    while queue:
+        bound, _, cx, cy, h = heapq.heappop(queue)
+        if -bound - best <= precision:
+            break
+        d = _distance_to_edge((cx, cy), rings)
+        if d > best:
+            best_point, best = (cx, cy), d
+        quarter = h / 2
+        push(cx - quarter, cy - quarter, quarter)
+        push(cx + quarter, cy - quarter, quarter)
+        push(cx - quarter, cy + quarter, quarter)
+        push(cx + quarter, cy + quarter, quarter)
+
+    return best_point
+
+
 def area_of(ring: list[tuple[float, float]]) -> float:
     total = 0.0
     for i in range(len(ring) - 1):
@@ -297,7 +402,7 @@ def main() -> None:
             if not rings:
                 continue
             rings.sort(key=area_of, reverse=True)
-            anchor = centroid_of(rings[0])
+            anchor = label_anchor(rings)
             shapes.append(
                 {
                     "name": name,

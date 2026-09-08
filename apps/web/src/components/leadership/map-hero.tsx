@@ -108,7 +108,7 @@ export function MapHero({
                 districts={data.districts}
                 layer="current"
                 selected={selected}
-                className="mx-auto max-h-[54vh] w-full"
+                maxHeight="54vh"
                 level={level}
                 // Klik tetap di beranda: rinciannya muncul di panel sebelah, bukan dengan
                 // meninggalkan halaman yang baru saja dibuka pengguna.

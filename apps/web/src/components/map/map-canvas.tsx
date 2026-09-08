@@ -10,6 +10,7 @@ import {
   framingShapes,
   HOME_AREA,
   isWithin,
+  labelSpan,
   polygonPoints,
   projectLatLon,
   shapesAt,
@@ -59,9 +60,20 @@ import {
 // Warna peta menunjuk variabel tema. Peta adalah satu-satunya tempat warna digambar
 // lewat atribut SVG dan bukan kelas Tailwind, jadi ia perlu rujukannya sendiri.
 const NO_DATA_FILL = "rgb(var(--line))";
-const EDGE = "rgb(var(--surface-app))";
+
+/**
+ * Garis tepi wilayah dalam keadaan diam.
+ *
+ * Sebelumnya sewarna latar, sehingga wilayah hanya terpisah oleh perbedaan warna isian —
+ * dan dua wilayah bertetangga yang kebetulan sekelas risiko menyatu menjadi satu bentuk
+ * yang tidak dapat dipisahkan mata. Garis gelap tipis membuat batasnya selalu terbaca,
+ * termasuk pada wilayah tanpa data yang isiannya nyaris tak berwarna.
+ */
+const EDGE = "rgb(var(--text) / 0.45)";
+
+/** Saat disorot, garisnya menebal DAN menghitam — dua isyarat, bukan satu. */
+const EDGE_HOVER = "rgb(var(--text) / 0.9)";
 const EDGE_SELECTED = "rgb(var(--accent))";
-const EDGE_ACTIVE = "rgb(var(--accent-soft))";
 
 /**
  * Angka besar di tengah wilayah pada layer yang sedang tampil; `null` bila tidak ada data.
@@ -223,7 +235,14 @@ export function MapCanvas({
   districts,
   layer,
   selected,
-  className = "mx-auto max-h-[62vh] w-full",
+  /**
+   * Tinggi maksimum peta, dinyatakan sebagai satuan CSS.
+   *
+   * Dipakai untuk menghitung lebar maksimum pembungkus — bukan dipasang pada SVG.
+   * Menjepit tinggi SVG langsung membuat gambarnya tercentang di dalam kotak yang lebih
+   * lebar, dan lapisan label kehilangan acuannya.
+   */
+  maxHeight = "62vh",
   showScores = true,
   historical,
   months = DEFAULT_HISTORICAL_MONTHS,
@@ -234,7 +253,7 @@ export function MapCanvas({
   districts: MapDistrict[];
   layer: MapLayer;
   selected: string | null;
-  className?: string;
+  maxHeight?: string;
   /** Angka besar di tengah wilayah; dapat dimatikan bila ruangnya sempit. */
   showScores?: boolean;
   /**
@@ -282,11 +301,38 @@ export function MapCanvas({
   // induknya ikut menentukan bidang supaya penyelaman tidak melompat: pembaca melihat
   // wilayah yang sama, diperbesar.
   const bounds = useMemo(() => boundsOf(framingShapes(shapes)), [shapes]);
+
+  /**
+   * Lebar maksimum label tiap wilayah, dinyatakan sebagai persen lebar peta.
+   *
+   * Jangkar label sudah terbukti berada di dalam poligonnya, tetapi itu belum cukup:
+   * kotak label dipusatkan pada jangkar, sehingga nama panjang di atas wilayah sempit
+   * tetap menjulur ke luar — "Mampang Prapatan" selebar 124 piksel di atas wilayah yang
+   * jauh lebih sempit terbaca sebagai nama milik tetangganya.
+   *
+   * `labelSpan` menjawab lebar poligon tepat pada ketinggian jangkarnya — bukan lebar
+   * kotak pembatasnya, yang untuk wilayah bertakik bisa hampir dua kali lipat. Nama yang
+   * tidak muat lalu turun ke baris kedua, bukan menjulur.
+   *
+   * Ada lantai 7%: wilayah tersempit sekalipun harus menyisakan ruang bagi satu kata,
+   * dan memaksanya lebih sempit hanya memindahkan masalah menjadi kata yang terpenggal.
+   */
+  const labelWidth = useMemo(() => {
+    const widths = new Map<string, string>();
+    for (const shape of shapes) {
+      const percent = Math.max((labelSpan(shape) / bounds.width) * 100, 7);
+      widths.set(shape.name, `${percent}%`);
+    }
+    return widths;
+  }, [shapes, bounds]);
   const viewBox = useMemo(() => viewBoxOf(shapes), [shapes]);
 
   // Tebal garis dan jari-jari titik dinyatakan sebagai pecahan dari bentang bidang gambar,
   // bukan angka tetap. Satuan gambar adalah meter: garis setebal 3 satuan wajar untuk peta
   // selebar 50 kilometer dan menjadi pita selebar 30 meter pada peta satu kelurahan.
+  // Lebar terbesar yang masih memenuhi batas tinggi, pada nisbah bidang gambar.
+  const frameWidth = `calc(${maxHeight} * ${bounds.width / bounds.height})`;
+
   const span = Math.max(bounds.width, bounds.height);
   const strokeWidth = span / 500;
   const pointScale = span / 1500;
@@ -311,7 +357,24 @@ export function MapCanvas({
   };
 
   return (
-    <div className="relative">
+    /*
+      Pembungkus ini bernisbah sisi PERSIS sama dengan bidang gambar, dan itu bukan
+      kerapian belaka.
+
+      Sebelumnya tinggi peta dibatasi `max-h-…` langsung pada SVG. SVG mempertahankan
+      nisbahnya sendiri (`preserveAspectRatio` bawaan), sehingga ketika tingginya dijepit,
+      gambarnya menyusut dan tercentang di tengah — menyisakan pita kosong di kiri dan
+      kanan. Lapisan label diposisikan dengan PERSENTASE terhadap kotak pembungkus, yang
+      tetap selebar induknya, sehingga label terlempar ke luar gambar. Yang paling jauh
+      adalah wilayah terluar: "Pesanggrahan" melayang di kiri peta dan "Tebet" di kanannya.
+
+      Dengan nisbah pembungkus disamakan, tidak ada lagi pita kosong: persentase label dan
+      koordinat SVG menunjuk titik yang sama.
+    */
+    <div
+      className="relative mx-auto w-full"
+      style={{ aspectRatio: `${bounds.width} / ${bounds.height}`, maxWidth: frameWidth }}
+    >
       {/* biome-ignore lint/a11y/useSemanticElements: peta adalah SVG; tidak ada
           elemen HTML semantik yang dapat menggantikan wadah wilayah di dalamnya. */}
       <svg
@@ -328,7 +391,7 @@ export function MapCanvas({
                   ? "Peta skor prediksi kamtibmas per kecamatan"
                   : "Peta risiko kamtibmas per kecamatan"
         }
-        className={className}
+        className="h-full w-full"
       >
         {shapes.map((shape) => {
           const district = byName.get(shape.name);
@@ -372,8 +435,11 @@ export function MapCanvas({
                         historical?.peakIncidents ?? 0,
                       )
               }
-              stroke={isSelected || home ? EDGE_SELECTED : isActive ? EDGE_ACTIVE : EDGE}
-              strokeWidth={strokeWidth * (isSelected || isActive || home ? 2 : 1)}
+              stroke={isSelected || home ? EDGE_SELECTED : isActive ? EDGE_HOVER : EDGE}
+              // Tebalnya bertingkat: tipis saat diam, dua kali lipat saat disorot, dan
+              // paling tebal saat terpilih. Perubahan tebal saja tidak cukup terlihat pada
+              // peta sepadat ini; warnanya ikut berubah pada baris di atas.
+              strokeWidth={strokeWidth * (isSelected || home ? 2.5 : isActive ? 2 : 1)}
               strokeLinejoin="round"
             />
           ));
@@ -429,7 +495,9 @@ export function MapCanvas({
                   r={radius * pointScale}
                   fill={HISTORICAL_HEX}
                   fillOpacity={0.55}
-                  stroke={EDGE}
+                  // Titik kejadian diberi tepi sewarna latar supaya lingkaran yang
+                  // bertumpuk tetap dapat dihitung satu per satu.
+                  stroke="rgb(var(--surface-app))"
                   strokeWidth={strokeWidth}
                 />
               );
@@ -466,7 +534,7 @@ export function MapCanvas({
             <div
               key={shape.name}
               className="absolute -translate-x-1/2 -translate-y-1/2 text-center leading-tight"
-              style={toPercent(shape.label, bounds)}
+              style={{ ...toPercent(shape.label, bounds), maxWidth: labelWidth.get(shape.name) }}
             >
               <div
                 className={`font-heading text-2xs font-semibold drop-shadow-[0_1px_2px_rgb(var(--surface-app))] sm:text-xs ${

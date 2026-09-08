@@ -45,7 +45,7 @@ export function MapPanel({ data }: { data: MapData }) {
             districts={data.districts}
             layer="current"
             selected={top?.kecamatan ?? null}
-            className="mx-auto max-h-[46vh] w-full"
+            maxHeight="46vh"
           />
           <RiskLegend />
           {top ? (

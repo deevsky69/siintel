@@ -172,3 +172,49 @@ export function toPercent([x, y]: MapPoint, bounds: Bounds): { left: string; top
     top: `${((y - bounds.y) / bounds.height) * 100}%`,
   };
 }
+
+/**
+ * Lebar ruang yang benar-benar tersedia untuk label sebuah wilayah, dalam satuan proyeksi.
+ *
+ * Bukan lebar kotak pembatas. Kotak pembatas Mampang Prapatan hampir dua kali lebar
+ * wilayahnya pada ketinggian tempat namanya duduk, sehingga membatasi label dengannya
+ * tetap membiarkan nama menjulur ke wilayah tetangga — persis keluhan yang membuat fungsi
+ * ini ada.
+ *
+ * Yang dihitung adalah **potongan mendatar** poligon tepat pada ketinggian jangkar label:
+ * seluruh perpotongan sisi dengan garis `y = jangkar.y` diurutkan, lalu diambil selang
+ * yang memuat jangkar itu sendiri. Selang itulah lebar wilayah di tempat nama akan
+ * digambar. Cincin dalam (lubang) ikut memotong, jadi selangnya berhenti di tepi lubang —
+ * sebagaimana seharusnya.
+ *
+ * Menjawab `0` bila jangkar ternyata tidak berada di dalam satu selang pun; pemanggil
+ * memutuskan lantai minimumnya sendiri, karena lebar terkecil yang masih pantas dibaca
+ * adalah keputusan tampilan, bukan keputusan geometri.
+ */
+export function labelSpan(shape: AreaShape): number {
+  const [anchorX, anchorY] = shape.label;
+  const crossings: number[] = [];
+
+  for (const ring of shape.rings) {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i];
+      const [xj, yj] = ring[j];
+      // Aturan yang sama dengan uji titik-dalam-poligon: satu ujung di atas garis dan satu
+      // di bawah. Menyamakan `>=` di kedua sisi akan menghitung ganda setiap simpul yang
+      // kebetulan tepat menyentuh garis.
+      if (yi > anchorY !== yj > anchorY) {
+        crossings.push(xi + ((anchorY - yi) * (xj - xi)) / (yj - yi));
+      }
+    }
+  }
+
+  crossings.sort((a, b) => a - b);
+
+  for (let i = 0; i + 1 < crossings.length; i += 2) {
+    if (anchorX >= crossings[i] && anchorX <= crossings[i + 1]) {
+      return crossings[i + 1] - crossings[i];
+    }
+  }
+
+  return 0;
+}

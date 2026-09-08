@@ -12,7 +12,7 @@ import type {
   PredictiveResponse,
 } from "@/lib/map-data";
 import { buildMapData, resolveSelectedDistrict } from "@/lib/map-data";
-import { boundsOf, isWithin, projectLatLon, shapesAt } from "@/lib/wilayah";
+import { boundsOf, isWithin, labelSpan, projectLatLon, shapesAt } from "@/lib/wilayah";
 
 /**
  * Peta membaca `/map/*`, yang sudah mengagregasi di backend. Uji di bawah karena itu
@@ -390,6 +390,37 @@ describe("peta risiko", () => {
     expect(screen.getByRole("link", { name: /^Tebet —/ }).getAttribute("aria-current")).toBeNull();
   });
 
+  it("menguatkan garis tepi wilayah saat disorot, dan paling kuat saat terpilih", () => {
+    // Pemilik proyek meminta garis tipis saat diam dan garis yang jelas saat disorot.
+    // Diuji lewat atribut, bukan lewat tangkapan layar: nilai `stroke` peta ditulis
+    // sebagai atribut SVG (bukan kelas Tailwind), jadi inilah keadaan yang sebenarnya
+    // dibaca peramban.
+    render(<RiskMap {...mapProps} />);
+
+    const garis = (nama: RegExp) => {
+      const polygon = screen.getByRole("link", { name: nama }).querySelector("polygon");
+      if (polygon === null) throw new Error("wilayah tanpa poligon");
+      return {
+        warna: polygon.getAttribute("stroke") ?? "",
+        tebal: Number(polygon.getAttribute("stroke-width")),
+      };
+    };
+
+    const diam = garis(/^Tebet —/);
+    const terpilih = garis(/^Kebayoran Baru —/);
+
+    fireEvent.mouseOver(screen.getByRole("link", { name: /^Tebet —/ }));
+    const disorot = garis(/^Tebet —/);
+
+    // Warna DAN tebalnya sama-sama berubah: pada peta sepadat ini, satu isyarat saja
+    // tidak terlihat dari kursi belakang ruang paparan.
+    expect(disorot.warna).not.toBe(diam.warna);
+    expect(disorot.tebal).toBeGreaterThan(diam.tebal);
+    expect(terpilih.tebal).toBeGreaterThan(disorot.tebal);
+    // Garis saat diam tetap ada — "tipis" bukan berarti hilang.
+    expect(diam.tebal).toBeGreaterThan(0);
+  });
+
   it("menampilkan ringkasan berlabel saat wilayah disentuh tetikus", () => {
     // Tooltip disusun sebagai daftar berlabel sejak 3 September 2026, mengikuti cara
     // Grafana Geomap dan ArcGIS Dashboards: identitas, angka utama, status, pembanding.
@@ -637,6 +668,49 @@ describe("proyeksi titik ke bidang peta", () => {
     expect(isWithin(projectLatLon(-6.24, 106.8), jaksel)).toBe(true);
     // Bandung — jauh di luar wilayah hukum mana pun pada peta ini.
     expect(isWithin(projectLatLon(-6.9, 107.6), jaksel)).toBe(false);
+  });
+
+  it("mengukur lebar wilayah pada ketinggian labelnya, bukan lebar kotak pembatasnya", () => {
+    // Kutipan keluhan pemilik proyek: "nama pesanggrahan diluar dari peta pesanggrahan".
+    // Penyebabnya kotak label yang lebih lebar daripada wilayahnya di tempat nama itu
+    // digambar — dan kotak pembatas tidak dapat mengukurnya, karena untuk wilayah
+    // bertakik ia jauh lebih lebar daripada wilayahnya sendiri.
+    for (const shape of shapesAt("kecamatan")) {
+      const span = labelSpan(shape);
+      const box = boundsOf([shape]);
+
+      expect(span).toBeGreaterThan(0);
+      expect(span).toBeLessThanOrEqual(box.width);
+    }
+
+    // Sekurang-kurangnya satu kecamatan harus JAUH lebih sempit pada ketinggian labelnya
+    // daripada kotak pembatasnya; kalau tidak, fungsi ini tidak mengukur apa pun yang
+    // tidak sudah diketahui kotak pembatas.
+    const sempit = shapesAt("kecamatan").filter(
+      (shape) => labelSpan(shape) < boundsOf([shape]).width * 0.7,
+    );
+    expect(sempit.length).toBeGreaterThan(0);
+  });
+
+  it("menjawab nol bila jangkar tidak berada di dalam wilayahnya", () => {
+    // Bentuk L: jangkar sengaja ditaruh pada sudut kosongnya.
+    const span = labelSpan({
+      name: "uji",
+      label: [90, 90],
+      rings: [
+        [
+          [0, 0],
+          [100, 0],
+          [100, 40],
+          [40, 40],
+          [40, 100],
+          [0, 100],
+          [0, 0],
+        ],
+      ],
+    });
+
+    expect(span).toBe(0);
   });
 
   it("meletakkan Jakarta Selatan di dalam bidang wilayah hukum Polda Metro Jaya", () => {
