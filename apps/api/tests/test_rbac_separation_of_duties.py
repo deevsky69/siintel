@@ -104,3 +104,47 @@ def test_the_check_would_catch_a_regression() -> None:
     assert PRODUCES_THE_NUMBERS & previously_merged, (
         "daftar kewenangan penghasil angka tidak lagi mencakup yang dahulu bermasalah"
     )
+
+
+def test_publishing_to_the_public_is_a_command_decision_not_a_technical_one() -> None:
+    """`public_alert:publish` ada pada Pimpinan, dan TIDAK pada Administrator (U-10).
+
+    Sampai 9 September 2026 permission ini ada di katalog tetapi tidak dipegang satu peran
+    pun: katalog menyatakan sebuah kewenangan yang tidak berlaku bagi siapa-siapa, dan
+    kanal peringatan kepada masyarakat tidak dapat dijalankan siapa pun. Tidak ada test
+    yang gagal karenanya — permission yatim tidak menimbulkan gejala apa-apa.
+
+    Ia diletakkan pada Pimpinan karena mengumumkan peringatan kepada masyarakat mengubah
+    perilaku orang di luar organisasi dan tidak dapat ditarik kembali setelah terbaca.
+    Administrator — peran yang menjalankan prediksi — karenanya kekurangan tepat tiga
+    permission, dan ketiganya keputusan komando: memutuskan tindakan, menilai ketepatan,
+    dan mengumumkan kepada publik.
+    """
+    roles = yaml.safe_load(RBAC_FILE.read_text(encoding="utf-8"))["roles"]
+    holders = {
+        name
+        for name, scopes in roles.items()
+        for entries in scopes.values()
+        if "public_alert:publish" in entries
+    }
+
+    assert holders == {"Pimpinan"}, (
+        f"pemegang public_alert:publish: {sorted(holders) or 'tidak ada'}"
+    )
+
+
+def test_the_three_permissions_administrator_lacks_are_all_command_decisions() -> None:
+    """Yang menjalankan prediksi tidak memutuskan, tidak menilai, dan tidak mengumumkan."""
+    config = yaml.safe_load(RBAC_FILE.read_text(encoding="utf-8"))
+    catalogue = {
+        f"{resource}:{action}"
+        for resource, actions in config["permissions"].items()
+        for action in actions
+    }
+    admin = {entry for entries in config["roles"]["Administrator"].values() for entry in entries}
+
+    assert catalogue - admin == {
+        "commander_decision:approve",
+        "evaluation:run",
+        "public_alert:publish",
+    }

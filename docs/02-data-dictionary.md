@@ -90,7 +90,9 @@
 `public_alert_id` uuid PK · `code` UQ · `warning_id` FK nullable · `created_at` · `severity` · `threat_type` · `area_text` · `time_window` · `window_start` · `window_end` · `status` · `public_message`.
 
 Memakai `area_text` (teks wilayah untuk publik), bukan `location_id`, agar tidak mengekspos grid internal.
-> **NOT SPECIFIED (U-10):** siapa berwenang mempublikasikan dan severity minimum yang boleh dipublikasikan. `REQUIRES HUMAN / POLICY APPROVAL`.
+> **SEPARUH DITETAPKAN (U-10), 9 September 2026:** kewenangan menerbitkan alert publik ada pada **Pimpinan** — `public_alert:publish`, scope ALL. Diletakkan di sana karena mengumumkan peringatan kepada masyarakat adalah keputusan komando, bukan tindakan teknis: ia mengubah perilaku orang di luar organisasi dan tidak dapat ditarik kembali setelah terbaca.
+>
+> **Masih terbuka:** severity minimum yang boleh dipublikasikan. `REQUIRES HUMAN / POLICY APPROVAL`.
 
 ## 8. `community_feedback`
 
@@ -314,7 +316,7 @@ predictions         DRAFT → PUBLISHED → VALIDATED
 
 ## 23. YANG MASIH MENUNGGU KEPUTUSAN PENGGUNA
 
-~~U-01 threshold risiko/warning~~ dan ~~U-02 bobot faktor~~ ditetapkan 9 September 2026 · U-03 definisi target prediksi & aturan pencocokan evaluasi · U-04 ukuran grid & batas wilayah · U-05 kebijakan kredensial · U-06 aturan scope jurisdiksi/fungsi · U-08 state machine final · U-10 kewenangan publikasi alert · U-13 identitas & bukti LAPOR PRESISI · U-14 retensi/klasifikasi · ~~U-16 taksonomi final~~ ditetapkan 9 September 2026.
+~~U-01 threshold risiko/warning~~ dan ~~U-02 bobot faktor~~ ditetapkan 9 September 2026 · U-03 definisi target prediksi & aturan pencocokan evaluasi · U-04 ukuran grid & batas wilayah · U-05 kebijakan kredensial · U-06 aturan scope jurisdiksi/fungsi · U-08 state machine final · U-10 severity minimum publikasi alert (kewenangannya ditetapkan 9 September 2026) · U-13 identitas & bukti LAPOR PRESISI · U-14 retensi/klasifikasi · ~~U-16 taksonomi final~~ ditetapkan 9 September 2026.
 
 Rincian dan opsi: `docs/implementation-notes/000c-specification-lock.md`.
 

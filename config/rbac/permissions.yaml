@@ -67,6 +67,28 @@ roles:
       # Pemisahan ini murah (satu permission) tetapi menutup pertanyaan yang paling
       # mungkin diajukan penguji Taskap: siapa yang memverifikasi angka validasinya.
       - evaluation:run
+      # DITETAPKAN 9 September 2026 — keputusan pemilik proyek, menutup U-10 / P-2.
+      #
+      # Sebelum ini `public_alert:publish` ada di katalog permission tetapi TIDAK
+      # DIPEGANG SATU PERAN PUN. Akibatnya bukan sekadar kekosongan dokumen: kanal
+      # peringatan kepada masyarakat tidak dapat dijalankan siapa pun, dan katalog
+      # menyatakan sebuah kewenangan yang tidak berlaku bagi siapa-siapa.
+      #
+      # Diletakkan pada Pimpinan, bukan Administrator, karena menerbitkan peringatan
+      # kepada masyarakat adalah keputusan komando dan bukan tindakan teknis: ia
+      # mengubah perilaku orang di luar organisasi, tidak dapat ditarik kembali setelah
+      # terbaca, dan menanggung risiko kepanikan maupun risiko diam.
+      #
+      # Administrator karenanya kekurangan TEPAT TIGA permission dari 43, dan
+      # ketiganya adalah keputusan komando: `commander_decision:approve`,
+      # `evaluation:run`, dan `public_alert:publish`. Peran yang menjalankan prediksi
+      # tidak memutuskan tindakannya, tidak menilai ketepatannya sendiri, dan tidak
+      # mengumumkannya kepada publik.
+      #
+      # SEVERITY MINIMUM BELUM DITETAPKAN — sisa U-10 yang masih terbuka. Yang diputus
+      # 9 September 2026 adalah SIAPA yang berwenang, bukan MULAI TINGKAT MANA sebuah
+      # peringatan pantas diumumkan.
+      - public_alert:publish
       - audit:read
       - config:read
 

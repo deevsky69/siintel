@@ -110,7 +110,7 @@ permission atas resource tersebut.
 | risk_score | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run(ALL) |
 | prediction | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run, publish(ALL) |
 | warning | read(ALL) | read(ALL) | read, acknowledge(OWN_JURISDICTION) | read, acknowledge, resolve(ALL) |
-| public_alert | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| public_alert | read, publish(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
 | recommendation | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
 | commander_decision | read, approve(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
 | operation | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
@@ -122,7 +122,7 @@ permission atas resource tersebut.
 | audit | read(ALL) | — | — | read(ALL) |
 | config | read(ALL) | — | — | read, manage(ALL) |
 
-Jumlah permission per peran: Pimpinan 22, Fungsi 17, Polsek 22, Administrator 40.
+Jumlah permission per peran: Pimpinan 23, Fungsi 17, Polsek 22, Administrator 40.
 
 <!-- matriks:selesai -->
 
@@ -138,7 +138,7 @@ Butir berikut adalah **keputusan kewenangan organisasi**, bukan keputusan teknis
 | # | Pertanyaan | Terkait |
 |---|---|---|
 | P-1 | Siapa yang berwenang menyetujui rekomendasi — hanya Pimpinan, atau Administrator juga untuk prioritas rendah? | `commander_decision:approve` |
-| P-2 | Siapa yang berwenang **mempublikasikan alert publik** dan pada severity minimum berapa? Saat ini tidak ada satu peran pun yang memegang `public_alert:publish`. | `public_alert:publish` (U-10) |
+| P-2 | **Separuh dijawab 9 September 2026:** kewenangan menerbitkan alert publik ada pada **Pimpinan**. Yang masih terbuka: mulai severity berapa sebuah peringatan pantas diumumkan. | `public_alert:publish` (U-10) |
 | P-3 | Administrator kini boleh mem-*publish* prediksi tanpa persetujuan siapa pun. Apakah itu dikehendaki, atau publikasi perlu ditahan Pimpinan? | `prediction:publish` |
 | P-4 | Definisi jurisdiksi Polsek: apakah dibatasi `location.polsek`, atau ada pengecualian lintas wilayah? | `OWN_JURISDICTION` (U-06) |
 | P-5 | Apakah role Fungsi dibatasi per fungsi (Intelkam/Reskrim/…) atau melihat seluruh fungsi? | `OWN_FUNCTION` (U-06) |

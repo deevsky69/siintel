@@ -736,6 +736,7 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 | Pemetaan status wilayah Aman/Waspada/Siaga (U-22) | 9 September 2026 | `leadership_display.area_status`, Siaga = HIGH + CRITICAL |
 | Taksonomi nilai (U-16) | 9 September 2026 | `config/taxonomy/mappings.yaml` versi `taksonomi-2026-09-01`, 20 domain |
 | Prediksi tanpa kelas risiko | 9 September 2026 | Prediksi tetap skor mentah; tangga kelas hanya bagi penilaian keadaan berjalan |
+| Kewenangan publikasi alert publik (separuh U-10) | 9 September 2026 | `public_alert:publish` pada **Pimpinan**, scope ALL. Severity minimumnya masih terbuka |
 
 Seluruhnya ditetapkan **memakai nilai yang sudah berlaku**, tanpa satu angka pun berubah,
 sehingga baris yang sudah tersimpan tetap sah dan tetap tertelusur. Ditetapkan berarti
@@ -748,7 +749,7 @@ Butir berikut **tidak diinvensi** dan memblokir task tertentu:
 
 | Item | Memblokir |
 |---|---|
-| Kewenangan & kriteria publikasi alert publik (U-10 / P-2) | TASK 111 — saat ini **tidak satu peran pun** memegang `public_alert:publish` |
+| **Kriteria** publikasi alert publik — severity minimum (sisa U-10 / P-2) | TASK 111. Kewenangannya sudah ditetapkan pada Pimpinan 9 September 2026 |
 | Definisi target prediksi & aturan pencocokan evaluasi (U-03) | TASK 100–104, 150–151 |
 | Ambang peringkat volume laporan (0,70 / 0,40) | Layar Pimpinan — dipisahkan dari U-22 pada 9 September 2026 |
 | Ukuran grid & batas GIS resmi (U-04) | TASK 011, 080–084 |
