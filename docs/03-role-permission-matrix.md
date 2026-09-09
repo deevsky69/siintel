@@ -10,11 +10,20 @@
 | Level | Role | Ruang lingkup |
 |---|---|---|
 | 1 | Pimpinan | Dashboard strategis, prediksi, rekomendasi, persetujuan |
-| 2 | Command Center | Monitoring, warning, tasking, deployment |
-| 3 | Analyst | Analitik, spasial, modelling, evaluasi |
 | 4 | Fungsi | Sesuai fungsi yang diberi kewenangan (Intelkam/Reskrim/Samapta/Binmas/Lantas) |
 | 5 | Polsek | Data dan situasi di wilayah hukumnya |
-| 6 | Administrator | Konfigurasi teknis, manajemen user/sistem |
+| 6 | Administrator | Konfigurasi teknis, manajemen user/sistem, monitoring, analitik |
+
+> **Penggabungan peran — keputusan pemilik proyek, 1 September 2026, ditegaskan kembali
+> 9 September 2026.** Level 2 (*Command Center*) dan level 3 (*Analyst*) **dihapus**;
+> keduanya menjadi Administrator penuh. Nomor level 2 dan 3 sengaja dibiarkan kosong
+> alih-alih dinomori ulang, supaya rujukan lama pada dokumen dan catatan implementasi
+> tidak berpindah arti.
+>
+> Administrator karenanya memegang 40 dari 43 permission. Dua yang sengaja berada di
+> luar jangkauannya milik Pimpinan: `commander_decision:approve` (yang mengusulkan tidak
+> boleh menjadi yang memutuskan) dan `evaluation:run` (yang menghasilkan angka tidak
+> boleh menilai ketepatannya sendiri).
 
 ---
 
@@ -68,32 +77,57 @@ Penegakan `scope` terjadi **di backend** (query filter), bukan di frontend.
 
 ## 3. MATRIKS ROLE → PERMISSION (`PROPOSED`)
 
-Diturunkan dari draf matriks sebelumnya; **belum disetujui**. Format sel: `action(scope)`.
+**Tabel di bawah dibangkitkan dari `config/rbac/permissions.yaml`** — sumber yang
+benar-benar dipakai seeder RBAC dan ditegakkan backend. Jangan menyuntingnya dengan
+tangan; ubah konfigurasinya lalu jalankan:
 
-| Resource | Pimpinan | Command Center | Analyst | Fungsi | Polsek | Administrator |
-|---|---|---|---|---|---|---|
-| dashboard | read(ALL) | read(ALL) | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
-| location | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, write(ALL) |
-| crime | read(ALL) | read(ALL) | read, write, export(ALL) | read, write(OWN_FUNCTION) | read, write(OWN_JURISDICTION) | read(ALL) |
-| intelligence | read(ALL) | read(ALL) | read(ALL) | read, write(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
-| patrol | read(ALL) | read, write(ALL) | read(ALL) | read, write(OWN_FUNCTION) | read, write(OWN_JURISDICTION) | read(ALL) |
-| police_unit | read(ALL) | read(ALL) | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
-| map | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
-| analytics | read(ALL) | read(ALL) | read, export(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
-| risk_score | read(ALL) | read(ALL) | read, run(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
-| prediction | read(ALL) | read(ALL) | read, run, publish(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
-| warning | read(ALL) | read, acknowledge, resolve(ALL) | read(ALL) | read(ALL) | read, acknowledge(OWN_JURISDICTION) | read(ALL) |
-| public_alert | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
-| recommendation | read(ALL) | read, write(ALL) | read, write(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
-| commander_decision | read, approve(ALL) | read(ALL) | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
-| operation | read(ALL) | read, write(ALL) | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
-| citizen_report | read(ALL) | read, write(ALL) | read(ALL) | read(OWN_FUNCTION) | read, write(OWN_JURISDICTION) | read(ALL) |
-| community_feedback | read(ALL) | read(ALL) | read(ALL) | — | read(OWN_JURISDICTION) | read(ALL) |
-| evaluation | read(ALL) | read(ALL) | read, run(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
-| user | — | — | — | — | — | read, manage(ALL) |
-| role | — | — | — | — | — | read, manage(ALL) |
-| audit | read(ALL) | read(ALL) | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
-| config | read(ALL) | read(ALL) | read(ALL) | — | — | read, manage(ALL) |
+```bash
+python3 scripts/matriks-rbac.py --tulis
+```
+
+Alasannya konkret: sampai 9 September 2026 tabel ini ditulis tangan, dan ia sudah
+menyimpang jauh. Ia masih memuat kolom Command Center dan Analyst — dua peran yang
+dihapus 1 September 2026 — dan memberi Administrator sekadar `read` pada hampir seluruh
+resource, padahal peran itu sesungguhnya memegang 40 dari 43 permission. Dokumen yang
+bertentangan dengan konfigurasi yang dijalankan lebih berbahaya daripada dokumen yang
+tidak ada, karena ia tetap dibaca sebagai kebenaran.
+
+Format sel: `action(scope)`. Tanda `—` berarti peran itu tidak memegang satu pun
+permission atas resource tersebut.
+
+<!-- matriks:mulai -->
+
+| Resource | Pimpinan | Fungsi | Polsek | Administrator |
+|---|---|---|---|---|
+| dashboard | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| location | read(ALL) | read(ALL) | read(ALL) | read, write(ALL) |
+| crime | read(ALL) | read, write(ALL) | read, write(OWN_JURISDICTION) | read, write, export(ALL) |
+| intelligence | read(ALL) | — | read(OWN_JURISDICTION) | read, write(ALL) |
+| patrol | read(ALL) | read, write(OWN_FUNCTION) | read, write(OWN_JURISDICTION) | read, write(ALL) |
+| police_unit | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
+| map | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| analytics | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, export(ALL) |
+| risk_score | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run(ALL) |
+| prediction | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run, publish(ALL) |
+| warning | read(ALL) | read(ALL) | read, acknowledge(OWN_JURISDICTION) | read, acknowledge, resolve(ALL) |
+| public_alert | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| recommendation | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
+| commander_decision | read, approve(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read(ALL) |
+| operation | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
+| citizen_report | read(ALL) | — | read, write(OWN_JURISDICTION) | read, write(ALL) |
+| community_feedback | read(ALL) | — | read(OWN_JURISDICTION) | read(ALL) |
+| evaluation | read, run(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| user | — | — | — | read, manage(ALL) |
+| role | — | — | — | read, manage(ALL) |
+| audit | read(ALL) | — | — | read(ALL) |
+| config | read(ALL) | — | — | read, manage(ALL) |
+
+Jumlah permission per peran: Pimpinan 22, Fungsi 17, Polsek 22, Administrator 40.
+
+<!-- matriks:selesai -->
+
+Statusnya tetap `PROPOSED`: yang dibangkitkan adalah **isi tabelnya**, bukan
+persetujuan atasnya. Pemberian permission per peran menunggu jawaban P-1…P-7 di §4.
 
 ---
 
@@ -103,13 +137,13 @@ Butir berikut adalah **keputusan kewenangan organisasi**, bukan keputusan teknis
 
 | # | Pertanyaan | Terkait |
 |---|---|---|
-| P-1 | Siapa yang berwenang menyetujui rekomendasi — hanya Pimpinan, atau Command Center juga untuk tingkat tertentu? | `commander_decision:approve` |
-| P-2 | Siapa yang berwenang **mempublikasikan alert publik** dan pada severity minimum berapa? | `public_alert:publish` (U-10) |
-| P-3 | Apakah Analyst boleh mem-*publish* prediksi, atau perlu persetujuan? | `prediction:publish` |
+| P-1 | Siapa yang berwenang menyetujui rekomendasi — hanya Pimpinan, atau Administrator juga untuk prioritas rendah? | `commander_decision:approve` |
+| P-2 | Siapa yang berwenang **mempublikasikan alert publik** dan pada severity minimum berapa? Saat ini tidak ada satu peran pun yang memegang `public_alert:publish`. | `public_alert:publish` (U-10) |
+| P-3 | Administrator kini boleh mem-*publish* prediksi tanpa persetujuan siapa pun. Apakah itu dikehendaki, atau publikasi perlu ditahan Pimpinan? | `prediction:publish` |
 | P-4 | Definisi jurisdiksi Polsek: apakah dibatasi `location.polsek`, atau ada pengecualian lintas wilayah? | `OWN_JURISDICTION` (U-06) |
 | P-5 | Apakah role Fungsi dibatasi per fungsi (Intelkam/Reskrim/…) atau melihat seluruh fungsi? | `OWN_FUNCTION` (U-06) |
-| P-6 | Apakah Pimpinan/Command Center boleh membaca seluruh audit log, atau dibatasi? | `audit:read` |
-| P-7 | Siapa yang boleh mengubah bobot risiko/threshold pada produksi? | `config:manage` |
+| P-6 | Fungsi dan Polsek belum memegang `audit:read` sama sekali, karena `audit_logs` tidak punya kolom lokasi sehingga OWN_JURISDICTION mustahil ditegakkan. Apakah keduanya tetap tanpa akses audit? | `audit:read` |
+| P-7 | Siapa yang boleh mengubah bobot risiko/threshold pada produksi? Saat ini Administrator, bersama seluruh `config:manage`. | `config:manage` |
 
 Sampai P-1…P-7 dijawab, matriks §3 berstatus `PROPOSED` dan hanya dipakai sebagai baseline pengembangan.
 

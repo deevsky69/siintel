@@ -32,7 +32,12 @@ SCOPES = ("ALL", "OWN_JURISDICTION", "OWN_FUNCTION")
 
 
 class Role(TimestampMixin, Base):
-    """Peran pengguna: Pimpinan, Command Center, Analyst, Fungsi, Polsek, Administrator."""
+    """Peran pengguna: Pimpinan, Fungsi, Polsek, Administrator.
+
+    Command Center dan Analyst dilebur ke dalam Administrator pada 1 September 2026 —
+    keputusan pemilik proyek. Sumber kebenaran pemberian permission adalah
+    `config/rbac/permissions.yaml`, bukan daftar di sini.
+    """
 
     __tablename__ = "roles"
 
