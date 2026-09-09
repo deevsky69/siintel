@@ -47,3 +47,20 @@ test-results/
 # Berkas lampiran laporan masyarakat. Isinya foto, suara, dan video dari warga — data
 # pribadi yang tidak boleh masuk ke repositori dalam keadaan apa pun.
 var/lampiran/
+
+# Kunci privat dan keystore penandatangan — TIDAK PERNAH masuk repositori (CLAUDE.md §28).
+#
+# Ditambahkan 9 September 2026, saat repositori ini menjadi publik dan langkah berikutnya
+# pada APK adalah membuat kunci rilis satuan. Yang dijaga bukan kelalaian besar melainkan
+# yang kecil: `git add -A` setelah menjalankan keytool di direktori proyek. Sekali sebuah
+# kunci terdorong ke repositori publik ia harus dianggap bocor selamanya — menghapusnya
+# dari riwayat tidak menariknya kembali dari mesin siapa pun yang sudah menyalin.
+#
+# Sertifikat (bagian PUBLIK) tetap boleh: `apps/android/.../siintel_ca.pem` memang
+# terlacak, dan memang hanya sertifikat.
+*.key
+*.p12
+*.jks
+*.keystore
+*-key.pem
+*privkey*
