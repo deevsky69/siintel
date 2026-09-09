@@ -23,7 +23,7 @@ from __future__ import annotations
 import os
 import uuid
 from collections.abc import Iterator
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
@@ -179,6 +179,56 @@ def _baseline(score: int = 63) -> engine.Baseline:
             "context_factor": 68,
         },
     )
+
+
+def _forecast(baseline: engine.Baseline | None) -> engine.Forecast:
+    moment = datetime(2025, 12, 19, 18, 0, tzinfo=UTC)
+    return engine.Forecast(
+        location_id=uuid.uuid4(),
+        grid_id="JKS-001",
+        kecamatan="Tebet",
+        kelurahan="Manggarai",
+        polsek="Tebet",
+        threat_type="CURANMOR",
+        time_window="18:00-23:59",
+        window_start=moment,
+        window_end=moment,
+        baseline=baseline,
+        risk_score=None if baseline is None else baseline.risk_score,
+        confidence=None if baseline is None else 70,
+        confidence_reason="diuji",
+        supporting_incidents=3,
+        dominant_factors=(),
+        not_predicted_reason=None if baseline is not None else "tanpa dasar",
+    )
+
+
+def test_predictions_are_never_given_a_risk_class() -> None:
+    """Keputusan pemilik proyek 9 September 2026: prediksi tetap skor mentah.
+
+    Sampai hari itu mesin ini memanggil `thresholds.class_for(...)` untuk tiap prediksi,
+    sehingga layar Prediction Center menampilkan "95 CRITICAL" — tangga yang ditetapkan
+    bagi PENILAIAN keadaan berjalan dipinjamkan kepada PERKIRAAN. Skor prediksi 80 tidak
+    menyatakan hal yang sama dengan skor penilaian 80, dan menyamakan keduanya membuat
+    perkiraan terbaca sebagai keadaan.
+
+    Yang diperiksa adalah bentuk keluarannya, bukan sekadar ketiadaan atribut: kunci
+    `risk_class` tidak boleh muncul dengan nama apa pun yang menyiratkan ia milik prediksi.
+    """
+    row = _forecast(_baseline()).as_dict()
+
+    assert "risk_class" not in row
+    assert row["risk_score"] == 63
+    # Kelas penilaian dasarnya tetap terbawa — dengan nama yang menyebut milik siapa ia.
+    assert row["baseline_risk_class"] == "MODERATE"
+
+
+def test_a_forecast_without_a_baseline_reports_no_class_at_all() -> None:
+    """Tanpa penilaian dasar tidak ada kelas untuk dilaporkan, dan tidak boleh dikarang."""
+    row = _forecast(None).as_dict()
+
+    assert row["baseline_risk_class"] is None
+    assert row["risk_score"] is None
 
 
 def test_every_dominant_factor_is_labelled_rule() -> None:
@@ -421,17 +471,26 @@ def test_each_sample_row_can_be_traced_back_to_its_baseline(
 
 
 @pytestmark_db
-def test_risk_class_comes_from_the_threshold_configuration(
+def test_a_run_records_its_threshold_version_but_classifies_nothing(
     client: TestClient, session: Session
 ) -> None:
-    """Kelas risiko dibaca dari config, tidak dihitung ulang di kode (CLAUDE.md §12)."""
+    """Versi ambang tetap dicatat, tetapi tidak dipakai memberi kelas pada prediksi.
+
+    Sampai 9 September 2026 test ini justru MENUNTUT setiap baris contoh berkelas
+    `thresholds.class_for(skor)`. Pemilik proyek kemudian memutuskan prediksi tetap skor
+    mentah, sehingga tuntutan itu menjadi kebalikan dari yang harus dijaga.
+
+    Versinya tetap dicatat karena ambang itulah yang menentukan apakah sebuah prediksi
+    kelak melahirkan peringatan — hubungan yang harus tetap dapat ditelusuri.
+    """
     headers = _auth(client, _user(session, "Administrator"))
     _status, body = _run(client, headers)
     thresholds = risk.load_thresholds()
 
     assert body["threshold_version"] == thresholds.version
     for row in body["sample"]:
-        assert row["risk_class"] == thresholds.class_for(int(row["risk_score"]))
+        assert "risk_class" not in row, "prediksi tidak boleh diberi kelas"
+        assert 0 <= int(row["risk_score"]) <= 100
 
 
 @pytestmark_db

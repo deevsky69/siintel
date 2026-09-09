@@ -75,7 +75,14 @@ export type RunForecast = {
   window_start: string;
   window_end: string;
   risk_score: number | null;
-  risk_class: string | null;
+  /**
+   * Kelas PENILAIAN DASAR yang melahirkan prediksi ini — bukan kelas prediksinya.
+   *
+   * Prediksi tidak diberi kelas sama sekali (keputusan pemilik proyek 9 September 2026).
+   * Namanya menyebut milik siapa kelas itu, karena `risk_class` di sebelah `risk_score`
+   * pada baris prediksi terbaca sebagai kelas prediksi itu sendiri.
+   */
+  baseline_risk_class: string | null;
   confidence: number | null;
   confidence_reason: string;
   supporting_incidents: number;
@@ -113,7 +120,8 @@ export type RunResult = {
   threshold_status: string;
   evidence: { incidents: number; date_from: string | null; date_to: string | null };
   not_computed_reason: string | null;
-  risk_class_distribution: Record<string, number>;
+  /** Sebaran kelas penilaian dasar — menjawab prediksi ini lahir dari penilaian sekelas apa. */
+  baseline_class_distribution: Record<string, number>;
   by_threat_type: {
     threat_type: string;
     windows: number;

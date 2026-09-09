@@ -23,11 +23,11 @@ import { shapesAt } from "./wilayah";
  * Dua hal yang sengaja **tidak** dilakukan di sini:
  *
  * 1. **Tidak menghitung ulang kelas risiko.** `risk_class` selalu berasal dari respons.
- *    Layer prediktif tidak membawa kelas sama sekali — bukan lagi karena ambangnya belum
- *    ditetapkan (U-01 ditutup 9 September 2026), melainkan karena ambang itu ditetapkan bagi
- *    PENILAIAN keadaan berjalan, dan belum ada keputusan bahwa tangga yang sama berlaku bagi
- *    PERKIRAAN. Skor prediksi 80 tidak menyatakan hal yang sama dengan skor penilaian 80,
- *    maka layer itu ditampilkan sebagai skor mentah dan dinyatakan demikian di layar.
+ *    Layer prediktif tidak membawa kelas sama sekali. Sejak 9 September 2026 itu adalah
+ *    KEPUTUSAN, bukan kekurangan: tangga kelas ditetapkan pada hari yang sama (U-01), tetapi
+ *    bagi PENILAIAN keadaan berjalan. Skor prediksi 80 tidak menyatakan hal yang sama dengan
+ *    skor penilaian 80, dan satu tangga untuk keduanya membuat perkiraan terbaca sebagai
+ *    keadaan. Layer itu karena itu tampil sebagai skor mentah, dan layar menyebutnya.
  * 2. **Tidak membuang `*_basis`.** Setiap angka turunan dari backend datang bersama
  *    keterangan asalnya; keterangan itu diteruskan apa adanya ke komponen.
  *

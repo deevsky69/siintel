@@ -113,7 +113,7 @@ const result: RunResult = {
   threshold_status: "DEMO",
   evidence: { incidents: 1200, date_from: "2023-01-01", date_to: "2025-12-31" },
   not_computed_reason: null,
-  risk_class_distribution: { HIGH: 12, LOW: 644 },
+  baseline_class_distribution: { HIGH: 12, LOW: 644 },
   by_threat_type: [
     { threat_type: "CURANMOR", windows: 132, highest: 88, average: 41, average_confidence: 18 },
   ],
@@ -131,7 +131,7 @@ const result: RunResult = {
       window_start: "2026-01-01T11:00:00+00:00",
       window_end: "2026-01-01T17:00:00+00:00",
       risk_score: 88,
-      risk_class: "CRITICAL",
+      baseline_risk_class: "CRITICAL",
       confidence: 25,
       confidence_reason: "7 kejadian CURANMOR pada sel ini di jendela 18:00-23:59",
       supporting_incidents: 7,

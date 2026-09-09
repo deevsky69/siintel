@@ -48,9 +48,11 @@ import {
  * - `current` — diwarnai menurut `risk_class` yang dikirim backend. Kelas tidak pernah
  *   dihitung ulang di sini (CLAUDE.md §12).
  * - `predictive` — prediksi **tidak menyimpan kelas risiko** dan tidak diberi kelas oleh
- *   API, karena ambangnya masih DEMO / PROPOSED (U-01). Layer ini karenanya memakai satu
- *   warna dengan kepekatan mengikuti skor, bukan tangga warna risiko, dan layar
- *   menyatakan bahwa yang ditampilkan adalah skor mentah tanpa kelas resmi.
+ *   API. Itu keputusan pemilik proyek 9 September 2026, bukan kekurangan yang menunggu
+ *   diperbaiki: tangga kelas ditetapkan hari yang sama (U-01), tetapi bagi PENILAIAN
+ *   keadaan berjalan — skor prediksi 80 tidak menyatakan hal yang sama dengan skor
+ *   penilaian 80. Layer ini karenanya memakai satu warna dengan kepekatan mengikuti skor,
+ *   bukan tangga warna risiko, dan layar menyebut bahwa yang tampil adalah skor mentah.
  *
  * Ketiganya memakai warna yang berjauhan supaya tidak ada layer yang terbaca sebagai
  * layer lain saat dipandang sekilas dari kursi belakang ruang paparan.
@@ -131,9 +133,11 @@ export function tooltipRows(district: MapDistrict, layer: MapLayer): TooltipRow[
       { label: "Skor prediksi", value: `${area.risk_score}/100` },
       { label: "Ancaman", value: area.threat_type },
       ...(area.time_window ? [{ label: "Jendela", value: area.time_window }] : []),
-      // Prediksi tidak berkelas (U-01), dan ketiadaannya disebut supaya tidak terbaca
-      // sebagai kelas yang kebetulan tidak muat.
-      { label: "Kelas", value: "belum ditetapkan" },
+      // Ketiadaan kelas disebut, supaya tidak terbaca sebagai kelas yang kebetulan tidak
+      // muat. Kata-katanya "tidak diberi kelas", BUKAN "belum ditetapkan": ambangnya sudah
+      // ditetapkan 9 September 2026, dan pada hari yang sama pemilik proyek memutuskan
+      // prediksi tetap tanpa kelas. Menulis "belum" menyebut keadaan yang tidak berlaku.
+      { label: "Kelas", value: "tidak diberi kelas" },
     ];
   }
 

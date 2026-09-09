@@ -167,7 +167,11 @@ describe("isi tooltip peta", () => {
 
     const kelas = tooltipRows(predictive, "predictive").find((row) => row.label === "Kelas");
 
-    expect(kelas?.value).toBe("belum ditetapkan");
+    // "tidak diberi kelas", BUKAN "belum ditetapkan": ambangnya sudah ditetapkan
+    // 9 September 2026, dan pada hari yang sama pemilik proyek memutuskan prediksi tetap
+    // skor mentah. Kata "belum" menyebut keadaan yang tidak lagi berlaku, dan mengundang
+    // orang berikutnya "melengkapinya".
+    expect(kelas?.value).toBe("tidak diberi kelas");
   });
 
   it("menjawab keadaan tanpa data tanpa mengarang angka", () => {

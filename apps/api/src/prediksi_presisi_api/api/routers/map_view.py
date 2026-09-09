@@ -72,7 +72,10 @@ PREDICTIVE_BASIS = (
     "Nilai per kecamatan adalah hasil agregasi prediksi di lapisan API: risk_score = skor "
     "tertinggi antar sel pada horizon tersebut, confidence dan jendela waktu diambil dari "
     "prediksi berskor tertinggi itu. Prediksi tidak menyimpan kelas risiko dan tidak "
-    "diberi kelas di sini — ambang kelas belum ditetapkan (U-01). Prediksi berstatus "
+    "diberi kelas di sini. Itu KEPUTUSAN pemilik proyek 9 September 2026, bukan akibat "
+    "ambang yang belum ada: tangga kelas ditetapkan hari yang sama bagi penilaian keadaan "
+    "berjalan, dan skor prediksi 80 tidak menyatakan hal yang sama dengan skor penilaian "
+    "80. Prediksi berstatus "
     f"{UNPUBLISHED_PREDICTION_STATUS} tidak ikut."
 )
 

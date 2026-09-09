@@ -127,13 +127,18 @@ def _reject_partial_scope(current: CurrentUser, permission: str) -> None:
 
 
 def _summary(projection: engine.Projection) -> dict[str, Any]:
-    """Sebaran kelas risiko, ringkasan per jenis ancaman, dan alasan yang tidak diprediksi."""
+    """Sebaran kelas PENILAIAN DASAR, ringkasan per jenis ancaman, dan alasan tak diprediksi.
+
+    Sebarannya menjawab "prediksi ini lahir dari penilaian sekelas apa", bukan "prediksi
+    ini berkelas apa". Prediksi tidak diberi kelas — keputusan pemilik proyek 9 September
+    2026 — dan nama kuncinya menyebut hal itu supaya pembaca tidak menyimpulkan sebaliknya.
+    """
     classes: dict[str, int] = {}
     threats: dict[str, dict[str, Any]] = {}
 
     for forecast in projection.predicted:
         score = forecast.risk_score or 0
-        label = forecast.risk_class or "TIDAK DIKETAHUI"
+        label = "TIDAK DIKETAHUI" if forecast.baseline is None else forecast.baseline.risk_class
         classes[label] = classes.get(label, 0) + 1
 
         threat = threats.setdefault(
@@ -166,7 +171,7 @@ def _summary(projection: engine.Projection) -> dict[str, Any]:
     top = sorted(projection.predicted, key=lambda item: item.risk_score or 0, reverse=True)
 
     return {
-        "risk_class_distribution": classes,
+        "baseline_class_distribution": classes,
         "by_threat_type": sorted(
             threats.values(), key=lambda item: int(item["highest"]), reverse=True
         ),

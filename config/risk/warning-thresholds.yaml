@@ -111,6 +111,30 @@ versions:
 # hanya dibuat pada skor >= 70. Ini terlihat jelas hanya setelah ambangnya ditulis di sini.
 
 # =============================================================================
+# APA YANG TANGGA INI BERLAKUKAN — DAN APA YANG TIDAK
+# =============================================================================
+#
+# Keputusan pemilik proyek, 9 September 2026, diambil bersamaan dengan penetapan U-01:
+#
+#   Kelas risiko di atas berlaku bagi PENILAIAN KEADAAN BERJALAN (`risk_scores`).
+#   PREDIKSI tetap ditampilkan sebagai SKOR MENTAH, tanpa kelas.
+#
+# Alasannya bukan bahwa ambangnya belum siap — ia ditetapkan pada hari yang sama.
+# Alasannya bahwa kedua angka itu menjawab pertanyaan yang berbeda. Skor penilaian 80
+# menyatakan "sel ini SEDANG berisiko sebesar itu"; skor prediksi 80 menyatakan "sel ini
+# DIPERKIRAKAN berisiko sebesar itu pada jendela waktu di depan", lengkap dengan
+# ketidakpastian yang dibawa kata "diperkirakan" dan dinyatakan terpisah sebagai
+# `confidence`. Memberi keduanya kata "KRITIS" yang sama membuat perkiraan terbaca sebagai
+# keadaan, dan itu persis kekeliruan yang paling mahal pada layar peringatan dini.
+#
+# Karena itu `predictions` tidak menyimpan kolom kelas, API tidak menghitungkannya, dan
+# peta menampilkan layer prediktif dengan satu warna berkepekatan — bukan tangga warna
+# risiko. Dijaga `test_predictions_are_never_given_a_risk_class`.
+#
+# Membalik keputusan ini berarti menetapkan tangga TERSENDIRI bagi prediksi, bukan
+# meminjam tangga di atas.
+
+# =============================================================================
 # TAMPILAN LAYAR PIMPINAN — DEMO / PROPOSED, REQUIRES USER APPROVAL
 # =============================================================================
 #

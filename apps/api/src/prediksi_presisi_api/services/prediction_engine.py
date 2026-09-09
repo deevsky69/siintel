@@ -30,8 +30,16 @@ EMPAT BATAS YANG MENENTUKAN BENTUK MODUL INI
    terhadap kombinasi terpadat. Dasar tipis menghasilkan angka rendah, dan alasannya
    ikut pada setiap baris.
 
-4. **Kelas risiko dibaca dari `config/risk/warning-thresholds.yaml`**, tepatnya dari
-   `versions[active_version].risk_classes` — tidak dihitung ulang di kode.
+4. **Prediksi tidak diberi kelas risiko sama sekali.** Keputusan pemilik proyek
+   9 September 2026: prediksi tetap skor mentah. Sampai hari itu mesin ini memberi tiap
+   prediksi kelas hasil `thresholds.class_for(...)`, sehingga layar Prediction Center
+   menampilkan "95 CRITICAL" di sebelah skor — tangga yang ditetapkan bagi PENILAIAN
+   keadaan berjalan dipinjamkan kepada PERKIRAAN, dan perkiraan terbaca sebagai keadaan.
+   Kelas penilaian dasarnya tetap terbawa sebagai `baseline_risk_class`, dengan nama yang
+   menyebut milik siapa kelas itu.
+
+   Versi ambang tetap dicatat pada tiap putaran (`threshold_version`), karena ambang itulah
+   yang menentukan apakah sebuah prediksi kelak melahirkan peringatan.
 """
 
 from __future__ import annotations
@@ -177,7 +185,12 @@ class Forecast:
     window_end: datetime
     baseline: Baseline | None
     risk_score: int | None
-    risk_class: str | None
+    # TIDAK ADA `risk_class` di sini, dan itu keputusan pemilik proyek 9 September 2026:
+    # prediksi tetap skor mentah. Tangga kelas ditetapkan hari yang sama (U-01) bagi
+    # PENILAIAN keadaan berjalan; skor prediksi 80 tidak menyatakan hal yang sama dengan
+    # skor penilaian 80, dan satu tangga untuk keduanya membuat perkiraan terbaca sebagai
+    # keadaan. Kelas penilaian dasarnya tetap dapat dicapai lewat `baseline.risk_class` —
+    # ia fakta tentang baris `risk_scores`, bukan label atas prediksi ini.
     confidence: int | None
     confidence_reason: str
     supporting_incidents: int
@@ -206,7 +219,10 @@ class Forecast:
             "window_start": self.window_start,
             "window_end": self.window_end,
             "risk_score": self.risk_score,
-            "risk_class": self.risk_class,
+            # Namanya menyebut MILIK SIAPA kelas itu. `risk_class` di sebelah `risk_score`
+            # pada baris prediksi terbaca sebagai kelas prediksi itu sendiri, dan itulah
+            # yang tidak boleh.
+            "baseline_risk_class": None if self.baseline is None else self.baseline.risk_class,
             "confidence": self.confidence,
             "confidence_reason": self.confidence_reason,
             "supporting_incidents": self.supporting_incidents,
@@ -594,7 +610,6 @@ def project(
                             window_end=window_end,
                             baseline=None,
                             risk_score=None,
-                            risk_class=None,
                             confidence=None,
                             confidence_reason=confidence_reason,
                             supporting_incidents=count,
@@ -626,8 +641,6 @@ def project(
                         window_end=window_end,
                         baseline=baseline,
                         risk_score=baseline.risk_score,
-                        # Kelas dibaca dari config, tidak dihitung ulang di kode.
-                        risk_class=thresholds.class_for(baseline.risk_score),
                         confidence=confidence,
                         confidence_reason=confidence_reason,
                         supporting_incidents=count,

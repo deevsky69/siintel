@@ -506,7 +506,11 @@ tidak ada yang mengira sistem sudah memakai model pembelajaran mesin.
 ### Dua hal yang sengaja dibuat demikian
 
 - **Layer prediktif tidak memiliki kelas risiko** (Rendah/Sedang/Tinggi/Kritis), hanya
-  skor mentah. Memberi kelas berarti menerapkan ambang yang belum ditetapkan resmi.
+  skor mentah. Sejak 9 September 2026 ini **keputusan pemilik proyek**, bukan kekurangan
+  yang menunggu diperbaiki: tangga kelas ditetapkan pada hari yang sama, tetapi bagi
+  penilaian keadaan **berjalan**. Skor prediksi 80 tidak menyatakan hal yang sama dengan
+  skor penilaian 80, dan memakai satu tangga untuk keduanya membuat perkiraan terbaca
+  sebagai keadaan.
 - **Bentuk wilayah adalah perkiraan** dari titik koordinat lokasi, **bukan batas
   administratif resmi**. Ini dinyatakan di layar.
 

@@ -41,8 +41,11 @@ function ForecastCard({ forecast }: { forecast: RunForecast }) {
           <span className="font-heading text-xl font-bold tabular-nums text-ink">
             {forecast.risk_score === null ? "—" : forecast.risk_score}
           </span>
-          <span className="ml-2 text-2xs uppercase tracking-wider text-ink-muted">
-            {forecast.risk_class ?? "tidak diprediksi"}
+          {/* Skor mentah, TANPA kelas. Sampai 9 September 2026 baris ini menempelkan
+              kelas di sebelah skor — "95 CRITICAL" — dan itu meminjamkan tangga yang
+              ditetapkan bagi penilaian keadaan berjalan kepada sebuah perkiraan. */}
+          <span className="ml-2 text-2xs uppercase tracking-wider text-ink-faint">
+            {forecast.risk_score === null ? "tidak diprediksi" : "skor prediksi"}
           </span>
         </div>
       </div>
@@ -101,7 +104,7 @@ function ForecastCard({ forecast }: { forecast: RunForecast }) {
 }
 
 export function RunSummary({ result }: { result: RunResult }) {
-  const classes = Object.entries(result.risk_class_distribution);
+  const classes = Object.entries(result.baseline_class_distribution);
 
   return (
     <div className="space-y-3">
@@ -160,13 +163,23 @@ export function RunSummary({ result }: { result: RunResult }) {
       </dl>
 
       {classes.length > 0 ? (
-        <ul className="flex flex-wrap gap-1.5">
-          {classes.map(([name, count]) => (
-            <li key={name} className="badge bg-base-800 text-ink">
-              {name} {count}
-            </li>
-          ))}
-        </ul>
+        <div>
+          {/* Judulnya menyebut MILIK SIAPA kelas ini. Tanpa judul, deretan lencana
+              "CRITICAL 12" di bawah ringkasan prediksi terbaca sebagai kelas prediksinya
+              — persis yang tidak boleh, karena prediksi tidak diberi kelas. */}
+          <p className="stat-label">Kelas penilaian dasar</p>
+          <ul className="mt-1 flex flex-wrap gap-1.5">
+            {classes.map(([name, count]) => (
+              <li key={name} className="badge bg-base-800 text-ink">
+                {name} {count}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1 text-2xs leading-relaxed text-ink-faint">
+            Kelas ini milik baris penilaian yang menjadi dasar tiap prediksi, bukan kelas
+            prediksinya. Prediksi ditampilkan sebagai skor mentah tanpa kelas.
+          </p>
+        </div>
       ) : null}
 
       {result.by_threat_type.length > 0 ? (
