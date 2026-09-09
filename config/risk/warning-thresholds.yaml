@@ -145,9 +145,12 @@ versions:
 #
 # Ia tetap berada di berkas ini, bukan di kode, karena keduanya adalah ambang — dan ambang
 # hanya boleh hidup di satu tempat (CLAUDE.md §12).
+#
+# Setiap blok di bawah membawa STATUSNYA SENDIRI. Sampai 9 September 2026 keduanya berbagi
+# satu penanda, sehingga menetapkan salah satunya akan diam-diam menetapkan yang lain —
+# padahal pemetaan status wilayah (U-22) dan peringkat volume laporan adalah dua keputusan
+# yang berbeda, dan yang kedua bahkan bukan tentang risiko sama sekali.
 leadership_display:
-  status: PROPOSED
-
   # ---------------------------------------------------------------------------
   # STATUS WILAYAH — Aman / Waspada / Siaga
   #
@@ -162,12 +165,22 @@ leadership_display:
   # menuntut tindakan. Menggabungkan dari bawah akan menyebut wilayah MODERATE sebagai
   # "Aman", dan kata itu menghentikan orang bertanya lebih jauh.
   #
-  # BELUM DISETUJUI. Layar menyatakan pemetaan ini terbuka beserta statusnya.
+  # DITETAPKAN pemilik proyek 9 September 2026 (U-22), memakai pemetaan yang sudah
+  # berlaku. Tidak ada satu baris pun yang berubah saat penetapan, sehingga setiap layar
+  # yang pernah menyebut sebuah kecamatan "Siaga" tetap menyebutnya demikian.
+  #
+  # Yang ditetapkan adalah PENGGABUNGANNYA. Konsekuensinya tetap berlaku dan tetap perlu
+  # dinyatakan: wilayah CRITICAL dan HIGH tampil dengan satu nama yang sama, sehingga
+  # layar Pimpinan tidak membedakan keduanya. Yang membedakannya adalah angka skornya,
+  # yang selalu ikut tampil.
   # ---------------------------------------------------------------------------
   area_status:
-    - { status: AMAN, label: Aman, risk_classes: [LOW] }
-    - { status: WASPADA, label: Waspada, risk_classes: [MODERATE] }
-    - { status: SIAGA, label: Siaga, risk_classes: [HIGH, CRITICAL] }
+    status: FINAL
+    ditetapkan: 2026-09-09
+    mapping:
+      - { status: AMAN, label: Aman, risk_classes: [LOW] }
+      - { status: WASPADA, label: Waspada, risk_classes: [MODERATE] }
+      - { status: SIAGA, label: Siaga, risk_classes: [HIGH, CRITICAL] }
 
   # ---------------------------------------------------------------------------
   # PERINGKAT VOLUME LAPORAN — daftar "Top 10 area rawan"
@@ -180,8 +193,16 @@ leadership_display:
   # bukan terhadap angka mutlak. Wilayah dengan 70% laporan sebanyak wilayah teratas
   # berperingkat KRITIS pada jendela itu; pada jendela lain, jumlah yang sama bisa
   # berperingkat lain. Layar menyatakan hal ini.
+  #
+  # MASIH PROPOSED, dan sengaja TIDAK ikut ditetapkan bersama U-22 pada 9 September 2026:
+  # yang diputus hari itu adalah pemetaan kelas risiko ke nama status, sedangkan ambang
+  # 0,70 dan 0,40 di bawah tidak pernah menjadi bagian U-22. Menetapkannya menuntut
+  # pertanyaannya sendiri — apakah "Kritis" pantas disematkan pada wilayah yang hanya
+  # ramai melapor, sementara volume laporan bukan ukuran kerawanan.
   # ---------------------------------------------------------------------------
   report_volume:
-    - { level: KRITIS, label: Kritis, min_share_of_peak: 0.70 }
-    - { level: SEDANG, label: Sedang, min_share_of_peak: 0.40 }
-    - { level: RENDAH, label: Rendah, min_share_of_peak: 0.0 }
+    status: PROPOSED
+    levels:
+      - { level: KRITIS, label: Kritis, min_share_of_peak: 0.70 }
+      - { level: SEDANG, label: Sedang, min_share_of_peak: 0.40 }
+      - { level: RENDAH, label: Rendah, min_share_of_peak: 0.0 }

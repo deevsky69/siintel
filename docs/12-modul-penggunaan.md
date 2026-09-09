@@ -284,7 +284,7 @@ wilayahnya sendiri.
 | Kartu | Angkanya | Bacanya |
 |---|---|---|
 | **Laporan Masuk** | Total 24 jam terakhir | Rinciannya tiga jenis: kejadian, intelijen, warga |
-| **Status Wilayah** | Berapa dari berapa kecamatan pada status terbanyak | Pemetaan statusnya **belum disetujui** |
+| **Status Wilayah** | Berapa dari berapa kecamatan pada status terbanyak | Pemetaan statusnya **ditetapkan 9 September 2026**; Siaga menggabungkan kelas Tinggi dan Kritis |
 | **Perlu Perhatian** | Butir yang masih menunggu manusia | Terpisah: peringatan belum diterima, dan keputusan yang menunggu Anda |
 | **Wilayah Prioritas** | Skor sel tertinggi wilayah teratas | Rata-rata wilayahnya disebut di bawahnya |
 

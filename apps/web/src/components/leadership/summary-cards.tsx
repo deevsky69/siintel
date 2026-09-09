@@ -114,10 +114,17 @@ export function AreaStatusCard({ areaStatus }: { areaStatus: AreaStatus }) {
             {areaStatus.assessment_date ?? "terakhir"}.
           </p>
 
+          {/* Kalimat penutup MENGIKUTI status, tidak ditulis tetap di sebelahnya. Sampai
+              9 September 2026 baris ini berbunyi "masih {status} dan belum disetujui",
+              sehingga begitu pemetaannya ditetapkan layar berbunyi "masih FINAL dan belum
+              disetujui" — dua pernyataan yang bertentangan dalam satu kalimat. */}
           <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
             Status mengikuti sel dengan skor tertinggi di kecamatan itu, sama seperti peta. Pemetaan
-            empat kelas risiko ke tiga nama status masih{" "}
-            <strong>{areaStatus.mapping_status}</strong> dan belum disetujui.
+            empat kelas risiko ke tiga nama status berstatus{" "}
+            <strong>{areaStatus.mapping_status}</strong>
+            {areaStatus.mapping_status === "FINAL"
+              ? " — ditetapkan pemilik proyek. Siaga menggabungkan kelas Tinggi dan Kritis; yang membedakan keduanya adalah angka skornya."
+              : " dan belum disetujui."}
           </p>
         </>
       )}

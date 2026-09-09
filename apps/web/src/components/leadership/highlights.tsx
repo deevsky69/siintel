@@ -79,7 +79,10 @@ export function Highlights({ board }: { board: LeadershipBoard }) {
         title="Status Wilayah"
         value={`${dominant.areas}/${board.area_status.areas.length}`}
         tone={toneOf(AREA_STATUS_TONE, dominant.status).split(" ")[0]}
-        note={`Kecamatan berstatus ${dominant.label} pada penilaian ${board.area_status.assessment_date ?? "terakhir"}. Pemetaan status belum disetujui.`}
+        // Kalimat penutupnya mengikuti status pemetaan dari API, bukan ditulis tetap.
+        note={`Kecamatan berstatus ${dominant.label} pada penilaian ${board.area_status.assessment_date ?? "terakhir"}. Pemetaan status ${
+          board.area_status.mapping_status === "FINAL" ? "sudah ditetapkan" : "belum disetujui"
+        }.`}
         href="/wilayah"
         linkLabel="Peringkat wilayah"
       />

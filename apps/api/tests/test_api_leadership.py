@@ -9,7 +9,7 @@ Yang dijaga di sini bukan bentuk respons, melainkan lima hal yang rusak tanpa te
    barisnya terisi peringatan CRITICAL dan satu-satunya butir yang hanya dapat
    diselesaikan pimpinan tidak pernah terlihat.
 4. **Tidak ada ambang di kode.** Nama status dan tingkat volume berasal dari config, dan
-   responsnya selalu menyatakan bahwa pemetaan itu belum disetujui.
+   responsnya selalu menyatakan STATUS pemetaan itu apa adanya — bukan kalimat tetap.
 5. **Rekomendasi kebijakan benar-benar diturunkan dari data**, bukan kalimat tetap.
 """
 
@@ -282,17 +282,30 @@ def test_attention_list_only_holds_what_still_waits_for_a_person(
 # --- 4. Ambang berasal dari config ------------------------------------------------------
 
 
-def test_area_status_uses_the_mapping_from_config_and_says_it_is_unapproved(
+def test_area_status_uses_the_mapping_from_config_and_states_its_status(
     client: TestClient, session: Session
 ) -> None:
+    """Pemetaan DAN statusnya sama-sama berasal dari konfigurasi.
+
+    Sampai 9 September 2026 test ini menuntut `display.status != "FINAL"` dan menuntut
+    kalimat "belum disetujui" ada di dasar — yakni memanggang keadaan "belum ditetapkan"
+    ke dalam suite. Ketika pemilik proyek menetapkan U-22, tuntutan itu berbalik menjadi
+    penghalang keputusannya sendiri. Yang dijaga sekarang: apa pun statusnya, layar
+    menyebut status yang sama dengan konfigurasi, dan kalimat penutupnya MENGIKUTI status
+    itu alih-alih ditulis tetap.
+    """
     display = load_leadership_display()
     leader = _make_user(session, "Pimpinan")
     area_status = _board(client, leader)["area_status"]
     assert isinstance(area_status, dict)
 
-    assert area_status["mapping_status"] == display.status
-    assert display.status != "FINAL", "pemetaan ini belum disetujui siapa pun"
-    assert "belum disetujui" in str(area_status["basis"])
+    assert area_status["mapping_status"] == display.area_status_status
+    basis = str(area_status["basis"])
+    if display.area_status_status == "FINAL":
+        assert "ditetapkan pemilik proyek" in basis
+        assert "belum disetujui" not in basis
+    else:
+        assert "belum disetujui" in basis
 
     for area in area_status["areas"]:
         expected = display.status_for(str(area["risk_class"]))

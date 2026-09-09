@@ -23,9 +23,9 @@ export const board: LeadershipBoard = {
   },
   area_status: {
     assessment_date: "2025-12-31",
-    mapping_status: "PROPOSED",
+    mapping_status: "FINAL",
     basis:
-      "Empat kelas dipetakan ke tiga nama status. Status pemetaan: PROPOSED — belum disetujui.",
+      "Empat kelas dipetakan ke tiga nama status. Status pemetaan: FINAL — ditetapkan pemilik proyek.",
     mapping: [
       { status: "AMAN", label: "Aman", risk_classes: ["LOW"] },
       { status: "WASPADA", label: "Waspada", risk_classes: ["MODERATE"] },

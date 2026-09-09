@@ -58,10 +58,16 @@ describe("sorotan beranda", () => {
     }
   });
 
-  it("menyatakan pemetaan status belum disetujui", () => {
+  it("menyebut status pemetaan apa adanya, ke arah mana pun", () => {
     render(<Highlights board={board} />);
+    expect(screen.getByText(/Pemetaan status sudah ditetapkan/i)).toBeDefined();
 
-    expect(screen.getByText(/belum disetujui/i)).toBeDefined();
+    const proposed = {
+      ...board,
+      area_status: { ...board.area_status, mapping_status: "PROPOSED" },
+    };
+    render(<Highlights board={proposed} />);
+    expect(screen.getAllByText(/Pemetaan status belum disetujui/i).length).toBeGreaterThan(0);
   });
 });
 

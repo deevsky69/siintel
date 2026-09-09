@@ -41,10 +41,20 @@ describe("kartu laporan masuk", () => {
 });
 
 describe("kartu status wilayah", () => {
-  it("menyatakan pemetaannya belum disetujui", () => {
+  it("menyebut status pemetaan apa adanya, ke arah mana pun", () => {
+    // Kalimat penutupnya MENGIKUTI status. Sampai 9 September 2026 layar ini berbunyi
+    // "masih {status} dan belum disetujui" — sehingga begitu U-22 ditetapkan ia berbunyi
+    // "masih FINAL dan belum disetujui", dua pernyataan bertentangan dalam satu kalimat.
     render(<AreaStatusCard areaStatus={board.area_status} />);
 
-    expect(screen.getAllByText("PROPOSED").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("FINAL").length).toBeGreaterThan(0);
+    expect(screen.getByText(/ditetapkan pemilik proyek/)).toBeDefined();
+    expect(screen.queryByText(/belum disetujui/)).toBeNull();
+  });
+
+  it("kembali menyatakan belum disetujui bila statusnya memang belum", () => {
+    render(<AreaStatusCard areaStatus={{ ...board.area_status, mapping_status: "PROPOSED" }} />);
+
     expect(screen.getByText(/belum disetujui/)).toBeDefined();
   });
 

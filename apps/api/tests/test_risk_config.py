@@ -232,11 +232,25 @@ def test_versions_that_are_merely_proposed_are_not_the_ones_in_force() -> None:
             )
 
 
-def test_the_leadership_display_mapping_is_still_a_proposal() -> None:
-    """Penetapan U-01/U-02 TIDAK ikut menutup U-22.
+def test_each_leadership_display_block_carries_its_own_status() -> None:
+    """Dua keputusan berbeda tidak boleh berbagi satu penanda.
 
-    Pemetaan Aman/Waspada/Siaga menggabungkan HIGH dan CRITICAL menjadi satu nama, dan
-    penggabungan itu mengubah makna. Ia berada di berkas yang sama dengan ambang yang baru
-    ditetapkan, sehingga paling mudah ikut terbawa tanpa ada yang memutuskannya.
+    Test ini lahir 9 September 2026 untuk menjaga U-22 agar tidak ikut terbawa penetapan
+    U-01/U-02, dan waktu itu ia berbunyi "pemetaan ini masih PROPOSED". Pada hari yang
+    sama pemilik proyek menetapkan U-22 dengan sengaja — sehingga yang perlu dijaga bukan
+    lagi nilainya, melainkan bahwa kedua blok punya statusnya masing-masing.
+
+    Sebelum pemisahan, menetapkan pemetaan status wilayah akan diam-diam ikut menetapkan
+    ambang peringkat volume laporan — 0,70 dan 0,40 — yang tidak pernah menjadi bagian
+    U-22 dan bahkan bukan tentang risiko sama sekali.
     """
-    assert _threshold_catalogue()["leadership_display"]["status"] == "PROPOSED"
+    display = _threshold_catalogue()["leadership_display"]
+
+    assert "status" not in display, "status gabungan menetapkan dua hal sekaligus"
+    for nama in ("area_status", "report_volume"):
+        assert display[nama]["status"] in {"FINAL", "PROPOSED"}, nama
+
+    # Yang ditetapkan 9 September 2026 hanyalah pemetaan status wilayah.
+    assert display["area_status"]["status"] == "FINAL"
+    assert display["area_status"]["ditetapkan"]
+    assert display["report_volume"]["status"] == "PROPOSED"

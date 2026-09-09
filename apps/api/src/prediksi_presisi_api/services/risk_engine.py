@@ -326,6 +326,19 @@ def threshold_status_of(version: str | None) -> str | None:
     return None if body is None else str(body.get("status", "UNKNOWN"))
 
 
+def _verdict(status: str) -> str:
+    """Kalimat penutup yang MENGIKUTI status, bukan yang ditulis tetap di sebelahnya.
+
+    Sampai 9 September 2026 kedua kalimat dasar di bawah menginterpolasi status lalu
+    menempelkan "— belum disetujui" apa adanya. Begitu pemetaannya ditetapkan, kalimatnya
+    berbunyi "Status pemetaan: FINAL — belum disetujui": dua pernyataan yang bertentangan
+    dalam satu kalimat, dan tidak ada satu test pun yang gagal karenanya.
+    """
+    if status == "FINAL":
+        return " — ditetapkan pemilik proyek, dan berlaku sebagai ketentuan tampilan."
+    return " — belum disetujui."
+
+
 @dataclass(frozen=True)
 class LeadershipDisplay:
     """Pemetaan nama untuk layar Pimpinan — **tampilan saja, bukan perhitungan**.
@@ -335,7 +348,12 @@ class LeadershipDisplay:
     `config/risk/`, bukan tersebar di kode yang menampilkannya (CLAUDE.md §12).
     """
 
-    status: str
+    #: Status DIPISAH per blok. Sampai 9 September 2026 keduanya berbagi satu penanda,
+    #: sehingga menetapkan pemetaan status wilayah (U-22) akan diam-diam ikut menetapkan
+    #: peringkat volume laporan — dua keputusan berbeda, dan yang kedua bahkan bukan
+    #: tentang risiko.
+    area_status_status: str
+    report_volume_status: str
     area_status: tuple[dict[str, Any], ...]
     report_volume: tuple[dict[str, Any], ...]
 
@@ -350,8 +368,8 @@ class LeadershipDisplay:
             "kesalahan kedua arah tidak sepadan: menggabungkan dari atas hanya menyamakan "
             "dua kelas yang sama-sama menuntut tindakan, sedangkan menggabungkan dari "
             "bawah akan menyebut wilayah MODERATE sebagai 'Aman' dan kata itu "
-            f"menghentikan orang bertanya lebih jauh. Status pemetaan: {self.status} — "
-            "belum disetujui."
+            f"menghentikan orang bertanya lebih jauh. Status pemetaan: "
+            f"{self.area_status_status}{_verdict(self.area_status_status)}"
         )
 
     @property
@@ -361,7 +379,8 @@ class LeadershipDisplay:
             "jumlah laporan tidak ditimbang dan tidak dinormalkan terhadap luas maupun "
             "jumlah penduduk. Ambangnya relatif terhadap wilayah dengan laporan terbanyak "
             "pada jendela yang sedang tampil, sehingga jumlah yang sama dapat berperingkat "
-            f"berbeda di jendela lain. Status: {self.status} — belum disetujui."
+            f"berbeda di jendela lain. Status: "
+            f"{self.report_volume_status}{_verdict(self.report_volume_status)}"
         )
 
     def status_for(self, risk_class: str | None) -> dict[str, Any]:
@@ -410,8 +429,10 @@ def load_leadership_display() -> LeadershipDisplay:
         message = "config/risk/warning-thresholds.yaml tidak memuat blok leadership_display"
         raise RiskEngineError(message)
 
+    area = raw["area_status"]
+    volume = raw["report_volume"]
     known = {band.risk_class for band in load_thresholds().bands}
-    mapped = {name for row in raw["area_status"] for name in row["risk_classes"]}
+    mapped = {name for row in area["mapping"] for name in row["risk_classes"]}
     # Kelas yang ada tetapi tidak dipetakan akan tampil sebagai "tidak dikenali" di layar,
     # tanpa apa pun yang menjelaskan mengapa. Lebih baik gagal saat memuat konfigurasi.
     if known - mapped:
@@ -422,12 +443,11 @@ def load_leadership_display() -> LeadershipDisplay:
         raise RiskEngineError(message)
 
     return LeadershipDisplay(
-        status=str(raw["status"]),
-        area_status=tuple(raw["area_status"]),
+        area_status_status=str(area["status"]),
+        report_volume_status=str(volume["status"]),
+        area_status=tuple(area["mapping"]),
         report_volume=tuple(
-            sorted(
-                raw["report_volume"], key=lambda row: float(row["min_share_of_peak"]), reverse=True
-            )
+            sorted(volume["levels"], key=lambda row: float(row["min_share_of_peak"]), reverse=True)
         ),
     )
 

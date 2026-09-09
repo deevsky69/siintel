@@ -297,7 +297,7 @@ def _area_status(session: Session, polsek: str | None) -> dict[str, Any]:
             for row in display.area_status
         ],
         "mapping": [dict(row) for row in display.area_status],
-        "mapping_status": display.status,
+        "mapping_status": display.area_status_status,
         "basis": f"{AREA_STATUS_SCOPE} {display.area_status_basis}",
     }
 
@@ -465,7 +465,7 @@ def _top_report_areas(session: Session, polsek: str | None, days: int) -> dict[s
         # sebagai seluruh laporan pada jendela tersebut.
         "unattributed_reports": int(unattributed or 0),
         "areas": ranked,
-        "level_status": display.status,
+        "level_status": display.report_volume_status,
         "basis": display.report_volume_basis,
     }
 

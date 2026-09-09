@@ -416,8 +416,9 @@ Empat hal pada kontraknya yang menentukan cara membacanya:
 
 3. **`area_status` memetakan EMPAT kelas risiko ke TIGA nama status** (Aman/Waspada/Siaga),
    dan pemetaannya dibaca dari `config/risk/warning-thresholds.yaml` blok
-   `leadership_display`. Responsnya selalu membawa `mapping` dan
-   `mapping_status: PROPOSED`. **REQUIRES USER APPROVAL (U-22)** — lihat catatan di bawah.
+   `leadership_display.area_status`. Responsnya selalu membawa `mapping` dan
+   `mapping_status`, dibaca apa adanya dari konfigurasi — **DITETAPKAN (U-22)
+   9 September 2026**, lihat catatan di bawah.
    Skor kecamatan memakai definisi yang sama dengan `/map/current-risk`, yaitu sel
    tertinggi, dijaga `test_area_status_follows_the_same_definition_the_map_uses`.
 
@@ -426,12 +427,20 @@ Empat hal pada kontraknya yang menentukan cara membacanya:
    (Kritis/Sedang/Rendah) relatif terhadap wilayah dengan laporan terbanyak pada jendela
    yang tampil. `policy.recommendations` seluruhnya berlabel `source: RULE`.
 
-> **REQUIRES USER APPROVAL (U-22): pemetaan status wilayah.** Nama Aman/Waspada/Siaga
+> **DITETAPKAN (U-22), 9 September 2026: pemetaan status wilayah.** Nama Aman/Waspada/Siaga
 > diminta pemilik proyek; sistem memiliki empat kelas risiko sedangkan namanya tiga, jadi
-> dua kelas harus digabung dan penggabungan itu mengubah makna. Yang dipakai sekarang
+> dua kelas harus digabung dan penggabungan itu mengubah makna. Yang ditetapkan adalah
 > `HIGH + CRITICAL -> SIAGA`, dipilih karena kesalahan kedua arah tidak sepadan:
-> menggabungkan dari bawah akan menyebut wilayah `MODERATE` sebagai "Aman". Belum
-> disetujui, dan layar menyatakannya.
+> menggabungkan dari bawah akan menyebut wilayah `MODERATE` sebagai "Aman".
+>
+> Konsekuensinya tetap berlaku dan tetap dinyatakan layar: wilayah `CRITICAL` dan `HIGH`
+> tampil dengan satu nama yang sama, sehingga yang membedakan keduanya adalah angka
+> skornya — yang selalu ikut tampil.
+>
+> **Tingkat volume laporan (`top_report_areas.level_status`) TIDAK ikut ditetapkan** dan
+> tetap `PROPOSED`. Ambang 0,70 dan 0,40 tidak pernah menjadi bagian U-22, dan ia bahkan
+> bukan tentang risiko: menetapkannya menuntut pertanyaannya sendiri, yaitu apakah
+> "Kritis" pantas disematkan pada wilayah yang hanya ramai melapor.
 
 > `NOT SPECIFIED` (U-11): sumber konten **Executive Brief**. Belum ada entitas, penyedia, maupun task di roadmap. Endpoint `/executive-brief` **tidak didefinisikan** sampai diputuskan apakah kontennya dihasilkan template rule atau model bahasa (keputusan bisnis + kebijakan).
 
