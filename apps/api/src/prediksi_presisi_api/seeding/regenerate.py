@@ -16,7 +16,8 @@ memang tidak koheren. Modul ini membangkitkan ulang isinya secara **deterministi
 **`risk_score` dan `risk_class` yang sudah ada tidak diubah.** Yang dibangkitkan ulang hanya
 komponen penyusun dan metadatanya, sehingga sebaran risiko pada dataset tetap seperti semula.
 
-Bobot dan threshold berasal dari `config/risk/` dan berstatus `DEMO / PROPOSED` (U-01, U-02).
+Bobot dan threshold berasal dari `config/risk/`; versi yang berlaku ditetapkan pemilik
+proyek 9 September 2026 (U-01, U-02).
 """
 
 from __future__ import annotations
@@ -828,8 +829,9 @@ def _moment(value: str) -> datetime:
 def high_risk_minimum() -> int:
     """Batas bawah kelas risiko HIGH menurut `config/risk/warning-thresholds.yaml`.
 
-    Dibaca dari konfigurasi, tidak ditulis sebagai angka di sini: ambang berstatus
-    `DEMO / PROPOSED` (U-01) dan CLAUDE.md §12 melarang menyebarkannya ke banyak tempat.
+    Dibaca dari konfigurasi, tidak ditulis sebagai angka di sini: ambang hanya boleh hidup
+    di satu tempat (CLAUDE.md §12), dan setelah ditetapkan 9 September 2026 (U-01) menyalin
+    angkanya ke kode berarti menyimpan ketentuan resmi di tempat yang tidak berversi.
     """
     classes = active_thresholds()["risk_classes"]
     for band in classes:

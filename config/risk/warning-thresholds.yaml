@@ -1,12 +1,25 @@
 # THRESHOLD KELAS RISIKO & PERINGATAN DINI — PREDIKSI PRESISI
 #
-# Status: DEMO / PROPOSED — REQUIRES USER APPROVAL (U-01).
+# Status: versi `dummy-v1` = FINAL — DITETAPKAN pemilik proyek 9 September 2026 (U-01).
+#         versi `proposed-2026-09-01` = PROPOSED, belum dipakai menghitung apa pun.
+#         blok `leadership_display` = PROPOSED, menunggu keputusan terpisah (U-22).
 #
-# Angka di bawah **bukan** requirement. Nilainya diambil dari ambang yang secara de facto
-# sudah tertanam di dataset dummy (temuan audit U-01), lalu dinyatakan secara terbuka di sini.
+# ASAL ANGKANYA, DAN ARTI PENETAPANNYA
 #
-# Menuliskannya sebagai konfigurasi lebih jujur daripada membiarkannya tersembunyi di data:
-# ambang yang tidak tertulis tetap bekerja, tetapi tidak dapat ditinjau maupun diubah.
+#   Nilai di bawah mula-mula tidak dipilih siapa pun: ia secara de facto sudah tertanam di
+#   dataset dummy, dan temuan audit U-01 hanya membuatnya terlihat. Menuliskannya sebagai
+#   konfigurasi membuatnya dapat ditinjau; penetapan 9 September 2026 membuatnya dapat
+#   dipertanggungjawabkan — ambang ini kini berlaku karena diputus, bukan karena kebetulan
+#   ada di data.
+#
+#   Yang ditetapkan adalah AMBANGNYA, bukan klaim bahwa memilih 70 sebagai batas terbit
+#   peringatan menghasilkan keseimbangan terbaik antara peringatan yang terlewat dan
+#   peringatan yang tidak berujung gangguan. Pertanyaan itu hanya dapat dijawab evaluasi,
+#   dan jawabannya dapat menuntut versi ambang baru kelak.
+#
+#   Tidak ada satu angka pun yang berubah saat penetapan ini, sehingga seluruh peringatan
+#   yang sudah terbit tetap sah: ia terbit di bawah ambang yang persis sama dengan yang
+#   kini ditetapkan.
 #
 # Threshold TIDAK dipasang sebagai CHECK constraint (docs/06 §3) dan TIDAK di-hardcode
 # di kode mana pun (CLAUDE.md §12). Setiap peringatan menyimpan `threshold_version`.
@@ -25,11 +38,16 @@ active_version: dummy-v1
 
 versions:
   # ===========================================================================
-  # dummy-v1 — BERLAKU untuk 84 baris `early_warnings` yang sudah ada.
-  # JANGAN diubah selama baris itu masih ada.
+  # dummy-v1 — DITETAPKAN 9 September 2026. BERLAKU untuk seluruh baris
+  # `early_warnings` yang sudah ada.
+  #
+  # JANGAN diubah. Larangannya menguat setelah ditetapkan: menurunkan ambang di sini
+  # tidak hanya membuat peringatan lama tampak terbit di bawah aturan yang tidak
+  # pernah berlaku, tetapi juga mengubah ketentuan yang sudah diputus pemilik proyek.
   # ===========================================================================
   dummy-v1:
-    status: DEMO
+    status: FINAL
+    ditetapkan: 2026-09-09
     risk_classes:
       - { class: LOW, min: 0, max: 44 }
       - { class: MODERATE, min: 45, max: 69 }

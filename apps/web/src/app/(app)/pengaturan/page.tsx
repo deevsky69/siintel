@@ -61,9 +61,10 @@ export default async function PengaturanPage() {
             </tbody>
           </table>
           <p className="mt-3 text-2xs leading-relaxed text-ink-faint">
-            Ambang ini berstatus <strong>{config.thresholds.status}</strong> dan belum ditetapkan
-            SOP mana pun. Ia hidup di satu berkas konfigurasi, bukan tersebar di kode — sehingga
-            penetapan resminya cukup mengubah satu tempat.
+            Ambang ini berstatus <strong>{config.thresholds.status}</strong>. Ia hidup di satu
+            berkas konfigurasi, bukan tersebar di kode — sehingga mengubahnya cukup di satu tempat,
+            dan setiap perubahan menuntut versi baru agar angka lama tetap dapat ditelusuri ke
+            ambang yang berlaku saat ia dihitung.
           </p>
         </Panel>
 

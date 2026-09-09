@@ -76,8 +76,11 @@ DRY_RUN_BASIS = (
 
 CONFIG_BASIS = (
     "Bobot berasal dari config/risk/risk-weights.yaml dan ambang kelas dari "
-    "config/risk/warning-thresholds.yaml. Keduanya berstatus DEMO / PROPOSED (U-01, U-02) "
-    "dan BUKAN ketentuan resmi — status setiap versi dibawa apa adanya pada respons ini. "
+    "config/risk/warning-thresholds.yaml. Versi yang berlaku, dummy-v1, DITETAPKAN pemilik "
+    "proyek 9 September 2026 (U-01, U-02) — status setiap versi dibawa apa adanya pada "
+    "respons ini, termasuk versi lain yang masih berstatus PROPOSED. Ditetapkan berarti "
+    "ambang dan bobotnya berlaku sebagai ketentuan, BUKAN berarti ketepatan modelnya "
+    "sudah terbukti; itu hanya dapat dinyatakan lewat evaluasi. "
     "Tidak ada bobot maupun ambang yang ditulis di kode (CLAUDE.md §11, §12)."
 )
 

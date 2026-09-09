@@ -207,7 +207,7 @@ def test_risk_class_is_read_from_the_column_not_recomputed(
 ) -> None:
     """Kelas risiko dibaca apa adanya dari data.
 
-    Ambang antar-kelas berstatus DEMO / PROPOSED (U-01); menghitung ulang kelas dari skor
+    Ambang antar-kelas berversi (U-01); menghitung ulang kelas dari skor
     di lapisan API berarti mengunci angka yang belum disetujui siapa pun (CLAUDE.md §11).
     """
     leader = _make_user(session, "Pimpinan")

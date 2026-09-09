@@ -535,7 +535,12 @@ def test_the_configuration_endpoint_shows_the_basis(client: TestClient, session:
     ]
 
     active = next(version for version in body["versions"] if version["active"])
-    assert active["status"] in {"DEMO", "PROPOSED"}
+    # Yang diperiksa adalah bahwa status DIBAWA APA ADANYA dari konfigurasi — bukan bahwa
+    # nilainya salah satu dari daftar tertentu. Sampai 9 September 2026 baris ini menuntut
+    # status DEMO atau PROPOSED, sehingga menetapkan konfigurasi lewat keputusan pemilik
+    # proyek justru MEMBUAT test gagal: penegasan itu memanggang keadaan "belum ditetapkan"
+    # ke dalam suite, dan bukan itu perilaku yang hendak dijaga.
+    assert active["status"] == catalogue.active.status
     for profile in active["profiles"]:
         assert profile["applies_to"]
         assert profile["factors"]

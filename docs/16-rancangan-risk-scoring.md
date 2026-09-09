@@ -1,8 +1,17 @@
 # RANCANGAN RISK SCORING — PREDIKSI PRESISI
 
-Status: **PROPOSED / DEMO — disusun atas permintaan pemilik proyek, menunggu penetapan**
-Tanggal: 1 September 2026
+Status: **PROPOSED — rancangan versi `proposed-2026-09-01`, belum dipakai menghitung apa pun**
+Tanggal: 1 September 2026 · catatan status diperbarui 9 September 2026
 
+> **Yang ditetapkan pada 9 September 2026 BUKAN dokumen ini.** Yang ditetapkan adalah versi
+> `dummy-v1` — lima faktor, satu profil — yang selama ini benar-benar menghitung seluruh
+> skor dan menerbitkan seluruh peringatan (U-01, U-02).
+>
+> Dokumen ini merancang versi BERIKUTNYA: tujuh faktor, dua profil, dan ambang terpisah
+> bagi gangguan terencana. Menyalakannya mengubah angka dan menuntut pembangkitan ulang
+> seluruh skor, sehingga ia adalah keputusan tersendiri — bukan akibat sampingan dari
+> penetapan 9 September 2026.
+>
 > Seluruh angka pada dokumen ini **bukan** hasil penelitian dan **bukan** ketentuan resmi
 > Polri. Ia rancangan kerja agar sistem punya dasar yang dapat diperiksa dan diperdebatkan
 > (CLAUDE.md §11). Yang menetapkannya adalah pemilik proyek, bukan sistem.

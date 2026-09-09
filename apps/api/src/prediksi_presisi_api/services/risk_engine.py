@@ -306,6 +306,26 @@ def load_thresholds() -> Thresholds:
     )
 
 
+def threshold_status_of(version: str | None) -> str | None:
+    """Status versi ambang TERTENTU, bukan status versi yang sedang berlaku.
+
+    Sebuah peringatan menyimpan versi ambang yang berlaku saat ia terbit, dan versi itu
+    belum tentu versi aktif hari ini. Layar peringatan menyebut versinya; menyebut status
+    versi aktif di sebelahnya akan menyatakan sesuatu yang tidak berlaku bagi baris yang
+    sedang ditampilkan.
+
+    Menjawab `None` untuk versi yang tidak dikenal — termasuk versi yang pernah dipakai
+    lalu dihapus dari konfigurasi. Menjatuhkannya ke status aktif akan menyebut baris lama
+    "ditetapkan" hanya karena versi lain kebetulan ditetapkan.
+    """
+    if not version or not THRESHOLDS_FILE.exists():
+        return None
+
+    catalogue: dict[str, Any] = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
+    body = catalogue.get("versions", {}).get(version)
+    return None if body is None else str(body.get("status", "UNKNOWN"))
+
+
 @dataclass(frozen=True)
 class LeadershipDisplay:
     """Pemetaan nama untuk layar Pimpinan — **tampilan saja, bukan perhitungan**.

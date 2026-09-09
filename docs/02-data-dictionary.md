@@ -126,8 +126,8 @@ risk_score = round( Σ ( bobot_i × faktor_i ) )    dengan Σ bobot_i = 1
 Bobot **tidak** disimpan di kode maupun di baris data; berasal dari `config/risk/risk-weights.yaml` dan versinya dicatat pada `weights_version`.
 `CHECK` constraint atas hubungan ini **baru dipasang setelah bobot disetujui** (lihat docs/06).
 
-> **NOT SPECIFIED (U-02):** nilai bobot final. `REQUIRES USER APPROVAL` — hasil penelitian/model/SOP.
-> **NOT SPECIFIED (U-01):** batas kelas `risk_class`. Nilai yang terlihat pada dataset dummy (LOW <45, MODERATE 45–69, HIGH 70–84, CRITICAL ≥85) berstatus `DEMO / PROPOSED` (CLAUDE.md §11).
+> **DITETAPKAN (U-02), 9 September 2026:** bobot versi `dummy-v1` pada `config/risk/risk-weights.yaml` berlaku sebagai ketentuan. Nilainya tidak berubah saat ditetapkan, sehingga seluruh baris lama tetap sah. Ketetapan ini **bukan** pernyataan bahwa bobotnya terbukti secara empiris; itu tetap menunggu penelitian/model/evaluasi.
+> **DITETAPKAN (U-01), 9 September 2026:** batas kelas `risk_class` — LOW <45, MODERATE 45–69, HIGH 70–84, CRITICAL ≥85 — berlaku sebagai ketentuan, versi `dummy-v1`. Angkanya semula tertanam diam-diam di dataset dummy; kini ia berlaku karena diputus, bukan karena kebetulan ada di data.
 
 **Peran tabel ini (`TECHNICAL DECISION`, SDL-13):** `risk_scores` adalah penilaian risiko **kondisi berjalan** per (lokasi × jendela waktu × jenis ancaman × tanggal penilaian). Menjadi sumber layer *Current Risk* pada peta (CLAUDE.md §24, TASK 082) dan dapat menjadi fitur masukan model. **Bukan** tahap antara antara prediction dan early warning.
 
@@ -164,7 +164,7 @@ Output prediction wajib menjawab WHAT · WHERE · WHEN · RISK · CONFIDENCE · 
 `acknowledged_*`/`resolved_*` ditambahkan karena docs/05 menyediakan transisi acknowledge/resolve tetapi tidak ada tempat menyimpan pelakunya (`TECHNICAL DECISION`).
 `severity`, `risk_score`, `threat_type`, dan `location_id` disalin dari prediksi sumber pada saat warning dibuat (snapshot) agar riwayat peringatan tidak berubah ketika prediksi diperbarui.
 
-> **NOT SPECIFIED (U-01):** threshold pemicu dan batas antar level. Nilai pada dataset dummy (warning ≥70, critical ≥85; level `LOW`/`WATCH` tidak pernah muncul) berstatus `DEMO / PROPOSED`. Threshold wajib configurable (CLAUDE.md §12) melalui `config/risk/warning-thresholds.yaml`, versinya dicatat pada `threshold_version`.
+> **DITETAPKAN (U-01), 9 September 2026:** threshold pemicu dan batas antar level — warning ≥70, critical ≥85 — berlaku sebagai ketentuan, versi `dummy-v1`. Level `LOW` dan `WATCH` tetap tidak pernah muncul pada dataset karena peringatan hanya dibuat pada skor ≥70; itu sifat datanya, bukan cacat ambangnya. Threshold tetap configurable (CLAUDE.md §12) melalui `config/risk/warning-thresholds.yaml`, versinya dicatat pada `threshold_version`.
 
 ## 12. `recommendations`
 
@@ -312,7 +312,7 @@ predictions         DRAFT → PUBLISHED → VALIDATED
 
 ## 23. YANG MASIH MENUNGGU KEPUTUSAN PENGGUNA
 
-U-01 threshold risiko/warning · U-02 bobot faktor · U-03 definisi target prediksi & aturan pencocokan evaluasi · U-04 ukuran grid & batas wilayah · U-05 kebijakan kredensial · U-06 aturan scope jurisdiksi/fungsi · U-08 state machine final · U-10 kewenangan publikasi alert · U-13 identitas & bukti LAPOR PRESISI · U-14 retensi/klasifikasi · U-16 taksonomi final.
+~~U-01 threshold risiko/warning~~ dan ~~U-02 bobot faktor~~ ditetapkan 9 September 2026 · U-03 definisi target prediksi & aturan pencocokan evaluasi · U-04 ukuran grid & batas wilayah · U-05 kebijakan kredensial · U-06 aturan scope jurisdiksi/fungsi · U-08 state machine final · U-10 kewenangan publikasi alert · U-13 identitas & bukti LAPOR PRESISI · U-14 retensi/klasifikasi · U-16 taksonomi final.
 
 Rincian dan opsi: `docs/implementation-notes/000c-specification-lock.md`.
 

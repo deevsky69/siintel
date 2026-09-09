@@ -14,6 +14,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...models import EarlyWarning, Location, Prediction, Recommendation, RiskScore
+from ...services.risk_engine import threshold_status_of
 from ..deps import (
     CurrentUser,
     function_filter,
@@ -168,6 +169,11 @@ def list_warnings(
                 "grid_id": location.grid_id,
                 "prediction_code": prediction_code,
                 "threshold_version": warning.threshold_version,
+                # Status versi ambang MILIK BARIS INI. Sebelum 9 September 2026 layar
+                # peringatan menuliskan "DEMO / PROPOSED" sebagai teks tetap, sehingga ia
+                # tidak ikut berubah ketika ambangnya ditetapkan — layar dan konfigurasi
+                # menyatakan dua hal berbeda tanpa ada yang gagal.
+                "threshold_status": threshold_status_of(warning.threshold_version),
             }
             for warning, location, prediction_code in rows
         ],

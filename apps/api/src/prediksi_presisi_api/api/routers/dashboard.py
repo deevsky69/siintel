@@ -44,7 +44,7 @@ RECENT_HOURS = 24
 SECURITY_INDEX_BASE = 100
 
 #: Ambang "wilayah berisiko tinggi", sepadan config/risk/warning-thresholds.yaml
-#: yang berstatus DEMO / PROPOSED (U-01).
+#: versi dummy-v1 yang ditetapkan 9 September 2026 (U-01).
 HIGH_RISK_THRESHOLD = 70
 
 
@@ -165,7 +165,7 @@ def summary(
         ),
         "high_risk_basis": (
             f"Kecamatan dengan sel risiko tertinggi mencapai {HIGH_RISK_THRESHOLD}. "
-            "Ambang berstatus DEMO / PROPOSED."
+            "Ambang ditetapkan 9 September 2026 (U-01)."
         ),
         "incidents_24h": incidents_24h or 0,
         "predictions_24h": predictions_24h or 0,

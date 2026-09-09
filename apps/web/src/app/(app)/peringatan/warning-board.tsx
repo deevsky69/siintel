@@ -242,16 +242,35 @@ export function WarningBoard({
     ),
   ];
 
+  // Status dibaca dari baris yang benar-benar tampil, bukan ditulis tetap di layar.
+  // Sampai 9 September 2026 kalimat di sini berbunyi "DEMO / PROPOSED" apa adanya,
+  // sehingga ia tidak ikut berubah ketika ambangnya ditetapkan — layar dan konfigurasi
+  // menyatakan dua hal berbeda dan tidak ada satu test pun yang gagal karenanya.
+  const statuses = [
+    ...new Set(
+      groups
+        .flatMap((group) => group.rows)
+        .map((warning) => warning.threshold_status)
+        .filter((status): status is string => Boolean(status)),
+    ),
+  ];
+  const settled = statuses.length > 0 && statuses.every((status) => status === "FINAL");
+
   return (
     <div className="space-y-3">
-      {/* CLAUDE.md §11: ambang belum final, dan itu dinyatakan di layar. */}
-      <StatusNotice status="DEMO / PROPOSED">
+      {/* CLAUDE.md §11: status ambang dinyatakan di layar, apa pun statusnya. */}
+      <StatusNotice
+        status={statuses.length > 0 ? statuses.join(" / ") : "TIDAK DIKENAL"}
+        tone={settled ? "accent" : "caution"}
+      >
         Ambang yang memicu peringatan pada layar ini berasal dari konfigurasi versi{" "}
         <span className="font-mono">
           {thresholds.length > 0 ? thresholds.join(", ") : "tidak ada"}
         </span>
-        . Ambang tersebut belum ditetapkan secara resmi, sehingga tingkat peringatan di sini belum
-        boleh dibaca sebagai keputusan final.
+        .{" "}
+        {settled
+          ? "Ambang tersebut sudah ditetapkan pemilik proyek, sehingga tingkat peringatan di sini berlaku sebagai ketentuan — bukan sebagai bukti bahwa modelnya tepat, yang hanya dapat dinyatakan lewat evaluasi."
+          : "Ambang tersebut belum ditetapkan secara resmi, sehingga tingkat peringatan di sini belum boleh dibaca sebagai keputusan final."}
       </StatusNotice>
 
       <div className="grid grid-cols-12 gap-3">

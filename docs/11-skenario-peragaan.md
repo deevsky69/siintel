@@ -184,7 +184,7 @@ tampak selesai seluruhnya.
 | Pertanyaan | Jawaban jujur |
 |---|---|
 | Apakah ini memakai machine learning? | Belum. Prediksi berasal dari aturan berbobot; setiap faktor dilabeli `RULE` di layar. Model terlatih adalah TASK 100–104 |
-| Dari mana bobot risikonya? | `config/risk/risk-weights.yaml`, berstatus `DEMO / PROPOSED`. Penetapan resminya menunggu keputusan pemilik proyek |
+| Dari mana bobot risikonya? | `config/risk/risk-weights.yaml`, versi `dummy-v1`, ditetapkan pemilik proyek 9 September 2026. Ditetapkan berarti berlaku sebagai ketentuan; ketepatannya tetap urusan evaluasi |
 | Apakah datanya asli? | Tidak. Data sintetis yang koheren. Data resmi tidak pernah dimasukkan ke repository |
 | Siapa yang boleh menyetujui? | Saat ini hanya peran Pimpinan. Kewenangan resmi dan pendelegasiannya masih menunggu keputusan (docs/03, P-1..P-7) |
 | Apakah keputusan bisa dianulir? | Belum bisa, dan itu disengaja. Aturannya menunggu SOP |

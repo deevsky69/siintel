@@ -173,3 +173,70 @@ def test_planned_disturbances_warn_earlier_than_crime() -> None:
 
     assert planned < proposed["default"]["minimum_score"]
     assert planned == 60
+
+
+# --------------------------------------------------------------------------------------
+# Status penetapan (U-01, U-02)
+# --------------------------------------------------------------------------------------
+
+
+def _threshold_catalogue() -> dict[str, Any]:
+    """SELURUH isi berkas ambang, bukan hanya versi yang berlaku.
+
+    Berbeda dari `_thresholds()` di atas — yang menjawab isi versi aktif — karena yang
+    diperiksa di bagian ini justru versi mana yang aktif dan apa statusnya.
+    """
+    loaded: dict[str, Any] = yaml.safe_load(THRESHOLDS.read_text())
+    return loaded
+
+
+@pytest.mark.parametrize("berkas", ["bobot", "ambang"])
+def test_the_configuration_in_force_has_actually_been_adopted(berkas: str) -> None:
+    """Versi yang dipakai menghitung harus berstatus FINAL, bukan usulan.
+
+    Pemilik proyek menetapkan bobot dan ambang `dummy-v1` pada 9 September 2026 (U-02 dan
+    U-01). Sejak itu, menjalankan sistem di atas versi yang masih PROPOSED bukan lagi
+    keadaan sementara yang dapat dimaklumi melainkan kemunduran: setiap skor dan setiap
+    peringatan akan terbit di bawah aturan yang tidak pernah diputus siapa pun, dan tidak
+    ada gejala apa pun yang menandainya.
+
+    Test ini TIDAK memeriksa nilai bobot maupun ambangnya — hanya bahwa versi yang berlaku
+    sudah ditetapkan. Menetapkan angka yang keliru tetap mungkin, dan itu memang keputusan
+    pemilik proyek, bukan keputusan test.
+    """
+    catalogue = _catalogue() if berkas == "bobot" else _threshold_catalogue()
+    active = str(catalogue["active_version"])
+    body = catalogue["versions"][active]
+
+    assert body["status"] == "FINAL", (
+        f"versi aktif '{active}' berstatus {body['status']}; "
+        "menyalakan versi yang belum ditetapkan menuntut keputusan pemilik proyek"
+    )
+    assert body["ditetapkan"], f"versi '{active}' berstatus FINAL tanpa tanggal penetapan"
+
+
+def test_versions_that_are_merely_proposed_are_not_the_ones_in_force() -> None:
+    """Rancangan boleh hidup di berkas yang sama, asalkan tidak diam-diam menyala.
+
+    `proposed-2026-09-01` mengubah bobot DAN memindahkan TAWURAN ke profil lain, sehingga
+    menyalakannya mengubah angka — itu keputusan tersendiri yang menuntut pembangkitan
+    ulang skor, bukan akibat sampingan dari penetapan 9 September 2026.
+    """
+    for catalogue in (_catalogue(), _threshold_catalogue()):
+        for name, body in catalogue["versions"].items():
+            if name == str(catalogue["active_version"]):
+                continue
+            assert body["status"] != "FINAL", (
+                f"versi '{name}' ditandai FINAL tetapi tidak dipakai menghitung apa pun; "
+                "status FINAL pada versi yang tidak aktif membuat 'ditetapkan' kehilangan arti"
+            )
+
+
+def test_the_leadership_display_mapping_is_still_a_proposal() -> None:
+    """Penetapan U-01/U-02 TIDAK ikut menutup U-22.
+
+    Pemetaan Aman/Waspada/Siaga menggabungkan HIGH dan CRITICAL menjadi satu nama, dan
+    penggabungan itu mengubah makna. Ia berada di berkas yang sama dengan ambang yang baru
+    ditetapkan, sehingga paling mudah ikut terbawa tanpa ada yang memutuskannya.
+    """
+    assert _threshold_catalogue()["leadership_display"]["status"] == "PROPOSED"

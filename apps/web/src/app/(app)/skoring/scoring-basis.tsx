@@ -130,8 +130,18 @@ export function ScoringBasis({ config }: { config: ScoringConfig }) {
 
   return (
     <div className="space-y-3">
-      <StatusNotice status={config.active_status} tone="caution">
-        Bobot versi <strong>{config.active_version}</strong> belum ditetapkan pemilik proyek.{" "}
+      {/* Kalimatnya mengikuti status yang dikirim API, tidak menetapkannya sendiri. Sampai
+          9 September 2026 baris ini menulis "belum ditetapkan" apa adanya, di sebelah lencana
+          status yang dibaca dari konfigurasi — dua pernyataan berdampingan yang dapat saling
+          bertentangan tanpa ada yang gagal. */}
+      <StatusNotice
+        status={config.active_status}
+        tone={config.active_status === "FINAL" ? "accent" : "caution"}
+      >
+        Bobot versi <strong>{config.active_version}</strong>{" "}
+        {config.active_status === "FINAL"
+          ? "sudah ditetapkan pemilik proyek dan berlaku sebagai ketentuan."
+          : "belum ditetapkan pemilik proyek."}{" "}
         {config.config_basis}
       </StatusNotice>
 

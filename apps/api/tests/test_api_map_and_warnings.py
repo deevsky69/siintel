@@ -179,8 +179,13 @@ def test_derived_numbers_state_where_they_come_from(client: TestClient, session:
     response = client.get("/api/v1/map/current-risk", headers=_auth(client, leader))
 
     # Angka turunan tidak boleh tampil tanpa penjelasan asalnya (pola dashboard.py).
-    assert "agregasi" in response.json()["aggregation_basis"]
-    assert "DEMO / PROPOSED" in response.json()["aggregation_basis"]
+    basis = response.json()["aggregation_basis"]
+    assert "agregasi" in basis
+    # Yang diperiksa adalah JANJINYA — kelas tidak dihitung ulang di lapisan API —
+    # bukan kata "DEMO / PROPOSED" yang dulu ditulis di sini. Status ambang hidup di
+    # `config/risk/`, dan menyalinnya ke dalam penegasan test berarti test ikut usang
+    # setiap kali statusnya berubah tanpa satu pun perilaku berubah.
+    assert "tidak dihitung ulang" in basis
 
 
 def test_current_risk_is_limited_to_the_officers_jurisdiction(
@@ -478,8 +483,8 @@ def test_map_carries_the_weights_version_that_produced_the_scores(
 ) -> None:
     """Ketertelusuran bobot (CLAUDE.md §25).
 
-    Skor risiko dihitung dengan bobot dari `config/risk/`, yang masih berstatus
-    `DEMO / PROPOSED`. Tanpa versinya ikut keluar, angka di layar tidak dapat
+    Skor risiko dihitung dengan bobot dari `config/risk/`, dan bobot itu berversi.
+    Tanpa versinya ikut keluar, angka di layar tidak dapat
     dikembalikan ke konfigurasi yang menghasilkannya — dan pertanyaan "bobotnya dari
     mana" tidak dapat dijawab saat paparan.
     """

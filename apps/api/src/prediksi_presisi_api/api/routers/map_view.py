@@ -14,9 +14,10 @@ Dua catatan yang menentukan bentuk modul ini:
 
 1. **Tidak ada ambang risiko di kode.** `risk_class` selalu diambil dari kolom
    `risk_scores.risk_class` yang sudah tersimpan; tidak ada perhitungan kelas dari skor
-   di sini. Ambang berasal dari `config/risk/warning-thresholds.yaml` yang masih
-   berstatus DEMO / PROPOSED (U-01), sehingga menghitung ulang kelas di lapisan API
-   berarti mengunci angka yang belum disetujui siapa pun (CLAUDE.md §11, §12).
+   di sini. Ambang berasal dari `config/risk/warning-thresholds.yaml`, dan meskipun versi
+   yang berlaku sudah DITETAPKAN 9 September 2026, aturan ini tetap: setiap baris membawa
+   versi ambang yang berlaku saat ia dihitung, sehingga menghitung ulang kelas di lapisan
+   API akan menilai baris lama memakai versi hari ini (CLAUDE.md §12).
    Prediksi tidak menyimpan kelas risiko, maka responsnya pun tidak mengarang kelas.
 
 2. **Setiap angka turunan membawa `*_basis`.** Nilai puncak, rata-rata, dan titik pusat
@@ -63,7 +64,8 @@ AGGREGATION_BASIS = (
     "tersimpan: risk_score = skor tertinggi antar sel, average_risk_score = rata-rata "
     "seluruh sel, dan latitude/longitude = rata-rata titik pusat grid dalam kecamatan. "
     "risk_class diambil apa adanya dari sel dengan skor tertinggi — tidak dihitung ulang "
-    "dari ambang mana pun, karena ambang pada config/risk/ masih DEMO / PROPOSED (U-01)."
+    "dari ambang mana pun, agar kelas sebuah baris tetap mencerminkan versi ambang yang "
+    "berlaku saat ia dihitung (U-01)."
 )
 
 PREDICTIVE_BASIS = (

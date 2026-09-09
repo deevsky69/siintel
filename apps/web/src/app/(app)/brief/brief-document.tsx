@@ -366,7 +366,8 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
             </li>
             <li>
               Kelas risiko dan tingkat peringatan dibaca apa adanya dari data, tidak dihitung ulang
-              dari skor. Ambangnya masih berstatus DEMO / PROPOSED dan belum ditetapkan.
+              dari skor. Ambangnya sudah ditetapkan, dan justru karena itu tidak dihitung ulang:
+              setiap baris membawa versi ambang yang berlaku saat ia terbit.
             </li>
             <li>
               Rekomendasi adalah usulan, bukan perintah. Tidak ada tindakan operasional yang lahir

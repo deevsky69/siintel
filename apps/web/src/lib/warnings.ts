@@ -37,6 +37,8 @@ export type WarningDetail = {
   grid_id: string | null;
   prediction_code: string;
   threshold_version: string | null;
+  /** Status versi ambang milik baris ini — `FINAL`, `PROPOSED`, atau null bila tak dikenal. */
+  threshold_status: string | null;
 };
 
 export type PredictionDetail = {

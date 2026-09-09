@@ -7,10 +7,12 @@ Polres Metro Jakarta Selatan
 > (tautan **Modul** di bilah atas), dengan tata letak siap cetak. Berkasnya ada di
 > `apps/web/public/modul.html`; dokumen inilah acuannya bila keduanya berbeda.
 >
-> **Status prototipe.** Seluruh angka pada aplikasi ini berasal dari **data sintetis**,
-> dan bobot maupun ambangnya berstatus `DEMO / PROPOSED` — belum ditetapkan sebagai
-> ketentuan resmi. Modul ini menjelaskan cara kerja sistem, bukan menyatakan bahwa
-> angkanya sudah dapat dipakai sebagai dasar tindakan nyata.
+> **Status prototipe.** Seluruh angka pada aplikasi ini berasal dari **data sintetis**.
+> Bobot dan ambang yang berlaku **ditetapkan pemilik proyek 9 September 2026**, sehingga
+> keduanya berlaku sebagai ketentuan — tetapi ketetapan itu menyangkut ANGKANYA, bukan
+> klaim bahwa hasilnya sudah terbukti tepat. Ketepatan hanya dapat dinyatakan lewat
+> evaluasi. Modul ini menjelaskan cara kerja sistem, bukan menyatakan bahwa angkanya sudah
+> dapat dipakai sebagai dasar tindakan nyata atas data sungguhan.
 
 ---
 
@@ -580,9 +582,10 @@ Kombinasi yang salah satu faktornya tidak dapat dihitung **tidak diberi skor sam
 beserta alasannya — bukan diberi skor dengan bobot dibagi ulang, sebab itu berarti
 mengarang bobot.
 
-> Bobot dan ambang berstatus `DEMO / PROPOSED`, menunggu penetapan. Setiap baris skor
-> menyimpan versi bobot yang menghasilkannya, sehingga angka lama tetap dapat ditelusuri
-> meskipun bobotnya kelak diganti.
+> Bobot dan ambang versi `dummy-v1` berstatus `FINAL` sejak 9 September 2026. Setiap baris
+> skor menyimpan versi bobot yang menghasilkannya, sehingga angka lama tetap dapat
+> ditelusuri meskipun bobotnya kelak diganti — dan penggantian itu menuntut versi baru,
+> bukan penyuntingan versi yang sudah ditetapkan.
 
 ---
 
@@ -951,7 +954,7 @@ klaim sistem ini dapat dipertahankan.
 |---|---|
 | **Data sintetis** | Seluruh data adalah bangkitan, bukan data operasional Polres. Tidak ada identitas nyata |
 | **Belum memakai model terlatih** | Prediksi berasal dari aturan berbobot. Seluruh faktor berlabel `RULE` |
-| **Bobot dan ambang belum resmi** | Berstatus `DEMO / PROPOSED`, menunggu penetapan |
+| **Bobot dan ambang sudah ditetapkan, belum terbukti** | Versi `dummy-v1` berstatus `FINAL` sejak 9 September 2026. Ditetapkan berarti berlaku sebagai ketentuan, bukan berarti terbukti tepat — itu urusan evaluasi |
 | **Prediksi bukan kepastian** | Menunjuk **wilayah dan rentang waktu**, bukan individu, dan bukan jaminan kejadian |
 | **Bukan alat penindakan** | Keluaran sistem adalah bahan pertimbangan, bukan dasar tindakan terhadap seseorang |
 | **Batas wilayah adalah perkiraan** | Bentuk pada peta diturunkan dari koordinat, bukan batas administratif resmi |

@@ -42,6 +42,7 @@ const active: WarningDetail = {
   grid_id: "JKS-028",
   prediction_code: "PRD-00111",
   threshold_version: "dummy-v1",
+  threshold_status: "FINAL",
 };
 
 const acknowledged: WarningDetail = {
@@ -151,12 +152,33 @@ describe("papan peringatan", () => {
     expect(screen.getByText("tidak ada")).toBeDefined();
   });
 
-  it("menampilkan versi ambang dan menandainya belum final", () => {
-    // CLAUDE.md §11: ambang DEMO/PROPOSED tidak boleh terbaca sebagai ketetapan.
+  it("menyebut versi ambang beserta statusnya yang sebenarnya", () => {
+    // Status dibaca dari barisnya, tidak ditulis tetap di layar. Sampai 9 September 2026
+    // kalimat ini berbunyi "DEMO / PROPOSED" apa adanya, sehingga ia tidak ikut berubah
+    // ketika ambangnya ditetapkan — dan tidak ada satu test pun yang gagal karenanya.
     board();
 
-    expect(screen.getByText("DEMO / PROPOSED")).toBeDefined();
+    expect(screen.getByText("FINAL")).toBeDefined();
     expect(screen.getAllByText("dummy-v1").length).toBeGreaterThan(0);
+    expect(screen.getByText(/sudah ditetapkan pemilik proyek/i)).toBeDefined();
+    // Ditetapkan BUKAN berarti terbukti tepat (CLAUDE.md §18).
+    expect(screen.getByText(/hanya dapat dinyatakan lewat evaluasi/i)).toBeDefined();
+  });
+
+  it("kembali menandai ambang belum final ketika versinya memang belum ditetapkan", () => {
+    // Penjaga arah sebaliknya: layar harus ikut berubah bila kelak versi PROPOSED
+    // dinyalakan, tanpa satu baris kode pun disunting.
+    board({
+      groups: [
+        {
+          status: "ACTIVE",
+          rows: [{ ...active, threshold_status: "PROPOSED" }],
+          total: 1,
+        },
+      ],
+    });
+
+    expect(screen.getByText("PROPOSED")).toBeDefined();
     expect(screen.getByText(/belum ditetapkan secara resmi/i)).toBeDefined();
   });
 

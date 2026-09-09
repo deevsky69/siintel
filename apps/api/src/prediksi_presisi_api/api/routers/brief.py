@@ -24,9 +24,11 @@ sehingga kekeliruan penyusunan kalimat terlihat, bukan tersembunyi (CLAUDE.md §
 ## Yang dijaga di sini
 
 1. **Tidak ada ambang yang dihitung ulang.** `risk_class` dan `severity` dibaca dari
-   kolomnya masing-masing. Ambang berstatus DEMO / PROPOSED (U-01), sehingga menghitung
-   kelas dari skor di lapisan API berarti mengunci angka yang belum disetujui siapa pun
-   (CLAUDE.md §11, §12) — aturan yang sama dipakai `routers/map_view.py`.
+   kolomnya masing-masing. Aturan ini TIDAK berubah ketika ambang ditetapkan pada
+   9 September 2026, dan alasannya justru menguat: setiap baris menyimpan versi ambang
+   yang berlaku saat ia dihitung, sehingga menghitung ulang kelas di lapisan API akan
+   menilai baris lama memakai versi yang berlaku hari ini — dan diam-diam mengubah arti
+   angka historis (CLAUDE.md §12). Aturan yang sama dipakai `routers/map_view.py`.
 
 2. **Setiap angka turunan membawa `*_basis`**, mengikuti `security_index_basis` pada
    `routers/dashboard.py`. Brief dibacakan kepada pimpinan; angka tanpa asal-usul di
@@ -265,7 +267,7 @@ def _risk_picture(session: Session, current: CurrentUser) -> dict[str, Any]:
             "Sel risiko tertinggi pada tanggal penilaian terakhir "
             f"({assessment_date}), beserta kecamatan, jenis ancaman, dan jendela "
             "waktunya. Kelas risiko dibaca dari kolom `risk_scores.risk_class`; "
-            "ambangnya berstatus DEMO / PROPOSED (U-01)."
+            "ambangnya ditetapkan 9 September 2026 (U-01), versi dummy-v1."
         ),
         "top_threats_basis": (
             f"{TOP_THREATS} jenis ancaman dengan sel risiko tertinggi pada tanggal "

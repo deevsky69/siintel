@@ -1,11 +1,26 @@
 # BOBOT FAKTOR RISK SCORE — PREDIKSI PRESISI
 #
-# Status: DEMO / PROPOSED — REQUIRES USER APPROVAL (U-02).
+# Status: versi `dummy-v1` = FINAL — DITETAPKAN pemilik proyek 9 September 2026 (U-02).
+#         versi `proposed-2026-09-01` = PROPOSED, belum dipakai menghitung apa pun.
 # Rancangan lengkap beserta alasannya: docs/16-rancangan-risk-scoring.md
 #
-# Angka di bawah **bukan** hasil penelitian dan **bukan** requirement. Nilainya
-# diperlukan agar hubungan antara faktor dan skor dapat diperiksa sama sekali.
-# CLAUDE.md §11 mengizinkannya secara eksplisit selama ditandai DEMO / PROPOSED.
+# APA YANG DITETAPKAN, DAN APA YANG TIDAK
+#
+#   Yang ditetapkan adalah bahwa bobot `dummy-v1` di bawah BERLAKU sebagai ketentuan
+#   penilaian pada prototipe ini. U-02 dengan demikian tertutup: bobotnya tidak lagi
+#   menunggu jawaban siapa pun, dan skor yang dihitung dengannya adalah skor yang sah
+#   menurut ketetapan pemilik proyek.
+#
+#   Yang TIDAK ikut ditetapkan adalah klaim bahwa angka ini benar secara empiris.
+#   Nilainya tidak berasal dari penelitian atas data kriminal nyata; ia diturunkan dari
+#   dataset sintetis lalu diadopsi apa adanya. Menetapkan sebuah angka menjadikannya
+#   ketentuan yang dapat dipertanggungjawabkan asal-usulnya — bukan menjadikannya terbukti.
+#   Membaca ketetapan ini sebagai bukti akurasi adalah persis kekeliruan yang dilarang
+#   CLAUDE.md §18, dan ketepatan modelnya tetap hanya dapat dinyatakan lewat evaluasi.
+#
+#   Tidak ada satu angka pun yang berubah saat penetapan ini. Seluruh baris `risk_scores`
+#   yang sudah ada karena itu tetap sah dan tetap tertelusur: ia dihitung dengan bobot
+#   yang persis sama dengan yang kini ditetapkan.
 #
 # MENGAPA BERVERSI
 #
@@ -32,11 +47,17 @@ active_version: dummy-v1
 
 versions:
   # ===========================================================================
-  # dummy-v1 — BERLAKU untuk 2019 baris `risk_scores` yang sudah ada.
-  # JANGAN diubah selama baris itu masih ada.
+  # dummy-v1 — DITETAPKAN 9 September 2026. BERLAKU untuk seluruh baris
+  # `risk_scores` yang sudah ada.
+  #
+  # JANGAN diubah. Larangannya justru menguat setelah ditetapkan: sebelumnya
+  # mengubahnya merusak ketertelusuran, kini ia juga mengubah ketentuan yang sudah
+  # diputus pemilik proyek. Cara yang benar tetap sama — tambah versi baru,
+  # tetapkan versi itu, lalu bangkitkan ulang skornya.
   # ===========================================================================
   dummy-v1:
-    status: DEMO
+    status: FINAL
+    ditetapkan: 2026-09-09
     profiles:
       historical:
         applies_to: [CURANMOR, CURAT, CURAS, KEJAHATAN_JALANAN, TAWURAN]
