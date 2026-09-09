@@ -39,7 +39,7 @@ def run() -> int:
     """Menjalankan satu putaran retensi. Mengembalikan jumlah berkas yang dihapus."""
     now = clock.reference_now()
 
-    orphans = attachments.sweep_staging(now)
+    orphans = attachments.sweep_staging()
     if orphans:
         logger.info("titipan unggahan yang tidak terpakai dibuang: %d", orphans)
 

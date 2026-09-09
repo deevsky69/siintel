@@ -19,7 +19,7 @@ import io
 import os
 import uuid
 from collections.abc import Iterator
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -590,6 +590,35 @@ def test_a_purged_attachment_answers_gone_rather_than_missing(
     assert still_listed[0]["purged_at"] is not None
 
 
+def _age_markers(staging: Path, minutes: int) -> None:
+    """Memundurkan cap waktu tiap tanda titipan, seolah ia sudah lama menganggur."""
+    for marker in staging.glob("*.tanda"):
+        baris = marker.read_text(encoding="utf-8").split("\n")
+        stamp = datetime.fromisoformat(baris[0]) - timedelta(minutes=minutes)
+        baris[0] = stamp.isoformat()
+        marker.write_text("\n".join(baris), encoding="utf-8")
+
+
+def test_a_corrupt_image_is_a_client_error_not_a_server_fault(client: TestClient) -> None:
+    """Ditemukan di produksi 9 September 2026: JPEG terpotong menjawab HTTP 500.
+
+    Bedanya menentukan bagi warga yang mengirim dari lapangan. 500 berarti "server rusak,
+    coba lagi nanti", sehingga berkas yang sama dikirim ulang berkali-kali dan tetap gagal.
+    400 menyebutkan bahwa berkasnyalah yang bermasalah.
+    """
+    # Kepala JPEG yang sah lalu penanda akhir — cukup untuk lolos pemeriksaan tanda tangan,
+    # tetapi tidak dapat didekode. Persis bentuk berkas yang terputus di tengah pengiriman.
+    terpotong = bytes.fromhex("ffd8ffe000104a46494600010100000100010000ffdb004300ffd9")
+
+    response = client.post(
+        "/api/v1/public/attachments",
+        files={"berkas": ("rusak.jpg", terpotong, "image/jpeg")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "VALIDATION_ERROR"
+
+
 def test_unused_upload_handles_are_swept_away(client: TestClient, storage: Path) -> None:
     """Titipan yang tidak pernah dipakai tidak boleh menumpuk selamanya."""
     client.post(
@@ -599,10 +628,35 @@ def test_unused_upload_handles_are_swept_away(client: TestClient, storage: Path)
     staging = storage / "lampiran" / "_menunggu"
     assert list(staging.glob("*.jpg"))
 
-    removed = store.sweep_staging(
-        clock.reference_now() + timedelta(minutes=store.STAGING_TTL_MINUTES + 1)
-    )
+    # Titipan yang masih segar TIDAK boleh ikut terbuang: pembersihan yang menyapu unggahan
+    # yang sedang berjalan lebih merugikan daripada tidak ada pembersihan sama sekali.
+    assert store.sweep_staging() == 0
+    assert list(staging.glob("*.jpg"))
 
-    assert removed == 1
+    _age_markers(staging, store.STAGING_TTL_MINUTES + 1)
+
+    assert store.sweep_staging() == 1
     assert not list(staging.glob("*.jpg"))
     assert not list(staging.glob("*.tanda"))
+
+
+def test_staging_marker_is_stamped_with_real_time_not_the_demo_clock(
+    client: TestClient, storage: Path
+) -> None:
+    """Umur titipan berlalu di dunia nyata, bukan di kalender dataset.
+
+    `DEMO_REFERENCE_TIME` membekukan "sekarang" pada 31 Desember 2025. Ketika tanda titipan
+    ikut dicap dengan waktu beku itu, `sweep_staging` membandingkan waktu beku dengan waktu
+    beku — selisihnya selalu nol, tidak satu pun titipan pernah kedaluwarsa, dan
+    pembersihan terjadwal menjadi pengaman yang tidak pernah bekerja sekali pun.
+    """
+    client.post(
+        "/api/v1/public/attachments",
+        files={"berkas": ("bukti.jpg", _photo_with_exif(), "image/jpeg")},
+    )
+
+    marker = next((storage / "lampiran" / "_menunggu").glob("*.tanda"))
+    stamped = datetime.fromisoformat(marker.read_text(encoding="utf-8").split("\n")[0])
+
+    assert abs((stamped - datetime.now(UTC)).total_seconds()) < 60
+    assert abs((stamped - clock.reference_now()).total_seconds()) > 3600

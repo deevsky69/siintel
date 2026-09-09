@@ -540,12 +540,15 @@ Role baseline:
 
 ```text
 Pimpinan
-Command Center
-Analyst
 Fungsi
 Polsek
 Administrator
 ```
+
+Command Center dan Analyst **dilebur ke dalam Administrator** — keputusan pemilik proyek
+1 September 2026, ditegaskan kembali 9 September 2026. Sumber kebenaran pemberian
+permission adalah `config/rbac/permissions.yaml`; matriks `docs/03` §3 dibangkitkan
+darinya oleh `scripts/matriks-rbac.py`.
 
 Authorization harus ditegakkan di backend.
 

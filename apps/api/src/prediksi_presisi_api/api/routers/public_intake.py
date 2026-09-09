@@ -281,7 +281,7 @@ def upload_attachment(
         )
 
     try:
-        handle, stored = attachment_store.stage(berkas.file, clock.reference_now())
+        handle, stored = attachment_store.stage(berkas.file)
     except attachment_store.AttachmentError as error:
         raise ApiError(status.HTTP_400_BAD_REQUEST, str(error)) from error
 

@@ -36,7 +36,7 @@ import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import BinaryIO
 
@@ -172,14 +172,32 @@ def _strip_image(source: Path, target: Path) -> str:
     except ImportError as error:  # pragma: no cover — dependensi wajib di produksi
         raise AttachmentError("Pemroses gambar tidak tersedia di server.") from error
 
-    with Image.open(source) as image:
-        image.load()
-        # Gambar baru yang kosong, lalu pikselnya ditempelkan. `image.copy()` TIDAK dapat
-        # dipakai: ia ikut membawa `info`, tempat EXIF, ICC, dan komentar tersimpan — dan
-        # hasilnya terlihat seperti gambar yang bersih padahal seluruh metadatanya utuh.
-        bare = Image.new(image.mode, image.size)
-        bare.paste(image)
-        bare.save(target, format=image.format)
+    # Berkas rusak, terpotong, atau bukan gambar sama sekali adalah kesalahan PENGIRIM,
+    # bukan kesalahan server. Tanpa penangkapan ini Pillow melempar `OSError` yang lolos
+    # sampai ke penangan galat umum dan menjadi HTTP 500 — sehingga foto yang gagal
+    # terkirim dari lapangan terbaca sebagai server yang rusak, dan warga mencoba lagi
+    # dengan berkas yang sama persis. Ditemukan di produksi 9 September 2026.
+    #
+    # `DecompressionBombError` ikut ditangkap dan sengaja disebut terpisah: pada kanal yang
+    # terbuka untuk umum, gambar yang kecil terkompresi tetapi raksasa saat dibentangkan
+    # adalah cara termurah menghabiskan memori server.
+    try:
+        with Image.open(source) as image:
+            image.load()
+            # Gambar baru yang kosong, lalu pikselnya ditempelkan. `image.copy()` TIDAK
+            # dapat dipakai: ia ikut membawa `info`, tempat EXIF, ICC, dan komentar
+            # tersimpan — dan hasilnya terlihat seperti gambar yang bersih padahal seluruh
+            # metadatanya utuh.
+            bare = Image.new(image.mode, image.size)
+            bare.paste(image)
+            bare.save(target, format=image.format)
+    except Image.DecompressionBombError as error:
+        raise AttachmentError("Ukuran gambar terlalu besar untuk diproses.") from error
+    except (OSError, ValueError) as error:
+        raise AttachmentError(
+            "Berkas gambar tidak dapat dibaca; kemungkinan rusak atau tidak selesai "
+            "terkirim. Coba kirim ulang."
+        ) from error
     return "pillow"
 
 
@@ -241,7 +259,7 @@ _SUFFIX = {
 }
 
 
-def stage(upload: BinaryIO, now: datetime) -> tuple[str, StoredAttachment]:
+def stage(upload: BinaryIO) -> tuple[str, StoredAttachment]:
     """Menerima satu unggahan, melucuti metadatanya, dan menyimpannya sebagai titipan.
 
     Mengembalikan sepasang: **handle** yang harus disertakan saat mengirim laporan, dan
@@ -287,8 +305,14 @@ def stage(upload: BinaryIO, now: datetime) -> tuple[str, StoredAttachment]:
     # bekerja saat pencarian memakai pola, tetapi pencarian dengan pola itulah yang
     # membuat handle dapat dipalsukan. Dengan nama yang tepat, batang nama tanda dan berkas
     # isinya sama-sama persis handle-nya.
+    # Waktu SUNGGUHAN, bukan waktu acuan demo. Umur titipan adalah "berapa lama berkas ini
+    # menganggur di cakram", dan itu berlalu di dunia nyata terlepas dari tanggal berapa
+    # yang sedang dipura-purakan dataset. Memakai `clock.reference_now()` di sini — yang
+    # BEKU pada 31 Desember 2025 — membuat `sweep_staging` membandingkan waktu beku dengan
+    # waktu beku, sehingga tidak satu pun titipan pernah kedaluwarsa dan pembersihannya
+    # menjadi pengaman yang tidak pernah bekerja.
     (staging / f"{handle}.tanda").write_text(
-        f"{now.isoformat()}\n{stored.kind}\n{stored.media_type}\n"
+        f"{datetime.now(UTC).isoformat()}\n{stored.kind}\n{stored.media_type}\n"
         f"{stored.byte_size}\n{stored.sha256}\n{stored.metadata_stripped_with}\n",
         encoding="utf-8",
     )
@@ -340,9 +364,12 @@ def path_of(attachment: CitizenReportAttachment) -> Path:
     return storage_root() / attachment.storage_key
 
 
-def sweep_staging(now: datetime) -> int:
-    """Membuang titipan yang tidak pernah dipakai. Mengembalikan jumlah yang dibuang."""
-    cutoff = now - timedelta(minutes=STAGING_TTL_MINUTES)
+def sweep_staging() -> int:
+    """Membuang titipan yang tidak pernah dipakai. Mengembalikan jumlah yang dibuang.
+
+    Memakai waktu sungguhan, bukan waktu acuan demo — lihat alasannya pada `stage`.
+    """
+    cutoff = datetime.now(UTC) - timedelta(minutes=STAGING_TTL_MINUTES)
     removed = 0
     for marker in _staging_root().glob("*.tanda"):
         stamp = marker.read_text(encoding="utf-8").split("\n")[0]
