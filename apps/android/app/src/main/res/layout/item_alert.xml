@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Satu imbauan kewaspadaan pada layar muka warga.
+
+  Sengaja tanpa tombol dan tanpa tujuan klik: imbauan adalah kanal SATU ARAH. Menjadikannya
+  dapat diketuk menjanjikan rincian yang memang tidak ada — dan rincian yang ada di sistem
+  justru yang tidak boleh keluar.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp"
+    android:background="@drawable/box_critical"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/alertHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/critical"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/alertMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:lineSpacingExtra="3dp"
+        android:textColor="@color/ink_muted"
+        android:textSize="13sp" />
+</LinearLayout>

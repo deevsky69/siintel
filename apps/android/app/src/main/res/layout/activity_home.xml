@@ -58,6 +58,44 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Imbauan yang sedang berlaku — "info sekitar" pada spesifikasi §4. Diletakkan
+             SEBELUM tombol lapor: warga yang membuka aplikasi karena melihat sesuatu perlu
+             tahu lebih dulu apakah hal itu sudah diketahui satuan. Seluruh bagian ini
+             disembunyikan bila tidak ada imbauan atau jaringan gagal — kotak kosong pada
+             layar muka terbaca seperti aplikasi yang rusak. -->
+        <LinearLayout
+            android:id="@+id/alertSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.1"
+                android:text="@string/home_alerts_title"
+                android:textAllCaps="true"
+                android:textColor="@color/ink_faint"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/alertList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="3dp"
+                android:text="@string/home_alerts_basis"
+                android:textColor="@color/ink_faint"
+                android:textSize="12sp" />
+        </LinearLayout>
+
         <Button
             android:id="@+id/reportButton"
             android:layout_width="match_parent"

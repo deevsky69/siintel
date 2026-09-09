@@ -179,6 +179,53 @@ memakai sebagian sumber daya server ini.
 
 ---
 
+> ### ⚠ NGINX DI DEPAN MEMATIKAN SELURUH SERVER ACTION — belum diperbaiki di sisi nginx
+>
+> Sejak 7 September 2026 demo dilayani lewat **nginx pada mesin lain** (`202.56.161.114`),
+> yang meneruskan permintaan ke server ini (`10.3.3.87`). Mesin itu **tidak dapat dihubungi
+> dari server ini** — SSH-nya tertutup — sehingga perbaikan di bawah harus dikerjakan oleh
+> yang memegangnya.
+>
+> **Gejalanya:** setiap tombol yang MENULIS gagal dengan HTTP 500 tanpa pesan apa pun di
+> layar. Menyetujui rekomendasi, menerima peringatan, mentriase laporan, menerbitkan
+> imbauan — semuanya. Setiap halaman yang hanya MEMBACA tetap normal, sehingga demo tampak
+> sehat sepenuhnya. Keterangannya hanya ada di log container:
+>
+> ```text
+> `x-forwarded-host` header with value `10.3.3.87` does not match `origin` header
+> with value `siintel.awansurya.com` from a forwarded Server Actions request.
+> ```
+>
+> Next membandingkan keduanya sebagai penangkal CSRF pada Server Action. nginx meneruskan
+> alamat IP, peramban mengirim nama domain, keduanya tidak cocok, action dibatalkan.
+>
+> **Perbaikan di nginx** (`/etc/nginx/sites-available/…` pada mesin itu):
+>
+> ```nginx
+> location / {
+>     proxy_pass http://10.3.3.87:443;
+>
+>     # Dua baris inilah yang menentukan. Tanpa keduanya, nginx meneruskan alamat
+>     # backend sebagai nama host, dan Next menolak SETIAP Server Action.
+>     proxy_set_header Host              $host;
+>     proxy_set_header X-Forwarded-Host  $host;
+>
+>     proxy_set_header X-Real-IP         $remote_addr;
+>     proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+>     proxy_set_header X-Forwarded-Proto $scheme;
+> }
+> ```
+>
+> **Tambalan sementara yang sudah terpasang.** `apps/web/next.config.ts` mendaftarkan nama
+> host publik pada `serverActions.allowedOrigins`, diteruskan sebagai build arg. Ini
+> membuat demo berjalan tanpa menyentuh nginx, dan **tidak** melemahkan perlindungan CSRF —
+> dibuktikan: permintaan dengan `Origin` palsu tetap dijawab 500, sedangkan yang sah lewat.
+> Tambalan ini tetap perlu dicabut setelah nginx diperbaiki, agar hanya ada satu tempat
+> yang menentukan asal yang sah.
+>
+> **Mendeteksinya:** `pnpm prod:periksa` — pemeriksaan ini dibuat justru karena kegagalan
+> tersebut senyap selama entah berapa lama.
+
 > ### ⚠ IP PUBLIK BERUBAH — 7 September 2026
 >
 > IP publik server berganti dari `111.68.123.134` menjadi `202.56.161.114`, dan bersamaan

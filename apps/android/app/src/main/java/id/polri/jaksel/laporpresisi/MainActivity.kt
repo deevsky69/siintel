@@ -2,9 +2,13 @@ package id.polri.jaksel.laporpresisi
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import id.polri.jaksel.laporpresisi.databinding.ActivityHomeBinding
+import id.polri.jaksel.laporpresisi.databinding.ItemAlertBinding
 import id.polri.jaksel.laporpresisi.petugas.PetugasActivity
+import kotlinx.coroutines.launch
 
 /**
  * Layar muka: dua pintu, dan tidak lebih.
@@ -32,6 +36,20 @@ import id.polri.jaksel.laporpresisi.petugas.PetugasActivity
  *
  * Nomor darurat disebut di sini, bukan hanya di dalam formulir: orang yang salah membuka
  * aplikasi ini saat keadaan mendesak harus membaca "110" sebelum ia menekan apa pun.
+ *
+ * ## Imbauan yang sedang berlaku — "info sekitar" (spesifikasi §4)
+ *
+ * Ditambahkan 9 September 2026, setelah kanal imbauan dibangun. Ia diletakkan SEBELUM
+ * tombol lapor dengan sengaja: warga yang membuka aplikasi karena melihat sesuatu perlu
+ * tahu lebih dulu apakah hal itu sudah diketahui satuan.
+ *
+ * Ini satu-satunya isi kamtibmas yang ditampilkan tanpa akun, dan ia boleh ditampilkan
+ * justru karena setiap barisnya sudah melewati keputusan publikasi oleh pejabat berwenang.
+ * Peringatan dini yang belum diumumkan tidak pernah sampai ke sini, dan tidak ada satu
+ * angka pun yang ikut — tanpa skor, tanpa grid, tanpa kode peringatan internal.
+ *
+ * Kegagalan jaringan tidak menghalangi apa pun: bagiannya sekadar tidak muncul. Layar muka
+ * harus tetap menawarkan tombol lapor pada jaringan terburuk sekalipun.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -51,5 +69,41 @@ class MainActivity : AppCompatActivity() {
         views.officerButton.setOnClickListener {
             startActivity(Intent(this, PetugasActivity::class.java))
         }
+
+        muatImbauan()
+    }
+
+    /**
+     * Memuat imbauan setiap kali layar muka kembali tampak, bukan sekali saat dibuat.
+     *
+     * Warga yang baru selesai mengirim laporan kembali ke layar ini; imbauan yang terbit
+     * di sela itu harus ikut terlihat tanpa perlu menutup aplikasi.
+     */
+    override fun onResume() {
+        super.onResume()
+        muatImbauan()
+    }
+
+    private fun muatImbauan() {
+        lifecycleScope.launch {
+            val imbauan = PublicApi.imbauan(BuildConfig.API_BASE)
+            views.alertList.removeAllViews()
+
+            // Disembunyikan seluruhnya bila kosong — termasuk ketika kosongnya karena
+            // jaringan gagal. Judul tanpa isi terbaca seperti aplikasi yang rusak.
+            views.alertSection.visibility = if (imbauan.isEmpty()) View.GONE else View.VISIBLE
+
+            for (row in imbauan.take(MAX_ALERTS)) {
+                val card = ItemAlertBinding.inflate(layoutInflater, views.alertList, true)
+                val jam = row.timeWindow?.let { " · $it WIB" } ?: ""
+                card.alertHeadline.text = "${row.threatType} · ${row.areaText}$jam"
+                card.alertMessage.text = row.message
+            }
+        }
+    }
+
+    private companion object {
+        /** Layar muka bukan arsip: yang berguna dibaca adalah yang paling dekat berlaku. */
+        const val MAX_ALERTS = 3
     }
 }

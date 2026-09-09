@@ -1,8 +1,14 @@
 # KESESUAIAN TERHADAP RESUME SPESIFIKASI APLIKASI
 
 Sumber: `docs/source/Resume_Spesifikasi_Aplikasi_PREDIKSI_PRESISI.pdf`
-Diperiksa ulang: 2 September 2026 — terhadap kode dan basis data yang berjalan, bukan terhadap ingatan.
-Pemeriksaan pertama: 1 September 2026.
+Diperiksa ulang: **9 September 2026** — terhadap kode, basis data, dan demo yang berjalan,
+bukan terhadap ingatan. Pemeriksaan sebelumnya: 1 dan 2 September 2026.
+
+> **Catatan tentang dokumen ini sendiri.** Pada 9 September 2026 ia ditemukan usang dan
+> bahkan bertentangan dengan dirinya: tabel MVP menandai triase laporan masyarakat sudah
+> ada, sementara paragraf di bawahnya menyatakan "belum dapat diubah dari layar". Dokumen
+> kesesuaian yang salah lebih berbahaya daripada tidak ada, sebab justru ia yang dibaca
+> sebagai klaim. Seluruh baris di bawah diperiksa ulang terhadap keadaan hari ini.
 
 ---
 
@@ -23,22 +29,30 @@ Ini yang menjadi ukuran, karena §9 menyebut dirinya kebutuhan minimum proof of 
 | 9 | Early Warning | ✅ **ADA** | `/peringatan` beserta terima/selesaikan |
 | 10 | AI Recommendation | ✅ **ADA** | `/rekomendasi` |
 | 11 | Commander Decision / Approval | ✅ **ADA** | Setujui / Modifikasi / Tolak, usulan asli tidak tertimpa |
-| 12 | Community Intelligence & manajemen laporan masyarakat | ✅ **ADA** | Kanal publik `/lapor` menerima; `/masyarakat` membaca; triase pada `/input` |
+| 12 | Community Intelligence & manajemen laporan masyarakat | ✅ **ADA** | Kanal publik `/lapor` dan aplikasi Android menerima; `/masyarakat` membaca; triase pada `/input` lewat `POST /citizen-reports/{code}/status`; petugas juga memverifikasi dari ponsel |
 | 13 | Prediction vs Actual | ✅ **ADA** | `/evaluasi`, precision 0,397 · recall 0,400 |
 | 14 | Executive Brief | ✅ **ADA** | `/brief`, siap cetak |
 
-**Skor per 2 September 2026: 13 dari 14 lengkap, 1 sebagian, 0 belum.**
+**Skor per 9 September 2026: 14 dari 14 lengkap, 0 sebagian, 0 belum.**
 
-Riwayat: 8/3/3 → 10/3/1 (1 September) → 11/3/0 → **13/1/0** (2 September).
+Riwayat: 8/3/3 → 10/3/1 (1 September) → 11/3/0 → 13/1/0 (2 September) → **14/0/0**
+(9 September).
 
 `/peta` kini memuat **ketiga** layer yang diminta CLAUDE.md §24 — historis, risiko
 berjalan, prediktif — sehingga #3 dan #4 tertutup sekaligus. Ketiganya sengaja berwarna
 berjauhan dan bersatuan berbeda: dua layer memakai skor 0–100, sedangkan layer historis
 memakai **cacah kejadian** dan karena itu tidak diberi kelas risiko apa pun.
 
-Yang tersisa satu, **#12**: laporan masyarakat sudah terbaca tetapi statusnya belum dapat
-diubah dari layar. `community.py` sampai hari ini hanya memiliki dua endpoint baca dan
-tidak satu pun endpoint tulis — **triase** itulah pekerjaan berikutnya.
+**#12 tertutup.** `POST /citizen-reports/{code}/status` ada dan menegakkan
+`citizen_report:write`; layar `/input` memakainya, dan aplikasi Android petugas
+memverifikasi lewat endpoint yang sama. Diperiksa ujung ke ujung pada demo produksi
+9 September 2026: warga mengirim laporan dari aplikasi, laporan muncul di antrean Polsek,
+petugas memverifikasinya.
+
+**Yang bertambah setelah daftar MVP ini disusun** — bukan bagian dari 14 butir, tetapi
+menutup lengan terakhir rantai CLAUDE.md §9: **kanal imbauan kepada masyarakat**
+(`/imbauan`, TASK 111). Peringatan dini kini dapat diterbitkan Pimpinan menjadi imbauan
+publik, terbaca tanpa akun di halaman muka web maupun di aplikasi Android warga.
 
 ---
 
@@ -47,7 +61,7 @@ tidak satu pun endpoint tulis — **triase** itulah pekerjaan berikutnya.
 | Modul | Status |
 |---|---|
 | Executive Dashboard | ✅ |
-| Live Kamtibmas Map | ⚠️ layer kejadian ✅; layer laporan masyarakat dan unit patroli belum |
+| Live Kamtibmas Map | ⚠️ tiga layer ada (historis, risiko berjalan, prediktif); layer **laporan masyarakat** dan **unit patroli** belum — keduanya menuntut sumber posisi yang belum dimiliki sistem |
 | Crime Analytics | ✅ `/analitik` — tren bulanan, pola waktu, perbandingan antarwilayah |
 | Crime Pattern DNA | ✅ |
 | AI Prediction Center | ✅ `/prediksi` |
@@ -118,17 +132,18 @@ hanya oleh aplikasi.
 
 ---
 
-## 5. YANG BELUM SESUAI PADA MODEL DATA
-
-Dua kekurangan pada `citizen_reports` dibanding spesifikasi §5:
+## 5. MODEL DATA TERHADAP SPESIFIKASI §5
 
 | Spesifikasi | Keadaan | Catatan |
 |---|---|---|
-| **Foto / Video / Audio** (opsional) | ❌ tidak ada kolom maupun tabel lampiran | Perlu tabel lampiran terpisah; menyimpan berkas juga menyentuh kebijakan retensi |
-| **Identitas / Kontak** (opsional) | ❌ tidak ada kolom | **Sengaja.** Menambahkannya adalah keputusan privasi (CLAUDE.md §16, docs/14 §3), bukan kekurangan teknis |
+| **Foto / Video / Audio** (opsional) | ✅ **ADA** sejak 8 September 2026 | Tabel `citizen_report_attachments` (migration 0008). Metadata dilucuti sebelum disimpan — EXIF pada gambar lewat Pillow, metadata wadah audio/video lewat ffmpeg — sehingga koordinat GPS yang ditanam kamera ponsel tidak ikut tersimpan. Berkas dihapus 90 hari setelah laporannya selesai, dan pembersihannya berjalan terjadwal tiap jam |
+| **Identitas / Kontak** (opsional) | ❌ tidak ada kolom | **Sengaja.** Menambahkannya adalah keputusan privasi (CLAUDE.md §16, docs/14 §3), bukan kekurangan teknis. Spesifikasi sendiri menyebutnya *opsional sesuai mekanisme akun dan kebijakan perlindungan data* |
 
-Yang kedua tidak dianggap cacat: spesifikasi sendiri menyebutnya *opsional sesuai
-mekanisme akun dan kebijakan perlindungan data*.
+Konsekuensi yang perlu disadari dari baris kedua: karena tidak ada identitas pelapor,
+**tidak ada pula cara pelapor melihat status laporannya**. Tiket `RPT-xxxx` berurut dan
+karena itu dapat ditebak; sebuah endpoint yang hanya menuntut tiket akan membocorkan status
+laporan siapa pun. Menutupnya memerlukan token klaim acak yang disimpan di ponsel pelapor —
+perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 
 ---
 
@@ -143,29 +158,62 @@ mekanisme akun dan kebijakan perlindungan data*.
 | Community Intelligence | `/masyarakat` — 150 laporan, tanpa identitas pelapor, belum memengaruhi risk score |
 | Operation Center | `/operasi` — menutup lengan umpan balik |
 
+### Dikerjakan 8–9 September 2026
+
+| Pekerjaan | Hasil |
+|---|---|
+| Triase laporan masyarakat | `POST /citizen-reports/{code}/status`, dipakai `/input` dan aplikasi Android petugas — menutup MVP #12 |
+| Layer historis & prediktif pada peta | Ketiga layer §24 ada, dan peta beranda kini memuat seluruh wilayah hukum Polda Metro Jaya |
+| AI Prediction Center | `/prediksi` beserta `prediction:run` dan `prediction:publish` |
+| Lampiran laporan masyarakat | Foto/suara/video, metadata dilucuti, retensi 90 hari berjalan terjadwal |
+| Kanal imbauan publik | `/imbauan` — peringatan dini dapat diterbitkan Pimpinan, terbaca tanpa akun (TASK 111) |
+| Penetapan U-01, U-02, U-16, U-22, separuh U-10 | Bobot, ambang, taksonomi, pemetaan status wilayah, dan kewenangan publikasi alert |
+
 ### Masih tersisa
 
 | Urutan | Pekerjaan | Alasan |
 |---|---|---|
-| 1 | Triase laporan masyarakat (aksi tulis) | Melengkapi MVP #12; statusnya sudah ada, penyuntingannya belum |
-| 2 | Layer kejadian & historis pada peta | Melengkapi MVP #3 dan #4 |
-| 3 | AI Prediction Center | MVP #7 — perlu endpoint `prediction:run` dan `prediction:publish` |
-| 4 | Near-repeat pada Crime Pattern DNA | docs/01 §5.4 menyebutnya; definisi jendela jarak dan waktu **menunggu keputusan pemilik proyek** |
+| 1 | **Near-repeat** pada Crime Pattern DNA | docs/01 §5.4 menyebutnya; definisi jendela jarak dan waktu **menunggu keputusan pemilik proyek** |
+| 2 | Layer **laporan masyarakat** dan **unit patroli** pada peta | Modul §3 menyebut keduanya. Laporan masyarakat punya koordinat dan dapat digambar; posisi unit patroli **tidak ada sumbernya** — `patrol_activity` mencatat kegiatan, bukan posisi berjalan |
+| 3 | Severity minimum publikasi alert (sisa U-10) | Kanalnya berjalan **tanpa** gerbang severity, dan layar menyatakannya |
+| 4 | Ambang peringkat volume laporan | Dipisahkan dari U-22 pada 9 September 2026, masih `PROPOSED` |
+| 5 | Definisi target prediksi & aturan pencocokan evaluasi (U-03) | Menentukan **arti** angka precision/recall yang sudah ditampilkan `/evaluasi` |
+| 6 | Kunci rilis satuan untuk APK | APK rilis kini ditandatangani **kunci debug** — memadai untuk paparan pada perangkat sendiri, tidak untuk disebarkan |
 
-### Android — keadaan per 7 September 2026
+### Android — keadaan per 9 September 2026
 
-Dua APK sudah dapat dipasang dan **diverifikasi berjalan di emulator Android 14**, keduanya
-lewat HTTPS dengan CA satuan (`docs/implementation-notes/170-android.md`):
+**Satu APK**, bukan dua lagi (`id.polri.jaksel.laporpresisi`, 2.0.0). Layar mukanya dua
+pintu: lapor untuk warga, masuk untuk petugas. Diperiksa langsung terhadap demo produksi
+pada 9 September 2026 — bukan terhadap emulator dan bukan terhadap ingatan.
 
-| Aplikasi | Yang sudah bekerja | Yang belum |
+| Bagian | Yang sudah bekerja | Yang belum |
 |---|---|---|
-| **LAPOR PRESISI** (warga) | Mengirim laporan — teruji sampai tersimpan di basis data | Panic button, info sekitar, status laporan, community watch (spesifikasi §4) |
-| **PRESISI Petugas** | Masuk, sesi tujuh hari, membaca antrean menurut kewenangan | Bertindak atas antrean (menyetujui, menolak, mentriase) |
+| **Warga** | Mengirim laporan sampai tersimpan · berbagi lokasi · lampiran foto/suara/video · **imbauan kewaspadaan yang sedang berlaku** ("info sekitar" §4) | Panic button, status laporan, community watch — ketiganya terhalang keputusan, bukan pekerjaan teknis (lihat di bawah) |
+| **Petugas** | Masuk · sesi tujuh hari (teruji melewati proxy) · membaca antrean menurut kewenangan · **memverifikasi laporan** | Menyetujui rekomendasi dan menutup peringatan dari ponsel |
 
-Sisa fitur spesifikasi §4 tetap Tahap F sesuai ketentuan pemilik proyek. Kemampuan
-**bertindak** dari ponsel bukan sekadar pekerjaan teknis: ia menyentuh pertanyaan tindakan
-mana yang pantas diputuskan dari layar kecil di lapangan, dan itu keputusan pemilik proyek.
+Lingkaran penuhnya terbukti pada demo sungguhan: warga mengirim laporan → laporan muncul
+di antrean Polsek yang berwenang → petugas memverifikasinya.
 
-> Daftar "Masih tersisa" di atas bertanggal 1 September 2026 dan sebagian sudah dikerjakan
-> sesudahnya. Ia belum ditulis ulang di sini karena penulisan ulangnya menuntut audit penuh,
-> bukan tambalan.
+**Keamanan APK, diperiksa 9 September 2026.** Token petugas disimpan
+`EncryptedSharedPreferences` (AES256-GCM); tidak ada satu pun pernyataan `Log` di seluruh
+kode; sandi tidak pernah disimpan; tiga izin saja (internet dan lokasi, diminta hanya saat
+tombol ditekan); hanya layar muka yang `exported`; `allowBackup=false`; HTTP polos ditolak
+termasuk pada Android 7–8. Jangkar CA satuan dihapus dari varian rilis setelah sertifikat
+Let's Encrypt terbit.
+
+**Satu hal menutup jalan penyebaran:** APK rilis ditandatangani **kunci debug** —
+`C=US, O=Android, CN=Android Debug`. Kunci itu sama pada setiap mesin pengembang di dunia
+dan sandinya diketahui umum, sehingga siapa pun dapat membangun "pembaruan" yang diterima
+Android sebagai aplikasi yang sama. Memadai untuk paparan pada perangkat sendiri; tidak
+untuk dibagikan.
+
+#### Tiga fitur §4 yang TIDAK dikerjakan, dan mengapa
+
+Ketiganya terhalang keputusan pemilik proyek, bukan kesulitan teknis. Mengerjakannya tanpa
+keputusan itu bukan kemajuan melainkan kerusakan:
+
+| Fitur | Yang menghalangi |
+|---|---|
+| **Panic button** | **Komitmen respons** — siapa yang menerima, dalam berapa lama, dan apa yang terjadi bila tidak ada yang menjawab. Tombol darurat yang menjanjikan bantuan tanpa ada yang berkewajiban datang lebih berbahaya daripada tidak ada tombol sama sekali: ia membuat orang berhenti mencari pertolongan lain |
+| **Status laporan** | Tiket `RPT-xxxx` berurut dan dapat ditebak, sedangkan sistem sengaja tidak menyimpan identitas pelapor — jadi tidak ada apa pun untuk mengikat hak baca. Perlu token klaim acak di ponsel pelapor: perubahan skema dan kontrak API (sisa U-13) |
+| **Community watch** | Belum ada definisi produk. Apa yang dibagikan, kepada siapa, dan siapa yang memoderasinya adalah pertanyaan kebijakan sebelum menjadi pertanyaan teknis |

@@ -41,6 +41,7 @@
     "seed:operational": "cd apps/api && uv run python -m prediksi_presisi_api.seeding operational",
     "user:password": "cd apps/api && uv run python -m prediksi_presisi_api.cli set-password",
     "user:list": "cd apps/api && uv run python -m prediksi_presisi_api.cli list-users",
+    "prod:periksa": "bash scripts/periksa-produksi.sh",
     "prod:config": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml config",
     "prod:build": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml build",
     "prod:up": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml up -d",

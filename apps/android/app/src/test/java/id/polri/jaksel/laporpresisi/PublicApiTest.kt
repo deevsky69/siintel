@@ -31,6 +31,15 @@ class PublicApiTest {
 
     private val ticketBody = """{"ticket":"CR-2026-0001","message":"Laporan Anda diterima."}"""
 
+    private val alertsBody = """
+        {"data":[
+          {"code":"PAL-0026","severity":"CRITICAL","threat_type":"CURANMOR",
+           "area_text":"Kecamatan Tebet","time_window":"18:00-23:59",
+           "window_start":null,"window_end":null,
+           "message":"Imbauan kewaspadaan. Kunci kendaraan Anda."}],
+         "basis":"Sudah melewati keputusan publikasi."}
+    """.trimIndent()
+
     @Test
     fun `pilihan kategori dan kecamatan diambil dari server, bukan ditanam di aplikasi`() =
         runBlocking {
@@ -43,6 +52,58 @@ class PublicApiTest {
                 assertEquals(listOf("Tebet", "Kebayoran Baru"), options.areas)
                 assertEquals("Titik tengah kecamatan", options.coordinateBasis)
                 assertEquals("GET", server.requestsTo("/api/v1/public/report-options").single().method)
+            }
+        }
+
+    @Test
+    fun `imbauan yang berlaku dibaca dari server tanpa akun`() = runBlocking {
+        FakeServer().use { server ->
+            server.on("/api/v1/public/alerts", FakeServer.Reply(200, alertsBody))
+
+            val imbauan = PublicApi.imbauan(server.base)
+
+            assertEquals(1, imbauan.size)
+            assertEquals("CURANMOR", imbauan.single().threatType)
+            assertEquals("Kecamatan Tebet", imbauan.single().areaText)
+            assertEquals("18:00-23:59", imbauan.single().timeWindow)
+            // Tanpa Authorization: kanal ini memang terbuka, dan mengirim token ke sana
+            // akan membocorkan kredensial petugas ke permintaan yang tidak memerlukannya.
+            val permintaan = server.requestsTo("/api/v1/public/alerts").single()
+            assertEquals("GET", permintaan.method)
+            assertFalse(permintaan.headers.keys.any { it.equals("Authorization", true) })
+        }
+    }
+
+    @Test
+    fun `jaringan gagal membuat imbauan kosong, bukan aplikasi berhenti`() = runBlocking {
+        // Layar muka harus tetap menawarkan tombol lapor pada jaringan terburuk sekalipun.
+        // Melemparkan galat dari sini akan menjatuhkan seluruh layar demi bagian tambahan.
+        FakeServer().use { server ->
+            server.on("/api/v1/public/alerts", FakeServer.Reply(503, """{"error":"mati"}"""))
+
+            assertTrue(PublicApi.imbauan(server.base).isEmpty())
+        }
+    }
+
+    @Test
+    fun `imbauan tidak pernah membawa angka internal meski server mengirimkannya`() =
+        runBlocking {
+            // Pertahanan berlapis: kalau suatu saat API bocor, aplikasi tetap tidak
+            // menampilkannya — tipe `Imbauan` memang tidak punya tempat untuk itu.
+            val bocor = """
+                {"data":[{"code":"PAL-1","severity":"CRITICAL","threat_type":"CURAT",
+                  "area_text":"Kecamatan Tebet","time_window":null,
+                  "message":"Imbauan.","risk_score":95,"grid_id":"JKS-001",
+                  "warning_code":"WRN-00053"}]}
+            """.trimIndent()
+            FakeServer().use { server ->
+                server.on("/api/v1/public/alerts", FakeServer.Reply(200, bocor))
+
+                val satu = PublicApi.imbauan(server.base).single()
+
+                assertFalse(satu.toString().contains("95"))
+                assertFalse(satu.toString().contains("JKS-"))
+                assertFalse(satu.toString().contains("WRN-"))
             }
         }
 

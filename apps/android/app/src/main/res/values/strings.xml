@@ -49,6 +49,12 @@
     <string name="err_session">Sesi Anda berakhir. Masuk kembali untuk melanjutkan.</string>
     <string name="version_label">Versi</string>
 
+    <!-- "Info sekitar" pada spesifikasi §4. Kalimat dasarnya menyebut dari mana imbauan
+         berasal, karena warga yang membacanya berhak tahu bahwa ia melewati keputusan
+         pejabat berwenang — bukan angka yang bocor dari sistem. -->
+    <string name="home_alerts_title">Imbauan kewaspadaan yang sedang berlaku</string>
+    <string name="home_alerts_basis">Diterbitkan pejabat berwenang Polres Metro Jakarta Selatan. Menyebut wilayah setingkat kecamatan dan tidak memuat data rinci.</string>
+
     <!-- ===== Layar muka ===== -->
     <string name="home_lead">Kanal laporan masyarakat dan pemantauan kamtibmas Polres Metro Jakarta Selatan.</string>
     <string name="home_report">Lapor kejadian</string>

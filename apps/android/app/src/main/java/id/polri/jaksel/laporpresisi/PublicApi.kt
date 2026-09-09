@@ -54,8 +54,48 @@ object PublicApi {
 
     data class Ticket(val code: String, val message: String)
 
+    /**
+     * Satu imbauan kewaspadaan yang sedang berlaku.
+     *
+     * Sengaja TIDAK memuat skor risiko, kode grid, maupun kode peringatan internal — API
+     * publiknya memang tidak mengirimkannya. Warga membaca imbauan, bukan data intelijen.
+     */
+    data class Imbauan(
+        val code: String,
+        val threatType: String,
+        val areaText: String,
+        val timeWindow: String?,
+        val message: String,
+    )
+
     /** Kegagalan yang sudah diterjemahkan menjadi kalimat yang pantas dibaca warga. */
     class ApiFailure(val readable: String) : Exception(readable)
+
+    /**
+     * Imbauan yang sedang berlaku — "info sekitar" pada spesifikasi §4.
+     *
+     * Kegagalan TIDAK dilemparkan. Layar muka harus tetap menawarkan tombol lapor meskipun
+     * jaringan sedang buruk atau server tidak dapat dihubungi; menahan seluruh layar demi
+     * bagian tambahan justru menghalangi orang yang datang untuk melapor. Daftar kosong
+     * dan gagal memuat karena itu diperlakukan sama: bagiannya tidak ditampilkan.
+     */
+    suspend fun imbauan(baseUrl: String): List<Imbauan> = withContext(Dispatchers.IO) {
+        try {
+            val rows = JSONObject(get("$baseUrl/api/v1/public/alerts")).getJSONArray("data")
+            (0 until rows.length()).map { index ->
+                val row = rows.getJSONObject(index)
+                Imbauan(
+                    code = row.text("code"),
+                    threatType = row.text("threat_type"),
+                    areaText = row.text("area_text"),
+                    timeWindow = row.optString("time_window").ifBlank { null },
+                    message = row.text("message"),
+                )
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
 
     suspend fun options(baseUrl: String): Options = withContext(Dispatchers.IO) {
         val body = get("$baseUrl/api/v1/public/report-options")
