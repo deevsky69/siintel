@@ -251,11 +251,40 @@ Audit: `RUN_RISK_SCORING` (resource `risk_score`), `RUN_PREDICTION` (resource `p
 | POST | `/warnings/{id}/acknowledge` | `warning:acknowledge` |
 | POST | `/warnings/{id}/resolve` | `warning:resolve` |
 | GET | `/public-alerts` | `public_alert:read` |
+| GET | `/public-alerts/candidates` | `public_alert:publish` |
 | POST | `/public-alerts` | `public_alert:publish` |
+| POST | `/public-alerts/{code}/resolve` | `public_alert:publish` |
+| GET | `/public/alerts` | **tanpa autentikasi** |
 
 `resolve` ditambahkan karena status `RESOLVED` sudah dipakai tetapi sebelumnya tidak punya endpoint.
-Audit: `ACK_WARNING`, `RESOLVE_WARNING`, `PUBLISH_PUBLIC_ALERT` (resource sesuai).
-> `PROPOSED`: kewenangan `public_alert:publish` menunggu jawaban P-2 (docs/03 §4).
+Audit: `ACK_WARNING`, `RESOLVE_WARNING`, `PUBLISH_PUBLIC_ALERT`, `RESOLVE_PUBLIC_ALERT`.
+
+**Dibangun 9 September 2026 (TASK 111).** Sebelumnya `public_alerts` punya tabel, model,
+seeder, dan 25 baris — tetapi tidak satu endpoint pun. Rantai CLAUDE.md §9 berhenti di
+dalam organisasi.
+
+Empat hal yang mengikat kanal ini:
+
+1. **`/public/alerts` adalah satu-satunya isi kamtibmas yang keluar tanpa akun**, dan ia
+   boleh keluar justru karena tiap barisnya sudah melewati keputusan publikasi. Responsnya
+   tidak memuat `risk_score`, `confidence`, `grid_id`, `kelurahan`, maupun kode peringatan
+   internal; wilayah disebut setingkat kecamatan. Dijaga
+   `test_the_public_channel_never_leaks_internal_detail`.
+2. **`candidates` dibatasi `public_alert:publish`, bukan `:read`** — daftar itu antrean
+   kerja penerbit, dan menampilkannya kepada peran yang tidak dapat berbuat apa-apa hanya
+   menjanjikan tombol yang tidak ada.
+3. **Satu peringatan tidak punya dua imbauan aktif.** Penerbitan kedua dijawab 409; cara
+   mengganti isi yang keliru adalah mencabut lalu menerbitkan ulang.
+4. **`suggested_message` adalah RANCANGAN**, diturunkan aturan dari kolom peringatannya dan
+   tidak pernah tersimpan sendiri. Yang tersimpan adalah teks yang dikirim penerbitnya.
+
+> **DITETAPKAN (separuh U-10), 9 September 2026:** kewenangan `public_alert:publish` ada
+> pada **Pimpinan** (docs/03 §4 P-2).
+>
+> **Masih terbuka:** severity minimum yang boleh diumumkan. Karena itu **tidak ada gerbang
+> severity** pada endpoint mana pun di sini — seluruh peringatan hidup dapat diterbitkan,
+> apa pun tingkatnya — dan setiap respons menyatakannya lewat `severity_gate_basis`.
+> Menambahkan ambang diam-diam berarti memutuskan kebijakan yang belum diputus.
 
 ### 2.8 Rekomendasi & Keputusan Komandan
 

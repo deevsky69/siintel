@@ -1,13 +1,36 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import LoginPage from "@/app/masuk/page";
+import { ImbauanBerlaku } from "./beranda/imbauan-berlaku";
 import BerandaPublik from "./beranda/page";
 import type { ReportOptions } from "./lapor/actions";
 import { ReportForm } from "./lapor/report-form";
 
 // Server action tidak dapat dijalankan di lingkungan test; yang diuji di sini bentuk
 // formulirnya, bukan pengirimannya (itu diuji di sisi API).
-vi.mock("./lapor/actions", () => ({ submitReport: vi.fn(), uploadAttachment: vi.fn() }));
+const imbauan = vi.hoisted(() => ({
+  rows: [
+    {
+      code: "PAL-0026",
+      severity: "CRITICAL",
+      threat_type: "CURANMOR",
+      area_text: "Kecamatan Tebet",
+      time_window: "18:00-23:59",
+      message: "Imbauan kewaspadaan. Kunci kendaraan dan laporkan hal mencurigakan.",
+    },
+  ],
+}));
+
+vi.mock("./lapor/actions", () => ({
+  submitReport: vi.fn(),
+  uploadAttachment: vi.fn(),
+  getImbauanPublik: vi.fn(async () => imbauan.rows),
+}));
+
+/** Mengosongkan imbauan untuk menguji keadaan kosongnya. */
+function kosongkan() {
+  imbauan.rows = [];
+}
 
 // Halaman masuk memuat formulir yang membaca `?lanjut=` lewat useSearchParams, dan hook
 // itu menuntut app router yang tidak ada di lingkungan test. Yang diuji di sini jalan
@@ -44,6 +67,29 @@ describe("halaman muka publik", () => {
 
     // Satu-satunya angka yang boleh muncul adalah nomor darurat.
     expect(text.match(/\d+/g) ?? []).toEqual(["110"]);
+  });
+
+  it("hanya menampilkan imbauan yang sudah melewati keputusan publikasi", async () => {
+    // Bagian ini TIDAK melonggarkan aturan "halaman publik tanpa angka kamtibmas" — ia
+    // menegaskannya. Yang tampil hanya baris yang sudah diterbitkan pejabat berwenang;
+    // peringatan dini yang belum diumumkan tidak pernah sampai ke sini.
+    const bagian = await ImbauanBerlaku();
+    const { container } = render(bagian);
+    const teks = container.textContent ?? "";
+
+    expect(teks).toContain("CURANMOR");
+    expect(teks).toContain("Kecamatan Tebet");
+    // Tidak ada identitas internal apa pun: kode peringatan, kode grid, maupun skor.
+    expect(teks).not.toMatch(/WRN-|JKS-|PAL-/);
+    expect(teks).not.toMatch(/skor|risiko \d/i);
+  });
+
+  it("menghilang sepenuhnya ketika tidak ada imbauan yang berlaku", async () => {
+    // Bukan menampilkan kotak kosong: halaman muka publik tidak boleh memberi kesan ada
+    // sesuatu yang gagal dimuat.
+    kosongkan();
+
+    expect(await ImbauanBerlaku()).toBeNull();
   });
 
   it("mengarahkan keadaan darurat ke 110", () => {

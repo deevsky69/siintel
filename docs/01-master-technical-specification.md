@@ -749,7 +749,7 @@ Butir berikut **tidak diinvensi** dan memblokir task tertentu:
 
 | Item | Memblokir |
 |---|---|
-| **Kriteria** publikasi alert publik — severity minimum (sisa U-10 / P-2) | TASK 111. Kewenangannya sudah ditetapkan pada Pimpinan 9 September 2026 |
+| **Kriteria** publikasi alert publik — severity minimum (sisa U-10 / P-2) | Kanalnya sudah dibangun 9 September 2026 (TASK 111) dan berjalan **tanpa gerbang severity**, dinyatakan terbuka di setiap responsnya |
 | Definisi target prediksi & aturan pencocokan evaluasi (U-03) | TASK 100–104, 150–151 |
 | Ambang peringkat volume laporan (0,70 / 0,40) | Layar Pimpinan — dipisahkan dari U-22 pada 9 September 2026 |
 | Ukuran grid & batas GIS resmi (U-04) | TASK 011, 080–084 |

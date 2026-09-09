@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { ImbauanBerlaku } from "./imbauan-berlaku";
 
 export const metadata = { title: "PREDIKSI PRESISI" };
 
@@ -13,6 +15,13 @@ export const metadata = { title: "PREDIKSI PRESISI" };
  * statistik, dan tautan lain-lain; di sini keduanya justru berbahaya — angka kamtibmas di
  * halaman publik adalah data intelijen, dan tidak satu pun boleh keluar tanpa keputusan
  * publikasi (CLAUDE.md §24). Karena itu halaman ini **tidak memuat satu pun angka**.
+ *
+ * Sejak 9 September 2026 ada satu tambahan, dan ia justru menegaskan aturan yang sama:
+ * imbauan yang SUDAH melewati keputusan publikasi. Ia tampil bukan karena kanal publik
+ * dilonggarkan, melainkan karena kini ada pejabat yang berwenang memutuskan apa yang boleh
+ * keluar — `public_alert:publish` pada Pimpinan. Peringatan dini yang belum diumumkan tetap
+ * tidak pernah sampai ke halaman ini, dan tidak ada satu angka pun yang ikut: tanpa skor,
+ * tanpa cacah kejadian, tanpa peringkat wilayah.
  */
 export default function BerandaPublik() {
   return (
@@ -48,6 +57,14 @@ export default function BerandaPublik() {
             Masuk Petugas
           </Link>
         </div>
+
+        {/* Dibungkus Suspense supaya dua tombol di atas terlihat SEKETIKA. Halaman ini
+            paling sering dibuka dari ponsel dengan jaringan buruk, dan menahan seluruh
+            halaman demi bagian tambahan membuat pengunjung yang datang untuk melapor
+            justru menunggu. */}
+        <Suspense fallback={null}>
+          <ImbauanBerlaku />
+        </Suspense>
 
         <p className="mt-8 text-xs leading-relaxed text-ink-faint">
           Untuk keadaan darurat yang sedang berlangsung, hubungi <strong>110</strong>. Laporan

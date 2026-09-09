@@ -84,6 +84,15 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         permissions: ["warning:read"],
         hint: "Peringatan yang menunggu tindakan",
       },
+      {
+        href: "/imbauan",
+        label: "Imbauan Publik",
+        icon: "community",
+        // `public_alert:read`, bukan `:publish`: yang tidak dapat menerbitkan tetap
+        // berhak melihat apa yang sedang beredar atas nama satuannya.
+        permissions: ["public_alert:read"],
+        hint: "Yang sudah diumumkan kepada masyarakat",
+      },
     ],
   },
   {

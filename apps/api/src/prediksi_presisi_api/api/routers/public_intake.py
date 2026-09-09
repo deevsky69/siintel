@@ -63,6 +63,7 @@ from ...models import (
     CitizenReport,
     CitizenReportAttachment,
     Location,
+    PublicAlert,
 )
 from ...seeding.paths import TAXONOMY_FILE
 from ...services import attachments as attachment_store
@@ -79,6 +80,19 @@ INITIAL_STATUS = "RECEIVED"
 #: dapat diisi siapa saja tanpa akun adalah tempat paling mudah membanjiri basis data.
 MAX_DESCRIPTION = 1000
 MAX_LOCATION_TEXT = 255
+
+#: Status imbauan yang sedang berlaku, dan batas berapa banyak yang ditampilkan sekaligus.
+#: Halaman muka publik bukan arsip: yang berguna dibaca adalah yang berlaku sekarang, dan
+#: daftar panjang justru membuat tidak satu pun terbaca.
+ACTIVE_ALERT_STATUS = "ACTIVE"
+MAX_PUBLIC_ALERTS = 10
+
+PUBLIC_ALERT_BASIS = (
+    "Imbauan di sini adalah satu-satunya isi kamtibmas yang keluar tanpa akun, dan ia "
+    "keluar justru karena setiap barisnya sudah melewati keputusan publikasi oleh pejabat "
+    "berwenang. Peringatan dini yang belum diumumkan tidak pernah sampai ke halaman ini. "
+    "Wilayah disebut setingkat kecamatan; skor risiko dan lokasi rinci tidak ikut."
+)
 
 #: Berapa lama ke belakang waktu kejadian masih diterima. Laporan yang lebih tua dari ini
 #: bukan laporan kamtibmas yang dapat ditindak, dan lebih pantas lewat jalur resmi.
@@ -221,6 +235,45 @@ class ReportRequest(BaseModel):
 # ---------------------------------------------------------------------------
 # Endpoint
 # ---------------------------------------------------------------------------
+
+
+@router.get("/alerts", summary="Imbauan kewaspadaan yang sedang berlaku")
+def public_alerts(session: Session = Depends(get_db)) -> dict[str, Any]:
+    """Imbauan yang sedang berlaku, untuk dibaca siapa saja. **Tanpa autentikasi.**
+
+    Inilah satu-satunya angka— bukan, satu-satunya ISI kamtibmas yang boleh keluar tanpa
+    akun, dan ia boleh keluar justru karena setiap barisnya adalah hasil KEPUTUSAN
+    PUBLIKASI oleh pemegang `public_alert:publish` (CLAUDE.md §24). Peringatan dini yang
+    belum diumumkan tidak pernah sampai ke sini.
+
+    Yang dikirim sengaja sedikit: tingkat, jenis, wilayah setingkat kecamatan, jendela
+    waktu, dan kalimat imbauannya. TIDAK ada skor risiko, tidak ada `grid_id`, tidak ada
+    kode peringatan internal — ketiganya tidak berarti bagi pembaca di luar organisasi dan
+    justru memberi tahu di mana perhatian sedang terpusat.
+    """
+    rows = session.scalars(
+        select(PublicAlert)
+        .where(PublicAlert.status == ACTIVE_ALERT_STATUS)
+        .order_by(PublicAlert.window_start.desc().nullslast(), PublicAlert.created_at.desc())
+        .limit(MAX_PUBLIC_ALERTS)
+    ).all()
+
+    return {
+        "data": [
+            {
+                "code": alert.code,
+                "severity": alert.severity,
+                "threat_type": alert.threat_type,
+                "area_text": alert.area_text,
+                "time_window": alert.time_window,
+                "window_start": alert.window_start,
+                "window_end": alert.window_end,
+                "message": alert.public_message,
+            }
+            for alert in rows
+        ],
+        "basis": PUBLIC_ALERT_BASIS,
+    }
 
 
 @router.get("/report-options", summary="Pilihan isian formulir laporan masyarakat")

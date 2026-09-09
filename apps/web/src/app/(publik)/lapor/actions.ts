@@ -44,6 +44,40 @@ export type SubmitState =
 
 type ApiErrorBody = { error?: { message?: string } };
 
+export type ImbauanPublik = {
+  code: string;
+  severity: string;
+  threat_type: string;
+  area_text: string;
+  time_window: string | null;
+  message: string;
+};
+
+/**
+ * Imbauan yang sedang berlaku, untuk halaman muka publik. **Tanpa autentikasi.**
+ *
+ * Ini satu-satunya isi kamtibmas yang boleh tampil di halaman tanpa akun, dan ia boleh
+ * tampil justru karena setiap barisnya sudah melewati keputusan publikasi oleh pejabat
+ * berwenang (CLAUDE.md §24). Halaman muka tetap tidak memuat satu angka pun: tidak ada
+ * skor, tidak ada cacah kejadian, tidak ada peringkat wilayah.
+ *
+ * Kegagalan tidak dilempar. Halaman muka publik harus tetap terbuka meskipun API sedang
+ * tidak dapat dihubungi — pengunjung yang datang untuk melapor tidak boleh terhalang oleh
+ * bagian yang sifatnya tambahan.
+ */
+export async function getImbauanPublik(): Promise<ImbauanPublik[]> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/v1/public/alerts`, {
+      next: { revalidate: 60 },
+    });
+    if (!response.ok) return [];
+    const body = (await response.json()) as { data?: ImbauanPublik[] };
+    return body.data ?? [];
+  } catch {
+    return [];
+  }
+}
+
 export async function getReportOptions(): Promise<ReportOptions> {
   const response = await fetch(`${BASE_URL}/api/v1/public/report-options`, {
     // Pilihan isian jarang berubah, tetapi halaman ini harus tetap menampilkan daftar

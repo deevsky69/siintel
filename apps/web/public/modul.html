@@ -528,6 +528,7 @@
       <li><a href="#s11"><span>11</span><span>Penilaian risiko</span></a></li>
       <li><a href="#s12"><span>12</span><span>Prediction Center</span></a></li>
       <li><a href="#s13"><span>13</span><span>Warning Center</span></a></li>
+      <li><a href="#s13a"><span>13a</span><span>Imbauan publik</span></a></li>
       <li><a href="#s14"><span>14</span><span>Rekomendasi &amp; keputusan</span></a></li>
       <li><a href="#s15"><span>15</span><span>Operasi</span></a></li>
       <li><a href="#s16"><span>16</span><span>Evaluasi</span></a></li>
@@ -1356,6 +1357,59 @@ Selebihnya  terlipat</pre>
         Tombol hanya muncul bila status <strong>dan</strong> kewenangan mengizinkan. Bila Anda tidak
         berwenang, layar menyatakannya terus terang alih-alih menampilkan tombol yang pasti ditolak.
       </p>
+    </section>
+
+    <section id="s13a">
+      <h2 class="sec"><span class="num">13a</span><span>Imbauan publik</span></h2>
+      <p class="sec-note">Lengan terakhir rantai &mdash; ketika peringatan keluar dari organisasi</p>
+
+      <p>
+        Menu <strong>Imbauan Publik</strong>. Dibangun 9 September 2026; sebelumnya peringatan dini
+        berhenti di dalam organisasi dan tidak pernah sampai kepada orang yang paling
+        berkepentingan.
+      </p>
+
+      <h3>Siapa yang boleh menerbitkan</h3>
+      <p>
+        <strong>Hanya Pimpinan</strong>, ditetapkan pemilik proyek 9 September 2026. Mengumumkan
+        peringatan kepada masyarakat adalah keputusan komando, bukan tindakan teknis: ia mengubah
+        perilaku orang di luar organisasi, tidak dapat ditarik kembali setelah terbaca, dan
+        menanggung risiko kepanikan sekaligus risiko diam. Administrator &mdash; peran yang
+        menjalankan prediksi &mdash; justru tidak dapat mengumumkan hasilnya sendiri.
+      </p>
+
+      <h3>Menerbitkan</h3>
+      <ol class="steps">
+        <li><span>Buka <strong>Menunggu Diumumkan</strong> &mdash; peringatan yang masih hidup dan belum punya imbauan aktif.</span></li>
+        <li><span><strong>Baca dan sunting</strong> kalimatnya. Kotak isian sudah terisi <strong>rancangan</strong> yang diturunkan aturan dari kolom peringatannya &mdash; bukan keluaran model bahasa, dan bukan isi yang sudah tersimpan. Yang tersimpan adalah yang Anda kirim.</span></li>
+        <li><span>Tekan <strong>Terbitkan Imbauan</strong>. Ia langsung tampil di halaman muka publik, dapat dibaca siapa saja tanpa akun.</span></li>
+      </ol>
+
+      <h3>Mencabut</h3>
+      <p>
+        Tekan <strong>Cabut Imbauan</strong>; ia langsung hilang dari halaman publik. Mencabut lalu
+        menerbitkan ulang adalah cara mengganti isi yang keliru &mdash; satu peringatan tidak boleh
+        punya dua imbauan aktif, karena pembacanya tidak akan tahu mana yang berlaku.
+      </p>
+
+      <div class="note">
+        <span class="label">Yang tidak ikut keluar</span>
+        <p>
+          Imbauan menyebut wilayah <strong>setingkat kecamatan</strong>, dan tidak memuat skor
+          risiko, tingkat kepercayaan, kode grid, kelurahan, maupun kode peringatan internal.
+          Ketiganya tidak berarti bagi pembaca di luar organisasi, dan justru memberi tahu di mana
+          perhatian sedang terpusat.
+        </p>
+      </div>
+
+      <div class="note caution">
+        <span class="label">Tidak ada penyaringan tingkat</span>
+        <p>
+          Seluruh peringatan yang masih hidup dapat diumumkan, apa pun tingkatnya &mdash; severity
+          minimum belum ditetapkan. Layar menyatakannya terbuka alih-alih mendiamkannya, sebab layar
+          yang diam membuat pembacanya mengira sudah ada penyaringan.
+        </p>
+      </div>
     </section>
 
     <section id="s14">

@@ -650,6 +650,50 @@ berwenang, layar menyatakannya terus terang.
 
 ---
 
+## 13a. IMBAUAN PUBLIK — KETIKA PERINGATAN KELUAR DARI ORGANISASI
+
+Menu **Imbauan Publik**. Inilah lengan terakhir rantai: prediksi → peringatan →
+**imbauan kepada yang berkepentingan**. Dibangun 9 September 2026; sebelumnya peringatan
+dini berhenti di dalam organisasi.
+
+### Siapa yang boleh menerbitkan
+
+**Hanya Pimpinan.** Ditetapkan pemilik proyek 9 September 2026. Mengumumkan peringatan
+kepada masyarakat adalah keputusan komando, bukan tindakan teknis: ia mengubah perilaku
+orang di luar organisasi, tidak dapat ditarik kembali setelah terbaca, dan menanggung
+risiko kepanikan sekaligus risiko diam. Administrator — peran yang menjalankan prediksi —
+justru tidak dapat mengumumkan hasilnya sendiri.
+
+### Menerbitkan
+
+1. Buka **Menunggu Diumumkan**. Isinya peringatan yang masih hidup dan belum punya
+   imbauan aktif.
+2. **Baca dan sunting** kalimat pada kotak isian. Kotak itu sudah terisi **rancangan** yang
+   diturunkan aturan dari kolom peringatannya — bukan keluaran model bahasa, dan bukan isi
+   yang sudah tersimpan. Yang tersimpan adalah yang Anda kirim.
+3. Tekan **Terbitkan Imbauan**.
+
+Imbauan langsung tampil di halaman muka publik, dapat dibaca siapa saja tanpa akun.
+
+### Mencabut
+
+Tekan **Cabut Imbauan**. Ia langsung hilang dari halaman publik. Mencabut lalu menerbitkan
+ulang adalah cara mengganti isi yang keliru — satu peringatan tidak boleh punya dua imbauan
+aktif, karena pembacanya tidak akan tahu mana yang berlaku.
+
+### Yang tidak ikut keluar
+
+Imbauan menyebut wilayah **setingkat kecamatan**, dan **tidak memuat** skor risiko, tingkat
+kepercayaan, kode grid, kelurahan, maupun kode peringatan internal. Ketiganya tidak berarti
+bagi pembaca di luar organisasi, dan justru memberi tahu di mana perhatian sedang terpusat.
+
+> **Tidak ada penyaringan tingkat.** Seluruh peringatan yang masih hidup dapat diumumkan,
+> apa pun tingkatnya — severity minimum belum ditetapkan (sisa U-10). Layar menyatakannya
+> terbuka alih-alih mendiamkannya, sebab layar yang diam membuat pembacanya mengira sudah
+> ada penyaringan.
+
+---
+
 ## 14. REKOMENDASI & KEPUTUSAN — INTI SISTEM
 
 Menu **Recommendation**. **Bagian ini yang membuat sistem dapat dipertanggungjawabkan.**
