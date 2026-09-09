@@ -37,6 +37,24 @@ function explain(error: ApiError, action: "publish" | "withdraw"): string {
   return error.message;
 }
 
+/**
+ * Menyegarkan setiap halaman yang menampilkan imbauan.
+ *
+ * Halaman muka publik ikut disebut, dan itu yang paling mudah terlewat: ia di-prerender
+ * dengan ISR 60 detik, sehingga tanpa baris ini sebuah imbauan baru terbit — atau sebuah
+ * imbauan yang dicabut tetap beredar — sampai satu menit berikutnya. Pada kanal yang
+ * gunanya justru mengabarkan hal mendesak, satu menit adalah selisih yang nyata, dan
+ * imbauan tercabut yang masih terbaca lebih buruk lagi.
+ *
+ * `/` disebut terpisah dari `/beranda` karena halaman muka dilayani lewat rewrite di
+ * middleware: alamat yang di-cache adalah `/`, sedangkan berkasnya `beranda/page.tsx`.
+ */
+function segarkan(): void {
+  revalidatePath("/imbauan");
+  revalidatePath("/beranda");
+  revalidatePath("/");
+}
+
 export async function publish(_previous: PublishState, form: FormData): Promise<PublishState> {
   const warningCode = String(form.get("warning_code") ?? "").trim();
   const message = String(form.get("public_message") ?? "").trim();
@@ -56,7 +74,7 @@ export async function publish(_previous: PublishState, form: FormData): Promise<
     throw error;
   }
 
-  revalidatePath("/imbauan");
+  segarkan();
   return { error: null, done: { code: warningCode, action: "publish" } };
 }
 
@@ -71,6 +89,6 @@ export async function withdraw(_previous: PublishState, form: FormData): Promise
     throw error;
   }
 
-  revalidatePath("/imbauan");
+  segarkan();
   return { error: null, done: { code, action: "withdraw" } };
 }

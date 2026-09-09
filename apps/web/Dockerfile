@@ -44,8 +44,13 @@ WORKDIR /app
 
 COPY apps/web ./apps/web
 
+# Asal yang boleh menjalankan Server Action, dibaca `next.config.ts` saat BUILD karena
+# `output: "standalone"` membekukan config ke dalam image. Lihat alasan lengkapnya di sana.
+ARG APP_ALLOWED_ORIGINS
+
 ENV NEXT_TELEMETRY_DISABLED=1 \
-    NODE_ENV=production
+    NODE_ENV=production \
+    APP_ALLOWED_ORIGINS=${APP_ALLOWED_ORIGINS}
 
 RUN pnpm --filter @prediksi-presisi/web build
 

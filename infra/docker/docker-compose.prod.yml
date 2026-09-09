@@ -125,6 +125,10 @@ services:
     build:
       context: ../..
       dockerfile: apps/web/Dockerfile
+      args:
+        # Nama host publik demo. Harus cocok dengan `Origin` yang dikirim peramban, atau
+        # SELURUH Server Action ditolak Next sebagai dugaan CSRF — lihat `next.config.ts`.
+        APP_ALLOWED_ORIGINS: ${APP_ALLOWED_ORIGINS:-siintel.awansurya.com}
     image: prediksi-presisi/web:${IMAGE_TAG:-latest}
     container_name: predpol-prod-web
     restart: unless-stopped
