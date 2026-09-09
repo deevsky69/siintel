@@ -286,3 +286,57 @@ def test_public_alerts_are_stored_without_any_location_column(session: Session) 
     alert = session.scalar(select(PublicAlert).limit(1))
     assert alert is not None
     assert alert.area_text
+
+
+def test_a_status_left_untranslated_is_repaired_not_left_to_rot(session: Session) -> None:
+    """Ditemukan di produksi 9 September 2026: status tersimpan sebagai label Indonesia.
+
+    Basis data demo menyimpan `Diterima` alih-alih `RECEIVED`, karena barisnya masuk lewat
+    versi seeder yang belum memetakan taksonomi — dan seed yang hanya-menambah tidak pernah
+    memperbaikinya. Seluruh kueri menyaring nilai enum, sehingga produksi melaporkan NOL
+    laporan menunggu verifikasi padahal ada 17, dan antrean petugas pada aplikasi Android
+    kosong sama sekali.
+    """
+    seed_public_data(session)
+    session.flush()
+
+    rusak = session.scalars(select(CitizenReport).limit(1)).one()
+    kode, semula = rusak.code, rusak.status
+    rusak.status = "Diterima"
+    session.flush()
+
+    seed_public_data(session)
+    session.flush()
+    session.expire_all()
+
+    diperbaiki = session.scalar(select(CitizenReport).where(CitizenReport.code == kode))
+    assert diperbaiki is not None
+    assert diperbaiki.status == "RECEIVED", "status berbahasa Indonesia dibiarkan apa adanya"
+    assert semula in {"RECEIVED", "VERIFIED", "FORWARDED", "IN_PROGRESS", "CLOSED"}
+
+
+def test_an_operational_status_change_is_never_undone_by_reseeding(session: Session) -> None:
+    """Verifikasi yang benar-benar dilakukan petugas TIDAK boleh dibatalkan seed berikutnya.
+
+    Inilah sebabnya perbaikan di atas hanya menyentuh nilai yang bukan enum sah, alih-alih
+    menyegarkan status dari CSV seperti yang dikerjakan untuk `recommendation_text`.
+    Kalimat rekomendasi adalah keterangan yang dibangkitkan; status laporan adalah keadaan
+    operasional, dan menyegarkannya merusak lebih banyak daripada yang diperbaiki.
+    """
+    seed_public_data(session)
+    session.flush()
+
+    laporan = session.scalars(
+        select(CitizenReport).where(CitizenReport.status == "RECEIVED").limit(1)
+    ).one()
+    kode = laporan.code
+    laporan.status = "VERIFIED"
+    session.flush()
+
+    seed_public_data(session)
+    session.flush()
+    session.expire_all()
+
+    tetap = session.scalar(select(CitizenReport).where(CitizenReport.code == kode))
+    assert tetap is not None
+    assert tetap.status == "VERIFIED", "seed membatalkan verifikasi petugas"

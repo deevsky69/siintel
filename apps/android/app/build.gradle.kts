@@ -18,9 +18,16 @@ android {
         versionCode = 2
         versionName = "2.0.0"
 
-        // Alamat API dibaca dari sini, bukan ditanam di kode: server demo memakai port
-        // tidak lazim, dan alamat produksi kelak berbeda lagi.
-        buildConfigField("String", "API_BASE", "\"${project.findProperty("apiBase") ?: "https://siintel.awansurya.com:8998"}\"")
+        // Alamat API dibaca dari sini, bukan ditanam di kode: alamat produksi kelak
+        // berbeda, dan pengujian lokal memakai alamat lain lagi
+        // (`gradle assembleRelease -PapiBase=https://…`).
+        //
+        // BAWAANNYA PERNAH `:8998`, dan itu menjadi cacat yang membuat APK hasil bangun
+        // TIDAK DAPAT TERSAMBUNG SAMA SEKALI: port itu bergantung pada penerusan port di
+        // router, dan penerusan itu sudah tidak aktif. Demo kini dilayani pada 443 lewat
+        // nama domainnya. Alamat bawaan yang mati adalah kegagalan paling mahal pada
+        // sebuah APK — ia baru ketahuan setelah dipasang di ponsel orang.
+        buildConfigField("String", "API_BASE", "\"${project.findProperty("apiBase") ?: "https://siintel.awansurya.com"}\"")
     }
 
     buildFeatures {

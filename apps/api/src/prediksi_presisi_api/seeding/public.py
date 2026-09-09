@@ -35,6 +35,37 @@ from .master import SeedSummary
 from .taxonomy import Taxonomy, load_taxonomy
 
 
+def _repair_untranslated_status(session: Session, taxonomy: Taxonomy) -> int:
+    """Memperbaiki status laporan yang tersimpan sebagai label Bahasa Indonesia.
+
+    DITEMUKAN DI PRODUKSI 9 September 2026. Basis data demo menyimpan `Diterima`,
+    `Diteruskan`, dan seterusnya — bukan `RECEIVED`, `FORWARDED`. Barisnya masuk lewat
+    versi seeder yang belum memetakan taksonomi, dan karena seed bersifat hanya-menambah,
+    tidak ada satu pun jalan yang pernah memperbaikinya.
+
+    Akibatnya tidak kelihatan di layar tetapi menentukan: seluruh kueri menyaring
+    `status = 'RECEIVED'`, sehingga produksi melaporkan NOL laporan menunggu verifikasi
+    padahal ada 17. Antrean petugas pada aplikasi Android — fitur intinya — kosong.
+
+    YANG SENGAJA TIDAK DILAKUKAN
+
+        Menyegarkan status dari CSV seperti yang dikerjakan untuk `recommendation_text`.
+        Kalimat rekomendasi adalah keterangan yang dibangkitkan; status laporan adalah
+        KEADAAN OPERASIONAL. Menyegarkannya akan membatalkan verifikasi yang benar-benar
+        dilakukan petugas pada demo — kerusakan yang lebih parah daripada yang diperbaiki.
+
+    Karena itu yang disentuh hanya baris yang statusnya BUKAN nilai enum yang sah. Nilai
+    seperti itu mustahil lahir dari aplikasi; ia hanya dapat berasal dari seeder lama.
+    """
+    valid = set(taxonomy.mappings["status_citizen_report"].values())
+    stale = session.scalars(select(CitizenReport).where(CitizenReport.status.not_in(valid))).all()
+
+    for report in stale:
+        report.status = taxonomy.require("status_citizen_report", report.status)
+
+    return len(stale)
+
+
 def seed_citizen_reports(session: Session, taxonomy: Taxonomy, summary: SeedSummary) -> None:
     """Memuat laporan masyarakat.
 
@@ -47,6 +78,7 @@ def seed_citizen_reports(session: Session, taxonomy: Taxonomy, summary: SeedSumm
     locations = location_index(session)
     inserted = 0
     unmapped = 0
+    repaired = _repair_untranslated_status(session, taxonomy)
 
     for row in src.read_rows("citizen_reports.csv"):
         code = src.required_text(row, "report_id", "citizen_reports.csv")
@@ -90,8 +122,13 @@ def seed_citizen_reports(session: Session, taxonomy: Taxonomy, summary: SeedSumm
         inserted += 1
 
     summary.record("citizen_reports", inserted, len(existing))
+    catatan = []
     if unmapped:
-        summary.note("citizen_reports", f"{unmapped} laporan belum tertaut ke sel grid")
+        catatan.append(f"{unmapped} laporan belum tertaut ke sel grid")
+    if repaired:
+        catatan.append(f"{repaired} status berbahasa Indonesia diperbaiki")
+    if catatan:
+        summary.note("citizen_reports", "; ".join(catatan))
 
 
 def seed_public_alerts(session: Session, taxonomy: Taxonomy, summary: SeedSummary) -> None:

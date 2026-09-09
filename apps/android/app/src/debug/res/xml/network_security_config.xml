@@ -3,8 +3,12 @@
   Berlaku HANYA pada varian debug.
 
   Varian rilis memakai `src/main/res/xml/network_security_config.xml`, yang menolak HTTP
-  polos ke mana pun dan hanya mempercayai satu CA untuk satu domain. Berkas ini tidak
-  melonggarkannya — ia berkas lain, pada sumber lain, yang tidak pernah ikut ke APK rilis.
+  polos ke mana pun dan mempercayai CA sistem saja. Berkas ini tidak melonggarkannya — ia
+  berkas lain, pada sumber lain, yang tidak pernah ikut ke APK rilis.
+
+  CA satuan ikut pindah ke sini (`src/debug/res/raw/`) pada 9 September 2026, setelah
+  sertifikat Let's Encrypt terbit. Rilis tidak lagi membawa blob CA apa pun; pengembang
+  yang menguji terhadap server ber-sertifikat swatandatangan tetap terlayani.
 
   Yang dilonggarkan di sini pun sempit: HTTP polos ke 10.0.2.2 saja, yaitu alamat komputer
   pengembang dilihat dari dalam emulator Android. Tanpa itu, aplikasi mustahil diuji

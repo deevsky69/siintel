@@ -1,47 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Kepercayaan terhadap sertifikat server PREDIKSI PRESISI.
+  Kepercayaan sertifikat dan larangan HTTP polos.
 
-  MENGAPA INI ADA
+  JANGKAR CA SATUAN SUDAH DIHAPUS — 9 September 2026.
 
-    Server demo memakai sertifikat yang ditandatangani CA milik satuan, bukan CA publik.
-    Android menolak sambungan HTTPS semacam itu — dan penolakannya benar. Yang dikerjakan
-    berkas ini adalah menambahkan SATU jangkar kepercayaan untuk SATU domain.
+    Berkas ini sebelumnya menambahkan CA milik satuan sebagai jangkar kepercayaan untuk
+    `siintel.awansurya.com`, karena server demo memakai sertifikat swatandatangan. Sejak
+    7 September 2026 domain itu dilayani sertifikat Let's Encrypt yang sah, sehingga
+    jangkar tambahan tidak lagi diperlukan — dan membawanya terus berarti memperluas
+    permukaan kepercayaan tanpa alasan: siapa pun yang memegang kunci CA satuan dapat
+    menyamar sebagai server ini bagi aplikasi ini saja. Rencana penghapusannya memang
+    sudah tertulis sejak awal (`docs/10` §3.2).
 
-  MENGAPA INI BUKAN "MEMATIKAN PEMERIKSAAN SERTIFIKAT"
+  MENGAPA BERKAS INI TETAP ADA MESKI ISINYA TINGGAL SATU LARANGAN
 
-    Perbedaannya menentukan, dan mudah tertukar:
-
-      mematikan pemeriksaan  ->  menerima sertifikat APA PUN, termasuk milik penyadap
-      menyematkan jangkar    ->  menerima HANYA sertifikat dari CA yang tertulis di sini
-
-    Yang kedua justru LEBIH ketat daripada kepercayaan bawaan Android, yang menerima
-    ratusan CA publik di seluruh dunia. Aplikasi ini hanya menerima satu.
-
-  YANG TETAP BERLAKU
-
-    `cleartextTrafficPermitted="false"` — HTTP polos tetap ditolak, termasuk ke domain ini.
-    Sertifikat swatandatangan mengamankan sambungannya; ia tidak membuat HTTP polos aman.
-
-  KAPAN BERKAS INI DIHAPUS
-
-    Begitu sertifikat Let's Encrypt terbit (`docs/10` §3.2), hapus berkas ini beserta
-    `res/raw/siintel_ca.crt` dan rujukannya di manifest. Menyematkan CA sendiri adalah
-    jalan pintas yang dibayar dengan satu kewajiban: APK harus dibangun ulang bila CA-nya
-    berganti.
+    `cleartextTrafficPermitted="false"` BUKAN pengulangan setelan bawaan di sini.
+    Android melarang HTTP polos secara bawaan hanya sejak API 28, sedangkan `minSdk`
+    aplikasi ini 24 — dipilih rendah dengan sengaja agar dapat dipasang pada ponsel murah
+    yang sudah lama. Pada Android 7 dan 8, tanpa berkas ini, HTTP polos justru DIIZINKAN.
+    Menghapusnya akan melonggarkan keamanan tepat pada perangkat yang paling rentan.
 -->
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">siintel.awansurya.com</domain>
-        <trust-anchors>
-            <certificates src="@raw/siintel_ca" />
-            <!-- CA publik tetap dipercaya untuk domain ini, supaya aplikasi terus bekerja
-                 pada hari sertifikat Let's Encrypt dipasang — tanpa menunggu APK baru. -->
-            <certificates src="system" />
-        </trust-anchors>
-    </domain-config>
-
-    <!-- Selain domain di atas, berlaku kepercayaan bawaan Android tanpa tambahan apa pun. -->
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />

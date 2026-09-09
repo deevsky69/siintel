@@ -125,24 +125,42 @@ gradle assembleRelease
 # keluaran: app/build/outputs/apk/release/app-release.apk
 ```
 
-Alamat API dapat diganti tanpa menyunting kode:
+Alamat API bawaannya `https://siintel.awansurya.com`, dan dapat diganti tanpa menyunting
+kode:
 
 ```bash
-gradle assembleRelease -PapiBase=https://siintel.awansurya.com:8998
+gradle assembleRelease -PapiBase=https://alamat-lain
 ```
+
+> Bawaannya pernah menyebut port `8998`, dan itu membuat APK hasil bangun **tidak dapat
+> tersambung sama sekali**: port itu bergantung pada penerusan port di router yang sudah
+> tidak aktif. Alamat bawaan yang mati adalah kegagalan paling mahal pada sebuah APK — ia
+> baru ketahuan setelah terpasang di ponsel orang. Diperbaiki 9 September 2026.
 
 ## Tanda tangan
 
 `assembleRelease` saat ini memakai **kunci debug** supaya APK-nya langsung dapat dipasang
-untuk pengujian dan paparan. Untuk penyebaran nyata, ganti dengan kunci rilis milik satuan —
-dan **jangan menaruh keystore itu di repository** (CLAUDE.md §28).
+untuk pengujian dan paparan. Diperiksa 9 September 2026 dan memang demikian:
+
+```text
+Signer #1 certificate DN: C=US, O=Android, CN=Android Debug
+```
+
+**Ini menutup jalan penyebaran nyata, dan alasannya bukan formalitas.** Kunci debug adalah
+kunci yang SAMA pada setiap mesin pengembang di dunia, dengan kata sandi yang diketahui
+umum (`android`). Siapa pun dapat membangun "pembaruan" yang diterima Android sebagai
+aplikasi yang sama, dan Google Play menolak APK bertanda tangan debug.
+
+Untuk paparan pada perangkat yang dikendalikan sendiri, ini memadai. Untuk dibagikan kepada
+personel atau masyarakat, ganti dengan kunci rilis milik satuan — dan **jangan menaruh
+keystore itu di repository** (CLAUDE.md §28).
 
 ## Alamat API
 
 Backend dibuka ke publik lewat **awalan path**, bukan subdomain:
 
 ```text
-https://siintel.awansurya.com:8998/api/v1/...
+https://siintel.awansurya.com/api/v1/...
 ```
 
 Subdomain (`api.<domain>`) lebih rapi tetapi menuntut satu A record baru di panel DomaiNesia
