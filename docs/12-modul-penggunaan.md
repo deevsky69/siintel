@@ -804,6 +804,8 @@ Kejadian**:
 siintel.awansurya.com  →  Lapor Kejadian  →  formulir  →  nomor tiket
 ```
 
+Bisa juga lewat **aplikasi Android** — tombol *Lapor Kejadian* pada layar mukanya.
+
 Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
 pengiriman adalah **nomor tiket** seperti `RPT-0151` — satu-satunya penanda yang
 dipegangnya, dan ia tidak terikat ke nama siapa pun.
@@ -813,16 +815,40 @@ Yang **tidak** ada di formulir itu, dan ketiadaannya disengaja:
 | Tidak ada | Alasannya |
 |---|---|
 | Kolom nama, telepon, alamat pelapor | Basis data memang tidak punya tempat untuk itu. Menyediakan kolomnya hanya akan menampung data yang lalu dibuang, sementara pelapor mengira datanya tersimpan |
-| Unggah foto atau video | Menyimpan berkas warga menyentuh retensi dan klasifikasi data — keputusan kebijakan yang belum diambil, bukan pekerjaan yang belum sempat |
 | Penanda "mendesak" | Urgensi ditetapkan petugas saat triase. Bila pelapor dapat mengisinya, siapa pun dapat menaikkan prioritas laporannya sendiri |
+
+Yang **sudah ada** sejak 8 September 2026, dan syaratnya:
+
+| Ada | Syarat yang menyertainya |
+|---|---|
+| **Lampiran foto, suara, video** | Metadata dilucuti saat unggah — termasuk koordinat GPS yang ditanam kamera ponsel. Hanya petugas berwenang memverifikasi yang dapat membukanya, dan berkasnya dihapus 90 hari setelah laporan selesai |
+| **Berbagi lokasi tepat** | Hanya bila pelapor menekan tombolnya sendiri. Sistem mencatat asal koordinat, sehingga titik pusat kecamatan tidak pernah tertukar dengan titik yang benar-benar dibagikan |
 
 Yang dijaga di sisi sistem:
 
 - **Kategori dari daftar tertutup**, bukan isian bebas. Dua ejaan untuk satu hal akan
   memecah seluruh analisis pola, dan pada kanal publik ejaannya pasti bermacam-macam.
-- **Lokasi sebatas kecamatan.** Pelapor memilih kecamatan dan boleh menambahkan keterangan
-  tempat sebagai teks. Titik pada peta adalah pusat kecamatan, **bukan TKP sebenarnya** —
-  dan itu dinyatakan di layar.
+- **Lokasi sebatas kecamatan bila pelapor tidak membagikan titiknya.** Titik pada peta
+  adalah pusat kecamatan, **bukan TKP sebenarnya**, dan itu dinyatakan di layar.
+
+### Bagaimana pelapor memeriksa status laporannya
+
+Pada aplikasi Android, tombol **Cek Status Laporan Saya** muncul setelah ponsel itu pernah
+mengirim laporan.
+
+Cara mengamankannya perlu dipahami, karena masalahnya nyata: nomor tiket **berurut**
+sehingga dapat ditebak, sedangkan sistem sengaja tidak menyimpan identitas pelapor — tidak
+ada apa pun untuk mengikat hak baca. Karena itu setiap laporan menerima **kode klaim**
+acak, diterbitkan sekali dan tersimpan terenkripsi di ponsel pelapor. Server hanya
+menyimpan sidik jarinya, bukan kodenya.
+
+> **Kode yang hilang tidak dapat diterbitkan ulang.** Tidak ada identitas yang dapat
+> dipakai mengenali pemiliknya kembali — dan itu memang harga dari kanal tanpa identitas.
+> Nomor tiket tetap dapat disebutkan kepada petugas seperti biasa.
+
+Menyebutkan nomor tiket saja **tidak pernah cukup** untuk membuka status. Tiket tanpa kode
+klaim, kode yang salah, dan tiket yang tidak ada dijawab sama persis — supaya tidak ada
+yang dapat memakai halaman ini untuk memastikan sebuah nomor tiket benar-benar ada.
 - **Paling banyak 10 laporan per jam dari satu jaringan.** Longgar dengan sengaja: satu
   kantor atau satu keluarga dapat berbagi satu alamat IP.
 - **Kejadian paling lama 30 hari ke belakang.** Yang lebih lama diarahkan ke Polsek

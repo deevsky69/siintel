@@ -83,7 +83,11 @@
 > `location_id` ditambahkan untuk menutup C-03 (ERD sudah menyatakan relasi ini; CLAUDE.md §19 mencantumkan `citizen_reports` sebagai pemakai `location_id`).
 > Nullable karena laporan masyarakat masuk dengan koordinat bebas dan baru dipetakan ke grid setelah geo-processing.
 > Laporan masyarakat **tidak otomatis dianggap fakta**; wajib melewati verifikasi.
-> **NOT SPECIFIED (U-13):** identitas/kontak pelapor, lampiran bukti (foto/video/audio), dan cara pelapor melihat status. Tidak ada tabel lampiran pada PoC.
+> **U-13 — dua dari tiga tertutup.**
+>
+> - **Lampiran bukti** (foto/video/audio): ✅ ada sejak 8 September 2026, tabel `citizen_report_attachments`, metadata dilucuti saat unggah, retensi 90 hari.
+> - **Cara pelapor melihat status**: ✅ ada sejak 9 September 2026 lewat **token klaim**. Token acak 256 bit diterbitkan sekali saat laporan dikirim dan disimpan di ponsel pelapor; basis data hanya menyimpan SHA-256-nya (`claim_token_hash`, migration 0009). Nomor tiket berurut dan dapat ditebak, jadi tiket saja tidak pernah cukup — tiket tanpa token, token salah, dan tiket tak dikenal dijawab 404 yang sama.
+> - **Identitas/kontak pelapor**: ❌ tetap tidak ada, dan itu **sengaja** (CLAUDE.md §16, docs/14 §3). Justru karena itulah token klaim diperlukan: tidak ada apa pun lain untuk mengikat hak baca.
 
 ## 7. `public_alerts`
 

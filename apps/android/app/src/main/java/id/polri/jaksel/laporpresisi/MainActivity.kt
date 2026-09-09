@@ -70,7 +70,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, PetugasActivity::class.java))
         }
 
+        views.statusButton.setOnClickListener { periksaStatus() }
+
         muatImbauan()
+        tampilkanTombolStatus()
     }
 
     /**
@@ -82,6 +85,44 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         muatImbauan()
+        tampilkanTombolStatus()
+    }
+
+    /**
+     * Tombol cek status hanya muncul bila ponsel ini pernah mengirim laporan.
+     *
+     * Kode klaim tersimpan di ponsel, bukan di server — jadi ponsel yang belum pernah
+     * melapor memang tidak punya apa pun untuk diperiksa. Tombol yang pasti menjawab
+     * "tidak ada" membuat orang mengira aplikasinya rusak.
+     */
+    private fun tampilkanTombolStatus() {
+        val ada = TiketStore(this).semua().isNotEmpty()
+        views.statusButton.visibility = if (ada) View.VISIBLE else View.GONE
+        if (!ada) views.statusResult.visibility = View.GONE
+    }
+
+    /**
+     * Memeriksa status laporan terakhir yang dikirim dari ponsel ini.
+     *
+     * Tiket yang sudah tidak dikenal server — misalnya karena basis data demo di-seed
+     * ulang — DIHAPUS dari ponsel. Menyimpannya terus membuat tombol ini selamanya
+     * menjawab gagal, dan pelapor tidak punya cara tahu bahwa penyebabnya bukan jaringan.
+     */
+    private fun periksaStatus() {
+        val store = TiketStore(this)
+        val tiket = store.semua().firstOrNull() ?: return
+
+        views.statusResult.visibility = View.VISIBLE
+        views.statusResult.text = getString(R.string.home_status_checking)
+
+        lifecycleScope.launch {
+            val status = PublicApi.statusLaporan(BuildConfig.API_BASE, tiket.code, tiket.claimToken)
+            views.statusResult.text = if (status == null) {
+                getString(R.string.home_status_none)
+            } else {
+                "${status.code} · ${status.statusLabel}\n${status.basis}"
+            }
+        }
     }
 
     private fun muatImbauan() {

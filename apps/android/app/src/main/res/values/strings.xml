@@ -52,6 +52,9 @@
     <!-- "Info sekitar" pada spesifikasi §4. Kalimat dasarnya menyebut dari mana imbauan
          berasal, karena warga yang membacanya berhak tahu bahwa ia melewati keputusan
          pejabat berwenang — bukan angka yang bocor dari sistem. -->
+    <string name="home_status">Cek Status Laporan Saya</string>
+    <string name="home_status_checking">Memeriksa…</string>
+    <string name="home_status_none">Status laporan tidak dapat diambil. Periksa jaringan, lalu coba lagi.</string>
     <string name="home_alerts_title">Imbauan kewaspadaan yang sedang berlaku</string>
     <string name="home_alerts_basis">Diterbitkan pejabat berwenang Polres Metro Jakarta Selatan. Menyebut wilayah setingkat kecamatan dan tidak memuat data rinci.</string>
 

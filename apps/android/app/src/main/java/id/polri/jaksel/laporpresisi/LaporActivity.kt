@@ -178,6 +178,14 @@ class LaporActivity : AppCompatActivity() {
 
     private fun showTicket(ticket: PublicApi.Ticket) {
         views.ticketText.text = ticket.code
+        // Kode klaim disimpan terenkripsi di ponsel ini, dan TIDAK ditampilkan.
+        //
+        // Menampilkannya hanya akan mengundang pelapor menyalinnya ke tempat yang tidak
+        // aman, padahal aplikasi sudah menyimpannya dan memakainya sendiri. Yang perlu ia
+        // ingat cukup nomor tiketnya — itu yang disebutkan kepada petugas.
+        if (ticket.claimToken.isNotBlank()) {
+            TiketStore(this).simpan(TiketStore.Tiket(ticket.code, ticket.claimToken))
+        }
         views.formGroup.visibility = View.GONE
         views.sentGroup.visibility = View.VISIBLE
         hideError()

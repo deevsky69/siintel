@@ -117,6 +117,29 @@
             android:textColor="@color/ink_faint"
             android:textSize="12sp" />
 
+        <!-- Cek status laporan sendiri. Disembunyikan bila ponsel ini belum pernah
+             mengirim laporan: tombol yang pasti menjawab "tidak ada" hanya membuat orang
+             mengira aplikasinya rusak. -->
+        <Button
+            android:id="@+id/statusButton"
+            style="@style/OutlineButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:paddingVertical="14dp"
+            android:text="@string/home_status"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/statusResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="3dp"
+            android:textColor="@color/ink_muted"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/officerButton"
             style="@style/OutlineButton"

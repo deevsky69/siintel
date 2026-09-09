@@ -133,7 +133,7 @@ def test_migrations_are_applied(engine: Engine) -> None:
     # Angkanya sengaja dipatok, bukan dibaca dari berkas migrasi. Membacanya dari sana
     # membuat test ini selalu lulus — ia akan membandingkan migrasi dengan dirinya sendiri
     # alih-alih dengan basis data yang benar-benar dipakai.
-    assert revision == "0008", "database belum di-migrate: jalankan `pnpm db:migrate`"
+    assert revision == "0009", "database belum di-migrate: jalankan `pnpm db:migrate`"
 
 
 def test_postgis_and_pgcrypto_are_installed(engine: Engine) -> None:

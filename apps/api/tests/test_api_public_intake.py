@@ -13,9 +13,11 @@ diuji di sini bukan bentuk responsnya melainkan batas-batasnya:
 
 from __future__ import annotations
 
+import hashlib
 import os
 from collections.abc import Iterator
 from datetime import timedelta
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -139,12 +141,16 @@ def test_the_response_returns_a_ticket_and_nothing_about_other_reports(
 ) -> None:
     body = client.post("/api/v1/public/citizen-reports", json=_payload(session)).json()
 
-    # `coordinate_source` dan `attachments` ditambahkan 8 September 2026. Keduanya hanya
-    # menggemakan apa yang baru saja DIKIRIM pelapor itu sendiri — dari mana koordinatnya
-    # dan berapa berkas yang ia lampirkan — bukan sesuatu tentang laporan orang lain.
+    # `coordinate_source` dan `attachments` ditambahkan 8 September 2026, `claim_token`
+    # beserta dua pendampingnya pada 9 September. Seluruhnya hanya menggemakan apa yang
+    # baru saja DIKIRIM pelapor itu sendiri, atau rahasia yang baru diterbitkan untuknya —
+    # bukan sesuatu tentang laporan orang lain.
     assert set(body) == {
         "ticket",
+        "claim_token",
+        "claim_basis",
         "status",
+        "status_label",
         "reported_at",
         "kecamatan",
         "message",
@@ -381,3 +387,135 @@ def test_a_proxy_chain_is_read_from_its_first_entry(client: TestClient, session:
         ).status_code
         == 429
     )
+
+
+# --------------------------------------------------------------------------------------
+# Token klaim — cara pelapor melihat status laporannya sendiri (sebagian U-13)
+# --------------------------------------------------------------------------------------
+
+
+def _submit(client: TestClient) -> dict[str, str]:
+    response = client.post(
+        "/api/v1/public/citizen-reports",
+        json={
+            "category": load_report_categories()[0],
+            "description": "Uji token klaim: pelapor memeriksa status laporannya sendiri.",
+            "kecamatan": "Tebet",
+        },
+    )
+    assert response.status_code == 201, response.text
+    body: dict[str, str] = response.json()
+    return body
+
+
+def test_a_claim_token_is_issued_once_and_never_stored(
+    client: TestClient, session: Session
+) -> None:
+    """Yang tersimpan hanya hash-nya; tokennya hanya ada di tangan pelapor.
+
+    Bocornya salinan basis data karena itu tidak memberi siapa pun hak membaca status
+    laporan orang lain.
+    """
+    body = _submit(client)
+    token = body["claim_token"]
+
+    assert len(token) >= 32
+    report = session.scalar(select(CitizenReport).where(CitizenReport.code == body["ticket"]))
+    assert report is not None
+    assert report.claim_token_hash
+    assert token not in str(report.claim_token_hash)
+    assert report.claim_token_hash == hashlib.sha256(token.encode()).hexdigest()
+
+
+def test_the_reporter_can_read_their_own_status(client: TestClient) -> None:
+    body = _submit(client)
+
+    response = client.get(
+        f"/api/v1/public/citizen-reports/{body['ticket']}",
+        headers={"X-Claim-Token": body["claim_token"]},
+    )
+
+    assert response.status_code == 200, response.text
+    assert response.json()["ticket"] == body["ticket"]
+    assert response.json()["status"] == "RECEIVED"
+    assert response.json()["status_label"] == "Diterima"
+
+
+def test_a_guessable_ticket_alone_reveals_nothing(client: TestClient) -> None:
+    """Inti seluruh rancangan ini.
+
+    Nomor tiket BERURUT dan karena itu dapat ditebak. Endpoint yang hanya menuntut nomor
+    tiket akan membocorkan status laporan siapa pun kepada siapa pun — dan pada sistem yang
+    sengaja tidak menyimpan identitas, tidak ada apa pun lain untuk mengikat hak baca.
+    """
+    body = _submit(client)
+
+    assert client.get(f"/api/v1/public/citizen-reports/{body['ticket']}").status_code == 404
+    assert (
+        client.get(
+            f"/api/v1/public/citizen-reports/{body['ticket']}",
+            headers={"X-Claim-Token": "token-yang-salah"},
+        ).status_code
+        == 404
+    )
+
+
+def test_an_unknown_ticket_and_a_wrong_token_are_indistinguishable(
+    client: TestClient,
+) -> None:
+    """Keduanya 404 dengan pesan yang sama.
+
+    Membedakannya akan mengubah endpoint ini menjadi alat memastikan sebuah nomor tiket
+    benar-benar ada — persis yang ingin dicegah.
+    """
+    body = _submit(client)
+
+    tidak_ada = client.get(
+        "/api/v1/public/citizen-reports/RPT-9999", headers={"X-Claim-Token": "apa-saja"}
+    )
+    salah = client.get(
+        f"/api/v1/public/citizen-reports/{body['ticket']}",
+        headers={"X-Claim-Token": "apa-saja"},
+    )
+
+    def tanpa_request_id(balasan: dict[str, Any]) -> dict[str, Any]:
+        # `request_id` memang berbeda tiap permintaan; yang harus sama adalah selebihnya.
+        galat = dict(balasan["error"])
+        galat.pop("request_id", None)
+        return galat
+
+    assert tidak_ada.status_code == salah.status_code == 404
+    assert tanpa_request_id(tidak_ada.json()) == tanpa_request_id(salah.json())
+
+
+def test_a_seeded_report_without_a_token_stays_unreadable(
+    client: TestClient, session: Session
+) -> None:
+    """150 laporan dummy tidak punya token, dan tidak seharusnya punya.
+
+    Tidak ada pelapor sungguhan di baliknya. Tanpa penjagaan ini, token kosong akan cocok
+    dengan kolom kosong dan membuka seluruh dataset kepada siapa pun.
+    """
+    lama = session.scalar(
+        select(CitizenReport).where(CitizenReport.claim_token_hash.is_(None)).limit(1)
+    )
+    assert lama is not None, "data awal tidak memuat laporan tanpa token — uji ini sia-sia"
+
+    for header in ({}, {"X-Claim-Token": ""}, {"X-Claim-Token": "-"}):
+        assert (
+            client.get(f"/api/v1/public/citizen-reports/{lama.code}", headers=header).status_code
+            == 404
+        )
+
+
+def test_the_status_reply_never_leaks_internal_assessment(client: TestClient) -> None:
+    """`urgency_score` dan `verification_score` adalah catatan kerja satuan, bukan milik
+    pelapor: membocorkannya memberi tahu seseorang seberapa serius satuan menganggapnya."""
+    body = _submit(client)
+
+    isi = client.get(
+        f"/api/v1/public/citizen-reports/{body['ticket']}",
+        headers={"X-Claim-Token": body["claim_token"]},
+    ).json()
+
+    assert {"urgency_score", "verification_score", "location_id", "latitude"}.isdisjoint(isi)

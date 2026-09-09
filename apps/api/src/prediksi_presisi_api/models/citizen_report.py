@@ -103,6 +103,17 @@ class CitizenReport(TimestampMixin, Base):
     #: lama memundurkan penghapusan berkasnya tiga bulan lagi, tanpa ada yang memutuskannya.
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
+    #: SHA-256 heksadesimal dari token klaim — satu-satunya cara pelapor membuktikan laporan
+    #: ini miliknya, pada sistem yang sengaja tidak menyimpan identitas siapa pun.
+    #:
+    #: Tokennya sendiri TIDAK PERNAH tersimpan di sini: ia diterbitkan sekali saat laporan
+    #: dikirim dan hanya ada di ponsel pelapor. Menyimpan hash-nya berarti salinan basis
+    #: data yang bocor tidak memberi siapa pun hak membaca status laporan orang lain.
+    #:
+    #: NULL untuk 150 laporan dummy, dan itu benar — tidak ada pelapor sungguhan di
+    #: baliknya. Laporan tanpa token dijawab sama dengan laporan yang tidak ada.
+    claim_token_hash: Mapped[str | None] = mapped_column(String(64))
+
     location: Mapped[Location | None] = relationship(back_populates="citizen_reports")
     feedback: Mapped[list[CommunityFeedback]] = relationship(back_populates="report")
     attachments: Mapped[list[CitizenReportAttachment]] = relationship(

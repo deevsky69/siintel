@@ -1569,16 +1569,45 @@ Selebihnya  terlipat</pre>
           <thead><tr><th>Tidak ada</th><th>Alasannya</th></tr></thead>
           <tbody>
             <tr><td>Kolom nama, telepon, alamat pelapor</td><td>Basis data memang tidak punya tempat untuk itu. Menyediakan kolomnya hanya akan menampung data yang lalu dibuang, sementara pelapor mengira datanya tersimpan.</td></tr>
-            <tr><td>Unggah foto atau video</td><td>Menyimpan berkas warga menyentuh retensi dan klasifikasi data — keputusan kebijakan yang belum diambil, bukan pekerjaan yang belum sempat.</td></tr>
             <tr><td>Penanda &#8220;mendesak&#8221;</td><td>Urgensi ditetapkan petugas saat triase. Bila pelapor dapat mengisinya, siapa pun dapat menaikkan prioritas laporannya sendiri.</td></tr>
           </tbody>
         </table>
       </div>
 
+      <p>Yang <strong>sudah ada</strong> sejak 8 September 2026, beserta syaratnya:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ada</th><th>Syarat yang menyertainya</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Lampiran foto, suara, video</strong></td><td>Metadata dilucuti saat unggah &mdash; termasuk koordinat GPS yang ditanam kamera ponsel. Hanya petugas berwenang memverifikasi yang dapat membukanya, dan berkasnya dihapus 90 hari setelah laporan selesai.</td></tr>
+            <tr><td><strong>Berbagi lokasi tepat</strong></td><td>Hanya bila pelapor menekan tombolnya sendiri. Sistem mencatat asal koordinat, sehingga titik pusat kecamatan tidak pernah tertukar dengan titik yang benar-benar dibagikan.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Bagaimana pelapor memeriksa status laporannya</h3>
+      <p>
+        Pada aplikasi Android, tombol <strong>Cek Status Laporan Saya</strong> muncul setelah ponsel
+        itu pernah mengirim laporan. Cara mengamankannya perlu dipahami: nomor tiket
+        <strong>berurut</strong> sehingga dapat ditebak, sedangkan sistem sengaja tidak menyimpan
+        identitas pelapor &mdash; tidak ada apa pun untuk mengikat hak baca. Karena itu setiap
+        laporan menerima <strong>kode klaim</strong> acak, diterbitkan sekali dan tersimpan
+        terenkripsi di ponsel pelapor; server hanya menyimpan sidik jarinya.
+      </p>
+      <div class="note caution">
+        <span class="label">Kode yang hilang tidak dapat diterbitkan ulang</span>
+        <p>
+          Tidak ada identitas yang dapat dipakai mengenali pemiliknya kembali &mdash; itu harga dari
+          kanal tanpa identitas. Nomor tiket tetap dapat disebutkan kepada petugas seperti biasa.
+          Menyebutkan nomor tiket saja <strong>tidak pernah cukup</strong> untuk membuka status:
+          tiket tanpa kode klaim, kode yang salah, dan tiket yang tidak ada dijawab sama persis.
+        </p>
+      </div>
+
       <p>Yang dijaga di sisi sistem:</p>
       <ul>
         <li><strong>Kategori dari daftar tertutup</strong>, bukan isian bebas. Dua ejaan untuk satu hal akan memecah seluruh analisis pola, dan pada kanal publik ejaannya pasti bermacam-macam.</li>
-        <li><strong>Lokasi sebatas kecamatan.</strong> Titik pada peta adalah pusat kecamatan, <strong>bukan TKP sebenarnya</strong> — dan itu dinyatakan di layar.</li>
+        <li><strong>Lokasi sebatas kecamatan bila pelapor tidak membagikan titiknya.</strong> Titik pada peta adalah pusat kecamatan, <strong>bukan TKP sebenarnya</strong> &mdash; dan itu dinyatakan di layar.</li>
         <li><strong>Paling banyak 10 laporan per jam dari satu jaringan.</strong> Longgar dengan sengaja: satu kantor dapat berbagi satu alamat IP.</li>
         <li><strong>Kejadian paling lama 30 hari ke belakang.</strong> Yang lebih lama diarahkan ke Polsek setempat.</li>
         <li><strong>Setiap pengiriman tercatat di jejak audit tanpa nama pengguna</strong> — memang tidak ada pengguna di baliknya, dan mengarangnya akan merusak arti kolom itu.</li>

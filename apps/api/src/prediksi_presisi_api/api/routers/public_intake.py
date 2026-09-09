@@ -46,13 +46,15 @@ di balik peristiwa ini, dan mengarangnya akan merusak arti kolom itu.
 
 from __future__ import annotations
 
+import hashlib
+import secrets
 import threading
 import time
 from datetime import datetime, timedelta
 from typing import Any
 
 import yaml
-from fastapi import APIRouter, Depends, File, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, Path, Request, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -86,6 +88,22 @@ MAX_LOCATION_TEXT = 255
 #: daftar panjang justru membuat tidak satu pun terbaca.
 ACTIVE_ALERT_STATUS = "ACTIVE"
 MAX_PUBLIC_ALERTS = 10
+
+#: Nama status dalam bahasa yang dibaca warga. Diambil dari taksonomi, bukan dikarang di
+#: sini — daftar nilainya ditetapkan pemilik proyek 9 September 2026 (U-16).
+STATUS_LABELS = {
+    "RECEIVED": "Diterima",
+    "VERIFIED": "Diverifikasi",
+    "FORWARDED": "Diteruskan",
+    "IN_PROGRESS": "Ditangani",
+    "CLOSED": "Selesai",
+}
+
+STATUS_BASIS = (
+    "Status ini menyatakan sejauh mana laporan Anda ditangani, bukan hasil penanganannya. "
+    "Penilaian internal atas laporan — seberapa mendesak dan seberapa dipercaya — tidak "
+    "ikut ditampilkan: keduanya catatan kerja satuan, bukan milik pelapor."
+)
 
 PUBLIC_ALERT_BASIS = (
     "Imbauan di sini adalah satu-satunya isi kamtibmas yang keluar tanpa akun, dan ia "
@@ -358,6 +376,80 @@ def _next_code(session: Session) -> str:
     return f"{prefix}-{int(number) + 1:04d}"
 
 
+def issue_claim_token() -> tuple[str, str]:
+    """Menerbitkan token klaim beserta hash yang disimpan.
+
+    Panjangnya 256 bit acak — sama dengan handle titipan lampiran. Bukan angka berurut,
+    bukan turunan nomor tiket: keduanya dapat ditebak, dan menebak berarti membaca status
+    laporan orang lain.
+    """
+    token = secrets.token_urlsafe(32)
+    return token, hash_claim_token(token)
+
+
+def hash_claim_token(token: str) -> str:
+    """SHA-256 heksadesimal dari token.
+
+    Sengaja BUKAN bcrypt maupun argon2. Keduanya dirancang melawan tebakan atas rahasia
+    berentropi rendah — kata sandi manusia. Token ini 256 bit acak; menebaknya mustahil,
+    dan memperlambat verifikasi hanya membuat pemeriksaan status lambat tanpa menambah
+    keamanan sedikit pun.
+    """
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+@router.get(
+    "/citizen-reports/{code}",
+    summary="Memeriksa status laporan sendiri dengan token klaim",
+)
+def report_status(
+    request: Request,
+    code: str = Path(description="Nomor tiket, mis. RPT-0151"),
+    session: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """Status satu laporan, untuk pelapornya sendiri. **Tanpa autentikasi.**
+
+    Token dikirim lewat header `X-Claim-Token`, BUKAN lewat query string. Query string
+    tercatat di log akses proxy, di riwayat peramban, dan pada header `Referer` yang
+    terkirim ke pihak ketiga — dan token yang tercatat di log bukan lagi rahasia.
+
+    Nomor tiket yang tidak ada, token yang salah, dan laporan tanpa token dijawab **sama**:
+    404. Membedakannya akan mengubah endpoint ini menjadi alat memastikan sebuah nomor
+    tiket benar-benar ada, yang persis ingin dicegah.
+
+    Yang dikembalikan hanya apa yang berasal dari pelapor sendiri ditambah status
+    penanganannya. `urgency_score` dan `verification_score` TIDAK ikut: keduanya penilaian
+    internal atas laporan itu, bukan milik pelapor, dan membocorkannya memberi tahu
+    seseorang seberapa serius satuan menganggapnya.
+    """
+    if not limiter.allow(_client_key(request)):
+        raise ApiError(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            "Terlalu banyak permintaan dari jaringan ini dalam satu jam terakhir.",
+        )
+
+    token = request.headers.get("X-Claim-Token", "")
+    report = session.scalar(select(CitizenReport).where(CitizenReport.code == code))
+
+    # Perbandingan tetap dijalankan meski laporannya tidak ada, memakai hash palsu:
+    # menjawab lebih cepat untuk tiket yang tidak ada akan membocorkan tiket mana yang ada.
+    tersimpan = report.claim_token_hash if report is not None and report.claim_token_hash else "-"
+    cocok = secrets.compare_digest(tersimpan, hash_claim_token(token) if token else "")
+
+    if report is None or not token or not cocok:
+        raise ApiError(status.HTTP_404_NOT_FOUND, "Laporan tidak ditemukan.")
+
+    return {
+        "ticket": report.code,
+        "status": report.status,
+        "status_label": STATUS_LABELS.get(report.status, report.status),
+        "reported_at": report.reported_at,
+        "category": report.category,
+        "attachments": len(report.attachments),
+        "basis": STATUS_BASIS,
+    }
+
+
 @router.post(
     "/citizen-reports",
     status_code=status.HTTP_201_CREATED,
@@ -452,8 +544,12 @@ def submit_report(
     except attachment_store.AttachmentError as error:
         raise ApiError(status.HTTP_400_BAD_REQUEST, str(error)) from error
 
+    claim_token, claim_hash = issue_claim_token()
+
     report = CitizenReport(
         code=_next_code(session),
+        # Hash-nya, bukan tokennya. Token hanya ada di tangan pelapor sejak baris di atas.
+        claim_token_hash=claim_hash,
         reported_at=now,
         incident_time=incident_time,
         category=payload.category,
@@ -517,7 +613,12 @@ def submit_report(
 
     return {
         "ticket": report.code,
+        # DITERBITKAN SEKALI, dan tidak dapat diminta ulang: yang tersimpan hanya hash-nya.
+        # Pelapor yang kehilangan token ini kehilangan cara memeriksa statusnya sendiri —
+        # dan itu harga yang dibayar agar sistem tidak perlu menyimpan identitas siapa pun.
+        "claim_token": claim_token,
         "status": report.status,
+        "status_label": STATUS_LABELS.get(report.status, report.status),
         "reported_at": report.reported_at,
         "kecamatan": payload.kecamatan,
         "coordinate_source": report.coordinate_source,
@@ -525,6 +626,11 @@ def submit_report(
         "message": (
             "Laporan Anda tercatat. Simpan nomor tiket ini untuk menanyakan "
             "perkembangannya kepada petugas."
+        ),
+        "claim_basis": (
+            "Kode klaim di atas diterbitkan SEKALI dan tidak dapat diminta ulang. Ia "
+            "disimpan aplikasi di ponsel Anda, dan menjadi satu-satunya cara memeriksa "
+            "status laporan ini — sistem sengaja tidak menyimpan identitas Anda."
         ),
         "basis": INTAKE_BASIS,
     }

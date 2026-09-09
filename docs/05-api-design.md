@@ -386,6 +386,36 @@ Audit: `CREATE_OPERATIONAL_ACTION`, `UPDATE_OPERATIONAL_ACTION`.
 |---|---|---|
 | GET | `/public/report-options` | — ✅ **ADA** |
 | POST | `/public/citizen-reports` | — ✅ **ADA** |
+| GET | `/public/citizen-reports/{code}` | — ✅ **ADA** (token klaim, 9 September 2026) |
+| POST | `/public/attachments` | — ✅ **ADA** |
+| GET | `/public/alerts` | — ✅ **ADA** |
+
+**Token klaim — cara pelapor melihat status laporannya sendiri (menutup sebagian U-13).**
+
+`POST /public/citizen-reports` kini juga menjawab `claim_token`: 256 bit acak, diterbitkan
+**sekali**, tidak dapat diminta ulang. Basis data hanya menyimpan SHA-256-nya
+(`claim_token_hash`, migration 0009), sehingga salinan basis data yang bocor tidak memberi
+siapa pun hak membaca status laporan orang lain.
+
+`GET /public/citizen-reports/{code}` menuntut token itu pada header **`X-Claim-Token`** —
+bukan query string, karena query string tercatat di log akses proxy, di riwayat peramban,
+dan pada header `Referer` yang terkirim ke pihak ketiga.
+
+| Keadaan | Jawaban |
+|---|---|
+| Tiket benar + token benar | 200, berisi status, label, kategori, dan jumlah lampiran |
+| Tiket benar, tanpa token | 404 |
+| Tiket benar, token salah | 404 |
+| Tiket tidak ada | 404 |
+| Laporan lama tanpa token (150 baris dummy) | 404 |
+
+Keempat kegagalan menjawab **404 yang identik**, termasuk pesannya. Membedakannya akan
+mengubah endpoint ini menjadi alat memastikan sebuah nomor tiket benar-benar ada — dan
+nomor tiket berurut, sehingga menebaknya mudah.
+
+`urgency_score` dan `verification_score` **tidak ikut**: keduanya penilaian internal atas
+laporan itu, bukan milik pelapor, dan membocorkannya memberi tahu seseorang seberapa serius
+satuan menganggapnya.
 
 **Keputusan pemilik proyek, 2 September 2026.** Bentuknya mengikuti `docs/14` §3:
 pengiriman **tanpa akun**, dan nomor tiket sebagai satu-satunya penanda yang dipegang

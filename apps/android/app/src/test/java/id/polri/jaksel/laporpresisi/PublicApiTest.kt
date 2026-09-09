@@ -56,6 +56,61 @@ class PublicApiTest {
         }
 
     @Test
+    fun `kode klaim diterima saat mengirim laporan dan dikirim lewat header saat memeriksa`() =
+        runBlocking {
+            // Lewat HEADER, bukan alamat: alamat tercatat di log proxy dan riwayat
+            // peramban, dan rahasia yang tercatat di log bukan lagi rahasia.
+            FakeServer().use { server ->
+                server.on(
+                    "/api/v1/public/citizen-reports",
+                    FakeServer.Reply(
+                        201,
+                        """{"ticket":"RPT-0151","claim_token":"rahasia-256-bit",
+                            "message":"Laporan Anda tercatat."}""",
+                    ),
+                )
+                server.on(
+                    "/api/v1/public/citizen-reports/RPT-0151",
+                    FakeServer.Reply(
+                        200,
+                        """{"ticket":"RPT-0151","status":"VERIFIED","status_label":"Diverifikasi",
+                            "category":"Kejahatan Jalanan","attachments":0,
+                            "basis":"Status penanganan, bukan hasilnya."}""",
+                    ),
+                )
+
+                val tiket = PublicApi.submit(
+                    server.base,
+                    ReportDraft("Pencurian", "Tebet", "", "Sepeda motor hilang di depan rumah."),
+                )
+                assertEquals("rahasia-256-bit", tiket.claimToken)
+
+                val status = PublicApi.statusLaporan(server.base, tiket.code, tiket.claimToken)
+                assertEquals("Diverifikasi", status?.statusLabel)
+
+                val permintaan = server.requestsTo("/api/v1/public/citizen-reports/RPT-0151").single()
+                assertEquals("rahasia-256-bit", permintaan.headers["X-Claim-Token"]?.single())
+                // Tidak ada rahasia yang ikut pada alamat.
+                assertFalse(permintaan.path.contains("rahasia"))
+            }
+        }
+
+    @Test
+    fun `tiket yang ditolak server menjawab null, bukan melemparkan galat`() = runBlocking {
+        // Server sengaja menjawab 404 yang SAMA untuk tiket tak dikenal dan kode klaim
+        // salah, supaya endpoint itu tidak dapat dipakai memastikan sebuah tiket ada.
+        // Aplikasi mengikutinya: keduanya "tidak dapat diambil", tanpa membedakan.
+        FakeServer().use { server ->
+            server.on(
+                "/api/v1/public/citizen-reports/RPT-9999",
+                FakeServer.Reply(404, """{"error":{"message":"Laporan tidak ditemukan."}}"""),
+            )
+
+            assertEquals(null, PublicApi.statusLaporan(server.base, "RPT-9999", "salah"))
+        }
+    }
+
+    @Test
     fun `imbauan yang berlaku dibaca dari server tanpa akun`() = runBlocking {
         FakeServer().use { server ->
             server.on("/api/v1/public/alerts", FakeServer.Reply(200, alertsBody))

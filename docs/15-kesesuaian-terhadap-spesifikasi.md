@@ -188,7 +188,7 @@ pada 9 September 2026 — bukan terhadap emulator dan bukan terhadap ingatan.
 
 | Bagian | Yang sudah bekerja | Yang belum |
 |---|---|---|
-| **Warga** | Mengirim laporan sampai tersimpan · berbagi lokasi · lampiran foto/suara/video · **imbauan kewaspadaan yang sedang berlaku** ("info sekitar" §4) | Panic button, status laporan, community watch — ketiganya terhalang keputusan, bukan pekerjaan teknis (lihat di bawah) |
+| **Warga** | Mengirim laporan sampai tersimpan · berbagi lokasi · lampiran foto/suara/video · **imbauan kewaspadaan yang sedang berlaku** ("info sekitar" §4) · **cek status laporan sendiri** dengan token klaim | Panic button dan community watch — keduanya terhalang keputusan, bukan pekerjaan teknis (lihat di bawah) |
 | **Petugas** | Masuk · sesi tujuh hari (teruji melewati proxy) · membaca antrean menurut kewenangan · **memverifikasi laporan** | Menyetujui rekomendasi dan menutup peringatan dari ponsel |
 
 Lingkaran penuhnya terbukti pada demo sungguhan: warga mengirim laporan → laporan muncul
@@ -207,13 +207,27 @@ dan sandinya diketahui umum, sehingga siapa pun dapat membangun "pembaruan" yang
 Android sebagai aplikasi yang sama. Memadai untuk paparan pada perangkat sendiri; tidak
 untuk dibagikan.
 
-#### Tiga fitur §4 yang TIDAK dikerjakan, dan mengapa
+#### Status laporan — dikerjakan 9 September 2026
 
-Ketiganya terhalang keputusan pemilik proyek, bukan kesulitan teknis. Mengerjakannya tanpa
+Pelapor kini dapat memeriksa status laporannya sendiri, dan cara mengamankannya perlu
+dicatat karena masalahnya nyata: nomor tiket `RPT-xxxx` **berurut** sehingga dapat ditebak,
+sedangkan sistem sengaja tidak menyimpan identitas pelapor — tidak ada akun, tidak ada
+nomor telepon, tidak ada apa pun untuk mengikat hak baca.
+
+Jawabannya **token klaim**: 256 bit acak, diterbitkan sekali saat laporan dikirim,
+tersimpan terenkripsi di ponsel pelapor. Basis data hanya menyimpan SHA-256-nya. Tiket
+tanpa token, token salah, tiket tak dikenal, dan laporan lama tanpa token dijawab **404
+yang identik** — sehingga endpoint ini tidak dapat dipakai memastikan sebuah tiket ada.
+
+Harganya dinyatakan kepada pelapor, bukan disembunyikan: kode yang hilang tidak dapat
+diterbitkan ulang, karena tidak ada identitas yang dapat dipakai mengenalinya kembali.
+
+#### Dua fitur §4 yang TIDAK dikerjakan, dan mengapa
+
+Keduanya terhalang keputusan pemilik proyek, bukan kesulitan teknis. Mengerjakannya tanpa
 keputusan itu bukan kemajuan melainkan kerusakan:
 
 | Fitur | Yang menghalangi |
 |---|---|
 | **Panic button** | **Komitmen respons** — siapa yang menerima, dalam berapa lama, dan apa yang terjadi bila tidak ada yang menjawab. Tombol darurat yang menjanjikan bantuan tanpa ada yang berkewajiban datang lebih berbahaya daripada tidak ada tombol sama sekali: ia membuat orang berhenti mencari pertolongan lain |
-| **Status laporan** | Tiket `RPT-xxxx` berurut dan dapat ditebak, sedangkan sistem sengaja tidak menyimpan identitas pelapor — jadi tidak ada apa pun untuk mengikat hak baca. Perlu token klaim acak di ponsel pelapor: perubahan skema dan kontrak API (sisa U-13) |
 | **Community watch** | Belum ada definisi produk. Apa yang dibagikan, kepada siapa, dan siapa yang memoderasinya adalah pertanyaan kebijakan sebelum menjadi pertanyaan teknis |

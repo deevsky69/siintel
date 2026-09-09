@@ -8,6 +8,7 @@ import java.io.BufferedReader
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 
 /**
  * Sambungan ke kanal publik PREDIKSI PRESISI.
@@ -52,7 +53,24 @@ object PublicApi {
     /** Satu berkas yang sudah dititipkan dan siap disebut saat mengirim laporan. */
     data class Staged(val handle: String, val kind: String, val byteSize: Long)
 
-    data class Ticket(val code: String, val message: String)
+    /**
+     * Tiket beserta kode klaimnya.
+     *
+     * [claimToken] diterbitkan SEKALI dan tidak dapat diminta ulang — yang tersimpan di
+     * server hanya hash-nya. Ia menjadi satu-satunya bukti bahwa laporan ini milik
+     * pelapor, pada sistem yang sengaja tidak menyimpan identitas siapa pun.
+     */
+    data class Ticket(val code: String, val claimToken: String, val message: String)
+
+    /** Status satu laporan, dilihat pelapornya sendiri. */
+    data class StatusLaporan(
+        val code: String,
+        val status: String,
+        val statusLabel: String,
+        val category: String,
+        val attachments: Int,
+        val basis: String,
+    )
 
     /**
      * Satu imbauan kewaspadaan yang sedang berlaku.
@@ -97,6 +115,50 @@ object PublicApi {
         }
     }
 
+    /**
+     * Status satu laporan, dengan kode klaim sebagai buktinya.
+     *
+     * Kode dikirim lewat header `X-Claim-Token`, BUKAN lewat alamat. Alamat tercatat di
+     * log proxy dan di riwayat peramban, dan rahasia yang tercatat di log bukan lagi
+     * rahasia.
+     *
+     * Menjawab `null` untuk tiket yang tidak ada MAUPUN kode klaim yang salah — server
+     * memang tidak membedakan keduanya, supaya endpoint ini tidak dapat dipakai memastikan
+     * sebuah nomor tiket benar-benar ada.
+     */
+    suspend fun statusLaporan(
+        baseUrl: String,
+        code: String,
+        claimToken: String,
+    ): StatusLaporan? = withContext(Dispatchers.IO) {
+        val encoded = URLEncoder.encode(code, "UTF-8")
+        val connection =
+            (URL("$baseUrl/api/v1/public/citizen-reports/$encoded").openConnection()
+                as HttpURLConnection).apply {
+                requestMethod = "GET"
+                setRequestProperty("Accept", "application/json")
+                setRequestProperty("X-Claim-Token", claimToken)
+                connectTimeout = TIMEOUT_MS
+                readTimeout = TIMEOUT_MS
+            }
+        try {
+            if (connection.responseCode != 200) return@withContext null
+            val json = JSONObject(connection.inputStream.bufferedReader().use { it.readText() })
+            StatusLaporan(
+                code = json.text("ticket"),
+                status = json.text("status"),
+                statusLabel = json.text("status_label"),
+                category = json.text("category"),
+                attachments = json.optInt("attachments", 0),
+                basis = json.text("basis"),
+            )
+        } catch (_: Exception) {
+            null
+        } finally {
+            connection.disconnect()
+        }
+    }
+
     suspend fun options(baseUrl: String): Options = withContext(Dispatchers.IO) {
         val body = get("$baseUrl/api/v1/public/report-options")
         val json = JSONObject(body)
@@ -133,7 +195,11 @@ object PublicApi {
         }
         val body = post("$baseUrl/api/v1/public/citizen-reports", payload.toString())
         val json = JSONObject(body)
-        Ticket(code = json.getString("ticket"), message = json.text("message"))
+        Ticket(
+            code = json.getString("ticket"),
+            claimToken = json.text("claim_token"),
+            message = json.text("message"),
+        )
     }
 
     /**
