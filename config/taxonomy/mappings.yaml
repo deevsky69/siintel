@@ -1,6 +1,6 @@
 # PEMETAAN NILAI TAKSONOMI — PREDIKSI PRESISI
 #
-# Status: PROPOSED — REQUIRES USER APPROVAL (U-16 / keputusan B-3).
+# Status: FINAL — DITETAPKAN pemilik proyek 9 September 2026 (U-16 / keputusan B-3).
 #
 # Dataset dummy memakai istilah Bahasa Indonesia, sementara nilai yang DISIMPAN di database
 # memakai UPPER_SNAKE berbahasa Inggris (docs/02 K-7). Berkas ini memetakan keduanya.
@@ -10,10 +10,33 @@
 #
 # Nomenklatur kedinasan (Polsek, Samapta, Curanmor, dst.) TIDAK diterjemahkan.
 #
-# Mengubah berkas ini tidak memerlukan migration: kolom taksonomi bertipe teks,
-# justru karena daftar nilainya belum final.
+# APA YANG DITETAPKAN
+#
+#   Dua puluh domain yang dipetakan di bawah. Tidak ada satu nilai pun yang berubah saat
+#   penetapan, sehingga seluruh baris yang sudah tersimpan tetap sah.
+#
+# APA YANG TIDAK IKUT DITETAPKAN, dan mengapa
+#
+#   `modus` (16 nilai), `target_type` (11), dan `location_type` (6) TIDAK ada di berkas ini
+#   dan memang tidak seharusnya ada. Ketiganya dipertahankan apa adanya sebagai istilah
+#   lapangan, bukan taksonomi berjenjang yang perlu dipetakan (docs/02 §22) — keputusan
+#   teknis yang mendahului penetapan ini dan tidak diubah olehnya.
+#
+#   Akibatnya nyata dan harus disadari: nilai `incident_type` yang tidak dikenal
+#   MENGHENTIKAN seed, sedangkan `modus` yang tidak dikenal diterima apa adanya. Kalau
+#   ketiga daftar itu kelak hendak ditutup juga, itu keputusan tersendiri — dan
+#   konsekuensinya seed menolak istilah lapangan yang belum terdaftar.
+#
+# Mengubah berkas ini tidak memerlukan migration: kolom taksonomi bertipe teks. Setelah
+# ditetapkan, penambahan nilai baru menuntut versi baru — bukan penyuntingan versi ini.
 
-version: proposed-2026-09-01
+# Nama versi menyebut tanggal ISINYA disusun. Awalan "proposed-" dibuang saat penetapan:
+# versi berstatus FINAL yang namanya berbunyi "proposed" tampil di layar Entri Data sebagai
+# dua pernyataan yang bertentangan. Tidak ada baris tersimpan yang merujuk nama ini, jadi
+# penggantiannya tidak memutus ketertelusuran apa pun.
+version: taksonomi-2026-09-01
+status: FINAL
+ditetapkan: 2026-09-09
 
 mappings:
   # Katalog ancaman — lihat docs/16-rancangan-risk-scoring.md §2.

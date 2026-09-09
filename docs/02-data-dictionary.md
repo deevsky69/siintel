@@ -274,7 +274,9 @@ Dataset dummy memakai empat bin 6 jam: `00:00-06:00`, `06:00-12:00`, `12:00-18:0
 
 ## 22. TAKSONOMI & PEMETAAN NILAI
 
-Nilai berikut **belum final** (`NOT SPECIFIED`, U-16) dan hanya terobservasi pada dataset dummy. Nilai final ditetapkan pemilik data/SOP. Pemetaan Indonesia→enum disimpan di `config/taxonomy/` dan diterapkan saat seed/import — canonical schema tidak diubah mengikuti file sumber (CLAUDE.md §18).
+**DITETAPKAN (U-16), 9 September 2026.** Nilai berikut berlaku sebagai taksonomi sistem, versi `taksonomi-2026-09-01`. Tidak ada satu nilai pun yang berubah saat penetapan, sehingga seluruh baris yang sudah tersimpan tetap sah. Pemetaan Indonesia→enum disimpan di `config/taxonomy/` dan diterapkan saat seed/import — canonical schema tidak diubah mengikuti file sumber (CLAUDE.md §18). Menambah nilai baru kini menuntut versi baru, bukan penyuntingan versi ini.
+
+> **Tiga baris terakhir tabel di bawah TIDAK ikut ditetapkan** dan memang tidak dipetakan sama sekali. `modus`, `target_type`, dan `location_type` dipertahankan apa adanya sebagai istilah lapangan — keputusan teknis yang mendahului penetapan ini. Akibatnya nyata: `incident_type` yang tidak dikenal **menghentikan** seed, sedangkan `modus` yang tidak dikenal diterima apa adanya. Menutup ketiga daftar itu adalah keputusan tersendiri, dan konsekuensinya seed menolak istilah lapangan yang belum terdaftar.
 
 | Domain | Nilai pada dataset dummy | Enum tersimpan (K-7) |
 |---|---|---|
@@ -312,7 +314,7 @@ predictions         DRAFT → PUBLISHED → VALIDATED
 
 ## 23. YANG MASIH MENUNGGU KEPUTUSAN PENGGUNA
 
-~~U-01 threshold risiko/warning~~ dan ~~U-02 bobot faktor~~ ditetapkan 9 September 2026 · U-03 definisi target prediksi & aturan pencocokan evaluasi · U-04 ukuran grid & batas wilayah · U-05 kebijakan kredensial · U-06 aturan scope jurisdiksi/fungsi · U-08 state machine final · U-10 kewenangan publikasi alert · U-13 identitas & bukti LAPOR PRESISI · U-14 retensi/klasifikasi · U-16 taksonomi final.
+~~U-01 threshold risiko/warning~~ dan ~~U-02 bobot faktor~~ ditetapkan 9 September 2026 · U-03 definisi target prediksi & aturan pencocokan evaluasi · U-04 ukuran grid & batas wilayah · U-05 kebijakan kredensial · U-06 aturan scope jurisdiksi/fungsi · U-08 state machine final · U-10 kewenangan publikasi alert · U-13 identitas & bukti LAPOR PRESISI · U-14 retensi/klasifikasi · ~~U-16 taksonomi final~~ ditetapkan 9 September 2026.
 
 Rincian dan opsi: `docs/implementation-notes/000c-specification-lock.md`.
 

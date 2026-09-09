@@ -1,9 +1,12 @@
 """Pemetaan nilai taksonomi dari `config/taxonomy/mappings.yaml`.
 
-Nilai taksonomi belum final (U-16), sehingga pemetaannya berada di konfigurasi dan
-bukan di kode maupun di ENUM database. Nilai yang tidak dikenal **menghentikan seed**
-alih-alih diterima apa adanya — nilai asing yang lolos akan menjadi taksonomi bayangan
-yang tidak pernah disetujui siapa pun.
+Pemetaannya berada di konfigurasi, bukan di kode maupun di ENUM database. Nilai yang tidak
+dikenal **menghentikan seed** alih-alih diterima apa adanya — nilai asing yang lolos akan
+menjadi taksonomi bayangan yang tidak pernah disetujui siapa pun.
+
+Taksonomi ditetapkan pemilik proyek 9 September 2026 (U-16). Penetapan itu tidak membuat
+pemetaannya boleh pindah ke kode: justru sebaliknya, menambah nilai baru kini menuntut
+versi baru pada konfigurasi, bukan penyuntingan diam-diam.
 """
 
 from __future__ import annotations
@@ -23,6 +26,9 @@ class Taxonomy:
     """Pemetaan nilai per domain, mis. `status_crime` atau `risk_class`."""
 
     version: str
+    #: Status penetapan versi ini — `FINAL` atau `PROPOSED`. Dibawa keluar apa adanya
+    #: supaya layar tidak perlu menuliskannya sendiri dan kemudian menyimpang darinya.
+    status: str
     mappings: dict[str, dict[str, str]]
     labels: dict[str, dict[str, str]]
 
@@ -71,6 +77,7 @@ def load_taxonomy(path: Path | None = None) -> Taxonomy:
 
     return Taxonomy(
         version=str(raw.get("version", "unknown")),
+        status=str(raw.get("status", "PROPOSED")),
         mappings={k: dict(v) for k, v in (raw.get("mappings") or {}).items()},
         labels={k: dict(v) for k, v in (raw.get("labels") or {}).items()},
     )

@@ -727,18 +727,34 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 
 ## 19.2 Masih menunggu pemilik proyek / data owner (`NOT SPECIFIED`)
 
+### Sudah ditetapkan
+
+| Item | Ditetapkan | Nilai yang berlaku |
+|---|---|---|
+| Bobot risk score (U-02) | 9 September 2026 | `config/risk/risk-weights.yaml` versi `dummy-v1` |
+| Threshold early warning & batas kelas risiko (U-01) | 9 September 2026 | `config/risk/warning-thresholds.yaml` versi `dummy-v1` |
+| Pemetaan status wilayah Aman/Waspada/Siaga (U-22) | 9 September 2026 | `leadership_display.area_status`, Siaga = HIGH + CRITICAL |
+| Taksonomi nilai (U-16) | 9 September 2026 | `config/taxonomy/mappings.yaml` versi `taksonomi-2026-09-01`, 20 domain |
+| Prediksi tanpa kelas risiko | 9 September 2026 | Prediksi tetap skor mentah; tangga kelas hanya bagi penilaian keadaan berjalan |
+
+Seluruhnya ditetapkan **memakai nilai yang sudah berlaku**, tanpa satu angka pun berubah,
+sehingga baris yang sudah tersimpan tetap sah dan tetap tertelusur. Ditetapkan berarti
+berlaku sebagai ketentuan — **bukan** berarti terbukti tepat; itu urusan evaluasi
+(CLAUDE.md §18).
+
+### Masih terbuka
+
 Butir berikut **tidak diinvensi** dan memblokir task tertentu:
 
 | Item | Memblokir |
 |---|---|
-| Bobot risk score final (U-02) | TASK 102, constraint bobot |
-| Threshold early warning & batas kelas risiko (U-01) | TASK 110 |
+| Kewenangan & kriteria publikasi alert publik (U-10 / P-2) | TASK 111 — saat ini **tidak satu peran pun** memegang `public_alert:publish` |
 | Definisi target prediksi & aturan pencocokan evaluasi (U-03) | TASK 100–104, 150–151 |
+| Ambang peringkat volume laporan (0,70 / 0,40) | Layar Pimpinan — dipisahkan dari U-22 pada 9 September 2026 |
 | Ukuran grid & batas GIS resmi (U-04) | TASK 011, 080–084 |
-| Matriks role-permission resmi + kewenangan approve/publish (U-06, U-10) | TASK 051, 111, 130 |
+| Matriks role-permission resmi + kewenangan approve (U-06, P-1…P-7) | TASK 051, 130 |
 | Kebijakan kredensial (panjang/rotasi password, MFA, SSO) (U-05) | TASK 050 |
 | Alur operasional resmi & state machine (U-08) | TASK 110–142 |
-| Taksonomi final (U-16) | TASK 011, 020 |
 | Sumber konten Executive Brief (U-11) | modul MVP #12 |
 | Identitas pelapor, bukti, dan status LAPOR PRESISI (U-13) | PHASE 17 |
 | Lingkungan produksi & sumber tile produksi (sisa U-15 — pengembangan sudah diputuskan: tile lokal) | PHASE 16 |

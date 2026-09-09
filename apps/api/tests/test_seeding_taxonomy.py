@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import UTC, date, time
 
 import pytest
+import yaml
 
 from prediksi_presisi_api.seeding import SeedError, load_taxonomy
 from prediksi_presisi_api.seeding import csv_source as src
@@ -136,3 +137,50 @@ def test_seeded_report_categories_are_all_offered_on_the_public_form() -> None:
     seeded = {category.name for category in REPORT_CATEGORIES}
 
     assert seeded <= offered, f"kategori pada data contoh tidak ditawarkan: {seeded - offered}"
+
+
+# --------------------------------------------------------------------------------------
+# Status penetapan (U-16)
+# --------------------------------------------------------------------------------------
+
+
+def test_the_taxonomy_in_use_has_actually_been_adopted() -> None:
+    """Taksonomi ditetapkan pemilik proyek 9 September 2026.
+
+    Seed MENGHENTIKAN dirinya pada nilai yang tidak dikenal — perilaku yang hanya masuk
+    akal bila daftar nilainya memang sudah diputus. Selama statusnya PROPOSED, penolakan
+    itu menegakkan daftar yang belum disetujui siapa pun.
+
+    Yang diperiksa hanyalah bahwa taksonomi yang dipakai sudah ditetapkan dan bertanggal.
+    Isi daftarnya tetap keputusan pemilik proyek, bukan keputusan test.
+    """
+    raw = yaml.safe_load(TAXONOMY_FILE.read_text(encoding="utf-8"))
+
+    assert raw["status"] == "FINAL"
+    assert raw["ditetapkan"], "berstatus FINAL tanpa tanggal penetapan"
+    assert load_taxonomy().status == "FINAL", "status tidak dibawa keluar dari konfigurasi"
+
+
+def test_the_version_name_never_contradicts_its_own_status() -> None:
+    """Versi FINAL yang namanya berbunyi "proposed" adalah dua pernyataan bertentangan.
+
+    Nama versi ini dicetak apa adanya pada layar Entri Data, di sebelah statusnya. Sebelum
+    9 September 2026 keduanya berbunyi `proposed-2026-09-01` dan `FINAL` berdampingan.
+    """
+    raw = yaml.safe_load(TAXONOMY_FILE.read_text(encoding="utf-8"))
+
+    if raw["status"] == "FINAL":
+        assert "proposed" not in str(raw["version"]).lower()
+
+
+def test_field_terminology_stays_out_of_the_mapped_taxonomy() -> None:
+    """`modus`, `target_type`, dan `location_type` sengaja TIDAK dipetakan (docs/02 §22).
+
+    Ketiganya istilah lapangan, bukan taksonomi berjenjang. Penetapan U-16 tidak mengubah
+    keputusan teknis itu, dan menambahkannya diam-diam ke berkas pemetaan akan membuat seed
+    menolak istilah lapangan yang belum terdaftar — perubahan perilaku yang menuntut
+    keputusan pemilik proyek, bukan kelengkapan yang kebetulan terlewat.
+    """
+    mapped = set(load_taxonomy().mappings)
+
+    assert {"modus", "target_type", "location_type"}.isdisjoint(mapped)

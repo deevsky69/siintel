@@ -154,7 +154,9 @@ pnpm gis:up      # PostGIS + tile server lokal (profile gis)
     tercakup lint, typecheck, dan test. `scripts/seed/` menyimpan dokumentasi dan script pembantu
     di luar paket; perintahnya dijalankan lewat `pnpm seed:*`.
 18. Nilai taksonomi dan katalog permission berada di `config/`, bukan di kode maupun ENUM database,
-    karena keduanya masih menunggu keputusan pemilik proyek (U-16, P-1…P-7).
+    karena keduanya berversi: taksonomi ditetapkan 9 September 2026 (U-16) sehingga nilai
+    baru menuntut versi baru, sedangkan pemberian permission per peran masih menunggu
+    keputusan pemilik proyek (P-1…P-7).
 
 ---
 

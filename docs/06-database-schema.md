@@ -250,7 +250,7 @@ Jangan mengarang atau mengunci di schema maupun kode:
 - bobot risk score (U-02);
 - threshold warning & batas kelas risiko (U-01);
 - algoritma ML;
-- taksonomi final (U-16);
+- ~~taksonomi final (U-16)~~ — ditetapkan 9 September 2026;
 - ukuran grid & batas wilayah (U-04);
 - retensi data (U-14);
 - SLA;

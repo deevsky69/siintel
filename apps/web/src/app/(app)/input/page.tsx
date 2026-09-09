@@ -145,7 +145,11 @@ export default async function DataEntryPage({
 
       <p className="mt-3 border-b border-base-800 pb-3 text-2xs leading-relaxed text-ink-muted">
         Nilai taksonomi mengikuti <code>config/taxonomy/mappings.yaml</code> versi{" "}
-        <span className="font-mono">{options.taxonomy_version}</span> dan berstatus PROPOSED (U-16).{" "}
+        <span className="font-mono">{options.taxonomy_version}</span>, berstatus{" "}
+        <span className="font-mono">{options.taxonomy_status}</span> (U-16)
+        {options.taxonomy_status === "FINAL"
+          ? " — ditetapkan pemilik proyek; nilai baru menuntut versi baru."
+          : " — belum ditetapkan."}{" "}
         {options.demo_clock
           ? `Waktu acuan aplikasi beku pada ${maxDate}; tanggal setelah itu ditolak backend.`
           : "Aplikasi memakai waktu sebenarnya."}

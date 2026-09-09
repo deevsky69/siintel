@@ -346,6 +346,10 @@ def entry_options(
         "impact": _options(DOMAIN_IMPACT),
         "suggestions": {key: sorted(values) for key, values in suggestions.items()},
         "taxonomy_version": _taxonomy().version,
+        # Statusnya ikut keluar supaya layar tidak menuliskannya sendiri lalu menyimpang:
+        # sampai 9 September 2026 halaman Entri Data mencetak "berstatus PROPOSED (U-16)"
+        # apa adanya di sebelah nomor versi yang dibaca dari konfigurasi.
+        "taxonomy_status": _taxonomy().status,
         "reference_time": clock.reference_now(),
         "demo_clock": clock.is_demo_clock(),
         "verification_basis": VERIFICATION_BASIS,

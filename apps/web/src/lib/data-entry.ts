@@ -46,6 +46,8 @@ export type EntryOptions = {
   impact: Option[];
   suggestions: EntrySuggestions;
   taxonomy_version: string;
+  /** `FINAL` atau `PROPOSED` — dibaca dari konfigurasi, bukan ditulis di layar. */
+  taxonomy_status: string;
   reference_time: string;
   demo_clock: boolean;
   /** Mengapa verifikasi laporan masyarakat bermakna; dibawa apa adanya ke layar. */
