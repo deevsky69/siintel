@@ -64,3 +64,12 @@ var/lampiran/
 *.keystore
 *-key.pem
 *privkey*
+
+# Data resmi yang dikirim pemilik proyek TIDAK PERNAH masuk repositori (CLAUDE.md §16).
+# Pada 30 September 2026 dua berkas Pusiknas terdorong ke akar repo yang PUBLIK; keduanya
+# dipindahkan ke data/raw/ (sudah diabaikan) dan pola ini menutup jalan terulangnya.
+/*.xlsx
+/*.xls
+/*.pptx
+/*.ppt
+/*.docx
