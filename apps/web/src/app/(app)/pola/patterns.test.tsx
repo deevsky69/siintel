@@ -111,7 +111,20 @@ function screenDna(props: Partial<Parameters<typeof PatternDna>[0]> = {}) {
       available={available}
       selected="CURANMOR"
       profile={profile}
-      source={{ date_from: "2023-01-01", date_to: "2025-12-31", incidents: 1200 }}
+      source={{
+        table: "crime_incidents",
+        date_from: "2023-01-01",
+        date_to: "2026-09-28",
+        incidents: 1200,
+        scope: null,
+        data_sources: [
+          {
+            code: "PUSIKNAS-2026-09-29",
+            label: "Pusiknas, posisi 29 September 2026",
+            incidents: 1200,
+          },
+        ],
+      }}
       scopeBasis="Seluruh angka dihitung dari kejadian di seluruh wilayah Polres."
       analysisBasis={ANALYSIS_BASIS}
       {...props}
