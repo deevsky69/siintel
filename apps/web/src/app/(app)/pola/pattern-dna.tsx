@@ -4,6 +4,7 @@ import { Panel } from "@/components/panel";
 import { dataSourceLabel } from "@/lib/analytics";
 import type {
   PatternDistribution,
+  PatternDnaResponse,
   PatternProfile,
   RepeatProfile,
   ThreatTypeCount,
@@ -243,7 +244,7 @@ export function PatternDna({
   profile: PatternProfile | null;
   scopeBasis: string;
   analysisBasis: string;
-  source: { date_from: string | null; date_to: string | null; incidents: number };
+  source: PatternDnaResponse["source"];
 }) {
   return (
     <div className="grid grid-cols-12 gap-3">
