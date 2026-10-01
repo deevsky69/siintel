@@ -1,6 +1,8 @@
 # BOBOT FAKTOR RISK SCORE — PREDIKSI PRESISI
 #
-# Status: versi `dummy-v1` = FINAL — DITETAPKAN pemilik proyek 9 September 2026 (U-02).
+# Status: versi `pusiknas-2026-10-01` = FINAL, aktif sejak 30 September 2026 — bobot
+#         identik dengan `dummy-v1` (U-02, 9 September 2026), cakupan jenis mengikuti data asli.
+#         versi `dummy-v1` = SUPERSEDED, tetap berlaku bagi baris lama yang merujuknya.
 #         versi `proposed-2026-09-01` = PROPOSED, belum dipakai menghitung apa pun.
 # Rancangan lengkap beserta alasannya: docs/16-rancangan-risk-scoring.md
 #
@@ -42,8 +44,13 @@
 #
 #   Menilai keduanya dengan satu rumus akan membuat salah satunya selalu keliru.
 
-# Versi yang dipakai seed dan mesin penilaian saat ini.
-active_version: dummy-v1
+# Versi yang dipakai mesin penilaian saat ini.
+#
+# 30 September 2026: data asli Pusiknas menggantikan dataset sintetis. Data itu hanya
+# memuat tiga jenis menurut klasifikasi Laporan Polisi — Curanmor, Curat, Curas — dan
+# pemilik proyek memutuskan jenis ancaman sistem mengikuti klasifikasi tersebut. Bobotnya
+# TIDAK berubah satu angka pun dari `dummy-v1`; yang berubah hanya cakupan jenisnya.
+active_version: pusiknas-2026-10-01
 
 versions:
   # ===========================================================================
@@ -56,11 +63,67 @@ versions:
   # tetapkan versi itu, lalu bangkitkan ulang skornya.
   # ===========================================================================
   dummy-v1:
-    status: FINAL
+    # SUPERSEDED, bukan dicabut: bobotnya tetap berlaku bagi setiap baris `risk_scores`
+    # yang menyimpan `weights_version: dummy-v1`, dan angkanya diteruskan utuh ke versi
+    # pengganti. Ia berhenti menjadi versi aktif karena cakupan jenisnya (lima jenis dari
+    # rancangan sintetis) tidak lagi sesuai dengan data yang dinilai.
+    status: SUPERSEDED
     ditetapkan: 2026-09-09
+    digantikan: 2026-09-30
+    digantikan_oleh: pusiknas-2026-10-01
     profiles:
       historical:
         applies_to: [CURANMOR, CURAT, CURAS, KEJAHATAN_JALANAN, TAWURAN]
+        weights:
+          historical_factor: 0.30 # kepadatan kejadian historis
+          recent_trend_factor: 0.25 # tren kejadian terkini
+          temporal_factor: 0.20 # kesesuaian dengan pola waktu
+          spatial_factor: 0.15 # konsentrasi spasial / near-repeat
+          context_factor: 0.10 # faktor kontekstual (kegiatan, POI, dsb.)
+
+  # ===========================================================================
+  # pusiknas-2026-10-01 — BERLAKU sejak data asli dimuat (30 September 2026).
+  #
+  # Bobot IDENTIK dengan dummy-v1 yang ditetapkan 9 September 2026 (U-02). Versi ini
+  # ada bukan karena ada angka yang berubah, melainkan karena `applies_to` berubah:
+  # pemilik proyek menetapkan jenis ancaman mengikuti klasifikasi Laporan Polisi pada
+  # data Pusiknas (Curanmor, Curat, Curas). Menyempitkan daftar pada dummy-v1 sendiri
+  # akan mengubah versi yang masih dirujuk baris lama — larangan yang sama seperti
+  # mengubah bobotnya.
+  #
+  # Tujuh jenis lain dari rancangan sintetis (docs/16 §2) dinyatakan DI LUAR CAKUPAN,
+  # bukan dihapus diam-diam: tidak ada satu pun kejadian jenis itu pada data asli,
+  # sehingga tidak ada yang dapat dinilai, diprediksi, maupun dievaluasi. Memasukkannya
+  # kembali menuntut data — dan keputusan pemilik proyek.
+  #
+  # Faktor konteks pada data asli: `locations.location_type` menyatakan jenjang wilayah
+  # (KELURAHAN / KECAMATAN), bukan kategori TKP seperti pada data sintetis, sehingga
+  # `context_factor` bernilai hampir seragam antar-kelurahan dan tidak membedakan sel.
+  # Bobotnya sengaja tidak dibagi ulang: itu berarti mengarang bobot baru (U-02 FINAL).
+  # Dicatat sebagai pertanyaan terbuka bagi pemilik proyek (docs/01 §19.2).
+  # ===========================================================================
+  pusiknas-2026-10-01:
+    status: FINAL
+    ditetapkan: 2026-09-30
+    dasar: >-
+      Bobot = ketetapan U-02 (9 September 2026), tidak berubah. Cakupan jenis = keputusan
+      pemilik proyek 30 September 2026: jenis ancaman mengikuti klasifikasi Laporan Polisi
+      pada data Pusiknas.
+    outside_scope:
+      - BEGAL
+      - KEJAHATAN_JALANAN
+      - PREMANISME
+      - NARKOBA
+      - UNJUK_RASA
+      - KERAMAIAN
+      - TAWURAN
+    outside_scope_basis: >-
+      Tidak ada kejadian jenis ini pada data Pusiknas 2023–Sep 2026. Jenis tetap dikenal
+      taksonomi (formulir entri dan impor masa depan), tetapi tidak dinilai dan tidak
+      diprediksi sampai datanya ada dan pemilik proyek memutuskan memasukkannya.
+    profiles:
+      historical:
+        applies_to: [CURANMOR, CURAT, CURAS]
         weights:
           historical_factor: 0.30 # kepadatan kejadian historis
           recent_trend_factor: 0.25 # tren kejadian terkini

@@ -114,18 +114,31 @@ def test_every_threat_type_belongs_to_exactly_one_profile() -> None:
     taxonomy = yaml.safe_load((REPO_ROOT / "config" / "taxonomy" / "mappings.yaml").read_text())
     declared = set(taxonomy["mappings"]["incident_type"].values())
 
-    # Kelengkapan dituntut pada versi TERBARU saja. Versi lama sengaja tidak dipaksa
+    # Kelengkapan dituntut pada versi yang BERLAKU saja. Versi lama sengaja tidak dipaksa
     # mencakup jenis yang baru ditambahkan — ia hanya perlu tetap dapat membaca skor
     # yang dahulu dihasilkannya.
-    newest = max(_catalogue()["versions"])
-    covered = {
-        threat
-        for profile in _catalogue()["versions"][newest]["profiles"].values()
-        for threat in profile["applies_to"]
-    }
-    assert declared == covered, (
-        f"versi {newest}: jenis tanpa profil penilaian {sorted(declared - covered)}; "
-        f"profil menyebut jenis di luar taksonomi {sorted(covered - declared)}"
+    #
+    # Sejak data asli (30 September 2026) "lengkap" tidak lagi berarti "setiap jenis
+    # dinilai": tujuh jenis rancangan sintetis tidak punya satu pun kejadian. Yang dituntut
+    # adalah setiap jenis taksonomi DISEBUT — dinilai, atau dinyatakan di luar cakupan
+    # beserta alasannya. Jenis yang tidak disebut sama sekali tetap gagal, karena diam
+    # tidak dapat dibedakan dari lupa.
+    catalogue = _catalogue()
+    active = str(catalogue["active_version"])
+    body = catalogue["versions"][active]
+    covered = {threat for profile in body["profiles"].values() for threat in profile["applies_to"]}
+    outside = set(body.get("outside_scope", []))
+    assert not (covered & outside), (
+        f"versi {active}: {sorted(covered & outside)} dinilai sekaligus dinyatakan di luar cakupan"
+    )
+    if outside:
+        assert body.get("outside_scope_basis"), (
+            f"versi {active}: jenis di luar cakupan tanpa alasan tertulis"
+        )
+    assert declared == covered | outside, (
+        f"versi {active}: jenis tanpa profil penilaian dan tanpa pernyataan di luar cakupan "
+        f"{sorted(declared - covered - outside)}; profil menyebut jenis di luar taksonomi "
+        f"{sorted((covered | outside) - declared)}"
     )
 
 
