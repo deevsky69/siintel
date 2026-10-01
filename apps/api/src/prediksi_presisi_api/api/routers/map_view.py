@@ -54,6 +54,11 @@ AREA_PREDICTION_LIMIT = 5
 #: dipublikasikan; menampilkannya menyamakan rancangan dengan prediksi resmi
 #: (docs/05 §2.6, `prediction:publish`).
 UNPUBLISHED_PREDICTION_STATUS = "DRAFT"
+#: Hanya prediksi PUBLISHED yang membentuk layer prediktif. VALIDATED berarti sudah
+#: dibandingkan dengan kenyataan — ia milik evaluasi, bukan peta "yang akan datang". Sejak
+#: evaluasi mundur menulis puluhan ribu prediksi VALIDATED (1 Oktober 2026), menyaring
+#: hanya DRAFT akan membuat peta memamerkan skor tertinggi dari masa lalu sebagai ramalan.
+PUBLISHED_PREDICTION_STATUS = "PUBLISHED"
 
 #: Peringatan yang dihitung sebagai "aktif" pada panel detail. Sengaja hanya `ACTIVE`:
 #: peringatan yang sudah di-*acknowledge* bukan lagi peringatan yang menunggu tindakan.
@@ -75,8 +80,9 @@ PREDICTIVE_BASIS = (
     "diberi kelas di sini. Itu KEPUTUSAN pemilik proyek 9 September 2026, bukan akibat "
     "ambang yang belum ada: tangga kelas ditetapkan hari yang sama bagi penilaian keadaan "
     "berjalan, dan skor prediksi 80 tidak menyatakan hal yang sama dengan skor penilaian "
-    "80. Prediksi berstatus "
-    f"{UNPUBLISHED_PREDICTION_STATUS} tidak ikut."
+    f"80. Hanya prediksi berstatus {PUBLISHED_PREDICTION_STATUS} yang ikut: "
+    f"{UNPUBLISHED_PREDICTION_STATUS} belum dipublikasikan, dan VALIDATED sudah "
+    "dibandingkan dengan kenyataan sehingga bukan lagi pandangan ke depan."
 )
 
 
@@ -273,7 +279,7 @@ def predictive_heatmap(
         .join(Location, Location.location_id == Prediction.location_id)
         .where(
             Prediction.forecast_horizon == requested,
-            Prediction.status != UNPUBLISHED_PREDICTION_STATUS,
+            Prediction.status == PUBLISHED_PREDICTION_STATUS,
         )
         .order_by(Prediction.risk_score.desc()),
         polsek,
@@ -496,7 +502,7 @@ def _area_predictions(session: Session, polsek: str | None, kecamatan: str) -> l
         .join(Location, Location.location_id == Prediction.location_id)
         .where(
             Location.kecamatan == kecamatan,
-            Prediction.status != UNPUBLISHED_PREDICTION_STATUS,
+            Prediction.status == PUBLISHED_PREDICTION_STATUS,
         )
         .order_by(Prediction.risk_score.desc(), Prediction.prediction_date.desc())
         .limit(AREA_PREDICTION_LIMIT),

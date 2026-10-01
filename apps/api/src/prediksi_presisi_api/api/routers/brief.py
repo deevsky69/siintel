@@ -76,7 +76,7 @@ from ..deps import (
     jurisdiction_filter,
     require_permission,
 )
-from .evaluation import BASIS as EVALUATION_BASIS
+from .evaluation import evaluation_basis
 from .operations import DECISIONS_ALLOWING_ACTION
 
 router = APIRouter(prefix="/brief", tags=["executive brief"])
@@ -414,7 +414,7 @@ def _accuracy(session: Session, current: CurrentUser) -> dict[str, Any]:
             "evaluated_rows": sum(counts.values()),
             "status": "PROPOSED",
         },
-        "accuracy_basis": EVALUATION_BASIS,
+        "accuracy_basis": evaluation_basis(),
     }
 
 

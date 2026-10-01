@@ -45,7 +45,7 @@ from datetime import date, datetime, time, timedelta
 from typing import Any
 
 import yaml
-from sqlalchemy import Select, func, select
+from sqlalchemy import Select, func, select, true
 from sqlalchemy.orm import Session
 
 from ..models import CitizenReport, CrimeIncident, IntelligenceReport, Location
@@ -221,10 +221,20 @@ class RiskBand:
 
 
 @dataclass(frozen=True)
+class SeverityBand:
+    severity: str
+    minimum: int
+    maximum: int
+
+
+@dataclass(frozen=True)
 class Thresholds:
     version: str
     status: str
     bands: tuple[RiskBand, ...]
+    #: Skor terendah yang melahirkan peringatan dini (`early_warning.default.minimum_score`).
+    minimum_warning_score: int
+    severities: tuple[SeverityBand, ...]
 
     def class_for(self, score: int) -> str:
         for band in self.bands:
@@ -234,6 +244,26 @@ class Thresholds:
         message = (
             f"skor {score} tidak masuk kelas mana pun pada "
             f"config/risk/warning-thresholds.yaml versi {self.version}"
+        )
+        raise RiskEngineError(message)
+
+    def severity_for(self, score: int) -> str | None:
+        """Severity peringatan untuk sebuah skor, atau None bila skor di bawah ambang terbit.
+
+        Dua ambang dibaca terpisah dan keduanya harus terpenuhi: `minimum_score` menentukan
+        APAKAH peringatan terbit, tangga `severities` menentukan TINGKATNYA. Pada dummy-v1
+        tangga itu dimulai dari 60 (WATCH) sementara ambang terbit 70, sehingga skor 65
+        punya severity tetapi tidak melahirkan peringatan — sengaja, dan dijaga test.
+        """
+        if score < self.minimum_warning_score:
+            return None
+        for band in self.severities:
+            if band.minimum <= score <= band.maximum:
+                return band.severity
+
+        message = (
+            f"skor {score} melampaui ambang terbit tetapi tidak masuk tangga severity mana "
+            f"pun pada config/risk/warning-thresholds.yaml versi {self.version}"
         )
         raise RiskEngineError(message)
 
@@ -301,8 +331,20 @@ def load_thresholds() -> Thresholds:
         message = "config/risk/warning-thresholds.yaml tidak memuat satu pun kelas risiko"
         raise RiskEngineError(message)
 
+    warning: dict[str, Any] = raw["early_warning"]["default"]
+    severities = tuple(
+        SeverityBand(
+            severity=str(band["severity"]), minimum=int(band["min"]), maximum=int(band["max"])
+        )
+        for band in warning["severities"]
+    )
+
     return Thresholds(
-        version=str(catalogue["active_version"]), status=str(raw["status"]), bands=bands
+        version=str(catalogue["active_version"]),
+        status=str(raw["status"]),
+        bands=bands,
+        minimum_warning_score=int(warning["minimum_score"]),
+        severities=severities,
     )
 
 
@@ -625,8 +667,32 @@ def _scoped(query: Select[Any], polsek: str | None) -> Select[Any]:
     return query if polsek is None else query.where(Location.polsek == polsek)
 
 
-def collect_evidence(session: Session, polsek: str | None = None) -> Evidence:
-    """Mengambil seluruh agregat yang dibutuhkan penilaian dalam beberapa query."""
+def _known_by(as_of: date | None) -> Any:
+    """Klausa: hanya kejadian yang sudah DILAPORKAN sampai akhir hari `as_of` (WIB).
+
+    Dipakai evaluasi mundur (`services/backtest.py`). Penilaian "seolah pada tanggal X"
+    hanya jujur bila ia tidak melihat kejadian yang baru dilaporkan sesudah X — dan pada
+    data asli p90 jarak lapor 3,4 hari, jadi kejadian yang TERJADI sebelum X pun belum
+    tentu sudah diketahui pada X. Karena itu yang dibatasi adalah `reported_at`, bukan
+    `incident_date`; baris tanpa `reported_at` (data sintetis) memakai `occurred_at`.
+
+    `None` berarti tanpa batas: penilaian berjalan melihat seluruh data.
+    """
+    if as_of is None:
+        return true()
+    cutoff = datetime.combine(as_of + timedelta(days=1), time(hour=0), tzinfo=clock.JAKARTA)
+    return func.coalesce(CrimeIncident.reported_at, CrimeIncident.occurred_at) < cutoff
+
+
+def collect_evidence(
+    session: Session, polsek: str | None = None, as_of: date | None = None
+) -> Evidence:
+    """Mengambil seluruh agregat yang dibutuhkan penilaian dalam beberapa query.
+
+    `as_of` membatasi bukti pada apa yang sudah dilaporkan sampai tanggal itu — lihat
+    `_known_by`. Jendela "terkini" ikut bergeser: 30 hari sebelum `as_of`, bukan sebelum
+    waktu acuan aplikasi.
+    """
     cells = tuple(
         Cell(
             location_id=row[0],
@@ -657,19 +723,25 @@ def collect_evidence(session: Session, polsek: str | None = None) -> Evidence:
             _scoped(
                 select(CrimeIncident.location_id, CrimeIncident.incident_type, func.count())
                 .join(Location, Location.location_id == CrimeIncident.location_id)
+                .where(_known_by(as_of))
                 .group_by(CrimeIncident.location_id, CrimeIncident.incident_type),
                 polsek,
             )
         ).all()
     }
 
-    since, now = clock.window(RECENT_DAYS * 24)
+    if as_of is None:
+        since, now = clock.window(RECENT_DAYS * 24)
+    else:
+        now = datetime.combine(as_of + timedelta(days=1), time(hour=0), tzinfo=clock.JAKARTA)
+        since = now - timedelta(days=RECENT_DAYS)
     recent = {
         (row[0], row[1]): int(row[2])
         for row in session.execute(
             _scoped(
                 select(CrimeIncident.location_id, CrimeIncident.incident_type, func.count())
                 .join(Location, Location.location_id == CrimeIncident.location_id)
+                .where(_known_by(as_of))
                 .where(CrimeIncident.occurred_at > since, CrimeIncident.occurred_at <= now)
                 .group_by(CrimeIncident.location_id, CrimeIncident.incident_type),
                 polsek,
@@ -687,6 +759,7 @@ def collect_evidence(session: Session, polsek: str | None = None) -> Evidence:
                     func.count(),
                 )
                 .join(Location, Location.location_id == CrimeIncident.location_id)
+                .where(_known_by(as_of))
                 # Jam yang tidak tercatat (21,9% data asli) tidak membentuk pola jam.
                 # Tanpa saringan ini NULL ikut dikelompokkan dan `int(None)` di bawah
                 # menjatuhkan seluruh penilaian risiko.
@@ -710,6 +783,7 @@ def collect_evidence(session: Session, polsek: str | None = None) -> Evidence:
                 func.count(),
             )
             .join(Location, Location.location_id == CrimeIncident.location_id)
+            .where(_known_by(as_of))
             .group_by(
                 CrimeIncident.location_id,
                 CrimeIncident.incident_type,
@@ -753,7 +827,9 @@ def collect_evidence(session: Session, polsek: str | None = None) -> Evidence:
                 func.min(CrimeIncident.incident_date),
                 func.max(CrimeIncident.incident_date),
                 func.count(),
-            ).join(Location, Location.location_id == CrimeIncident.location_id),
+            )
+            .join(Location, Location.location_id == CrimeIncident.location_id)
+            .where(_known_by(as_of)),
             polsek,
         )
     ).one()

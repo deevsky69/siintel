@@ -16,17 +16,30 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ...models import Prediction, PredictionActual
-from ...seeding.regenerate import EVALUATED_THREATS
+from ...models import CrimeIncident, Prediction, PredictionActual
+from ...services import risk_engine as risk
 from ..deps import CurrentUser, get_db, require_permission
 
 router = APIRouter(prefix="/evaluation", tags=["evaluasi"])
 
-BASIS = (
-    "Cakupan: kejadian nyata pada periode prediksi untuk jenis ancaman yang diprediksi "
-    f"({', '.join(EVALUATED_THREATS)}). False negative dihitung dari kejadian pada sel "
-    "tanpa prediksi terbit. Aturan pencocokan final belum ditetapkan (U-03)."
-)
+
+def _evaluated_threats() -> tuple[str, ...]:
+    """Jenis yang benar-benar dinilai versi bobot aktif — bukan daftar tetap di kode.
+
+    Sampai 1 Oktober 2026 daftar ini diambil dari konstanta seeder sintetis. Begitu versi
+    aktif menyempit ke tiga jenis data asli, konstanta itu kebetulan masih benar — dan
+    kebetulan bukan dasar yang boleh diandalkan evaluasi.
+    """
+    profile = risk.load_weights().active.profiles.get(risk.PROFILE_HISTORICAL)
+    return () if profile is None else profile.applies_to
+
+
+def evaluation_basis() -> str:
+    return (
+        "Cakupan: kejadian nyata pada periode prediksi untuk jenis ancaman yang diprediksi "
+        f"({', '.join(_evaluated_threats())}). False negative dihitung dari kejadian pada sel "
+        "tanpa prediksi terbit. Aturan pencocokan final belum ditetapkan (U-03)."
+    )
 
 
 def _counts(session: Session) -> dict[str, int]:
@@ -49,17 +62,48 @@ def metrics(
     predicted = hits + false_positives
     actual = hits + false_negatives
 
+    period = session.execute(
+        select(
+            func.min(PredictionActual.evaluation_date), func.max(PredictionActual.evaluation_date)
+        )
+    ).one()
+    threats = _evaluated_threats()
+    unevaluable = 0
+    if period[0] is not None and threats:
+        # Kejadian tanpa jam pada periode evaluasi: tidak dapat ditempatkan pada jendela
+        # mana pun, sehingga tidak masuk HIT/FN. Disebut, bukan disembunyikan (CLAUDE.md §26).
+        unevaluable = (
+            session.scalar(
+                select(func.count())
+                .select_from(CrimeIncident)
+                .where(
+                    CrimeIncident.incident_date >= period[0],
+                    CrimeIncident.incident_date <= period[1],
+                    CrimeIncident.incident_type.in_(threats),
+                    CrimeIncident.time_known.is_(False),
+                )
+            )
+            or 0
+        )
+    thresholds = risk.load_thresholds()
+
     return {
         "hits": hits,
         "false_positives": false_positives,
         "false_negatives": false_negatives,
+        "unevaluable_incidents": unevaluable,
+        "evaluated_from": period[0],
+        "evaluated_to": period[1],
+        "warning_floor": thresholds.minimum_warning_score,
+        "threshold_version": thresholds.version,
+        "threat_types": list(threats),
         # Pembagian nol dijawab None, bukan 0: "tidak dapat dihitung" berbeda maknanya
         # dari "nilainya nol".
         "precision": round(hits / predicted, 3) if predicted else None,
         "recall": round(hits / actual, 3) if actual else None,
         "evaluated_rows": sum(counts.values()),
         "status": "PROPOSED",
-        "basis": BASIS,
+        "basis": evaluation_basis(),
     }
 
 
@@ -89,5 +133,5 @@ def summary(
         "per_threat": per_threat,
         "model_versions": list(evaluated_models),
         "status": "PROPOSED",
-        "basis": BASIS,
+        "basis": evaluation_basis(),
     }

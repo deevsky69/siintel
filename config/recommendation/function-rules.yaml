@@ -1,0 +1,52 @@
+# ATURAN FUNGSI REKOMENDASI — PREDIKSI PRESISI
+#
+# Status: PROPOSED — REQUIRES USER APPROVAL.
+#
+# Menjawab satu pertanyaan untuk setiap peringatan dini yang terbit: fungsi mana yang
+# diusulkan bertindak (CLAUDE.md §14: Samapta, Binmas, Intelkam, Reskrim, Lantas).
+# Sebelum 1 Oktober 2026 pertanyaan ini hanya dijawab oleh dataset sintetis; tidak ada
+# kode runtime yang pernah menerbitkan rekomendasi. Berkas ini membuat aturannya terlihat,
+# dapat diuji, dan dapat diganti tanpa menyentuh kode (CLAUDE.md §12).
+#
+# MENGAPA SAMAPTA UNTUK KETIGANYA
+#
+#   Ketiga jenis yang dinilai (Curanmor, Curat, Curas) adalah kejahatan jalanan dan
+#   pencurian yang berulang menurut tempat dan jam. Tindakan PENCEGAHAN yang dapat
+#   diarahkan oleh prediksi "sel X, jendela Y" adalah kehadiran petugas di sana pada jam
+#   itu — patroli dan penjagaan, yaitu fungsi Samapta. Reskrim bekerja SETELAH kejadian,
+#   Binmas bekerja pada jangka panjang. Menugaskan keduanya pada peringatan enam jam ke
+#   depan tidak menjawab peringatannya.
+#
+#   Ini USULAN penyusun teknis, bukan ketentuan: siapa yang berwenang bertindak atas sebuah
+#   peringatan adalah keputusan organisasi (CLAUDE.md §2 C). Mengubahnya di sini — misalnya
+#   Curas ke Reskrim — langsung berlaku pada peringatan berikutnya, tidak pada yang sudah
+#   terbit. Rekomendasi yang sudah terbit tidak ditimpa (U-07).
+#
+# PRIORITAS
+#
+#   Diturunkan dari severity peringatan, bukan ditentukan sendiri: dua angka untuk satu
+#   hal yang sama akan saling bertentangan. Severity WATCH (60–69) tidak pernah terbit
+#   sebagai peringatan pada ambang dummy-v1 (minimum 70), tetapi tetap dipetakan supaya
+#   versi ambang berikutnya tidak menjumpai lubang.
+
+status: PROPOSED
+usulan: 2026-10-01
+
+# Fungsi yang dipakai bila jenis ancaman tidak disebut pada `rules`.
+default_function: SAMAPTA
+
+rules:
+  CURANMOR:
+    function: SAMAPTA
+    action: Tingkatkan patroli dan penjagaan
+  CURAT:
+    function: SAMAPTA
+    action: Tingkatkan patroli dan penjagaan permukiman
+  CURAS:
+    function: SAMAPTA
+    action: Tingkatkan patroli dan penjagaan
+
+priority_by_severity:
+  WATCH: MEDIUM
+  WARNING: HIGH
+  CRITICAL: URGENT

@@ -4,22 +4,30 @@
 tidak pernah masuk repository, tidak pernah ditulis ke berkas seed, dan tidak muncul
 sebagai argumen perintah — dimasukkan lewat prompt tersembunyi.
 
+`backtest` menjalankan evaluasi mundur (`services/backtest.py`) dan menulis
+`predictions` (VALIDATED) + `prediction_actual` untuk satu rentang hari — pekerjaan batch
+yang tidak punya tombol di layar, dan memang tidak perlu punya.
+
 Contoh:
 
     pnpm user:password -- demo.pimpinan
+    uv run python -m prediksi_presisi_api.cli backtest --dari 2026-01-01 --sampai 2026-09-28
 """
 
 from __future__ import annotations
 
 import argparse
 import getpass
+import json
 import sys
+from datetime import date
 
 from sqlalchemy import select
 
 from .db import get_session_factory
 from .models import User
 from .security.passwords import hash_password
+from .services import backtest as backtesting
 
 MINIMUM_LENGTH = 12
 
@@ -68,6 +76,23 @@ def list_users() -> int:
     return 0
 
 
+def run_backtest(start: date, end: date, horizon: str, dry_run: bool) -> int:
+    with get_session_factory()() as session:
+        try:
+            summary = backtesting.run_backtest(
+                session, start, end, horizon=horizon.upper(), write=not dry_run
+            )
+        except backtesting.BacktestError as error:
+            print(str(error), file=sys.stderr)
+            return 1
+        if dry_run:
+            session.rollback()
+        else:
+            session.commit()
+    print(json.dumps(summary.as_dict(), ensure_ascii=False, indent=2))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="predpol", description="Administrasi PREDIKSI PRESISI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -76,11 +101,22 @@ def main(argv: list[str] | None = None) -> int:
     password.add_argument("username")
 
     sub.add_parser("list-users", help="Menampilkan daftar pengguna dan status kredensialnya")
+    backtest = sub.add_parser(
+        "backtest", help="Evaluasi mundur: prediksi H-1 dibandingkan kejadian nyata hari H"
+    )
+    backtest.add_argument("--dari", type=date.fromisoformat, required=True)
+    backtest.add_argument("--sampai", type=date.fromisoformat, required=True)
+    backtest.add_argument("--horizon", default="24H")
+    backtest.add_argument(
+        "--dry-run", action="store_true", help="Menghitung tanpa menulis satu baris pun"
+    )
 
     arguments = parser.parse_args(argv)
 
     if arguments.command == "set-password":
         return set_password(arguments.username)
+    if arguments.command == "backtest":
+        return run_backtest(arguments.dari, arguments.sampai, arguments.horizon, arguments.dry_run)
     return list_users()
 
 

@@ -53,7 +53,7 @@ from typing import Any
 from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session
 
-from ..models import CrimeIncident, Location, RiskScore
+from ..models import CrimeIncident, Location, Prediction, RiskScore
 from ..models.prediction import FORECAST_HORIZONS
 from . import clock
 from . import risk_engine as risk
@@ -61,6 +61,9 @@ from . import risk_engine as risk
 #: Versi **aturan** proyeksi, bukan nama model. Disimpan pada `predictions.model_version`
 #: supaya setiap baris dapat dikembalikan ke aturan yang menghasilkannya.
 RULE_VERSION = "rule-persistence-v1"
+
+#: Pola kode prediksi yang dinomori berurutan.
+CODE_PATTERN = "^PRD-[0-9]+$"
 
 #: Status prediksi. Hanya `PUBLISHED` yang boleh melahirkan peringatan — itulah sebabnya
 #: publikasi adalah tindakan tersendiri, bukan efek samping menjalankan prediksi.
@@ -358,8 +361,18 @@ def collect_baselines(
     return baselines
 
 
+def next_code_number(session: Session) -> int:
+    """Nomor `PRD-xxxxx` berikutnya; dipakai Prediction Center dan evaluasi mundur."""
+    latest = session.scalar(
+        select(func.max(Prediction.code)).where(Prediction.code.regexp_match(CODE_PATTERN))
+    )
+    if latest is None:
+        return 1
+    return int(latest.rsplit("-", 1)[-1]) + 1
+
+
 def collect_support(
-    session: Session, polsek: str | None = None
+    session: Session, polsek: str | None = None, as_of: date | None = None
 ) -> dict[tuple[uuid.UUID, str, str], int]:
     """Kejadian historis per (sel, jenis ancaman, label jendela) — dasar `confidence`.
 
@@ -377,7 +390,7 @@ def collect_support(
             )
             .join(Location, Location.location_id == CrimeIncident.location_id)
             # Jam yang tidak tercatat tidak membentuk pola jam — lihat `time_known`.
-            .where(CrimeIncident.time_known.is_(True))
+            .where(CrimeIncident.time_known.is_(True), risk._known_by(as_of))
             .group_by(
                 CrimeIncident.location_id,
                 CrimeIncident.incident_type,

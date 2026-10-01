@@ -225,7 +225,12 @@ def predictive_outlook(
             select(Location.kecamatan, Prediction.risk_score, Prediction.threat_type)
             .select_from(Prediction)
             .join(Location, Location.location_id == Prediction.location_id)
-            .where(Prediction.forecast_horizon == horizon, Prediction.status != "DRAFT")
+            .where(
+                # PUBLISHED saja: VALIDATED sudah dibandingkan dengan kenyataan dan bukan
+                # lagi pandangan ke depan (lihat map_view.PUBLISHED_PREDICTION_STATUS).
+                Prediction.forecast_horizon == horizon,
+                Prediction.status == "PUBLISHED",
+            )
             .order_by(Prediction.risk_score.desc())
             .limit(1)
         )

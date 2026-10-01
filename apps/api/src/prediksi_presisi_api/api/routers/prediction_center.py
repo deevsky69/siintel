@@ -49,6 +49,8 @@ from ...models import Location, Prediction
 from ...models.prediction import FORECAST_HORIZONS
 from ...services import audit, clock
 from ...services import prediction_engine as engine
+from ...services import risk_engine as risk
+from ...services import warning_issuance as issuance
 from ..deps import (
     CurrentUser,
     get_db,
@@ -186,21 +188,11 @@ def _summary(projection: engine.Projection) -> dict[str, Any]:
 #: Bentuk kode prediksi yang dihasilkan mesin ini. Penomoran hanya melihat kode berbentuk
 #: `PRD-00001`; kode lain yang mungkin ada di tabel tidak ikut menentukan nomor berikutnya,
 #: sehingga satu baris berkode lain tidak dapat menghentikan seluruh penulisan.
-CODE_PATTERN = "^PRD-[0-9]+$"
-
-
-def _next_code_number(session: Session) -> int:
-    latest = session.scalar(
-        select(func.max(Prediction.code)).where(Prediction.code.regexp_match(CODE_PATTERN))
-    )
-    if latest is None:
-        return 1
-    return int(latest.rsplit("-", 1)[-1]) + 1
 
 
 def _persist(session: Session, projection: engine.Projection) -> int:
     """Menulis baris prediksi. Hanya kombinasi yang benar-benar dapat diproyeksikan."""
-    number = _next_code_number(session)
+    number = engine.next_code_number(session)
     written = 0
 
     for forecast in projection.predicted:
@@ -432,6 +424,7 @@ def publish_prediction(
         )
 
     prediction.status = engine.STATUS_PUBLISHED
+    summary = _issue(session, [prediction])
 
     audit.record(
         session,
@@ -440,9 +433,130 @@ def publish_prediction(
         resource_id=prediction.code,
         result=audit.RESULT_SUCCESS,
         user_id=current.user.user_id,
-        detail={"status_before": previous, "status_after": engine.STATUS_PUBLISHED},
+        detail={
+            "status_before": previous,
+            "status_after": engine.STATUS_PUBLISHED,
+            "warnings_issued": summary.warnings_issued,
+            "threshold_version": summary.threshold_version,
+        },
     )
     session.commit()
     session.refresh(prediction)
 
-    return _serialize(prediction)
+    return {**_serialize(prediction), "issuance": summary.as_dict()}
+
+
+def _issue(session: Session, predictions: list[Prediction], *, write: bool = True) -> Any:
+    """Menerbitkan peringatan + rekomendasi; konfigurasi yang rusak dijawab 422, bukan 500."""
+    try:
+        return issuance.issue_for_predictions(session, predictions, write=write)
+    except (issuance.IssuanceError, risk.RiskEngineError) as error:
+        session.rollback()
+        raise ApiError(status.HTTP_422_UNPROCESSABLE_ENTITY, str(error)) from error
+
+
+class PublishRunRequest(BaseModel):
+    """Permintaan mempublikasikan seluruh prediksi DRAFT dari satu penjalanan."""
+
+    prediction_date: date = Field(description="Tanggal prediksi dari penjalanan yang ditinjau.")
+    horizon: str = Field(description=f"Horizon penjalanan: {', '.join(FORECAST_HORIZONS)}.")
+    dry_run: bool = Field(
+        default=True,
+        description=(
+            "Bawaan true: menghitung berapa prediksi yang akan terbit dan berapa peringatan "
+            "yang akan lahir, tanpa mengubah apa pun."
+        ),
+    )
+
+
+PUBLISH_RUN_BASIS = (
+    "Publikasi massal mencakup tepat satu penjalanan (tanggal prediksi + horizon) yang "
+    "ringkasannya sudah ditinjau lewat POST /predictions/run, dan harus dinyatakan sadar "
+    "dengan dry_run=false. Ia tidak menggantikan tinjauan manusia atas peringatan: setiap "
+    "peringatan yang lahir tetap menunggu diterima (acknowledge) dan setiap rekomendasi "
+    "tetap menunggu keputusan komandan."
+)
+
+
+@router.post("/predictions/publish-run", summary="Mempublikasikan satu penjalanan prediksi")
+def publish_run(
+    payload: PublishRunRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("prediction:publish"),
+) -> dict[str, Any]:
+    """`DRAFT` -> `PUBLISHED` untuk seluruh prediksi satu penjalanan, lalu menerbitkan
+    peringatan dini dan rekomendasi bagi yang mencapai ambang.
+
+    Pada data asli satu penjalanan menghasilkan ratusan prediksi; mempublikasikannya satu
+    per satu bukan tinjauan, melainkan pengetikan. Yang ditinjau manusia adalah ringkasan
+    penjalanannya — sebaran skor, jenis, dan jendela — lalu penjalanan itu dipublikasikan
+    sebagai satu pernyataan. Prediksi yang sudah PUBLISHED/VALIDATED tidak disentuh.
+    """
+    _reject_partial_scope(current, "prediction:publish")
+    horizon = payload.horizon.upper()
+    resource_id = f"{payload.prediction_date.isoformat()}/{horizon}"
+
+    drafts = list(
+        session.scalars(
+            select(Prediction)
+            .where(
+                Prediction.prediction_date == payload.prediction_date,
+                Prediction.forecast_horizon == horizon,
+                Prediction.status == engine.STATUS_DRAFT,
+            )
+            .order_by(Prediction.code)
+        ).all()
+    )
+    if not drafts:
+        audit.record(
+            session,
+            action=AUDIT_PUBLISH,
+            resource_type=AUDIT_RESOURCE,
+            resource_id=resource_id,
+            result=audit.RESULT_FAILED,
+            user_id=current.user.user_id,
+            detail={
+                "reason": "tidak ada prediksi DRAFT pada penjalanan ini",
+                "dry_run": payload.dry_run,
+            },
+        )
+        session.commit()
+        raise ApiError(
+            status.HTTP_404_NOT_FOUND,
+            f"Tidak ada prediksi DRAFT untuk tanggal {payload.prediction_date.isoformat()} "
+            f"dengan horizon {horizon}.",
+        )
+
+    if not payload.dry_run:
+        for prediction in drafts:
+            prediction.status = engine.STATUS_PUBLISHED
+    summary = _issue(session, drafts, write=not payload.dry_run)
+
+    audit.record(
+        session,
+        action=AUDIT_PUBLISH,
+        resource_type=AUDIT_RESOURCE,
+        resource_id=resource_id,
+        result=audit.RESULT_SUCCESS,
+        user_id=current.user.user_id,
+        detail={
+            "dry_run": payload.dry_run,
+            "published": 0 if payload.dry_run else len(drafts),
+            "warnings_issued": summary.warnings_issued,
+            "threshold_version": summary.threshold_version,
+        },
+    )
+    session.commit()
+
+    return {
+        "prediction_date": payload.prediction_date,
+        "horizon": horizon,
+        "dry_run": payload.dry_run,
+        "drafts": len(drafts),
+        "published": 0 if payload.dry_run else len(drafts),
+        "issuance": summary.as_dict(),
+        "reference_time": clock.reference_now(),
+        "demo_clock": clock.is_demo_clock(),
+        "publish_run_basis": PUBLISH_RUN_BASIS,
+        "publication_basis": engine.PUBLICATION_BASIS,
+    }
