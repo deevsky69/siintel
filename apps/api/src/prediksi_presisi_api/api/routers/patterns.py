@@ -56,9 +56,13 @@ from sqlalchemy.orm import Session
 from ...models import CrimeIncident, Location
 from ..analysis import (
     DAY_LABELS,
-    HOURS_PER_DAY,
+    HOUR_BLOCK_BASIS,
+    HOUR_BLOCK_HOURS,
+    HOUR_BLOCK_STARTS,
     MAX_THREAT_TYPE_LENGTH,
     TIME_BASIS,
+    hour_block_label,
+    hour_block_of,
     incidents,
     share,
     threat_types,
@@ -147,7 +151,7 @@ def _ranked_distribution(
 def _hour_distribution(
     session: Session, polsek: str | None, threat_type: str, denominator: int
 ) -> dict[str, Any]:
-    """Sebaran 24 jam, urut jam — termasuk jam tanpa kejadian.
+    """Sebaran blok 3 jam, urut jam — termasuk blok tanpa kejadian.
 
     Diurutkan menurut jam, bukan menurut jumlah: jam rawan hanya terbaca bila jam-jam di
     sekitarnya ikut terlihat. Jam berjumlah nol tetap dikirim sebagai nol karena memang
@@ -162,16 +166,32 @@ def _hour_distribution(
         .where(CrimeIncident.time_known.is_(True))
         .group_by(hour)
     )
-    counts = {int(value): int(count) for value, count in session.execute(query).all()}
+    counts: dict[int, int] = {}
+    for value, count in session.execute(query).all():
+        block = hour_block_of(int(value))
+        counts[block] = counts.get(block, 0) + int(count)
+    unknown_time = int(
+        session.scalar(
+            incidents(polsek, threat_type)
+            .with_only_columns(func.count())
+            .where(CrimeIncident.time_known.is_(False))
+        )
+        or 0
+    )
 
     return {
         "id": "hour",
-        "label": "Jam kejadian",
+        "label": f"Blok jam kejadian ({HOUR_BLOCK_HOURS} jam)",
         "ordering": "natural",
         "denominator": denominator,
+        "block_hours": HOUR_BLOCK_HOURS,
+        # Disebut, bukan disembunyikan: penyebut tetap seluruh kejadian, sehingga jumlah
+        # persentase blok tidak mencapai 100% persis sebesar porsi yang jamnya tidak ada.
+        "unknown_time": unknown_time,
+        "block_basis": HOUR_BLOCK_BASIS,
         "buckets": [
-            _bucket(str(index), f"{index:02d}.00", counts.get(index, 0), denominator)
-            for index in range(HOURS_PER_DAY)
+            _bucket(str(start), hour_block_label(start), counts.get(start, 0), denominator)
+            for start in HOUR_BLOCK_STARTS
         ],
     }
 

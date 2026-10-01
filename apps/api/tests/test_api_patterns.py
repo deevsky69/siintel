@@ -183,13 +183,15 @@ def test_when_dimension_matches_direct_sql(client: TestClient, session: Session)
     ]
 
     hours = _distribution(profile, "when", "hour")
-    # Ke-24 jam selalu dikirim, termasuk yang kosong: jam bernilai nol memang nol.
-    assert [row["key"] for row in hours["buckets"]] == [str(index) for index in range(24)]
+    # Kedelapan blok 3 jam selalu dikirim, termasuk yang kosong: blok bernilai nol memang
+    # nol. Blok, bukan jam tunggal — keputusan pemilik proyek 30 September 2026.
+    assert [row["key"] for row in hours["buckets"]] == [str(index) for index in range(0, 24, 3)]
+    assert hours["block_hours"] == 3
     from_db = _counts(
         session,
         """
-        select extract(hour from incident_time)::int, count(*)
-        from crime_incidents where incident_type = :jenis group by 1
+        select (extract(hour from incident_time)::int / 3) * 3, count(*)
+        from crime_incidents where incident_type = :jenis and time_known group by 1
         """,
         jenis="CURANMOR",
     )
@@ -233,15 +235,18 @@ def test_when_dimension_uses_local_time_not_utc(client: TestClient, session: Ses
         text(
             """
             select
-              (select extract(hour from incident_time)::int from crime_incidents
-                where incident_type = :jenis group by 1 order by count(*) desc limit 1),
-              (select extract(hour from occurred_at)::int from crime_incidents
-                where incident_type = :jenis group by 1 order by count(*) desc limit 1)
+              (select (extract(hour from incident_time)::int / 3) * 3 from crime_incidents
+                where incident_type = :jenis and time_known
+                group by 1 order by count(*) desc limit 1),
+              (select (extract(hour from occurred_at)::int / 3) * 3 from crime_incidents
+                where incident_type = :jenis and time_known
+                group by 1 order by count(*) desc limit 1)
             """
         ),
         {"jenis": "CURANMOR"},
     ).one()
 
+    # Blok tersibuk (3 jam), bukan jam tunggal — satuan analitik sejak 30 September 2026.
     assert int(busiest) == local_peak
     assert local_peak != utc_peak, "dataset tidak lagi membedakan WIB dan UTC — uji ini tumpul"
 

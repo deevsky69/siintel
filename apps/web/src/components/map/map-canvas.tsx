@@ -291,8 +291,10 @@ export function MapCanvas({
   /** Kecamatan yang kelurahannya digambar; hanya berarti pada tingkat `kelurahan`. */
   focus?: string | null;
 }) {
+  // Dikunci menurut nama yang DIGAMBAR: kecamatan pada peta Polres, kelurahan pada peta
+  // yang diperbesar. `name` kosong hanya pada bentuk data lama.
   const byName = useMemo(
-    () => new Map(districts.map((district) => [district.kecamatan, district])),
+    () => new Map(districts.map((district) => [district.name ?? district.kecamatan, district])),
     [districts],
   );
 
@@ -406,7 +408,10 @@ export function MapCanvas({
           // Di luar wilayah hukum Polres ini, wilayah digambar tembus pandang: tidak ada
           // datanya, dan warna apa pun akan menyiratkan pengetahuan yang tidak ada.
           const outside = level === "polda" && shape.name !== HOME_AREA;
-          const flat = outside || level === "kelurahan";
+          // Kelurahan DIWARNAI sejak 1 Oktober 2026: sel penilaian pada data asli memang
+          // setingkat kelurahan, jadi warnanya adalah penilaian yang benar-benar dihitung.
+          // Yang tetap tembus pandang hanya wilayah di luar wilayah hukum Polres.
+          const flat = outside;
           // Satuan sendiri diwarnai aksen, bukan warna risiko: pada tingkat ini tidak ada
           // satu skor untuk seluruh Jakarta Selatan, dan memberinya warna dari tangga
           // risiko akan menyatakan penilaian yang tidak pernah dihitung.

@@ -54,9 +54,13 @@ from sqlalchemy.orm import Session
 from ...models import CrimeIncident, IntelligenceReport, Location
 from ..analysis import (
     DAY_LABELS,
-    HOURS_PER_DAY,
+    HOUR_BLOCK_BASIS,
+    HOUR_BLOCK_HOURS,
+    HOUR_BLOCK_STARTS,
     MAX_THREAT_TYPE_LENGTH,
     TIME_BASIS,
+    hour_block_label,
+    hour_block_of,
     incidents,
     share,
     threat_types,
@@ -491,14 +495,14 @@ def time_pattern(
     date_from: date | None = Query(None, description="Tanggal awal (incident_date)"),
     date_to: date | None = Query(None, description="Tanggal akhir (incident_date)"),
 ) -> dict[str, Any]:
-    """Matriks 7 hari x 24 jam — "jam rawan" dilihat bersama harinya.
+    """Matriks 7 hari x 8 blok 3 jam — "jam rawan" dilihat bersama harinya.
 
     Crime Pattern DNA sudah menyajikan sebaran jam dan sebaran hari **secara terpisah**
     untuk satu jenis. Dua sebaran terpisah tidak dapat menjawab pertanyaan yang justru
     menentukan penjadwalan patroli: apakah puncak jam 20.00 itu merata sepanjang pekan atau
     terkumpul pada Sabtu malam. Perkaliannya yang menjawab, dan itu yang ada di sini.
 
-    Seluruh 168 sel dikirim, termasuk yang bernilai nol, dan seluruhnya memakai penyebut
+    Seluruh 56 sel dikirim, termasuk yang bernilai nol, dan seluruhnya memakai penyebut
     yang sama: jumlah kejadian pada seluruh matriks.
     """
     polsek = jurisdiction_filter(current, "analytics:read")
@@ -517,10 +521,18 @@ def time_pattern(
         .where(CrimeIncident.time_known.is_(True))
         .group_by(day, hour)
     )
-    counts = {
-        (int(row_day), int(row_hour)): int(count)
-        for row_day, row_hour, count in session.execute(query).all()
-    }
+    counts: dict[tuple[int, int], int] = {}
+    for row_day, row_hour, count in session.execute(query).all():
+        key = (int(row_day), hour_block_of(int(row_hour)))
+        counts[key] = counts.get(key, 0) + int(count)
+    unknown_time = int(
+        session.scalar(
+            _ranged(incidents(polsek, requested), date_from, date_to)
+            .with_only_columns(func.count())
+            .where(CrimeIncident.time_known.is_(False))
+        )
+        or 0
+    )
 
     rows: list[dict[str, Any]] = []
     for index, name in enumerate(DAY_LABELS):
@@ -528,13 +540,13 @@ def time_pattern(
         cells = [
             {
                 "hour": position,
-                "label": f"{position:02d}.00",
+                "label": hour_block_label(position),
                 "incidents": counts.get((number, position), 0),
                 "share_percent": share(counts.get((number, position), 0), total),
             }
-            for position in range(HOURS_PER_DAY)
+            for position in HOUR_BLOCK_STARTS
         ]
-        day_total = sum(counts.get((number, position), 0) for position in range(HOURS_PER_DAY))
+        day_total = sum(counts.get((number, position), 0) for position in HOUR_BLOCK_STARTS)
         rows.append(
             {
                 "day": number,
@@ -548,17 +560,17 @@ def time_pattern(
     hours = [
         {
             "hour": position,
-            "label": f"{position:02d}.00",
+            "label": hour_block_label(position),
             "incidents": sum(counts.get((number, position), 0) for number in range(1, 8)),
             "share_percent": share(
                 sum(counts.get((number, position), 0) for number in range(1, 8)), total
             ),
         }
-        for position in range(HOURS_PER_DAY)
+        for position in HOUR_BLOCK_STARTS
     ]
 
     peak = max(counts.items(), key=lambda item: (item[1], -item[0][0], -item[0][1]), default=None)
-    cell_count = len(DAY_LABELS) * HOURS_PER_DAY
+    cell_count = len(DAY_LABELS) * len(HOUR_BLOCK_STARTS)
 
     return {
         "threat_type": requested,
@@ -568,6 +580,9 @@ def time_pattern(
         "incidents": total,
         "denominator": total,
         "cells": cell_count,
+        "block_hours": HOUR_BLOCK_HOURS,
+        "unknown_time": unknown_time,
+        "block_basis": HOUR_BLOCK_BASIS,
         "peak_cell": (
             None
             if peak is None or total == 0
@@ -575,13 +590,14 @@ def time_pattern(
                 "day": peak[0][0],
                 "day_label": DAY_LABELS[peak[0][0] - 1],
                 "hour": peak[0][1],
-                "label": f"{DAY_LABELS[peak[0][0] - 1]} {peak[0][1]:02d}.00",
+                "label": f"{DAY_LABELS[peak[0][0] - 1]} {hour_block_label(peak[0][1])}",
                 "incidents": peak[1],
                 "share_percent": share(peak[1], total),
             }
         ),
         "cell_basis": (
-            f"Matriks ini memiliki {cell_count} sel (7 hari x 24 jam) yang berbagi "
+            f"Matriks ini memiliki {cell_count} sel (7 hari x {len(HOUR_BLOCK_STARTS)} blok "
+            f"{HOUR_BLOCK_HOURS} jam) yang berbagi "
             f"{total} kejadian; bila kejadian tersebar rata, tiap sel berisi "
             f"{round(total / cell_count, 1)} kejadian. Angka itu pembanding aritmetika, "
             "bukan ambang: tidak ada sel yang ditandai rawan oleh sistem."

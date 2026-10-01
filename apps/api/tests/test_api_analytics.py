@@ -408,11 +408,12 @@ def test_time_pattern_matrix_matches_direct_sql(client: TestClient, session: Ses
         session,
         """
         select extract(isodow from incident_date)::int || '-' ||
-               extract(hour from incident_time)::int, count(*)
-        from crime_incidents group by 1
+               (extract(hour from incident_time)::int / 3) * 3, count(*)
+        from crime_incidents where time_known group by 1
         """,
     )
-    assert body["cells"] == 7 * 24
+    assert body["cells"] == 7 * 8
+    assert body["block_hours"] == 3
     assert (
         sum(cell["incidents"] for row in body["days"] for cell in row["cells"]) == body["incidents"]
     )
@@ -430,7 +431,8 @@ def test_time_pattern_marginals_match_direct_sql(client: TestClient, session: Se
         str(row["hour"]): row["incidents"] for row in body["hours"] if row["incidents"]
     } == _counts(
         session,
-        "select extract(hour from incident_time)::int, count(*) from crime_incidents group by 1",
+        "select (extract(hour from incident_time)::int / 3) * 3, count(*) "
+        "from crime_incidents where time_known group by 1",
     )
     assert [row["label"] for row in body["days"]] == [
         "Senin",

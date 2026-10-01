@@ -2,7 +2,12 @@ import { EmptyState } from "@/components/data-state";
 import { toHistoricalMonths, toMapLayer, toMapLevel } from "@/components/map/area";
 import { RiskMap } from "@/components/map/risk-map";
 import { Panel } from "@/components/panel";
-import { getAreaDetail, getMapData, resolveSelectedDistrict } from "@/lib/map-data";
+import {
+  getAreaDetail,
+  getKelurahanOverlay,
+  getMapData,
+  resolveSelectedDistrict,
+} from "@/lib/map-data";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +58,13 @@ export default async function PetaPage({
   }
 
   const selected = resolveSelectedDistrict(data, requested);
-  const detail = selected === null ? null : await getAreaDetail(selected);
+  const [detail, overlay] = await Promise.all([
+    selected === null ? null : getAreaDetail(selected),
+    // Lapisan kelurahan hanya diminta saat peta memang diperbesar ke satu kecamatan.
+    level === "kelurahan" && selected !== null
+      ? getKelurahanOverlay(selected, undefined, months)
+      : null,
+  ]);
 
   return (
     <RiskMap
@@ -63,6 +74,7 @@ export default async function PetaPage({
       layer={layer}
       months={months}
       level={level}
+      overlay={overlay}
     />
   );
 }

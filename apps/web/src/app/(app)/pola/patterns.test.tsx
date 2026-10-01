@@ -36,14 +36,16 @@ function ranked(id: string, label: string, buckets: [string, number][]): Pattern
 
 const hours: PatternDistribution = {
   id: "hour",
-  label: "Jam kejadian",
+  label: "Blok jam kejadian (3 jam)",
   ordering: "natural",
   denominator: 464,
-  buckets: Array.from({ length: 24 }, (_, hour) => ({
-    key: String(hour),
-    label: `${String(hour).padStart(2, "0")}.00`,
-    incidents: hour === 20 ? 47 : 0,
-    share_percent: hour === 20 ? 10.1 : 0,
+  block_hours: 3,
+  unknown_time: 12,
+  buckets: Array.from({ length: 8 }, (_, block) => ({
+    key: String(block * 3),
+    label: `${String(block * 3).padStart(2, "0")}.00-${String(block * 3 + 3).padStart(2, "0")}.00`,
+    incidents: block * 3 === 18 ? 47 : 0,
+    share_percent: block * 3 === 18 ? 10.1 : 0,
   })),
 };
 
@@ -198,13 +200,15 @@ describe("layar Crime Pattern DNA", () => {
     expect(rows[1].textContent).toContain("Kunci t");
   });
 
-  it("menampilkan seluruh 24 jam, termasuk jam tanpa kejadian", () => {
+  it("menampilkan seluruh 8 blok 3 jam, termasuk blok tanpa kejadian", () => {
     screenDna();
 
     const when = panel(/^WHEN ·/);
     expect(when.getByText("47 · 10,1% dari 464 kejadian")).toBeDefined();
-    // Dua puluh tiga jam sisanya tetap dikirim sebagai nol, bukan dihilangkan dari daftar.
-    expect(when.getAllByText("0 · 0,0% dari 464 kejadian")).toHaveLength(23);
+    // Tujuh blok sisanya tetap dikirim sebagai nol, bukan dihilangkan dari daftar.
+    expect(when.getAllByText("0 · 0,0% dari 464 kejadian")).toHaveLength(7);
+    // Kejadian tanpa jam disebut, bukan disembunyikan.
+    expect(when.getByText(/12 kejadian tanpa jam tercatat/)).toBeDefined();
   });
 
   it("membawa rentang tanggal pada setiap grid berulang", () => {

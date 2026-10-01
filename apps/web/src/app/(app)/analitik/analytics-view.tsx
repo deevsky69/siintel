@@ -301,13 +301,13 @@ function CompositionPanel({ trend }: { trend: TrendResponse }) {
   );
 }
 
-/** Matriks hari x jam: 168 sel, digambar sebagai kotak berkelas warna tetap. */
+/** Matriks hari x blok jam: 7 x 8 sel (blok 3 jam), digambar sebagai kotak berkelas warna tetap. */
 function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
   const peak = pattern.peak_cell?.incidents ?? 0;
 
   return (
     <Panel
-      title="Hari & Jam Rawan"
+      title="Hari & Blok Jam Rawan"
       className="col-span-12"
       action={
         <span className="text-2xs uppercase tracking-wider text-ink-faint">
@@ -317,13 +317,13 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
       bodyClassName="flex flex-col gap-3"
     >
       {pattern.incidents === 0 ? (
-        <EmptyState label="Tidak ada kejadian pada rentang ini, sehingga matriks hari × jam kosong." />
+        <EmptyState label="Tidak ada kejadian pada rentang ini, sehingga matriks hari × blok jam kosong." />
       ) : (
         <>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] border-separate border-spacing-0.5 text-left">
               <caption className="sr-only">
-                Jumlah kejadian menurut hari dalam pekan dan jam kejadian
+                Jumlah kejadian menurut hari dalam pekan dan blok jam kejadian
               </caption>
               <thead>
                 <tr>
@@ -334,7 +334,7 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
                       scope="col"
                       className="text-center text-2xs font-normal text-ink-faint"
                     >
-                      {hour.hour % 3 === 0 ? String(hour.hour).padStart(2, "0") : ""}
+                      {String(hour.hour).padStart(2, "0")}
                     </th>
                   ))}
                   <th className="stat-label w-12 text-right font-medium">Total</th>
@@ -384,9 +384,17 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
             </p>
           ) : null}
 
+          {pattern.unknown_time ? (
+            <p className="text-2xs leading-relaxed text-ink-faint">
+              {pattern.unknown_time} kejadian pada rentang ini tidak tercatat jamnya pada Laporan
+              Polisi dan tidak masuk sel mana pun; penyebut persentase tetap seluruh kejadian.
+              {pattern.block_basis ? ` ${pattern.block_basis}` : ""}
+            </p>
+          ) : null}
+
           <details>
             <summary className="cursor-pointer text-2xs uppercase tracking-wider text-ink-muted hover:text-accent">
-              Angka per jam, seluruh hari
+              Angka per blok jam, seluruh hari
             </summary>
             <ul className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-0.5 sm:grid-cols-4">
               {pattern.hours.map((hour) => (

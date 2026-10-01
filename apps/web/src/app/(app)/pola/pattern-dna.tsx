@@ -151,6 +151,11 @@ function NaturalDistribution({ distribution }: { distribution: PatternDistributi
           ))}
         </ul>
       </details>
+      {distribution.unknown_time ? (
+        <p className="mt-1 text-2xs leading-relaxed text-ink-faint">
+          {distribution.unknown_time} kejadian tanpa jam tercatat tidak masuk blok mana pun.
+        </p>
+      ) : null}
       <ScaleNote peak={peak} label="jam/hari" />
     </div>
   );

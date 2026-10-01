@@ -84,22 +84,24 @@ const pattern: TimePatternResponse = {
     label,
     incidents: index === 6 ? 21 : 0,
     share_percent: index === 6 ? 21.0 : 0,
-    cells: Array.from({ length: 24 }, (_, hour) => ({
-      hour,
-      label: `${String(hour).padStart(2, "0")}.00`,
-      incidents: index === 6 && hour === 18 ? 21 : 0,
-      share_percent: index === 6 && hour === 18 ? 21.0 : 0,
+    cells: Array.from({ length: 8 }, (_, block) => ({
+      hour: block * 3,
+      label: `${String(block * 3).padStart(2, "0")}.00-${String(block * 3 + 3).padStart(2, "0")}.00`,
+      incidents: index === 6 && block * 3 === 18 ? 21 : 0,
+      share_percent: index === 6 && block * 3 === 18 ? 21.0 : 0,
     })),
   })),
-  hours: Array.from({ length: 24 }, (_, hour) => ({
-    hour,
-    label: `${String(hour).padStart(2, "0")}.00`,
-    incidents: hour === 18 ? 21 : 0,
-    share_percent: hour === 18 ? 21.0 : 0,
+  hours: Array.from({ length: 8 }, (_, block) => ({
+    hour: block * 3,
+    label: `${String(block * 3).padStart(2, "0")}.00-${String(block * 3 + 3).padStart(2, "0")}.00`,
+    incidents: block * 3 === 18 ? 21 : 0,
+    share_percent: block * 3 === 18 ? 21.0 : 0,
   })),
+  block_hours: 3,
+  unknown_time: 4,
   incidents: 100,
   denominator: 100,
-  cells: 168,
+  cells: 56,
   peak_cell: {
     day: 7,
     day_label: "Minggu",
@@ -109,7 +111,7 @@ const pattern: TimePatternResponse = {
     share_percent: 21.0,
   },
   cell_basis:
-    "Matriks ini memiliki 168 sel yang berbagi 100 kejadian; bila tersebar rata, tiap sel berisi 0.6 kejadian. Angka itu pembanding aritmetika, bukan ambang.",
+    "Matriks ini memiliki 56 sel yang berbagi 100 kejadian; bila tersebar rata, tiap sel berisi 1.8 kejadian. Angka itu pembanding aritmetika, bukan ambang.",
   time_basis: "Jam diambil dari kolom incident_time — waktu setempat (WIB).",
   source: SOURCE,
   scope_basis: trend.scope_basis,
@@ -301,7 +303,7 @@ describe("layar Crime Analytics", () => {
     for (const title of [
       "Tren Bulanan",
       "Distribusi Jenis",
-      "Hari & Jam Rawan",
+      "Hari & Blok Jam Rawan",
       "Perbandingan Antarwilayah",
     ]) {
       expect(screen.getByRole("heading", { name: title })).toBeDefined();
@@ -319,24 +321,24 @@ describe("layar Crime Analytics", () => {
     renderView();
 
     expect(panel("Tren Bulanan").getByText(/relatif terhadap bulan terbanyak/)).toBeDefined();
-    expect(panel("Hari & Jam Rawan").getByText(/bukan terhadap ambang/)).toBeDefined();
+    expect(panel("Hari & Blok Jam Rawan").getByText(/bukan terhadap ambang/)).toBeDefined();
   });
 
-  it("menggambar matriks tujuh hari x dua puluh empat jam", () => {
+  it("menggambar matriks tujuh hari x delapan blok 3 jam", () => {
     renderView();
 
-    const rows = panel("Hari & Jam Rawan").getAllByRole("row");
+    const rows = panel("Hari & Blok Jam Rawan").getAllByRole("row");
     // Satu baris kepala + tujuh hari.
     expect(rows.length).toBe(8);
     for (const day of DAY_NAMES) {
-      expect(panel("Hari & Jam Rawan").getByRole("rowheader", { name: day })).toBeDefined();
+      expect(panel("Hari & Blok Jam Rawan").getByRole("rowheader", { name: day })).toBeDefined();
     }
   });
 
   it("menyebut sel terbanyak sebagai fakta, beserta penyebutnya", () => {
     renderView();
 
-    const matrix = panel("Hari & Jam Rawan");
+    const matrix = panel("Hari & Blok Jam Rawan");
     expect(matrix.getByText(/Minggu 18.00/)).toBeDefined();
     // Kalimat puncaknya sendiri yang diperiksa: persentase yang sama juga muncul pada
     // daftar angka per jam, dan keduanya memang menyebut sel yang sama.
@@ -369,7 +371,9 @@ describe("layar Crime Analytics", () => {
     });
 
     expect(panel("Tren Bulanan").getByText(/tidak ada tren untuk digambar/)).toBeDefined();
-    expect(panel("Hari & Jam Rawan").getByText(/matriks hari × jam kosong/)).toBeDefined();
+    expect(
+      panel("Hari & Blok Jam Rawan").getByText(/matriks hari × blok jam kosong/),
+    ).toBeDefined();
     expect(
       panel("Perbandingan Antarwilayah").getByText(/tidak ada wilayah untuk dibandingkan/),
     ).toBeDefined();

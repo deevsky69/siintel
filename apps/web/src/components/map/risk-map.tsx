@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Panel } from "@/components/panel";
-import type { AreaDetail, MapData } from "@/lib/map-data";
+import type { AreaDetail, KelurahanOverlay, MapData } from "@/lib/map-data";
 import { HOME_AREA, shapesAt } from "@/lib/wilayah";
 import type { HistoricalMonths, MapLayer, MapLevel } from "./area";
 import { HISTORICAL_MONTH_LABELS, HISTORICAL_MONTHS, MAP_LAYERS, mapHref } from "./area";
@@ -22,6 +22,7 @@ export function RiskMap({
   layer,
   months,
   level,
+  overlay = null,
 }: {
   data: MapData;
   selected: string | null;
@@ -29,7 +30,17 @@ export function RiskMap({
   layer: MapLayer;
   months: HistoricalMonths;
   level: MapLevel;
+  /** Baris per kelurahan untuk kecamatan terpilih; hanya ada pada tingkat `kelurahan`. */
+  overlay?: KelurahanOverlay | null;
 }) {
+  // Pada tingkat kelurahan kanvas menggambar baris kelurahan, dan skala kepekatan historis
+  // mengikuti puncak antar-kelurahan — bukan puncak antar-kecamatan, yang akan membuat
+  // seluruh kelurahan tampak pucat karena dibandingkan dengan jumlah satu kecamatan utuh.
+  const zoomed = level === "kelurahan" && overlay !== null;
+  const canvasDistricts = zoomed ? overlay.districts : data.districts;
+  const canvasHistorical = zoomed
+    ? { ...data.historical, peakIncidents: overlay.historicalPeakIncidents }
+    : data.historical;
   const district = data.districts.find((row) => row.kecamatan === selected) ?? null;
   const kelurahan = level === "kelurahan" && selected ? shapesAt("kelurahan", selected) : [];
 
@@ -141,10 +152,10 @@ export function RiskMap({
           ) : null}
 
           <MapCanvas
-            districts={data.districts}
+            districts={canvasDistricts}
             layer={layer}
             selected={selected}
-            historical={data.historical}
+            historical={canvasHistorical}
             months={months}
             level={level}
             focus={selected}
@@ -160,10 +171,21 @@ export function RiskMap({
 
           {level === "kelurahan" ? (
             <p className="text-2xs leading-relaxed text-ink-faint">
-              Kelurahan digambar <strong>tanpa warna risiko</strong>. Basis data menyimpan lokasi
-              sampai tingkat kecamatan; mewarnai kelurahan berarti menampilkan penilaian yang belum
-              pernah dibuat. Titik yang tampak pada layer historis adalah lokasi kejadian
-              sesungguhnya.
+              {zoomed ? (
+                <>
+                  Kelurahan diwarnai dari <strong>sel penilaian setingkat kelurahan</strong> —
+                  satuan lokasi pada data Pusiknas. Kelurahan tanpa warna tidak memiliki data pada
+                  layer ini.
+                  {overlay.unassigned.cells > 0 || overlay.unassigned.incidents > 0
+                    ? ` ${overlay.unassigned.incidents} kejadian (${overlay.unassigned.cells} sel) pada kecamatan ini tidak mencantumkan kelurahan pada Laporan Polisi dan hanya terhitung pada angka kecamatan.`
+                    : ""}
+                </>
+              ) : (
+                <>
+                  Kelurahan digambar <strong>tanpa warna</strong>: tidak ada baris setingkat
+                  kelurahan yang dapat ditampilkan untuk kewenangan Anda.
+                </>
+              )}
             </p>
           ) : null}
 

@@ -117,7 +117,7 @@ export default async function DashboardPage({
             })}{" "}
             WIB
           </span>
-          , sesuai rentang dataset sintetis.
+          , sesuai posisi data kejadian terakhir.
         </div>
       ) : null}
 

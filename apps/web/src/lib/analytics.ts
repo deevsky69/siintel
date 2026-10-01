@@ -115,9 +115,14 @@ export type TimePatternResponse = AnalyticsCommon & {
   threat_type: string | null;
   threat_types: ThreatTypeCount[];
   days: TimeRow[];
-  /** Total per jam, gabungan seluruh hari — kolom marginal matriks. */
+  /** Total per blok jam, gabungan seluruh hari — kolom marginal matriks. */
   hours: TimeCell[];
   cells: number;
+  /** Lebar blok jam (3 sejak 30 September 2026); absen pada respons lama = per jam. */
+  block_hours?: number;
+  /** Kejadian pada rentang ini yang jamnya tidak tercatat — tidak ada di sel mana pun. */
+  unknown_time?: number;
+  block_basis?: string;
   peak_cell: {
     day: number;
     day_label: string;

@@ -57,6 +57,8 @@ export type CurrentThreat = {
 
 export type CurrentRiskArea = {
   kecamatan: string;
+  /** Terisi hanya pada `level=kelurahan`; null untuk sel tanpa kelurahan pada Laporan Polisi. */
+  kelurahan?: string | null;
   polsek: string | null;
   risk_score: number;
   risk_class: string | null;
@@ -88,6 +90,7 @@ export type PredictiveThreat = {
 
 export type PredictiveArea = {
   kecamatan: string;
+  kelurahan?: string | null;
   polsek: string | null;
   /** Skor prediksi tertinggi wilayah pada horizon ini. **Tanpa kelas risiko** (U-01). */
   risk_score: number;
@@ -112,6 +115,7 @@ export type PredictiveResponse = {
 
 export type HistoricalArea = {
   kecamatan: string;
+  kelurahan?: string | null;
   polsek: string | null;
   /** Cacah kejadian mentah pada jendela. **Bukan skor, dan tidak berkelas** — lihat basis. */
   incidents: number;
@@ -225,6 +229,12 @@ export type AreaDetail = {
  */
 export type MapDistrict = {
   kecamatan: string;
+  /**
+   * Nama wilayah yang digambar: kecamatan pada peta Polres, kelurahan pada peta yang
+   * diperbesar. Kosong berarti sama dengan `kecamatan` (bentuk lama, sebelum data asli
+   * membawa sel setingkat kelurahan pada 1 Oktober 2026).
+   */
+  name?: string;
   historical: HistoricalArea | null;
   current: CurrentRiskArea | null;
   predictive: PredictiveArea | null;
@@ -285,6 +295,7 @@ export function buildMapData(
     horizon: predictive.horizon,
     districts: shapesAt("kecamatan").map((shape) => ({
       kecamatan: shape.name,
+      name: shape.name,
       historical: historicalByName.get(shape.name) ?? null,
       current: currentByName.get(shape.name) ?? null,
       predictive: predictiveByName.get(shape.name) ?? null,
@@ -359,6 +370,80 @@ export async function getMapData(
   ]);
 
   return buildMapData(current, predictive, historical);
+}
+
+/** Peta yang diperbesar ke satu kecamatan: satu baris per kelurahan, dari ketiga layer. */
+export type KelurahanOverlay = {
+  kecamatan: string;
+  districts: MapDistrict[];
+  /** Sel/kejadian yang kelurahannya tidak tercatat — dihitung pada kecamatan, tak tergambar. */
+  unassigned: { cells: number; incidents: number };
+  historicalPeakIncidents: number;
+  levelBasis: string;
+};
+
+/**
+ * Lapisan kelurahan untuk satu kecamatan.
+ *
+ * Diminta terpisah dari peta Polres, bukan diturunkan darinya: baris kecamatan hanya
+ * menyimpan skor puncaknya, dan membagi satu angka ke 10 kelurahan berarti mengarang
+ * penilaian yang tidak pernah dihitung. Backend yang mengelompokkan ulang sel per kelurahan
+ * (`level=kelurahan`), dan sejak data asli sel itu memang setingkat kelurahan.
+ */
+export async function getKelurahanOverlay(
+  kecamatan: string,
+  horizon: string = MAP_HORIZON,
+  months: number = DEFAULT_HISTORICAL_MONTHS,
+): Promise<KelurahanOverlay> {
+  const scope = `level=kelurahan&kecamatan=${encodeURIComponent(kecamatan)}`;
+  const [current, predictive, historical] = await Promise.all([
+    apiGet<CurrentRiskResponse>(`/map/current-risk?${scope}`),
+    apiGet<PredictiveResponse>(
+      `/map/predictive-heatmap?horizon=${encodeURIComponent(horizon)}&${scope}`,
+    ),
+    apiGet<HistoricalResponse>(
+      `/map/historical?months=${encodeURIComponent(String(months))}&${scope}`,
+    ),
+  ]);
+  return buildKelurahanOverlay(kecamatan, current, predictive, historical);
+}
+
+export function buildKelurahanOverlay(
+  kecamatan: string,
+  current: CurrentRiskResponse,
+  predictive: PredictiveResponse,
+  historical: HistoricalResponse,
+): KelurahanOverlay {
+  const named = <T extends { kelurahan?: string | null }>(areas: T[]) =>
+    new Map(areas.filter((area) => area.kelurahan).map((area) => [area.kelurahan as string, area]));
+  const currentByName = named(current.areas);
+  const predictiveByName = named(predictive.areas);
+  const historicalByName = named(historical.areas);
+
+  return {
+    kecamatan,
+    districts: shapesAt("kelurahan", kecamatan).map((shape) => ({
+      kecamatan,
+      name: shape.name,
+      historical: historicalByName.get(shape.name) ?? null,
+      current: currentByName.get(shape.name) ?? null,
+      predictive: predictiveByName.get(shape.name) ?? null,
+    })),
+    unassigned: {
+      cells: current.areas
+        .filter((area) => !area.kelurahan)
+        .reduce((total, area) => total + area.cell_count, 0),
+      incidents: historical.areas
+        .filter((area) => !area.kelurahan)
+        .reduce((total, area) => total + area.incidents, 0),
+    },
+    historicalPeakIncidents: historical.areas
+      .filter((area) => area.kelurahan)
+      .reduce((peak, area) => Math.max(peak, area.incidents), 0),
+    levelBasis:
+      (current as CurrentRiskResponse & { level_basis?: string }).level_basis ??
+      "Dikelompokkan per kelurahan oleh backend.",
+  };
 }
 
 /**

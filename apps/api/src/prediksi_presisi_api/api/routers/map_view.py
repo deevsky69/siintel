@@ -64,6 +64,37 @@ PUBLISHED_PREDICTION_STATUS = "PUBLISHED"
 #: peringatan yang sudah di-*acknowledge* bukan lagi peringatan yang menunggu tindakan.
 ACTIVE_WARNING_STATUS = "ACTIVE"
 
+#: Tingkat agregasi layer peta. Sejak data asli Pusiknas (1 Oktober 2026) sel master
+#: lokasi adalah KELURAHAN, sehingga peta dapat diwarnai setingkat kelurahan — sebelumnya
+#: grid sintetis hanya dapat dipercaya sampai kecamatan. Kejadian tanpa kelurahan pada
+#: Laporan Polisi (413 dari 8.203) berada pada sel cadangan setingkat kecamatan; pada
+#: tingkat kelurahan sel itu dikembalikan dengan `kelurahan: null`, bukan dibuang.
+MAP_LEVELS = ("kecamatan", "kelurahan")
+LEVEL_BASIS = (
+    "level=kelurahan mengelompokkan sel menurut kelurahan di dalam satu kecamatan "
+    "(parameter kecamatan). Sel yang kelurahannya tidak tercatat pada Laporan Polisi "
+    "dikembalikan sebagai baris dengan kelurahan null — ia tetap dihitung pada kecamatan, "
+    "tetapi tidak dapat digambar sebagai wilayah."
+)
+
+
+def _validated_level(level: str) -> str:
+    requested = level.lower()
+    if requested not in MAP_LEVELS:
+        raise ApiError(
+            status.HTTP_400_BAD_REQUEST,
+            "Tingkat peta tidak dikenal.",
+            details=[{"field": "level", "issue": f"harus salah satu dari {MAP_LEVELS}"}],
+        )
+    return requested
+
+
+def _area_key(kecamatan: str, kelurahan: str | None, level: str) -> tuple[str, str | None]:
+    """Kunci pengelompokan: (kecamatan, kelurahan) pada tingkat kelurahan; selainnya
+    (kecamatan, None)."""
+    return (kecamatan, kelurahan if level == "kelurahan" else None)
+
+
 AGGREGATION_BASIS = (
     "Nilai per kecamatan adalah hasil agregasi sel grid di lapisan API, bukan angka "
     "tersimpan: risk_score = skor tertinggi antar sel, average_risk_score = rata-rata "
@@ -152,15 +183,17 @@ def _single_version(versions: set[str | None]) -> str | None:
     return known[0] if len(known) == 1 else " + ".join(known)
 
 
-def _aggregate_current_risk(rows: list[Any]) -> list[dict[str, Any]]:
-    """Meringkas sel risiko menjadi satu baris per kecamatan."""
-    areas: dict[str, dict[str, Any]] = {}
+def _aggregate_current_risk(rows: list[Any], level: str = "kecamatan") -> list[dict[str, Any]]:
+    """Meringkas sel risiko menjadi satu baris per kecamatan (atau per kelurahan)."""
+    areas: dict[tuple[str, str | None], dict[str, Any]] = {}
 
     for score, location in rows:
+        key = _area_key(location.kecamatan, location.kelurahan, level)
         area = areas.setdefault(
-            location.kecamatan,
+            key,
             {
-                "kecamatan": location.kecamatan,
+                "kecamatan": key[0],
+                "kelurahan": key[1],
                 "polsek": location.polsek,
                 "risk_score": 0,
                 "risk_class": None,
@@ -207,6 +240,7 @@ def _aggregate_current_risk(rows: list[Any]) -> list[dict[str, Any]]:
         result.append(
             {
                 "kecamatan": area["kecamatan"],
+                "kelurahan": area["kelurahan"],
                 "polsek": area["polsek"],
                 "risk_score": int(area["risk_score"]),
                 "risk_class": area["risk_class"],
@@ -234,25 +268,34 @@ def current_risk(
     session: Session = Depends(get_db),
     current: CurrentUser = require_permission("map:read"),
     _risk_reader: CurrentUser = require_permission("risk_score:read"),
+    level: str = Query("kecamatan", description=f"Tingkat agregasi: {', '.join(MAP_LEVELS)}"),
+    kecamatan: str | None = Query(None, description="Batasi ke satu kecamatan"),
 ) -> dict[str, Any]:
-    """Risiko berjalan pada tanggal penilaian terakhir, satu baris per kecamatan.
+    """Risiko berjalan pada tanggal penilaian terakhir, satu baris per kecamatan/kelurahan.
 
     Membutuhkan `map:read` **dan** `risk_score:read` (docs/05 §2.4). Keduanya diperiksa
     sebagai dependency terpisah sehingga penolakan salah satunya tetap tercatat di audit.
     """
+    requested_level = _validated_level(level)
     polsek = _jurisdiction(current, "map:read", "risk_score:read")
     assessment_date = _latest_assessment_date(session, polsek)
 
     areas: list[dict[str, Any]] = []
     if assessment_date is not None:
-        areas = _aggregate_current_risk(_current_risk_rows(session, polsek, assessment_date))
+        areas = _aggregate_current_risk(
+            _current_risk_rows(session, polsek, assessment_date, kecamatan=kecamatan),
+            requested_level,
+        )
 
     return {
         "reference_time": clock.reference_now(),
         "demo_clock": clock.is_demo_clock(),
         "assessment_date": assessment_date,
+        "level": requested_level,
+        "kecamatan": kecamatan,
         "areas": areas,
         "aggregation_basis": AGGREGATION_BASIS,
+        "level_basis": LEVEL_BASIS,
     }
 
 
@@ -262,8 +305,11 @@ def predictive_heatmap(
     current: CurrentUser = require_permission("map:read"),
     _prediction_reader: CurrentUser = require_permission("prediction:read"),
     horizon: str = Query("6H", description="6H, 12H, 24H, 3D, atau 7D"),
+    level: str = Query("kecamatan", description=f"Tingkat agregasi: {', '.join(MAP_LEVELS)}"),
+    kecamatan: str | None = Query(None, description="Batasi ke satu kecamatan"),
 ) -> dict[str, Any]:
-    """Prediksi pada satu horizon, satu baris per kecamatan."""
+    """Prediksi pada satu horizon, satu baris per kecamatan (atau per kelurahan)."""
+    requested_level = _validated_level(level)
     requested = horizon.upper()
     if requested not in FORECAST_HORIZONS:
         raise ApiError(
@@ -284,13 +330,17 @@ def predictive_heatmap(
         .order_by(Prediction.risk_score.desc()),
         polsek,
     )
+    if kecamatan is not None:
+        query = query.where(Location.kecamatan == kecamatan)
 
-    areas: dict[str, dict[str, Any]] = {}
+    areas: dict[tuple[str, str | None], dict[str, Any]] = {}
     for prediction, location in session.execute(query).all():
+        key = _area_key(location.kecamatan, location.kelurahan, requested_level)
         area = areas.setdefault(
-            location.kecamatan,
+            key,
             {
-                "kecamatan": location.kecamatan,
+                "kecamatan": key[0],
+                "kelurahan": key[1],
                 "polsek": location.polsek,
                 # Baris pertama tiap kecamatan sudah merupakan yang berskor tertinggi
                 # karena query diurutkan menurun.
@@ -330,8 +380,11 @@ def predictive_heatmap(
         "reference_time": clock.reference_now(),
         "demo_clock": clock.is_demo_clock(),
         "horizon": requested,
+        "level": requested_level,
+        "kecamatan": kecamatan,
         "areas": ordered,
         "aggregation_basis": PREDICTIVE_BASIS,
+        "level_basis": LEVEL_BASIS,
     }
 
 
@@ -377,6 +430,8 @@ def historical(
     current: CurrentUser = require_permission("map:read"),
     _crime_reader: CurrentUser = require_permission("crime:read"),
     months: int = Query(12, description=f"Panjang jendela, salah satu dari {HISTORICAL_MONTHS}"),
+    level: str = Query("kecamatan", description=f"Tingkat agregasi: {', '.join(MAP_LEVELS)}"),
+    kecamatan: str | None = Query(None, description="Batasi ke satu kecamatan"),
 ) -> dict[str, Any]:
     """Kejadian yang **sudah terjadi**, sebagai bidang warna per kecamatan dan titik lokasi.
 
@@ -396,39 +451,52 @@ def historical(
             details=[{"field": "months", "issue": f"harus salah satu dari {HISTORICAL_MONTHS}"}],
         )
 
+    requested_level = _validated_level(level)
     polsek = _jurisdiction(current, "map:read", "crime:read")
     window_from, window_to = _month_window(months)
 
     def scoped(query: Select[Any]) -> Select[Any]:
-        return _scoped(
+        bounded = _scoped(
             query.join(Location, Location.location_id == CrimeIncident.location_id).where(
                 CrimeIncident.incident_date >= window_from,
                 CrimeIncident.incident_date <= window_to,
             ),
             polsek,
         )
+        return bounded if kecamatan is None else bounded.where(Location.kecamatan == kecamatan)
 
-    areas: dict[str, dict[str, Any]] = {}
-    by_type = session.execute(
-        scoped(
-            select(Location.kecamatan, Location.polsek, CrimeIncident.incident_type, func.count())
+    areas: dict[tuple[str, str | None], dict[str, Any]] = {}
+    by_type_query = scoped(
+        select(
+            Location.kecamatan,
+            Location.kelurahan,
+            Location.polsek,
+            CrimeIncident.incident_type,
+            func.count(),
         )
-        .group_by(Location.kecamatan, Location.polsek, CrimeIncident.incident_type)
-        .order_by(func.count().desc())
+    )
+    by_type = session.execute(
+        by_type_query.group_by(
+            Location.kecamatan, Location.kelurahan, Location.polsek, CrimeIncident.incident_type
+        ).order_by(func.count().desc())
     ).all()
-    for kecamatan, area_polsek, incident_type, count in by_type:
+    for area_kecamatan, area_kelurahan, area_polsek, incident_type, count in by_type:
+        key = _area_key(area_kecamatan, area_kelurahan, requested_level)
         area = areas.setdefault(
-            kecamatan,
+            key,
             {
-                "kecamatan": kecamatan,
+                "kecamatan": key[0],
+                "kelurahan": key[1],
                 "polsek": area_polsek,
                 "incidents": 0,
-                "by_threat_type": [],
+                "by_threat_type": {},
             },
         )
         area["incidents"] += int(count)
-        area["by_threat_type"].append(
-            {"threat_type": incident_type, "incidents": int(count)},
+        # Pada tingkat kecamatan beberapa kelurahan menyumbang jenis yang sama; dijumlahkan,
+        # bukan ditambahkan sebagai baris ganda.
+        area["by_threat_type"][incident_type] = area["by_threat_type"].get(incident_type, 0) + int(
+            count
         )
 
     points = [
@@ -485,9 +553,29 @@ def historical(
         "observed_from": observed_from,
         "observed_to": observed_to,
         "total_incidents": sum(int(area["incidents"]) for area in areas.values()),
-        "areas": sorted(areas.values(), key=lambda item: int(item["incidents"]), reverse=True),
+        "level": requested_level,
+        "kecamatan": kecamatan,
+        "areas": sorted(
+            (
+                {
+                    **area,
+                    "by_threat_type": sorted(
+                        (
+                            {"threat_type": threat, "incidents": total}
+                            for threat, total in area["by_threat_type"].items()
+                        ),
+                        key=lambda item: int(item["incidents"]),
+                        reverse=True,
+                    ),
+                }
+                for area in areas.values()
+            ),
+            key=lambda item: int(item["incidents"]),
+            reverse=True,
+        ),
         "points": points,
         "aggregation_basis": HISTORICAL_BASIS,
+        "level_basis": LEVEL_BASIS,
     }
 
 
