@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
+import { dataSourceLabel } from "@/lib/analytics";
 import type {
   PatternDistribution,
   PatternProfile,
@@ -253,6 +254,9 @@ export function PatternDna({
           <span className="text-2xs uppercase tracking-wider text-ink-faint">
             {source.incidents} kejadian · {formatDate(source.date_from)} –{" "}
             {formatDate(source.date_to)}
+            {dataSourceLabel(source.data_sources)
+              ? ` · ${dataSourceLabel(source.data_sources)}`
+              : ""}
           </span>
         }
         bodyClassName="flex flex-col gap-3"

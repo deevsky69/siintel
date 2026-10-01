@@ -181,7 +181,8 @@ export function locationLabel(row: LocationOption): string {
 /**
  * Tanggal `YYYY-MM-DD` menurut waktu acuan aplikasi, untuk batas atas isian tanggal.
  *
- * Jam acuan demo beku pada 31 Desember 2025 (SDL-16). Memakai tanggal peramban akan
+ * Jam acuan aplikasi dapat dibekukan pada posisi data (SDL-16; sejak data asli: 29
+ * September 2026). Memakai tanggal peramban akan
  * membuat isian yang wajar tampak "di masa depan" bagi backend — atau sebaliknya,
  * mengizinkan tanggal yang pasti ditolak. Backend tetap yang memutuskan; ini hanya agar
  * pemilih tanggal tidak menawarkan hari yang sudah pasti ditolak.

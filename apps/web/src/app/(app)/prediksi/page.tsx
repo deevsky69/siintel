@@ -45,8 +45,8 @@ export default async function PredictionCenterPage({
 
   const [predictions, outlook, profile] = await Promise.all([
     getPredictions({ horizon: filter.horizon ?? undefined, status: filter.status ?? undefined }),
-    // Dipakai hanya untuk waktu acuan aplikasi: dataset berhenti Desember 2025 dan jam
-    // dinding tidak dipakai (SDL-16). Endpoint ini memakai permission yang sama dengan
+    // Dipakai hanya untuk waktu acuan aplikasi: "sekarang" dikunci pada posisi data dan
+    // jam dinding tidak dipakai (SDL-16). Endpoint ini memakai permission yang sama dengan
     // daftar prediksi, sehingga tidak menambah syarat kewenangan bagi layar ini.
     getOutlook(),
     getProfile(),

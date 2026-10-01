@@ -44,7 +44,20 @@ export type AnalyticsSource = {
   incidents: number;
   /** Polsek pengguna bila cakupannya dibatasi wilayah, `null` bila tidak. */
   scope: string | null;
+  /** Asal data menurut barisnya sendiri (crime_incidents.data_source); absen pada respons lama. */
+  data_sources?: { code: string | null; label: string; incidents: number }[];
 };
+
+/** "Pusiknas, posisi 29 September 2026" — atau kosong bila respons tidak menyebut sumber. */
+export function dataSourceLabel(
+  sources: { label: string; incidents: number }[] | undefined,
+): string | null {
+  if (!sources || sources.length === 0) return null;
+  // Sumber terbanyak disebut; varian kecil (mis. tanggal kejadian diisi tanggal lapor)
+  // tetap satu keluarga data yang sama dan tidak perlu memenuhi baris judul.
+  const [main] = [...sources].sort((a, b) => b.incidents - a.incidents);
+  return main.label;
+}
 
 type AnalyticsCommon = {
   incidents: number;

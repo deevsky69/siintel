@@ -63,6 +63,28 @@ export function EvaluationView({
       <StatusNotice status={metrics.status} tone="caution">
         Angka pada halaman ini <strong>belum final</strong>. {metrics.basis}
       </StatusNotice>
+      {metrics.evaluated_from && metrics.evaluated_to ? (
+        <p className="text-xs leading-relaxed text-ink-muted">
+          Periode evaluasi <span className="text-ink">{metrics.evaluated_from}</span> s.d.{" "}
+          <span className="text-ink">{metrics.evaluated_to}</span>
+          {metrics.warning_floor !== undefined
+            ? `; prediksi dihitung "terbit" bila skornya mencapai ${metrics.warning_floor} (ambang versi ${metrics.threshold_version ?? "?"})`
+            : ""}
+          {metrics.threat_types && metrics.threat_types.length > 0
+            ? `; jenis yang dievaluasi ${metrics.threat_types.join(", ")}`
+            : ""}
+          .
+          {metrics.unevaluable_incidents ? (
+            <>
+              {" "}
+              <span className="text-ink">{metrics.unevaluable_incidents} kejadian</span> pada
+              periode ini tidak tercatat jamnya pada Laporan Polisi, sehingga tidak dapat
+              ditempatkan pada jendela mana pun — tidak dihitung terbukti maupun luput, dan disebut
+              di sini supaya tidak hilang dari angka.
+            </>
+          ) : null}
+        </p>
+      ) : null}
 
       <Panel
         title="Prediction vs Actual"

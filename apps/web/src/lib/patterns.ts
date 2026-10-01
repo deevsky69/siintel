@@ -107,6 +107,7 @@ export type PatternDnaResponse = {
     incidents: number;
     /** Polsek pengguna bila cakupannya dibatasi wilayah, `null` bila tidak. */
     scope: string | null;
+    data_sources?: { code: string | null; label: string; incidents: number }[];
   };
   scope_basis: string;
   analysis_basis: string;

@@ -17,6 +17,13 @@ export type EvaluationMetrics = {
   precision: number | null;
   recall: number | null;
   evaluated_rows: number;
+  /** Sejak evaluasi mundur data asli (1 Oktober 2026); absen pada respons lama. */
+  unevaluable_incidents?: number;
+  evaluated_from?: string | null;
+  evaluated_to?: string | null;
+  warning_floor?: number;
+  threshold_version?: string;
+  threat_types?: string[];
   status: string;
   basis: string;
 };

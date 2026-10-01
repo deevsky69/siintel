@@ -61,6 +61,7 @@ from ..analysis import (
     HOUR_BLOCK_STARTS,
     MAX_THREAT_TYPE_LENGTH,
     TIME_BASIS,
+    data_sources,
     hour_block_label,
     hour_block_of,
     incidents,
@@ -415,6 +416,7 @@ def crime_pattern_dna(
             "date_to": date_to,
             "incidents": total,
             "scope": polsek,
+            "data_sources": data_sources(session, polsek),
         },
         "scope_basis": (
             f"Seluruh angka dihitung hanya dari kejadian di wilayah {polsek}."

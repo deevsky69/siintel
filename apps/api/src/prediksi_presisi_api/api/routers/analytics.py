@@ -59,6 +59,7 @@ from ..analysis import (
     HOUR_BLOCK_STARTS,
     MAX_THREAT_TYPE_LENGTH,
     TIME_BASIS,
+    data_sources,
     hour_block_label,
     hour_block_of,
     incidents,
@@ -189,6 +190,7 @@ def _scope_basis(polsek: str | None) -> str:
 
 
 def _source(
+    session: Session,
     table: str,
     first: date | None,
     last: date | None,
@@ -201,6 +203,7 @@ def _source(
         "date_to": last,
         "incidents": total,
         "scope": polsek,
+        "data_sources": data_sources(session, polsek),
     }
 
 
@@ -475,7 +478,7 @@ def crime_trend(
             "penanda bahwa bulan itu 'menonjol' — ambang seperti itu belum ditetapkan. "
             "Bila dua bulan berjumlah sama, yang disebut adalah yang lebih awal."
         ),
-        "source": _source("crime_incidents", first, last, total, polsek),
+        "source": _source(session, "crime_incidents", first, last, total, polsek),
         "scope_basis": _scope_basis(polsek),
         "analysis_basis": ANALYSIS_BASIS,
         "related_analysis_basis": RELATED_ANALYSIS_BASIS,
@@ -603,7 +606,7 @@ def time_pattern(
             "bukan ambang: tidak ada sel yang ditandai rawan oleh sistem."
         ),
         "time_basis": TIME_BASIS,
-        "source": _source("crime_incidents", first, last, total, polsek),
+        "source": _source(session, "crime_incidents", first, last, total, polsek),
         "scope_basis": _scope_basis(polsek),
         "analysis_basis": ANALYSIS_BASIS,
         "related_analysis_basis": RELATED_ANALYSIS_BASIS,
@@ -714,7 +717,7 @@ def spatial_pattern(
             else f"Perbandingan ini mencakup {len(rows)} kecamatan di wilayah Polres."
         ),
         "rate_basis": RATE_BASIS,
-        "source": _source("crime_incidents", first, last, total, polsek),
+        "source": _source(session, "crime_incidents", first, last, total, polsek),
         "scope_basis": _scope_basis(polsek),
         "analysis_basis": ANALYSIS_BASIS,
         "related_analysis_basis": RELATED_ANALYSIS_BASIS,

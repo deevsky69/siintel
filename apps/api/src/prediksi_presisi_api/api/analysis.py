@@ -85,6 +85,43 @@ def share(count: int, denominator: int) -> float:
     return 0.0 if denominator == 0 else round(100 * count / denominator, 1)
 
 
+#: Label sumber data untuk layar, menurut kode `crime_incidents.data_source`. Kode yang
+#: tidak terdaftar ditampilkan apa adanya — bukan disembunyikan.
+DATA_SOURCE_LABELS: dict[str, str] = {
+    "PUSIKNAS-2026-09-29": "Pusiknas, posisi 29 September 2026",
+    "PUSIKNAS-2026-09-29/TANPA-TANGGAL-KEJADIAN": (
+        "Pusiknas, posisi 29 September 2026 (tanggal kejadian diisi tanggal lapor)"
+    ),
+}
+
+
+def data_sources(session: Session, polsek: str | None) -> list[dict[str, Any]]:
+    """Asal data kejadian di dalam cakupan pengguna, beserta jumlah barisnya.
+
+    Sebelum 1 Oktober 2026 seluruh kejadian sintetis dan kolom ini kosong; layar lalu
+    menulis "data dummy" sebagai teks tetap. Sejak data asli, asal data dibaca dari
+    barisnya sendiri supaya layar dan basis data tidak pernah bercerita berbeda.
+    """
+    query = (
+        incidents(polsek)
+        .add_columns(CrimeIncident.data_source, func.count())
+        .group_by(CrimeIncident.data_source)
+        .order_by(func.count().desc())
+    )
+    return [
+        {
+            "code": source,
+            "label": (
+                DATA_SOURCE_LABELS.get(str(source), str(source))
+                if source is not None
+                else "tanpa keterangan sumber"
+            ),
+            "incidents": int(count),
+        }
+        for source, count in session.execute(query).all()
+    ]
+
+
 def threat_types(session: Session, polsek: str | None) -> list[dict[str, Any]]:
     """Jenis gangguan yang ada di dalam cakupan pengguna, beserta jumlahnya."""
     query = (

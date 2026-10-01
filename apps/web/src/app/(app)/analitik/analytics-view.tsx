@@ -7,6 +7,7 @@ import type {
   TimePatternResponse,
   TrendResponse,
 } from "@/lib/analytics";
+import { dataSourceLabel } from "@/lib/analytics";
 import {
   type AnalyticsSelection,
   analyticsHref,
@@ -568,6 +569,9 @@ export function AnalyticsView({
           <span className="text-2xs uppercase tracking-wider text-ink-faint">
             {trend.source.incidents} kejadian · {formatDate(trend.source.date_from)} –{" "}
             {formatDate(trend.source.date_to)}
+            {dataSourceLabel(trend.source.data_sources)
+              ? ` · ${dataSourceLabel(trend.source.data_sources)}`
+              : ""}
           </span>
         }
         bodyClassName="flex flex-col gap-3"
