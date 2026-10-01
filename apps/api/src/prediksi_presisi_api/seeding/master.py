@@ -26,7 +26,7 @@ from sqlalchemy.orm import Session
 from ..models import Location, Permission, PoliceUnit, Role, RolePermission, User
 from . import csv_source as src
 from .errors import SeedError
-from .paths import RBAC_FILE
+from .paths import RBAC_FILE, SAMPLE_DATA_DIR
 from .taxonomy import Taxonomy, load_taxonomy
 
 #: Password akun demo sengaja DIKUNCI, bukan diisi kata sandi yang dapat ditebak.
@@ -113,6 +113,14 @@ def seed_police_units(session: Session, taxonomy: Taxonomy, summary: SeedSummary
     existing = _existing_codes(session, PoliceUnit, PoliceUnit.code)
     inserted = 0
 
+    # Data asli tidak membawa satuan fungsional (Samapta/Reskrim/...) per Polsek, dan
+    # mengarangnya adalah persis yang dilarang. Pada sumber `processed` berkas ini memang
+    # tidak ada: dilewati, dinyatakan, dan panel yang membacanya menampilkan keadaan kosong.
+    if not (src.current_directory() / "police_units.csv").exists():
+        summary.record("police_units", 0, len(existing))
+        summary.note("police_units", "tidak ada pada sumber ini — dilewati")
+        return
+
     for row in src.read_rows("police_units.csv"):
         code = src.required_text(row, "unit_id", "police_units.csv")
         if code in existing:
@@ -136,7 +144,7 @@ def seed_roles(session: Session, summary: SeedSummary) -> None:
     existing = _existing_codes(session, Role, Role.code)
     inserted = 0
 
-    for row in src.read_rows("roles.csv"):
+    for row in src.read_rows("roles.csv", SAMPLE_DATA_DIR):
         code = src.required_text(row, "role_id", "roles.csv")
         if code in existing:
             continue
@@ -172,7 +180,8 @@ def retire_unused_roles(session: Session, summary: SeedSummary) -> None:
     dihapus dengan tegas — bukan diam-diam membuat akun kehilangan kewenangannya.
     """
     declared = {
-        src.required_text(row, "role_id", "roles.csv") for row in src.read_rows("roles.csv")
+        src.required_text(row, "role_id", "roles.csv")
+        for row in src.read_rows("roles.csv", SAMPLE_DATA_DIR)
     }
 
     session.flush()
@@ -316,7 +325,7 @@ def seed_users(session: Session, taxonomy: Taxonomy, summary: SeedSummary) -> No
     current = {user.code: user for user in session.scalars(select(User)).all()}
     reassigned = 0
 
-    for row in src.read_rows("users.csv"):
+    for row in src.read_rows("users.csv", SAMPLE_DATA_DIR):
         code = src.required_text(row, "user_id", "users.csv")
         role_code = src.required_text(row, "role_id", f"users.csv:{code}")
 

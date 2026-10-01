@@ -376,6 +376,8 @@ def collect_support(
                 func.count(),
             )
             .join(Location, Location.location_id == CrimeIncident.location_id)
+            # Jam yang tidak tercatat tidak membentuk pola jam — lihat `time_known`.
+            .where(CrimeIncident.time_known.is_(True))
             .group_by(
                 CrimeIncident.location_id,
                 CrimeIncident.incident_type,

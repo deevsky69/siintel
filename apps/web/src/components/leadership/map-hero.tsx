@@ -5,7 +5,7 @@ import { RiskLegend } from "@/components/map/legend";
 import { MapCanvas } from "@/components/map/map-canvas";
 import { Panel } from "@/components/panel";
 import type { AreaDetail, MapData } from "@/lib/map-data";
-import type { CitizenRow, CrimeRow } from "@/lib/reports";
+import { type CitizenRow, type CrimeRow, jamKejadian } from "@/lib/reports";
 import { RISK_LABELS, RISK_TEXT, riskClassOf } from "@/lib/risk";
 import { HOME_AREA } from "@/lib/wilayah";
 
@@ -220,7 +220,7 @@ function AreaSummary({
         rows={crimes?.map((row) => ({
           key: row.code,
           headline: row.incident_type,
-          meta: `${row.incident_date} ${row.incident_time.slice(0, 5)}`,
+          meta: `${row.incident_date} ${jamKejadian(row)}`,
           tail: row.status ?? null,
         }))}
       />

@@ -154,7 +154,14 @@ def _hour_distribution(
     nol, bukan karena datanya tidak ada.
     """
     hour = cast(func.extract("hour", CrimeIncident.incident_time), Integer).label("jam")
-    query = incidents(polsek, threat_type).add_columns(hour, func.count()).group_by(hour)
+    query = (
+        incidents(polsek, threat_type)
+        .add_columns(hour, func.count())
+        # Jam yang tidak tercatat (21,9% data asli) tidak membentuk pola jam; tanpa ini
+        # NULL ikut dikelompokkan dan `int(None)` menjatuhkan endpoint dengan 500.
+        .where(CrimeIncident.time_known.is_(True))
+        .group_by(hour)
+    )
     counts = {int(value): int(count) for value, count in session.execute(query).all()}
 
     return {

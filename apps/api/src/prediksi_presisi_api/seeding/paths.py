@@ -29,5 +29,9 @@ def find_repo_root(start: Path | None = None) -> Path:
 
 REPO_ROOT = find_repo_root()
 SAMPLE_DATA_DIR = REPO_ROOT / "data" / "sample"
+#: Hasil pipeline impor data ASLI (CLAUDE.md §18). Diabaikan git — repositori ini publik,
+#: dan data resmi tidak pernah masuk ke dalamnya. Berkasnya hanya ada pada mesin yang
+#: menjalankan `scripts/import/pusiknas.py` atas berkas sumber di `data/raw/`.
+PROCESSED_DATA_DIR = REPO_ROOT / "data" / "processed"
 TAXONOMY_FILE = REPO_ROOT / "config" / "taxonomy" / "mappings.yaml"
 RBAC_FILE = REPO_ROOT / "config" / "rbac" / "permissions.yaml"

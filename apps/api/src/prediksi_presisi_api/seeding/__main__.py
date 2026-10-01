@@ -19,11 +19,13 @@ import argparse
 import sys
 
 from ..db import get_session_factory
+from . import csv_source as src
 from .analytics import seed_analytics_data
 from .crime import seed_crime_data
 from .errors import SeedError
 from .master import SeedSummary, seed_master_data
 from .operational import seed_operational_data
+from .paths import PROCESSED_DATA_DIR
 from .public import seed_public_data
 from .regenerate import regenerate, regenerate_operational, regenerate_public
 from .taxonomy import load_taxonomy
@@ -38,7 +40,38 @@ def main(argv: list[str] | None = None) -> int:
         choices=["master", "crime", "analytics", "operational", "public", "all", "regenerate"],
         help="kelompok data yang dimuat",
     )
+    parser.add_argument(
+        "--source",
+        choices=["sample", "processed"],
+        default="sample",
+        help=(
+            "sample = data sintetis di data/sample (bawaan); processed = data ASLI hasil "
+            "scripts/import/pusiknas.py di data/processed"
+        ),
+    )
     arguments = parser.parse_args(argv)
+
+    # Data asli hanya menyediakan master lokasi dan kejadian. Tujuh tabel sintetis lain
+    # tidak punya sumber asli dan — keputusan pemilik proyek 30 September 2026 — tidak lagi
+    # dimuat: layarnya terisi dari pemakaian nyata, bukan dari karangan. Perintah yang
+    # meminta kelompok itu pada sumber `processed` ditolak terang-terangan.
+    if arguments.source == "processed":
+        if arguments.command in {"analytics", "operational", "public", "regenerate"}:
+            print(
+                f"'{arguments.command}' tidak tersedia pada --source processed: kelompok data "
+                "itu tidak punya sumber asli dan tidak lagi dimuat.",
+                file=sys.stderr,
+            )
+            return 2
+        if not (PROCESSED_DATA_DIR / "crime_incidents.csv").exists():
+            print(
+                f"{PROCESSED_DATA_DIR} belum berisi hasil impor. Jalankan dulu:\n"
+                "  uv run --group analysis python ../../scripts/import/pusiknas.py",
+                file=sys.stderr,
+            )
+            return 2
+        src.use_directory(PROCESSED_DATA_DIR)
+        print(f"Sumber data: ASLI ({PROCESSED_DATA_DIR})")
 
     if arguments.command == "regenerate":
         try:
@@ -65,12 +98,13 @@ def main(argv: list[str] | None = None) -> int:
                 summary.merge(seed_master_data(session, taxonomy))
             if arguments.command in {"crime", "all"}:
                 summary.merge(seed_crime_data(session, taxonomy))
-            if arguments.command in {"analytics", "all"}:
+            sintetis = arguments.source == "sample"
+            if arguments.command in {"analytics", "all"} and sintetis:
                 summary.merge(seed_analytics_data(session, taxonomy))
-            if arguments.command in {"operational", "all"}:
+            if arguments.command in {"operational", "all"} and sintetis:
                 summary.merge(seed_operational_data(session, taxonomy))
             # Setelah analytics: imbauan publik menunjuk early_warnings.
-            if arguments.command in {"public", "all"}:
+            if arguments.command in {"public", "all"} and sintetis:
                 summary.merge(seed_public_data(session, taxonomy))
     except SeedError as error:
         print(f"\nSEED DIHENTIKAN: {error}", file=sys.stderr)

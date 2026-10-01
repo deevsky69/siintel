@@ -108,6 +108,7 @@ def test_local_time_is_stored_as_utc(session: Session) -> None:
     assert incident is not None
     assert incident.occurred_at.astimezone(UTC).hour == 6
     assert incident.occurred_at.astimezone(UTC).minute == 51
+    assert incident.time_known and incident.incident_time is not None
     assert incident.incident_time.hour == 13  # jam lokal dipertahankan untuk analisis jam rawan
 
 

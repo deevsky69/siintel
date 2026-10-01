@@ -107,6 +107,13 @@ def _columns_from_sql(table: str) -> dict[str, bool]:
     for added in re.findall(rf"ALTER TABLE {table} ADD COLUMN (.+?);", _offline_sql()):
         columns[added.split()[0]] = "NOT NULL" not in added
 
+    # Perubahan NULLABILITY lewat migrasi susulan. Tanpa ini, migration 0010 yang membuat
+    # `incident_time` boleh NULL (21,9% data asli tanpa jam) tetap terbaca NOT NULL dari
+    # CREATE TABLE-nya, dan test ini menuduh model menyimpang padahal migrasinya benar.
+    for column, verb in re.findall(
+        rf"ALTER TABLE {table} ALTER COLUMN (\w+) (DROP|SET) NOT NULL", _offline_sql()
+    ):
+        columns[column] = verb == "DROP"
     for dropped in re.findall(rf"ALTER TABLE {table} DROP COLUMN (\w+)", _offline_sql()):
         columns.pop(dropped, None)
 

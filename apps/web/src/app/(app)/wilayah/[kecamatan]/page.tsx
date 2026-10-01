@@ -3,7 +3,7 @@ import { EmptyState } from "@/components/data-state";
 import { DistrictDetail } from "@/components/map/district-detail";
 import { Panel } from "@/components/panel";
 import { getAreaDetail, MAP_HORIZON } from "@/lib/map-data";
-import { getCrimes } from "@/lib/reports";
+import { getCrimes, jamKejadian } from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
 
@@ -105,7 +105,7 @@ export default async function WilayahDetailPage({
                           <td className="py-1.5 pr-3 whitespace-nowrap text-ink-muted">
                             {row.incident_date}{" "}
                             <span className="font-mono text-2xs text-ink-faint">
-                              {row.incident_time.slice(0, 5)}
+                              {jamKejadian(row)}
                             </span>
                           </td>
                           <td className="py-1.5 pr-3 text-ink">{row.incident_type}</td>

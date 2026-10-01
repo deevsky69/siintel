@@ -21,11 +21,28 @@ SOURCE_TIMEZONE = ZoneInfo("Asia/Jakarta")
 _DATETIME_FORMATS = ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M")
 
 
+#: Direktori bawaan untuk `read_rows` bila pemanggil tidak menyebutnya. Diubah lewat
+#: `use_directory` oleh perintah seed `--source processed`, supaya SELURUH pembaca data
+#: kejadian dan lokasi berpindah ke hasil impor data asli tanpa satu per satu diubah.
+#: Yang tidak boleh ikut berpindah — roles, users — menyebut direktorinya secara eksplisit.
+_default_directory: Path = SAMPLE_DATA_DIR
+
+
+def use_directory(directory: Path) -> None:
+    """Mengarahkan pembaca bawaan ke direktori lain (mis. `data/processed`)."""
+    global _default_directory
+    _default_directory = directory
+
+
+def current_directory() -> Path:
+    return _default_directory
+
+
 def read_rows(name: str, directory: Path | None = None) -> list[dict[str, str]]:
     """Membaca satu berkas CSV menjadi daftar baris."""
-    source = (directory or SAMPLE_DATA_DIR) / name
+    source = (directory or _default_directory) / name
     if not source.exists():
-        message = f"berkas data dummy tidak ditemukan: {source}"
+        message = f"berkas data tidak ditemukan: {source}"
         raise SeedError(message)
 
     with source.open(encoding="utf-8", newline="") as handle:

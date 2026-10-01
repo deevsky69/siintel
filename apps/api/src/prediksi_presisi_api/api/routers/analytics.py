@@ -513,6 +513,8 @@ def time_pattern(
     query = (
         _ranged(incidents(polsek, requested), date_from, date_to)
         .add_columns(day, hour, func.count())
+        # Jam yang tidak tercatat tidak membentuk pola jam — lihat `time_known`.
+        .where(CrimeIncident.time_known.is_(True))
         .group_by(day, hour)
     )
     counts = {

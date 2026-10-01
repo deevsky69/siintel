@@ -687,6 +687,10 @@ def collect_evidence(session: Session, polsek: str | None = None) -> Evidence:
                     func.count(),
                 )
                 .join(Location, Location.location_id == CrimeIncident.location_id)
+                # Jam yang tidak tercatat (21,9% data asli) tidak membentuk pola jam.
+                # Tanpa saringan ini NULL ikut dikelompokkan dan `int(None)` di bawah
+                # menjatuhkan seluruh penilaian risiko.
+                .where(CrimeIncident.time_known.is_(True))
                 .group_by(
                     CrimeIncident.incident_type,
                     func.extract("hour", CrimeIncident.incident_time),

@@ -20,6 +20,7 @@ import os
 import uuid
 from collections.abc import Iterator
 from datetime import date
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -513,10 +514,10 @@ def test_map_carries_the_weights_version_that_produced_the_scores(
 # --- Peta: layer historis ---------------------------------------------------------------
 
 
-def _historical(client: TestClient, user: User, months: int = 12) -> dict[str, object]:
+def _historical(client: TestClient, user: User, months: int = 12) -> dict[str, Any]:
     response = client.get(f"/api/v1/map/historical?months={months}", headers=_auth(client, user))
     assert response.status_code == 200, response.text
-    body: dict[str, object] = response.json()
+    body: dict[str, Any] = response.json()
     return body
 
 
@@ -529,8 +530,9 @@ def test_historical_counts_match_the_database(client: TestClient, session: Sessi
     leader = _make_user(session, "Pimpinan")
     body = _historical(client, leader, months=36)
 
-    expected = dict(
-        session.execute(
+    expected: dict[str, int] = {
+        str(name): int(count)
+        for name, count in session.execute(
             select(Location.kecamatan, func.count())
             .select_from(CrimeIncident)
             .join(Location, Location.location_id == CrimeIncident.location_id)
@@ -540,13 +542,13 @@ def test_historical_counts_match_the_database(client: TestClient, session: Sessi
             )
             .group_by(Location.kecamatan)
         ).all()
-    )
+    }
 
     # Tanpa penegasan ini perbandingan di bawah lulus ketika keduanya kosong — dan
     # endpoint yang tidak mengembalikan apa pun akan terbaca sebagai endpoint yang benar.
     assert expected, "data dummy tidak memuat kejadian pada jendela 36 bulan"
 
-    areas = {area["kecamatan"]: area["incidents"] for area in body["areas"]}  # type: ignore[index,union-attr]
+    areas = {area["kecamatan"]: area["incidents"] for area in body["areas"]}
     assert areas == {name: int(count) for name, count in expected.items()}
     assert body["total_incidents"] == sum(expected.values())
 
@@ -567,7 +569,7 @@ def test_historical_window_excludes_what_falls_outside_it(
     assert date.fromisoformat(str(narrow["window_from"])) > date.fromisoformat(
         str(wide["window_from"])
     )
-    assert int(narrow["total_incidents"]) <= int(wide["total_incidents"])  # type: ignore[arg-type]
+    assert int(narrow["total_incidents"]) <= int(wide["total_incidents"])
 
     observed_from = narrow["observed_from"]
     if observed_from is not None:
@@ -595,7 +597,7 @@ def test_historical_points_carry_coordinates_and_add_up(
         assert point["incidents"] >= 1
         assert point["location_code"]
 
-    assert sum(int(point["incidents"]) for point in points) == int(body["total_incidents"])  # type: ignore[arg-type]
+    assert sum(int(point["incidents"]) for point in points) == int(body["total_incidents"])
 
 
 def test_historical_never_reports_a_risk_class(client: TestClient, session: Session) -> None:
@@ -641,14 +643,14 @@ def test_historical_is_limited_to_the_users_jurisdiction(
     body = _historical(client, officer, months=36)
 
     assert body["areas"], "pengguna Polsek harus tetap melihat wilayahnya sendiri"
-    assert {area["polsek"] for area in body["areas"]} == {scoped_polsek}  # type: ignore[index,union-attr]
+    assert {area["polsek"] for area in body["areas"]} == {scoped_polsek}
 
     allowed = set(
         session.scalars(
             select(Location.kecamatan).where(Location.polsek == scoped_polsek).distinct()
         ).all()
     )
-    assert {point["kecamatan"] for point in body["points"]} <= allowed  # type: ignore[index,union-attr]
+    assert {point["kecamatan"] for point in body["points"]} <= allowed
 
 
 def test_historical_requires_both_gates(client: TestClient, session: Session) -> None:

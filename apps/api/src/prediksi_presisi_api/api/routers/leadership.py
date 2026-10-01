@@ -555,6 +555,8 @@ def _peak_hour_band(session: Session, polsek: str | None, kecamatan: str, days: 
                 Location.kecamatan == kecamatan,
                 CrimeIncident.incident_date >= since,
                 CrimeIncident.incident_date <= today,
+                # Jam yang tidak tercatat tidak membentuk pola jam — lihat `time_known`.
+                CrimeIncident.time_known.is_(True),
             )
             .group_by(func.extract("hour", CrimeIncident.incident_time)),
             polsek,

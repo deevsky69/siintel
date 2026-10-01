@@ -105,7 +105,13 @@ def list_crimes(
                 "incident_type": incident.incident_type,
                 "occurred_at": incident.occurred_at,
                 "incident_date": incident.incident_date,
-                "incident_time": incident.incident_time.isoformat(),
+                # None bila jam tidak tercatat pada Laporan Polisi (21,9% data asli).
+                # Sebelum data asli masuk, baris ini memanggil `.isoformat()` tanpa syarat
+                # dan akan menjatuhkan seluruh daftar kejadian dengan 500.
+                "incident_time": (
+                    incident.incident_time.isoformat() if incident.time_known else None
+                ),
+                "time_known": incident.time_known,
                 "location_type": incident.location_type,
                 "modus": incident.modus,
                 "target_type": incident.target_type,

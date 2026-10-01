@@ -3,7 +3,7 @@ import { Panel } from "@/components/panel";
 import { ReportFilters } from "@/components/reports/report-filters";
 import { StatusForm } from "@/components/reports/status-form";
 import { getEntryOptions } from "@/lib/data-entry";
-import { getCrimes } from "@/lib/reports";
+import { getCrimes, jamKejadian } from "@/lib/reports";
 import { changeCrimeStatus } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -154,9 +154,7 @@ export default async function LaporanPetugasPage({
                     <td className="py-1.5 pr-3 font-mono text-2xs text-ink-muted">{row.code}</td>
                     <td className="py-1.5 pr-3 whitespace-nowrap">
                       <span className="text-ink">{row.incident_date}</span>{" "}
-                      <span className="font-mono text-2xs text-ink-faint">
-                        {row.incident_time.slice(0, 5)}
-                      </span>
+                      <span className="font-mono text-2xs text-ink-faint">{jamKejadian(row)}</span>
                     </td>
                     <td className="py-1.5 pr-3 text-ink">{row.incident_type}</td>
                     <td className="py-1.5 pr-3 text-ink-muted">

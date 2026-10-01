@@ -34,9 +34,19 @@
 # versi berstatus FINAL yang namanya berbunyi "proposed" tampil di layar Entri Data sebagai
 # dua pernyataan yang bertentangan. Tidak ada baris tersimpan yang merujuk nama ini, jadi
 # penggantiannya tidak memutus ketertelusuran apa pun.
-version: taksonomi-2026-09-01
+# VERSI 2 — 1 Oktober 2026, menyertai pergantian ke data kejadian asli Pusiknas (keputusan
+# pemilik proyek 30 September 2026). Versi 1 ditetapkan 9 September 2026 atas data sintetis;
+# baris-baris sintetis itu dihapus bersama pergantian ini, sehingga tidak ada baris tersimpan
+# yang merujuk versi 1 lagi.
+#
+# Yang berubah hanya PENAMBAHAN dua domain yang dibawa Laporan Polisi asli — `data_group`
+# dan `report_source`. Daftar `incident_type` TIDAK dipangkas ke tiga jenis yang ada pada
+# data: taksonomi ini juga dipakai formulir entri petugas, dan petugas tetap boleh mencatat
+# tawuran atau unjuk rasa. Bahwa data asli hanya memuat Curanmor, Curat, dan Curas adalah
+# sifat DATANYA, dan layar menyatakannya dari data — bukan dari daftar ini.
+version: taksonomi-2026-10-01
 status: FINAL
-ditetapkan: 2026-09-09
+ditetapkan: 2026-10-01
 
 mappings:
   # Katalog ancaman — lihat docs/16-rancangan-risk-scoring.md §2.
@@ -60,6 +70,21 @@ mappings:
     UNJUK_RASA: UNJUK_RASA
     Keramaian: KERAMAIAN
     KERAMAIAN: KERAMAIAN
+
+  # Pembagian latih/uji — ditetapkan PEMILIK DATA (Pusiknas), bukan oleh sistem ini:
+  # data latih = laporan 2023 s.d. 2025, data uji = laporan 2026.
+  data_group:
+    Data latih: TRAIN
+    TRAIN: TRAIN
+    Data uji: TEST
+    TEST: TEST
+
+  # Dari mana Laporan Polisi berasal. 99,8% data asli berasal dari laporan masyarakat.
+  report_source:
+    Laporan masyarakat: CITIZEN_REPORT
+    CITIZEN_REPORT: CITIZEN_REPORT
+    Temuan anggota Polri: POLICE_FINDING
+    POLICE_FINDING: POLICE_FINDING
 
   status_crime:
     Dilaporkan: REPORTED

@@ -19,6 +19,7 @@ import os
 import uuid
 from collections.abc import Iterator
 from datetime import date, datetime
+from typing import Any
 from urllib.parse import quote
 
 import pytest
@@ -121,10 +122,10 @@ def _auth(client: TestClient, user: User) -> dict[str, str]:
     return {"Authorization": f"Bearer {user and response.json()['access_token']}"}
 
 
-def _board(client: TestClient, user: User) -> dict[str, object]:
+def _board(client: TestClient, user: User) -> dict[str, Any]:
     response = client.get("/api/v1/dashboard/leadership", headers=_auth(client, user))
     assert response.status_code == 200, response.text
-    body: dict[str, object] = response.json()
+    body: dict[str, Any] = response.json()
     return body
 
 
@@ -166,8 +167,7 @@ def test_reports_24h_counts_each_kind_against_the_database(
     assert reports["citizen_reports"] == int(citizen or 0)
     assert reports["intelligence_reports"] == int(intelligence or 0)
     assert reports["total"] == sum(
-        int(reports[key])  # type: ignore[arg-type]
-        for key in ("crime_incidents", "citizen_reports", "intelligence_reports")
+        int(reports[key]) for key in ("crime_incidents", "citizen_reports", "intelligence_reports")
     )
 
 

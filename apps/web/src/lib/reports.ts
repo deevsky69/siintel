@@ -15,7 +15,9 @@ export type CrimeRow = {
   incident_type: string;
   occurred_at: string;
   incident_date: string;
-  incident_time: string;
+  /** null bila jam tidak tercatat pada Laporan Polisi — 21,9% data asli Pusiknas. */
+  incident_time: string | null;
+  time_known: boolean;
   location_type: string | null;
   modus: string | null;
   target_type: string | null;
@@ -93,3 +95,10 @@ export const getCitizenReports = (query: Query = {}) =>
 
 export const getIntelligenceReports = (query: Query = {}) =>
   apiGet<Page<IntelRow>>(`/intelligence-reports${search(query)}`);
+
+/** Jam kejadian untuk tabel: "13:51", atau tanda bahwa jam memang tidak tercatat. */
+export const JAM_TIDAK_TERCATAT = "jam tidak tercatat";
+
+export function jamKejadian(row: Pick<CrimeRow, "incident_time" | "time_known">): string {
+  return row.time_known && row.incident_time ? row.incident_time.slice(0, 5) : JAM_TIDAK_TERCATAT;
+}

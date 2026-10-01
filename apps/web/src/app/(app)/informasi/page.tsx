@@ -2,7 +2,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { ApiError } from "@/lib/api";
-import { getCitizenReports, getCrimes, getIntelligenceReports } from "@/lib/reports";
+import { getCitizenReports, getCrimes, getIntelligenceReports, jamKejadian } from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +52,7 @@ export default async function InformasiPage() {
               key={row.code}
               code={row.code}
               headline={row.incident_type}
-              when={`${row.incident_date} ${row.incident_time.slice(0, 5)}`}
+              when={`${row.incident_date} ${jamKejadian(row)}`}
               where={row.kecamatan}
               detail={row.modus ?? row.location_type}
             />

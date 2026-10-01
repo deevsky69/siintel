@@ -14,6 +14,7 @@ lapangan, bukan taksonomi berjenjang yang perlu dipetakan (docs/02 §22).
 from __future__ import annotations
 
 import uuid
+from datetime import time
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -74,20 +75,44 @@ def seed_crime_incidents(session: Session, taxonomy: Taxonomy, summary: SeedSumm
 
         where = f"crime_incidents.csv:{code}"
         incident_date = src.parse_date(src.required_text(row, "incident_date", where), where)
-        incident_time = src.parse_time(src.required_text(row, "incident_time", where), where)
+
+        # Jam boleh kosong — 21,9% data asli tidak mencatatnya. Baris itu TIDAK diberi jam
+        # 00:00 diam-diam: `time_known` menandainya, dan `occurred_at` memakai tengah malam
+        # setempat hanya agar hitungan per HARI tetap memuatnya. Pola JAM wajib menyaring
+        # `time_known` (migration 0010).
+        raw_time = src.text(row, "incident_time")
+        incident_time = src.parse_time(raw_time, where) if raw_time else None
+        time_known = incident_time is not None
+
+        raw_reported = src.text(row, "reported_at")
+        latitude = src.text(row, "latitude")
+        longitude = src.text(row, "longitude")
+        lag = src.text(row, "report_lag_hours")
 
         session.add(
             CrimeIncident(
                 code=code,
                 incident_type=taxonomy.require("incident_type", src.text(row, "incident_type")),
-                occurred_at=src.combine(incident_date, incident_time),
+                occurred_at=src.combine(incident_date, incident_time or time(0, 0)),
                 incident_date=incident_date,
                 incident_time=incident_time,
+                time_known=time_known,
                 location_id=_resolve_location(locations, src.text(row, "grid_id"), where),
                 location_type=src.text(row, "location_type"),
                 modus=src.text(row, "modus"),
                 target_type=src.text(row, "target_type"),
                 status=taxonomy.map("status_crime", src.text(row, "status")),
+                # Kolom yang dibawa Laporan Polisi asli; kosong pada data sintetis.
+                reported_at=src.parse_datetime(raw_reported, where) if raw_reported else None,
+                report_lag_hours=float(lag) if lag else None,
+                report_source=taxonomy.map("report_source", src.text(row, "report_source")),
+                receiving_unit=src.text(row, "receiving_unit"),
+                data_group=taxonomy.map("data_group", src.text(row, "data_group")),
+                street=src.text(row, "street"),
+                latitude=float(latitude) if latitude else None,
+                longitude=float(longitude) if longitude else None,
+                grid_500m=src.text(row, "grid_500m"),
+                data_source=src.text(row, "data_source"),
             )
         )
         inserted += 1
@@ -99,6 +124,17 @@ def seed_intelligence_reports(session: Session, taxonomy: Taxonomy, summary: See
     existing = set(session.scalars(select(IntelligenceReport.code)).all())
     locations = location_index(session)
     inserted = 0
+
+    # Tidak punya sumber asli. Pada sumber `processed` berkas ini memang tidak ada:
+
+    # dilewati dan dinyatakan — keputusan pemilik proyek 30 September 2026.
+
+    if not (src.current_directory() / "intelligence_reports.csv").exists():
+        summary.record("intelligence_reports", 0, len(existing))
+
+        summary.note("intelligence_reports", "tidak ada pada sumber ini — dilewati")
+
+        return
 
     for row in src.read_rows("intelligence_reports.csv"):
         code = src.required_text(row, "intelligence_id", "intelligence_reports.csv")
@@ -130,6 +166,17 @@ def seed_patrol_activity(session: Session, summary: SeedSummary) -> None:
     locations = location_index(session)
     units = unit_index(session)
     inserted = 0
+
+    # Tidak punya sumber asli. Pada sumber `processed` berkas ini memang tidak ada:
+
+    # dilewati dan dinyatakan — keputusan pemilik proyek 30 September 2026.
+
+    if not (src.current_directory() / "patrol_activity.csv").exists():
+        summary.record("patrol_activity", 0, len(existing))
+
+        summary.note("patrol_activity", "tidak ada pada sumber ini — dilewati")
+
+        return
 
     for row in src.read_rows("patrol_activity.csv"):
         code = src.required_text(row, "patrol_id", "patrol_activity.csv")
