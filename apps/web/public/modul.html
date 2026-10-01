@@ -1076,6 +1076,7 @@ Selebihnya  terlipat</pre>
         <li><span>Arahkan kursor ke sebuah kecamatan untuk menyorotnya.</span></li>
         <li><span><strong>Klik</strong> kecamatan itu untuk membuka rinciannya di panel kanan.</span></li>
         <li><span>Alamat halaman ikut berubah, sehingga tampilan itu <strong>dapat dibagikan sebagai tautan</strong> — berguna saat paparan.</span></li>
+        <li><span>Tautan <strong>Kelurahan</strong> pada panel memperbesar peta ke satu kecamatan. Sejak data asli (1 Oktober 2026) kelurahan <strong>diwarnai</strong> dari sel penilaian setingkat kelurahan — satuan lokasi pada Laporan Polisi. Kejadian tanpa kelurahan hanya terhitung pada angka kecamatan, dan layar menyebut jumlahnya.</span></li>
       </ol>
 
       <h3>Tiga layer, tiga pertanyaan berbeda</h3>
@@ -1220,9 +1221,18 @@ Selebihnya  terlipat</pre>
 
       <p>
         Menu <strong>Analytics</strong>. Tiga sudut: <strong>tren</strong> per bulan,
-        <strong>matriks hari × jam</strong> untuk melihat jam rawan, dan
+        <strong>matriks hari × blok jam</strong> untuk melihat jam rawan, dan
         <strong>perbandingan antarwilayah</strong>.
       </p>
+      <div class="note">
+        <span class="label">Jam dibaca dalam blok 3 jam</span>
+        <p>
+          Keputusan pemilik proyek 30 September 2026: delapan blok sehari, bukan 24 kolom.
+          Kejadian yang jamnya tidak tercatat pada Laporan Polisi (sekitar seperlima data asli)
+          disebut jumlahnya dan tidak masuk blok mana pun; pada Curat, jam yang tercatat kerap
+          waktu kejadian <em>diketahui</em>, bukan berlangsung.
+        </p>
+      </div>
       <p>
         Bedanya dengan Pattern DNA: yang ini membandingkan <strong>lintas jenis dan lintas
         waktu</strong>, sedangkan DNA memprofilkan <strong>satu jenis</strong> pada lima
@@ -1319,6 +1329,23 @@ Selebihnya  terlipat</pre>
       <p>
         Hanya prediksi terbit yang boleh melahirkan peringatan. Itulah sebabnya publikasi adalah
         tindakan tersendiri — bukan efek samping menjalankan.
+      </p>
+
+      <h3>Yang terjadi saat terbit (sejak 1 Oktober 2026)</h3>
+      <p>
+        Setiap prediksi terbit yang skornya mencapai ambang terbit (70 pada ambang yang berlaku)
+        <strong>melahirkan satu peringatan dini</strong> berstatus ACTIVE dan
+        <strong>satu rekomendasi</strong> berstatus menunggu keputusan. Severity mengikuti tangga
+        ambang yang sama (70–84 WARNING, 85–100 CRITICAL) dan versinya tersimpan pada peringatan.
+        Fungsi yang diusulkan mengikuti aturan <span class="mono">config/recommendation/function-rules.yaml</span>
+        — masih <strong>usulan</strong> (Samapta untuk ketiga jenis), dan layar menyatakannya.
+      </p>
+      <p>
+        Pada data asli satu penjalanan menghasilkan ±830 prediksi, jadi tersedia
+        <strong>publikasi massal per penjalanan</strong> (Administrator): tinjau ringkasan
+        penjalanannya, lalu terbitkan seluruhnya sebagai satu pernyataan. Bawaannya uji-coba yang
+        hanya menghitung berapa peringatan akan lahir. Tinjauan manusia tetap ada — pada peringatan
+        (diterima/ditutup) dan rekomendasi (keputusan Pimpinan).
       </p>
       <div class="note">
         <span class="label">Ini bukan model terlatih</span>
@@ -1545,6 +1572,20 @@ Selebihnya  terlipat</pre>
         Seluruh angka bertanda <span class="mono">PROPOSED</span> karena aturan pencocokan prediksi
         dengan kejadian nyata belum ditetapkan resmi.
       </p>
+
+      <h3>Dari mana angkanya (sejak 1 Oktober 2026)</h3>
+      <p>
+        Angka dihitung oleh <strong>evaluasi mundur</strong> atas data asli: untuk setiap hari pada
+        periode uji (Januari–September 2026), sistem menilai risiko <em>seolah pada hari
+        sebelumnya</em> — hanya dengan kejadian yang <strong>sudah dilaporkan</strong> sampai hari
+        itu — lalu membandingkan prediksi yang mencapai ambang terbit dengan kejadian nyata hari itu
+        pada sel, jenis, dan jendela 6 jam yang sama.
+      </p>
+      <ul>
+        <li>Kejadian yang jamnya tidak tercatat <strong>tidak dapat dicocokkan</strong> dan disebut terpisah sebagai <em>tidak dapat dievaluasi</em> — bukan dihitung luput, bukan dibuang.</li>
+        <li>Layar menyebut periode evaluasi, ambang terbit, jenis yang dievaluasi, dan jumlah yang tak terevaluasi.</li>
+        <li>Hasil pertama (ambang 70, horizon 24H): precision <strong>0,010</strong>, recall <strong>0,259</strong>. Itu temuan, bukan kegagalan: pada ambang itu sistem menerbitkan ±77 peringatan sehari untuk ±4 kejadian sehari. Menetapkan ambang dan aturan pencocokan adalah keputusan pemilik proyek.</li>
+      </ul>
     </section>
 
     <section id="s17">

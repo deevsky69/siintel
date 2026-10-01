@@ -169,6 +169,19 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | Kanal imbauan publik | `/imbauan` — peringatan dini dapat diterbitkan Pimpinan, terbaca tanpa akun (TASK 111) |
 | Penetapan U-01, U-02, U-16, U-22, separuh U-10 | Bobot, ambang, taksonomi, pemetaan status wilayah, dan kewenangan publikasi alert |
 
+### Dikerjakan 30 September – 1 Oktober 2026 — data asli menggantikan data sintetis
+
+| Pekerjaan | Keadaan |
+|---|---|
+| **Impor data resmi Pusiknas** (8.203 LP Curanmor/Curat/Curas, 2023–Sep 2026) | `scripts/import/pusiknas.py`: menolak kolom identitas, membangun 65 lokasi kelurahan + 10 cadangan kecamatan, memeriksa hasilnya terhadap lima lembar rekap resmi dan **menolak menulis** bila ada selisih. Berkas sumber dan hasil di `data/raw/`, `data/processed/` — tidak pernah masuk repo publik |
+| **Skema kejadian jujur pada jam kosong** (migration 0010) | `incident_time` boleh NULL + `time_known`; kolom Laporan Polisi (`reported_at`, `report_lag_hours`, `report_source`, `receiving_unit`, `data_group`, koordinat, `data_source`). Lima pola jam hanya membaca kejadian yang jamnya tercatat |
+| **Tujuh tabel sintetis dihapus** (keputusan pemilik proyek) | Intelijen, patroli, laporan masyarakat, imbauan, umpan balik, keputusan, tindakan: mulai kosong, terisi hanya oleh aplikasi |
+| **Bobot `pusiknas-2026-10-01`** | Angka U-02 utuh, cakupan tiga jenis; tujuh jenis sintetis `outside_scope` |
+| **Rantai PREDIKSI → PERINGATAN → REKOMENDASI disambung** | Sebelumnya tidak ada kode runtime yang menerbitkan peringatan/rekomendasi. Publikasi (tunggal / massal `publish-run`) menerbitkan keduanya dari ambang yang berlaku; fungsi dari `config/recommendation/function-rules.yaml` (PROPOSED) |
+| **Evaluasi mundur** (success criteria #06) | `cli backtest`: bukti dibatasi tanggal lapor, unit sel × jenis × jendela, kejadian tanpa jam dilaporkan terpisah. Hasil TEST Jan–Sep 2026: precision 0,010, recall 0,259 |
+| **Analitik blok 3 jam, peta kelurahan, label sumber data** | Keputusan 30 September 2026; layer peta `level=kelurahan`; "Pusiknas, posisi 29 September 2026" dibaca dari baris data |
+| **Produksi** | Belum diterapkan — `scripts/terapkan-data-asli-produksi.sh` menyiapkan seluruh langkah (cadangan, migrasi, pengosongan, seed, mesin, pemeriksaan) dan menunggu dijalankan pemegang persetujuan |
+
 ### Masih tersisa
 
 | Urutan | Pekerjaan | Alasan |
@@ -177,8 +190,12 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | 2 | Layer **laporan masyarakat** dan **unit patroli** pada peta | Modul §3 menyebut keduanya. Laporan masyarakat punya koordinat dan dapat digambar; posisi unit patroli **tidak ada sumbernya** — `patrol_activity` mencatat kegiatan, bukan posisi berjalan |
 | 3 | Severity minimum publikasi alert (sisa U-10) | Kanalnya berjalan **tanpa** gerbang severity, dan layar menyatakannya |
 | 4 | Ambang peringkat volume laporan | Dipisahkan dari U-22 pada 9 September 2026, masih `PROPOSED` |
-| 5 | Definisi target prediksi & aturan pencocokan evaluasi (U-03) | Menentukan **arti** angka precision/recall yang sudah ditampilkan `/evaluasi` |
+| 5 | Definisi target prediksi & aturan pencocokan evaluasi (U-03) | Evaluasi mundur sudah menghitung dengan aturan `PROPOSED`; hasilnya (precision 0,010 pada ambang 70) menuntut keputusan atas ambang dan/atau aturan pencocokan |
 | 6 | Kunci rilis satuan untuk APK | APK rilis kini ditandatangani **kunci debug** — memadai untuk paparan pada perangkat sendiri, tidak untuk disebarkan |
+| 7 | Faktor konteks pada data asli | `context_factor` hampir seragam antar-kelurahan (tidak ada data POI/kegiatan pada Pusiknas); bobot tidak dibagi ulang karena U-02 FINAL — menunggu pilihan pemilik proyek |
+| 8 | Master satuan (`police_units`) | Daftar unit sintetis dihapus; daftar resmi belum diberikan, sehingga layar Operasi belum dapat mencatat penugasan |
+| 9 | Fungsi yang diusulkan per jenis | `function-rules.yaml` PROPOSED (Samapta untuk ketiganya) |
+| 10 | Konfirmasi perubahan sistem pelaporan 2024 | Tren 3.992 → 1.884 → 1.237 → 1.090 terlalu curam untuk dibaca sebagai penurunan kejahatan semata |
 
 ### Android — keadaan per 9 September 2026
 

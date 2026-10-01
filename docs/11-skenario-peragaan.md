@@ -19,7 +19,8 @@ Dua success criteria yang harus terjawab:
 | Akun utama | `demo.pimpinan` — satu-satunya peran yang boleh **memutuskan rekomendasi** |
 | Akun tindak lanjut | `demo.commandcenter` — satu-satunya peran yang boleh **menerima dan menyelesaikan peringatan** |
 | Akun pembanding | `demo.polsek` — dibatasi Polsek Tebet |
-| Waktu acuan | `DEMO_REFERENCE_TIME` wajib diisi, jika tidak seluruh panel "24 jam terakhir" kosong |
+| Waktu acuan | `DEMO_REFERENCE_TIME=2026-09-29T00:00:00+07:00` — posisi data Pusiknas; kosong berarti panel "24 jam terakhir" membaca rentang sesudah data berakhir |
+| Data | **Asli**: 8.203 Laporan Polisi Curanmor/Curat/Curas Polres Metro Jakarta Selatan, Pusiknas posisi 29 September 2026. Tidak ada lagi data sintetis di tabel kejadian; tabel intelijen, patroli, laporan masyarakat, imbauan, keputusan, dan tindakan **mulai kosong** dan terisi hanya oleh peragaan |
 
 > **Ganti password kedua akun sebelum paparan.** Nilai yang dipakai selama pengembangan
 > harus dianggap bocor (`docs/10` §7.1).
@@ -151,19 +152,25 @@ Buka `/evaluasi`.
 
 **Klaim:** prediksi ini dapat dinilai, bukan hanya ditampilkan.
 
-| Angka | Nilai |
+| Angka | Nilai (evaluasi mundur, TEST Jan–Sep 2026, ambang 70, horizon 24H) |
 |---|---|
-| Precision | 0,397 |
-| Recall | 0,400 |
-| Baris evaluasi | 241 |
+| Precision | 0,010 |
+| Recall | 0,259 |
+| Terbukti / positif palsu / luput | 200 / 20.564 / 571 |
+| Tidak dapat dievaluasi (tanpa jam) | 295 |
 
-Yang layak ditunjuk:
+Angka ini **hasil hitung atas data asli**, bukan angka pajangan — dan justru itu yang
+layak dikatakan di depan penguji:
 
-- Seluruh angka bertanda **`PROPOSED`** karena aturan pencocokan prediksi-kejadian belum
-  ditetapkan (U-03). Metrik tanpa definisi pencocokan tidak dapat dipertanggungjawabkan.
-- **Recall dapat dihitung** karena dataset memuat 90 *false negative* — kejadian yang
-  tidak diprediksi. Tanpa baris itu, recall mustahil dihitung dan angka precision saja
-  akan menyesatkan (CLAUDE.md §26).
+- Precision 1% berarti ambang 70 yang berlaku menerbitkan ±77 peringatan sehari untuk
+  ±4 kejadian sehari. Itu bukan kegagalan sistem evaluasi; itu **temuan** yang menuntut
+  keputusan pemilik proyek atas ambang dan aturan pencocokan (U-03). Sistem yang menutupi
+  angka ini tidak dapat dipercaya pada angka lainnya.
+- Bukti tiap hari dibatasi menurut **tanggal lapor** (p90 jarak lapor 3,4 hari), jadi
+  prediksi "H-1" tidak pernah melihat kejadian yang baru diketahui sesudahnya.
+- **Recall dapat dihitung** karena 571 kejadian yang luput dicatat sebagai *false
+  negative* yang menunjuk kejadian nyatanya (CLAUDE.md §26).
+- Seluruh angka bertanda **`PROPOSED`** karena aturan pencocokan belum ditetapkan resmi.
 
 ---
 
@@ -195,7 +202,8 @@ tampak selesai seluruhnya.
 ## 9. YANG HARUS DISIAPKAN SEHARI SEBELUMNYA
 
 - [ ] Password kedua akun demo sudah diganti
-- [ ] `DEMO_REFERENCE_TIME` terisi, dan dashboard menunjukkan angka 24 jam yang tidak nol
+- [ ] `DEMO_REFERENCE_TIME=2026-09-29T00:00:00+07:00`, dan dashboard menunjukkan angka 24 jam yang tidak nol
+- [ ] Penilaian risiko, prediksi 24H, dan publikasi massal sudah dijalankan untuk 29 September 2026 (`scripts/terapkan-data-asli-produksi.sh` langkah 7); Warning Center berisi ±96 peringatan ACTIVE
 - [ ] Satu rekomendasi **sengaja disisakan** berstatus menunggu keputusan untuk diperagakan
 - [ ] Dua jendela peramban sudah masuk sebagai Pimpinan dan Polsek
 - [ ] Sertifikat HTTPS sudah terbit (`docs/10` §5.4)

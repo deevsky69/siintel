@@ -113,7 +113,8 @@ skema OpenAPI aplikasi yang benar-benar berjalan.
 | GET | `/risk-scores/config` | `config:read` — ✅ **ADA** |
 | POST | `/risk-scores/run` | `risk_score:run` — ✅ **ADA** |
 | POST | `/predictions/run` | `prediction:run` — ✅ **ADA** |
-| POST | `/predictions/{code}/publish` | `prediction:publish` — ✅ **ADA** |
+| POST | `/predictions/{code}/publish` | `prediction:publish` — ✅ **ADA**; sejak 1 Oktober 2026 juga **menerbitkan peringatan + rekomendasi** bila skor mencapai ambang terbit (respons membawa `issuance`) |
+| POST | `/predictions/publish-run` | `prediction:publish` — ✅ **ADA** (1 Oktober 2026): publikasi massal satu penjalanan (`prediction_date` + `horizon`), `dry_run` bawaan true, menolak akun bercakupan sebagian |
 | POST | `/crimes` | `crime:write` — ✅ **ADA** |
 | POST | `/crimes/{code}/status` | `crime:write` — ✅ **ADA** |
 | POST | `/citizen-reports/{code}/status` | `citizen_report:write` — ✅ **ADA** |
@@ -155,8 +156,8 @@ Audit: `VIEW_SENSITIVE_DATA` untuk detail kejadian, `IMPORT_DATA` untuk impor.
 | GET | `/map/historical` | `map:read`, `crime:read` | ✅ **ADA** — layer historis: cacah per kecamatan **dan** titik lokasi; parameter `months` |
 | GET | `/map/incidents` | `map:read` | ~~Titik kejadian (GeoJSON)~~ — digabung ke `/map/historical` |
 | GET | `/map/historical-heatmap` | `map:read` | ~~Agregasi historis per grid~~ — digabung ke `/map/historical` |
-| GET | `/map/current-risk` | `map:read`, `risk_score:read` | Layer risiko berjalan |
-| GET | `/map/predictive-heatmap` | `map:read`, `prediction:read` | Layer prediktif; parameter `horizon` |
+| GET | `/map/current-risk` | `map:read`, `risk_score:read` | Layer risiko berjalan; `level=kecamatan|kelurahan`, `kecamatan=` (1 Oktober 2026) |
+| GET | `/map/predictive-heatmap` | `map:read`, `prediction:read` | Layer prediktif; parameter `horizon`, `level`, `kecamatan`. Hanya prediksi **PUBLISHED** — VALIDATED milik evaluasi |
 | GET | `/map/area/{kecamatan}` | `map:read` | Rincian wilayah: ancaman berperingkat, jam rawan, riwayat kejadian, peringatan aktif, prediksi + WHY |
 | GET | `/map/grid/{location_id}` | `map:read` | Detail satu sel grid — **belum dibuat** |
 
@@ -204,7 +205,7 @@ mentah dan menyatakannya terbuka lewat `basis`.
 |---|---|---|---|
 | GET | `/analytics/crime-pattern-dna` | `analytics:read` | ✅ **ADA** |
 | GET | `/analytics/trend` | `analytics:read` | ✅ **ADA** |
-| GET | `/analytics/time-pattern` | `analytics:read` | ✅ **ADA** — matriks hari × jam |
+| GET | `/analytics/time-pattern` | `analytics:read` | ✅ **ADA** — matriks hari × **blok 3 jam** (56 sel) sejak 30 September 2026; `unknown_time`, `block_basis`, `source.data_sources` |
 | GET | `/analytics/spatial-pattern` | `analytics:read` | ✅ **ADA** — perbandingan antarkecamatan |
 | GET | `/analytics/location-profile/{location_id}` | `analytics:read` | belum |
 | GET | `/analytics/export` | `analytics:export` | belum |
@@ -368,7 +369,7 @@ Audit: `CREATE_OPERATIONAL_ACTION`, `UPDATE_OPERATIONAL_ACTION`.
 | GET | `/evaluation/metrics` | `evaluation:read` |
 | POST | `/evaluation/run` | `evaluation:run` |
 
-`/evaluation/metrics` mengembalikan precision, recall, false positive, false negative (CLAUDE.md §26) beserta `model_version`, rentang evaluasi, dan **aturan pencocokan yang dipakai**.
+`/evaluation/metrics` mengembalikan precision, recall, false positive, false negative (CLAUDE.md §26) beserta `evaluated_from/to`, `unevaluable_incidents` (kejadian tanpa jam pada periode), `warning_floor`, `threshold_version`, `threat_types` (dari versi bobot aktif), dan **aturan pencocokan yang dipakai** (`basis`). Barisnya ditulis oleh evaluasi mundur `python -m prediksi_presisi_api.cli backtest --dari --sampai` (pekerjaan batch di server, bukan endpoint — `/evaluation/run` tidak dibuat).
 > Selama aturan pencocokan belum ditetapkan (U-03), respons wajib menandai hasil sebagai `PROPOSED` dan tidak boleh disajikan sebagai validasi model final.
 
 ### 2.11 Partisipasi Masyarakat

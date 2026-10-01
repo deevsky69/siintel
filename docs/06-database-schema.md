@@ -58,6 +58,10 @@ pnpm db:rollback   # alembic downgrade -1
 ```
 
 Baseline `0001` hanya mengaktifkan ekstensi `postgis` dan `pgcrypto`; belum ada tabel.
+Revisi terakhir **`0010`** (30 September 2026, data asli): `crime_incidents.incident_time`
+boleh NULL + `time_known`, kolom Laporan Polisi (`reported_at`, `report_lag_hours`,
+`report_source`, `receiving_unit`, `data_group` TRAIN/TEST, `street`, koordinat,
+`grid_500m`, `data_source`). Rinciannya docs/02 §3.
 Tabel inti dibuat mulai TASK 011. Engine dibuat secara *lazy* sehingga mengimpor modul aplikasi
 tidak membuka koneksi — test dan build tidak memerlukan database yang hidup.
 

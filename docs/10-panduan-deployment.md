@@ -650,14 +650,16 @@ Yang wajib diisi:
 | `DEMO_REFERENCE_TIME` | lihat peringatan di bawah |
 | `ACME_EMAIL` | **hanya untuk JALUR B**; boleh dikosongkan pada JALUR A |
 
-**Peringatan tentang `DEMO_REFERENCE_TIME`.** Data sintetis berhenti pada 31 Desember 2025.
-Bila dibiarkan kosong, aplikasi memakai waktu server yang sebenarnya, sehingga seluruh panel
-"24 jam terakhir" dan "peringatan aktif" akan **kosong** saat paparan. Isi dengan waktu di
-dalam rentang data:
+**Peringatan tentang `DEMO_REFERENCE_TIME`.** Data asli Pusiknas berposisi 29 September 2026
+(kejadian terakhir 28 September). Bila dibiarkan kosong, aplikasi memakai waktu server yang
+sebenarnya, sehingga panel "24 jam terakhir" membaca rentang sesudah data berakhir dan
+tampak **kosong**. Isi dengan posisi data:
 
 ```text
-DEMO_REFERENCE_TIME=2025-12-31T21:00:00+07:00
+DEMO_REFERENCE_TIME=2026-09-29T00:00:00+07:00
 ```
+
+(Sampai 30 September 2026 nilainya `2025-12-31T21:00:00+07:00`, akhir dataset sintetis.)
 
 Aplikasi menyatakan terbuka di antarmuka bahwa waktu acuan sedang dipakai — ini transparansi
 yang disengaja (`services/clock.py`), dan justru itu yang membuat klaim tetap dapat
@@ -790,7 +792,27 @@ Periksa hasilnya:
 predpol exec api alembic current
 ```
 
-### 6.2 Mengisi data demo
+### 6.2 Mengisi data
+
+**Data asli (sejak 30 September 2026).** Seluruh langkah — cadangan, migrasi 0010,
+pengosongan data sintetis, seed data asli, mesin penilaian/prediksi/publikasi, evaluasi
+mundur, pemeriksaan — ada pada satu skrip yang berhenti meminta ketikan `LANJUT` sebelum
+langkah yang tidak dapat dibatalkan:
+
+```bash
+bash scripts/terapkan-data-asli-produksi.sh
+```
+
+Prasyaratnya: berkas resmi di `data/raw/` (tidak pernah masuk repo), `data/processed/`
+dibangun oleh `scripts/import/pusiknas.py`, dan `.env.production` berisi
+`DEMO_REFERENCE_TIME` posisi data. Compose produksi memasang `data/processed/` ke
+container API (baca-saja) agar seed dapat dijalankan di dalamnya:
+
+```bash
+predpol exec api python -m prediksi_presisi_api.seeding --source processed all
+```
+
+**Data sintetis (sebelum 30 September 2026 — hanya untuk lingkungan uji):**
 
 ```bash
 predpol exec api python -m prediksi_presisi_api.seeding all

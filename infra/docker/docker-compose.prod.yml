@@ -109,6 +109,11 @@ services:
       # Volume bernama, bukan bind mount ke host: isinya data pribadi, dan menaruhnya di
       # dalam pohon repository mengundangnya ikut ter-commit suatu hari.
       - attachments:/var/lib/predpol/lampiran
+      # Data asli hasil impor (scripts/import/pusiknas.py). Direktori ini tidak pernah
+      # masuk image maupun repo (gitignore); ia dipasang dari server, baca-saja, supaya
+      # `python -m prediksi_presisi_api.seeding --source processed all` dapat dijalankan
+      # di dalam container tanpa menyalin berkas resmi ke mana pun.
+      - ../../data/processed:/app/data/processed:ro
     # `expose` menyatakan port yang dapat dijangkau SESAMA container di jaringan
     # `internal`. Ini bukan `ports:` — tidak ada satu pun port yang dibuka ke host.
     expose:

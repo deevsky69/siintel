@@ -59,12 +59,25 @@
 | incident_type | text/enum | Ya | | Lihat §22 |
 | occurred_at | timestamptz | Ya | | Gabungan `incident_date` + `incident_time` saat import |
 | incident_date | date | Ya | | Dipertahankan untuk agregasi harian |
-| incident_time | time | Ya | | Dipertahankan untuk analisis jam rawan |
+| incident_time | time | **Tidak** | | Jam setempat; **NULL bila Laporan Polisi tidak mencatat jam** (21,9% data asli). Migration 0010 |
+| time_known | boolean | Ya | | `false` berarti `incident_time` NULL dan `occurred_at` memakai 00.00 hanya sebagai penanda hari; pola jam **wajib** menyaring `time_known` (CHECK `time_known_needs_time`) |
 | location_id | uuid | Ya | FK → locations | K-8 |
-| location_type | text | Tidak | | Kategori TKP |
+| location_type | text | Tidak | | Kategori TKP menurut Laporan Polisi (53 nilai pada data asli) |
 | modus | text | Tidak | | |
 | target_type | text | Tidak | | |
 | status | text/enum | Tidak | | Lihat §22 |
+| reported_at | timestamptz | Tidak | | Tanggal lapor (LP). Evaluasi mundur membatasi bukti menurut kolom ini |
+| report_lag_hours | numeric | Tidak | | `reported_at − occurred_at`, jam; p90 pada data asli 3,4 hari |
+| report_source | text/enum | Tidak | | `CITIZEN_REPORT` / `POLICE_FINDING` (§22) |
+| receiving_unit | text | Tidak | | Satuan penerima laporan; 22,5% bukan satuan teritorial TKP |
+| data_group | text/enum | Tidak | | `TRAIN` / `TEST` menurut pembagian resmi Pusiknas (CHECK) |
+| street | text | Tidak | | Nama jalan TKP — bukan identitas |
+| latitude, longitude | numeric | Tidak | | Terisi 17% (hampir seluruhnya 2025–2026) |
+| grid_500m | text | Tidak | | Kode grid 500 m dari sumber, bila ada |
+| data_source | text | Tidak | | `PUSIKNAS-2026-09-29` (+ `/TANPA-TANGGAL-KEJADIAN` untuk 10 baris yang memakai tanggal lapor); layar membaca label sumber dari sini |
+
+> **Yang tidak pernah disimpan**: nama korban/pelapor, NIK, telepon, alamat rumah. Impor
+> menolak kolom semacam itu secara eksplisit (`scripts/import/pusiknas.py`, CLAUDE.md §16).
 
 `polsek`, `kecamatan`, `kelurahan`, `grid_id`, `latitude`, `longitude` **tidak lagi disimpan di tabel ini** (K-8) — tersedia lewat join ke `locations`.
 
@@ -280,7 +293,7 @@ Dataset dummy memakai empat bin 6 jam: `00:00-06:00`, `06:00-12:00`, `12:00-18:0
 
 ## 22. TAKSONOMI & PEMETAAN NILAI
 
-**DITETAPKAN (U-16), 9 September 2026.** Nilai berikut berlaku sebagai taksonomi sistem, versi `taksonomi-2026-09-01`. Tidak ada satu nilai pun yang berubah saat penetapan, sehingga seluruh baris yang sudah tersimpan tetap sah. Pemetaan Indonesia→enum disimpan di `config/taxonomy/` dan diterapkan saat seed/import — canonical schema tidak diubah mengikuti file sumber (CLAUDE.md §18). Menambah nilai baru kini menuntut versi baru, bukan penyuntingan versi ini.
+**DITETAPKAN (U-16), 9 September 2026; versi `taksonomi-2026-10-01` sejak 1 Oktober 2026** — dua domain ditambahkan untuk data asli (`data_group`: Data latih→TRAIN, Data uji→TEST; `report_source`: Laporan masyarakat→CITIZEN_REPORT, Temuan anggota Polri→POLICE_FINDING), tidak ada nilai lama yang berubah. Nilai berikut berlaku sebagai taksonomi sistem. Tidak ada satu nilai pun yang berubah saat penetapan, sehingga seluruh baris yang sudah tersimpan tetap sah. Pemetaan Indonesia→enum disimpan di `config/taxonomy/` dan diterapkan saat seed/import — canonical schema tidak diubah mengikuti file sumber (CLAUDE.md §18). Menambah nilai baru kini menuntut versi baru, bukan penyuntingan versi ini.
 
 > **Tiga baris terakhir tabel di bawah TIDAK ikut ditetapkan** dan memang tidak dipetakan sama sekali. `modus`, `target_type`, dan `location_type` dipertahankan apa adanya sebagai istilah lapangan — keputusan teknis yang mendahului penetapan ini. Akibatnya nyata: `incident_type` yang tidak dikenal **menghentikan** seed, sedangkan `modus` yang tidak dikenal diterima apa adanya. Menutup ketiga daftar itu adalah keputusan tersendiri, dan konsekuensinya seed menolak istilah lapangan yang belum terdaftar.
 
@@ -304,7 +317,9 @@ Dataset dummy memakai empat bin 6 jam: `00:00-06:00`, `06:00-12:00`, `12:00-18:0
 | `function` | Samapta, Binmas, Intelkam, Reskrim, Lantas | SAMAPTA, BINMAS, INTELKAM, RESKRIM, LANTAS |
 | `modus` | 16 nilai (`kunci_t`, `congkel`, `pecah_kaca`, …) | dipertahankan apa adanya (istilah lapangan) |
 | `target_type` | 11 nilai (`motor`, `mobil`, `toko`, …) | dipertahankan apa adanya |
-| `location_type` | Permukiman, Parkiran, Jalan, Pertokoan, Pusat Aktivitas, Fasilitas Publik | dipertahankan apa adanya (kategori TKP) |
+| `location_type` | Permukiman, Parkiran, Jalan, Pertokoan, Pusat Aktivitas, Fasilitas Publik | dipertahankan apa adanya (kategori TKP pada `crime_incidents`; pada data asli 53 nilai LP). **Pada `locations` kolom ini kini jenjang wilayah: `KELURAHAN` / `KECAMATAN`** |
+| `data_group` | Data latih, Data uji | TRAIN, TEST (sejak v2) |
+| `report_source` | Laporan masyarakat, Temuan anggota Polri | CITIZEN_REPORT, POLICE_FINDING (sejak v2) |
 
 **State machine antar status (`PROPOSED`, U-08).** Transisi yang diusulkan — final mengikuti SOP:
 

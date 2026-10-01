@@ -331,16 +331,28 @@ Data quality checks should cover:
 
 # 8. PREDICTION DATA SPLIT
 
-The supplied concept uses:
+**Berlaku sejak data asli (30 September 2026).** Data kejadian resmi Pusiknas (posisi
+29 September 2026; 8.203 Laporan Polisi Curanmor/Curat/Curas, 2023–September 2026) sudah
+membawa pembagiannya sendiri pada kolom `data_group`:
 
-Training:
-2023–2024
+| Kelompok | Isi | Baris |
+|---|---|---|
+| `TRAIN` | laporan sampai 31 Desember 2025 | 7.113 |
+| `TEST` | laporan 1 Januari – 28 September 2026 | 1.090 |
 
-Validation:
-Jan–Sep 2025
+Pembagian itu **diikuti, bukan dibuat ulang**. Evaluasi mundur (`services/backtest.py`,
+`cli backtest`) menilai setiap hari pada periode TEST dengan bukti yang dibatasi menurut
+**tanggal lapor** (`reported_at`) sampai hari sebelumnya — bukan tanggal kejadian — sebab
+p90 jarak lapor pada data ini 3,4 hari; tanpa batas itu penilaian "pada hari H-1" diam-diam
+memakai kejadian yang baru diketahui sesudahnya. Inilah bentuk konkret larangan di bawah.
 
-Holdout:
-Oct–Dec 2025
+Kejadian tanpa jam tercatat (21,9%) tidak dapat ditempatkan pada jendela 6 jam; ia
+dilaporkan terpisah sebagai *tidak dapat dievaluasi*, bukan dihitung luput dan bukan
+dibuang. Aturan pencocokan selengkapnya tetap `PROPOSED` (U-03, §19.2).
+
+> Rancangan awal konsep — latih 2023–2024, validasi Jan–Sep 2025, *holdout* Okt–Des 2025 —
+> dibuat untuk dataset sintetis dan **tidak lagi berlaku**; ia disimpan di sini hanya
+> sebagai jejak asal-usul.
 
 The implementation must not leak future information into training features.
 
@@ -737,6 +749,10 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 | Taksonomi nilai (U-16) | 9 September 2026 | `config/taxonomy/mappings.yaml` versi `taksonomi-2026-09-01`, 20 domain |
 | Prediksi tanpa kelas risiko | 9 September 2026 | Prediksi tetap skor mentah; tangga kelas hanya bagi penilaian keadaan berjalan |
 | Kewenangan publikasi alert publik (separuh U-10) | 9 September 2026 | `public_alert:publish` pada **Pimpinan**, scope ALL. Severity minimumnya masih terbuka |
+| Data asli menggantikan data sintetis | 30 September 2026 | `crime_incidents` + `locations` dari Pusiknas (posisi 29 September 2026) lewat `scripts/import/pusiknas.py`; **ketujuh tabel sintetis dihapus** (intelijen, patroli, laporan masyarakat, imbauan, umpan balik, keputusan, tindakan) — diisi ulang hanya oleh kejadian nyata lewat aplikasi |
+| Jenis ancaman | 30 September 2026 | Mengikuti klasifikasi Laporan Polisi: **CURANMOR, CURAT, CURAS**. Bobot `pusiknas-2026-10-01` = angka U-02 utuh dengan `applies_to` tiga jenis; tujuh jenis rancangan sintetis dinyatakan `outside_scope` |
+| Jendela waktu | 30 September 2026 | Prediksi tetap **6 jam**; analitik menampilkan jam dalam **blok 3 jam** |
+| Taksonomi v2 (U-16) | 1 Oktober 2026 | `taksonomi-2026-10-01`: domain `data_group` dan `report_source` ditambahkan; nilai lama tidak berubah |
 
 Seluruhnya ditetapkan **memakai nilai yang sudah berlaku**, tanpa satu angka pun berubah,
 sehingga baris yang sudah tersimpan tetap sah dan tetap tertelusur. Ditetapkan berarti
@@ -750,7 +766,12 @@ Butir berikut **tidak diinvensi** dan memblokir task tertentu:
 | Item | Memblokir |
 |---|---|
 | **Kriteria** publikasi alert publik — severity minimum (sisa U-10 / P-2) | Kanalnya sudah dibangun 9 September 2026 (TASK 111) dan berjalan **tanpa gerbang severity**, dinyatakan terbuka di setiap responsnya |
-| Definisi target prediksi & aturan pencocokan evaluasi (U-03) | TASK 100–104, 150–151 |
+| Definisi target prediksi & aturan pencocokan evaluasi (U-03) | Evaluasi mundur sudah berjalan dengan aturan `PROPOSED` (sel × jenis × jendela 6 jam). Hasil pada TEST Jan–Sep 2026, ambang 70: **precision 0,010, recall 0,259** (20.764 prediksi tingkat peringatan ≈ 77/hari, 200 terbukti, 571 luput, 295 tak terevaluasi). Angka itu bahan keputusan: ambang, aturan pencocokan, atau keduanya |
+| **Faktor konteks pada data asli** | `context_factor` (bobot 0,10) hampir seragam antar-kelurahan karena `locations.location_type` kini jenjang wilayah, bukan kategori TKP; data POI/kegiatan tidak ada pada Pusiknas. Bobot sengaja tidak dibagi ulang (U-02 FINAL). Pilihan: biarkan, versi bobot baru tanpa konteks, atau sumber konteks resmi |
+| **Fungsi yang diusulkan per jenis ancaman** | `config/recommendation/function-rules.yaml` (`PROPOSED`): Samapta untuk ketiganya. Siapa yang bertindak atas peringatan adalah keputusan organisasi |
+| **Master satuan (`police_units`)** | Kosong sejak data asli: daftar unit sintetis dihapus dan daftar resmi belum diberikan; layar Operasi tidak dapat mencatat penugasan sampai ada |
+| **Perubahan sistem pelaporan 2024?** | Tren tahunan 3.992 → 1.884 → 1.237 → 1.090 (2023–Sep 2026) terlalu curam untuk dibaca sebagai penurunan kejahatan semata; perlu konfirmasi apakah cara pencatatan berubah |
+| **Jam pada Laporan Polisi** | Terutama Curat, jam yang tercatat dapat berupa waktu kejadian *diketahui*; pola jam dibaca dengan catatan itu (dinyatakan di layar) |
 | Ambang peringkat volume laporan (0,70 / 0,40) | Layar Pimpinan — dipisahkan dari U-22 pada 9 September 2026 |
 | Ukuran grid & batas GIS resmi (U-04) | TASK 011, 080–084 |
 | Matriks role-permission resmi + kewenangan approve (U-06, P-1…P-7) | TASK 051, 130 |

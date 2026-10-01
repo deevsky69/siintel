@@ -446,6 +446,10 @@ Menu **Live Map**.
 4. **Klik** kecamatan itu untuk membuka rinciannya di panel kanan.
 5. Alamat halaman ikut berubah, sehingga tampilan itu **dapat dibagikan sebagai
    tautan** — berguna saat paparan.
+6. Tautan **Kelurahan** pada panel memperbesar peta ke satu kecamatan. Sejak data asli
+   (1 Oktober 2026) kelurahan **diwarnai** dari sel penilaian setingkat kelurahan — satuan
+   lokasi pada Laporan Polisi. Kejadian yang tidak mencantumkan kelurahan hanya terhitung
+   pada angka kecamatan, dan layar menyebut jumlahnya.
 
 ### Tiga layer, tiga pertanyaan berbeda
 
@@ -542,8 +546,13 @@ Setiap persentase menyebut penyebutnya. "62%" tanpa "dari 464 kejadian" menyesat
 
 ## 10. ANALYTICS — PERBANDINGAN LINTAS JENIS DAN WAKTU
 
-Menu **Analytics**. Tiga sudut: **tren** per bulan, **matriks hari × jam** untuk melihat
-jam rawan, dan **perbandingan antarwilayah**.
+Menu **Analytics**. Tiga sudut: **tren** per bulan, **matriks hari × blok jam** untuk
+melihat jam rawan, dan **perbandingan antarwilayah**.
+
+> **Jam dibaca dalam blok 3 jam** (keputusan pemilik proyek 30 September 2026) — delapan
+> blok sehari, bukan 24 kolom. Kejadian yang jamnya tidak tercatat pada Laporan Polisi
+> (sekitar seperlima data asli) **disebut jumlahnya** dan tidak masuk blok mana pun; pada
+> Curat, jam yang tercatat kerap waktu kejadian *diketahui*, bukan berlangsung.
 
 Bedanya dengan Pattern DNA: yang ini membandingkan **lintas jenis dan lintas waktu**,
 sedangkan DNA memprofilkan **satu jenis** pada lima dimensinya. Perbandingan antarwilayah
@@ -614,6 +623,21 @@ Karena itu jumlah baris satu penjalanan sama untuk semua horizon.
 
 Hanya prediksi terbit yang boleh melahirkan peringatan. Itulah sebabnya publikasi adalah
 tindakan tersendiri — bukan efek samping menjalankan.
+
+### Yang terjadi saat terbit (sejak 1 Oktober 2026)
+
+Setiap prediksi terbit yang skornya mencapai ambang terbit (70 pada ambang yang berlaku)
+**melahirkan satu peringatan dini** berstatus ACTIVE dan **satu rekomendasi** berstatus
+menunggu keputusan. Severity mengikuti tangga ambang yang sama (70–84 WARNING, 85–100
+CRITICAL) dan versinya tersimpan pada peringatan. Fungsi yang diusulkan mengikuti aturan
+`config/recommendation/function-rules.yaml` — masih **usulan** (Samapta untuk ketiga
+jenis), dan layar menyatakannya.
+
+Pada data asli satu penjalanan menghasilkan ±830 prediksi, jadi tersedia **publikasi
+massal per penjalanan** (`POST /predictions/publish-run`, Administrator): tinjau ringkasan
+penjalanannya, lalu terbitkan seluruhnya sebagai satu pernyataan. Bawaannya uji-coba
+(`dry_run`) yang hanya menghitung berapa peringatan akan lahir. Yang ditinjau manusia
+tetap ada — pada peringatan (diterima/ditutup) dan rekomendasi (keputusan Pimpinan).
 
 > **Ini bukan model terlatih.** Skor prediksi diproyeksikan dari penilaian risiko terakhir
 > pada sel, jenis, dan jendela yang sama. Layar menyatakannya sendiri, dan setiap faktor
@@ -790,6 +814,23 @@ mencatat kejadian yang tidak diprediksi, agar *recall* benar-benar dapat dihitun
 
 Seluruh angka bertanda **`PROPOSED`** karena aturan pencocokan prediksi dengan kejadian
 nyata belum ditetapkan resmi.
+
+### Dari mana angkanya (sejak 1 Oktober 2026)
+
+Angka dihitung oleh **evaluasi mundur** atas data asli (`cli backtest`): untuk setiap hari
+pada periode uji (Januari–September 2026), sistem menilai risiko *seolah pada hari
+sebelumnya* — hanya dengan kejadian yang **sudah dilaporkan** sampai hari itu — lalu
+membandingkan prediksi yang mencapai ambang terbit dengan kejadian nyata hari itu pada
+sel, jenis, dan jendela 6 jam yang sama.
+
+- Kejadian yang jamnya tidak tercatat **tidak dapat dicocokkan** dan disebut terpisah
+  sebagai *tidak dapat dievaluasi* — bukan dihitung luput, bukan dibuang.
+- Layar menyebut periode evaluasi, ambang terbit, jenis yang dievaluasi, dan jumlah yang
+  tak terevaluasi.
+- Hasil pertama (ambang 70, horizon 24H): precision **0,010**, recall **0,259**. Angka ini
+  temuan, bukan kegagalan: pada ambang itu sistem menerbitkan ±77 peringatan sehari untuk
+  ±4 kejadian sehari. Menetapkan ambang dan aturan pencocokan adalah keputusan pemilik
+  proyek (U-03).
 
 ---
 
