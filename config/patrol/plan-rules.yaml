@@ -1,0 +1,29 @@
+# ATURAN RENCANA PATROLI TAHUNAN — PREDIKSI PRESISI
+#
+# Status: PROPOSED — REQUIRES USER APPROVAL.
+#
+# Permintaan pemilik proyek 4 Oktober 2026: dari pola kejadian 2025, sistem mengusulkan
+# kepada Pimpinan di kelurahan mana dan pada blok jam berapa patroli dilakukan sepanjang
+# tahun berikutnya, lalu usulan itu dicocokkan dengan kejadian nyata tahun tersebut.
+#
+# Yang ada di berkas ini adalah PARAMETER penyusunan usulan, bukan hasilnya. Mengubahnya
+# mengubah usulan berikutnya, tidak mengubah apa pun yang sudah tersimpan (usulan tidak
+# disimpan; ia dihitung ulang dari data setiap kali dibuka, dan versinya disebut).
+#
+# Angka di bawah dipilih penyusun teknis supaya usulannya ringkas dan dapat dibaca satu
+# halaman — bukan hasil penelitian. Berapa slot yang sanggup dipatroli satuan adalah
+# pertanyaan kapasitas yang hanya dapat dijawab organisasi (CLAUDE.md §2 C).
+
+status: PROPOSED
+usulan: 2026-10-04
+version: rencana-patroli-v1
+
+# Pola diambil dari sekian bulan terakhir sebelum batas tampilan data (12 = seluruh 2025).
+basis_months: 12
+
+# Banyaknya slot (kelurahan x blok jam) teratas yang diusulkan untuk tiap jenis.
+max_slots_per_threat: 15
+
+# Slot dengan kejadian lebih sedikit dari ini tidak diusulkan, berapa pun peringkatnya:
+# satu-dua kejadian setahun bukan pola, melainkan kebetulan.
+minimum_incidents: 3

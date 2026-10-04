@@ -19,6 +19,7 @@ import argparse
 import sys
 
 from ..db import get_session_factory
+from ..services.visibility import see_everything
 from . import csv_source as src
 from .analytics import seed_analytics_data
 from .crime import seed_crime_data
@@ -94,6 +95,9 @@ def main(argv: list[str] | None = None) -> int:
     summary = SeedSummary()
     try:
         with get_session_factory()() as session, session.begin():
+            # Seeder harus melihat SELURUH baris: saringan tampilan akan membuat baris
+            # 2026 tampak belum ada dan diseed dua kali.
+            see_everything(session)
             if arguments.command in {"master", "all"}:
                 summary.merge(seed_master_data(session, taxonomy))
             if arguments.command in {"crime", "all"}:

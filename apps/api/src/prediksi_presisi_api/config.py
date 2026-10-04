@@ -45,6 +45,9 @@ class Settings(BaseSettings):
 
     # Waktu acuan untuk dataset demo (SDL-16). Kosong = pakai waktu nyata.
     demo_reference_time: str | None = None
+    # Batas tampilan kejadian (ISO date, mis. 2025-12-31). Kosong = tanpa batas.
+    # Lihat services/visibility.py.
+    display_data_until: str | None = None
 
     app_timezone: str = "Asia/Jakarta"
 

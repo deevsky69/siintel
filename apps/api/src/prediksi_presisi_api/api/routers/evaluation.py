@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from ...models import CrimeIncident, Prediction, PredictionActual
 from ...services import risk_engine as risk
+from ...services import visibility
 from ..deps import CurrentUser, get_db, require_permission
 
 router = APIRouter(prefix="/evaluation", tags=["evaluasi"])
@@ -74,13 +75,16 @@ def metrics(
         # mana pun, sehingga tidak masuk HIT/FN. Disebut, bukan disembunyikan (CLAUDE.md §26).
         unevaluable = (
             session.scalar(
-                select(func.count())
-                .select_from(CrimeIncident)
-                .where(
-                    CrimeIncident.incident_date >= period[0],
-                    CrimeIncident.incident_date <= period[1],
-                    CrimeIncident.incident_type.in_(threats),
-                    CrimeIncident.time_known.is_(False),
+                # Periode evaluasi berada di luar batas tampilan layar; dinyatakan eksplisit.
+                visibility.all_incidents(
+                    select(func.count())
+                    .select_from(CrimeIncident)
+                    .where(
+                        CrimeIncident.incident_date >= period[0],
+                        CrimeIncident.incident_date <= period[1],
+                        CrimeIncident.incident_type.in_(threats),
+                        CrimeIncident.time_known.is_(False),
+                    )
                 )
             )
             or 0

@@ -57,6 +57,11 @@ def get_engine() -> Engine:
 @lru_cache
 def get_session_factory() -> sessionmaker[Session]:
     """Session factory tunggal per proses."""
+    # Impor lokal: services.visibility membutuhkan model, dan model membutuhkan Base di
+    # modul ini. Saringan dipasang sekali, saat session pertama kali diminta.
+    from .services.visibility import install
+
+    install()
     return sessionmaker(bind=get_engine(), autoflush=False, expire_on_commit=False)
 
 

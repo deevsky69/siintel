@@ -199,6 +199,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         hint: "Usulan tindakan dan keputusan komandan",
       },
       {
+        href: "/rencana-patroli",
+        label: "Rencana Patroli",
+        icon: "recommendation",
+        permissions: ["recommendation:read"],
+        hint: "Usulan kelurahan dan blok jam patroli tahun ini, dicocokkan dengan kenyataan",
+      },
+      {
         href: "/intelijen",
         label: "Dokumen Intelijen",
         icon: "intelligence",

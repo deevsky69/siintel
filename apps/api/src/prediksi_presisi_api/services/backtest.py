@@ -58,7 +58,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..models import CrimeIncident, Prediction, PredictionActual
-from . import audit, clock
+from . import audit, clock, visibility
 from . import prediction_engine as engine
 from . import risk_engine as risk
 
@@ -289,6 +289,10 @@ def run_backtest(
             "mundur harian memerlukan jarak minimal satu hari (24H, 3D, 7D)"
         )
         raise BacktestError(message)
+
+    # Evaluasi mundur membandingkan prediksi dengan kejadian pada periode uji, jadi ia
+    # harus melihat kejadian di luar batas tampilan layar (services/visibility.py).
+    visibility.see_everything(session)
 
     catalogue = risk.load_weights()
     thresholds = risk.load_thresholds()
