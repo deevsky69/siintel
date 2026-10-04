@@ -31,4 +31,10 @@ docker exec "$API" alembic upgrade head
 docker exec "$API" alembic current
 
 echo "== pemeriksaan"
+# Traefik butuh beberapa detik mendaftarkan ulang rute container yang baru dibuat; tanpa
+# jeda, pemeriksaan pertama gagal padahal stack sehat.
+for _ in $(seq 1 12); do
+  [ "$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$BASE/api/v1/health")" = "200" ] && break
+  sleep 5
+done
 bash scripts/periksa-produksi.sh "$BASE"
