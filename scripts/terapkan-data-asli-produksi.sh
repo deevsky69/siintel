@@ -4,25 +4,44 @@
 #
 # Dijalankan DI SERVER oleh orang yang memegang persetujuan pemilik proyek 30 September
 # 2026 ("ganti seluruh data menjadi data asli; hapus ketujuh tabel sintetis"). Skrip ini
-# sengaja berhenti pada tiap langkah yang tidak dapat dibatalkan dan meminta ketikan
+# sengaja berhenti pada langkah yang tidak dapat dibatalkan dan meminta ketikan
 # "LANJUT" — bukan karena langkahnya rumit, melainkan karena ia menghapus data produksi.
 #
 # Urutannya mengikuti CLAUDE.md §20 (migration -> apply -> test) dan §17/§18:
 #
 #   0. prasyarat: data/raw/*.xlsx ada, data/processed/ dibangun ulang dari impor
 #   1. cadangan DB produksi (pg_dump) ke ~/siintel-cadangan/
-#   2. bangun ulang image API + web dari kode terbaru
-#   3. nyalakan ulang stack; migrasi ke 0010 (alembic upgrade head) di dalam container API
-#   4. kosongkan tabel sintetis dan turunannya (urutan FK), sisakan master + users + audit
-#   5. seed --source processed (kejadian asli + lokasi kelurahan)
-#   6. jalankan penilaian risiko, prediksi 24H, publikasi massal, evaluasi mundur
-#   7. pnpm prod:periksa
+#   2. jam acuan produksi -> posisi data
+#   3. bangun ulang image API + web dari kode terbaru, nyalakan ulang stack
+#   4. migrasi ke 0010 (alembic upgrade head) di dalam container API
+#   5. kosongkan tabel sintetis dan turunannya (urutan FK), sisakan master + users + audit
+#   6. seed --source processed (kejadian asli + lokasi kelurahan)
+#   7. jalankan penilaian risiko, prediksi 24H, publikasi massal, evaluasi mundur
+#   8. pnpm prod:periksa
+#
+# Pemakaian:
+#   bash scripts/terapkan-data-asli-produksi.sh                   # seluruh langkah, bertanya sebelum menghapus
+#   bash scripts/terapkan-data-asli-produksi.sh --dari-langkah 5  # melanjutkan dari langkah ke-N
+#   bash scripts/terapkan-data-asli-produksi.sh --yakin           # tanpa prompt — untuk sesi tanpa
+#                                                                 #  terminal (mis. awalan `!` di Claude
+#                                                                 #  Code), HANYA setelah persetujuan
+#                                                                 #  eksplisit
 #
 # Tidak ada kata sandi di berkas ini. Kata sandi akun demo produksi dibaca dari
-# ~/siintel-demo-passwords.txt (mode 600) hanya untuk login API pada langkah 6, dan tidak
+# ~/siintel-demo-passwords.txt (mode 600) hanya untuk login API pada langkah 7, dan tidak
 # pernah dicetak.
 
 set -euo pipefail
+
+MULAI=0
+YAKIN=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dari-langkah) MULAI="$2"; shift 2 ;;
+    --yakin) YAKIN=1; shift ;;
+    *) echo "argumen tidak dikenal: $1"; exit 1 ;;
+  esac
+done
 
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
@@ -38,13 +57,21 @@ BACKTEST_TO="2026-09-28"
 konfirmasi() {
   echo
   echo ">>> $1"
+  if [ "$YAKIN" = "1" ]; then echo "(--yakin: dilanjutkan tanpa prompt)"; return; fi
+  if [ ! -t 0 ]; then
+    echo "Tidak ada terminal untuk mengetik LANJUT. Jalankan ulang dengan --yakin bila persetujuan sudah diberikan."
+    exit 1
+  fi
   read -r -p "Ketik LANJUT untuk meneruskan: " jawab
   [ "$jawab" = "LANJUT" ] || { echo "Dibatalkan."; exit 1; }
 }
 
 langkah() { printf '\n\033[1m== %s ==\033[0m\n' "$1"; }
+# Langkah bernomor dilewati bila di bawah --dari-langkah.
+lewati() { [ "$1" -lt "$MULAI" ]; }
 
 # ---------------------------------------------------------------------------
+if ! lewati 0; then
 langkah "0. Prasyarat"
 [ -f "$ENV_FILE" ] || { echo ".env.production tidak ada"; exit 1; }
 ls data/raw/*.xlsx >/dev/null 2>&1 || { echo "data/raw/*.xlsx tidak ada — unduh berkas resmi ke data/raw/ lebih dahulu"; exit 1; }
@@ -53,16 +80,21 @@ ls data/raw/*.xlsx >/dev/null 2>&1 || { echo "data/raw/*.xlsx tidak ada — undu
 python3 - <<'PY'
 import json; m = json.load(open("data/processed/MANIFEST.json")); print("MANIFEST:", {k: m[k] for k in ("incidents", "locations", "position") if k in m})
 PY
+fi
 
 # ---------------------------------------------------------------------------
+CADANGAN="(tidak dibuat pada penjalanan ini — lihat ~/siintel-cadangan/)"
+if ! lewati 1; then
 langkah "1. Cadangan DB produksi"
 mkdir -p "$HOME/siintel-cadangan"
 CADANGAN="$HOME/siintel-cadangan/predpol-prod-$(date +%Y%m%d-%H%M%S).sql.gz"
 docker exec "$DB" sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' | gzip > "$CADANGAN"
 chmod 600 "$CADANGAN"
 echo "cadangan: $CADANGAN ($(du -h "$CADANGAN" | cut -f1))"
+fi
 
 # ---------------------------------------------------------------------------
+if ! lewati 2; then
 langkah "2. Jam acuan produksi -> posisi data ($REFERENCE_TIME)"
 if grep -q '^DEMO_REFERENCE_TIME=' "$ENV_FILE"; then
   sed -i "s|^DEMO_REFERENCE_TIME=.*|DEMO_REFERENCE_TIME=$REFERENCE_TIME|" "$ENV_FILE"
@@ -70,7 +102,9 @@ else
   echo "DEMO_REFERENCE_TIME=$REFERENCE_TIME" >> "$ENV_FILE"
 fi
 grep '^DEMO_REFERENCE_TIME=' "$ENV_FILE"
+fi
 
+if ! lewati 3; then
 langkah "3. Bangun ulang image dan nyalakan ulang stack"
 "${COMPOSE[@]}" build
 "${COMPOSE[@]}" up -d
@@ -80,13 +114,17 @@ for _ in $(seq 1 60); do
   sleep 5
 done
 docker inspect -f '{{.State.Health.Status}}' "$API"
+fi
 
+if ! lewati 4; then
 langkah "4. Migrasi skema (alembic upgrade head)"
 docker exec "$API" alembic upgrade head
 docker exec "$API" alembic current
+fi
 
 # ---------------------------------------------------------------------------
-konfirmasi "Langkah berikut MENGHAPUS seluruh data sintetis di produksi (kejadian, lokasi grid, dan ketujuh tabel sintetis beserta turunannya). Cadangan ada di $CADANGAN."
+if ! lewati 5; then
+konfirmasi "Langkah berikut MENGHAPUS seluruh data sintetis di produksi (kejadian, lokasi grid, dan ketujuh tabel sintetis beserta turunannya). Cadangan: $CADANGAN."
 langkah "5. Kosongkan tabel sintetis (urutan FK)"
 docker exec -i "$DB" sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' <<'SQL'
 begin;
@@ -109,11 +147,15 @@ delete from police_units;
 delete from locations;
 commit;
 SQL
+fi
 
+if ! lewati 6; then
 langkah "6. Seed data asli (--source processed)"
 docker exec "$API" python -m prediksi_presisi_api.seeding --source processed all
+fi
 
 # ---------------------------------------------------------------------------
+if ! lewati 7; then
 langkah "7. Mesin: penilaian risiko, prediksi 24H, publikasi, evaluasi mundur"
 PASSFILE="$HOME/siintel-demo-passwords.txt"
 [ -r "$PASSFILE" ] || { echo "$PASSFILE tidak dapat dibaca; jalankan langkah 7 secara manual"; exit 1; }
@@ -130,6 +172,7 @@ curl -sf -X POST "$BASE/api/v1/predictions/publish-run" "${AUTH[@]}" -d '{"predi
 unset TOKEN
 docker exec "$API" python -m prediksi_presisi_api.cli backtest --dari "$BACKTEST_FROM" --sampai "$BACKTEST_TO" \
   | python3 -c 'import sys,json;d=json.load(sys.stdin);print({k:d[k] for k in ("predictions","hits","false_positives","false_negatives","unevaluable_incidents","precision","recall")})'
+fi
 
 # ---------------------------------------------------------------------------
 langkah "8. Pemeriksaan produksi"

@@ -203,7 +203,7 @@ tampak selesai seluruhnya.
 
 - [ ] Password kedua akun demo sudah diganti
 - [ ] `DEMO_REFERENCE_TIME=2026-09-29T00:00:00+07:00`, dan dashboard menunjukkan angka 24 jam yang tidak nol
-- [ ] Penilaian risiko, prediksi 24H, dan publikasi massal sudah dijalankan untuk 29 September 2026 (`scripts/terapkan-data-asli-produksi.sh` langkah 7); Warning Center berisi ±96 peringatan ACTIVE
+- [x] Penilaian risiko, prediksi 24H, dan publikasi massal sudah dijalankan untuk 29 September 2026 (4 Oktober 2026); Warning Center berisi 96 peringatan ACTIVE
 - [ ] Satu rekomendasi **sengaja disisakan** berstatus menunggu keputusan untuk diperagakan
 - [ ] Dua jendela peramban sudah masuk sebagai Pimpinan dan Polsek
 - [ ] Sertifikat HTTPS sudah terbit (`docs/10` §5.4)

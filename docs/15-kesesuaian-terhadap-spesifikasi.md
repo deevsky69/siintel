@@ -180,7 +180,7 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | **Rantai PREDIKSI → PERINGATAN → REKOMENDASI disambung** | Sebelumnya tidak ada kode runtime yang menerbitkan peringatan/rekomendasi. Publikasi (tunggal / massal `publish-run`) menerbitkan keduanya dari ambang yang berlaku; fungsi dari `config/recommendation/function-rules.yaml` (PROPOSED) |
 | **Evaluasi mundur** (success criteria #06) | `cli backtest`: bukti dibatasi tanggal lapor, unit sel × jenis × jendela, kejadian tanpa jam dilaporkan terpisah. Hasil TEST Jan–Sep 2026: precision 0,010, recall 0,259 |
 | **Analitik blok 3 jam, peta kelurahan, label sumber data** | Keputusan 30 September 2026; layer peta `level=kelurahan`; "Pusiknas, posisi 29 September 2026" dibaca dari baris data |
-| **Produksi** | Belum diterapkan — `scripts/terapkan-data-asli-produksi.sh` menyiapkan seluruh langkah (cadangan, migrasi, pengosongan, seed, mesin, pemeriksaan) dan menunggu dijalankan pemegang persetujuan |
+| **Produksi** | **Diterapkan 1–4 Oktober 2026** lewat `scripts/terapkan-data-asli-produksi.sh` (cadangan `~/siintel-cadangan/predpol-prod-20261001-035009.sql.gz`, skema 0010, data sintetis dihapus, 8.203 kejadian + 75 lokasi dimuat, 832 skor dan prediksi, 96 peringatan + rekomendasi, evaluasi mundur precision 0,010 / recall 0,259; `prod:periksa` lulus seluruhnya) |
 
 ### Masih tersisa
 
