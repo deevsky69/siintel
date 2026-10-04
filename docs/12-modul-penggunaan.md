@@ -834,6 +834,43 @@ sel, jenis, dan jendela 6 jam yang sama.
 
 ---
 
+## 16a. RENCANA PATROLI — USULAN TAHUN INI, DICOCOKKAN DENGAN KENYATAAN
+
+Menu **Operasi → Rencana Patroli**. Sejak 4 Oktober 2026 aplikasi diperagakan seolah
+berdiri di **awal 2026**: seluruh layar hanya memuat kejadian sampai 31 Desember 2025, dan
+halaman ini menjawab pertanyaan Pimpinan untuk tahun berjalan — **di kelurahan mana dan
+pada blok jam berapa patroli dilakukan**, untuk tiap jenis (Curanmor, Curat, Curas).
+
+### Bagian pertama: usulan
+
+Dari pola 2025, untuk tiap jenis diusulkan paling banyak 15 slot *kelurahan × blok 3 jam*
+yang sekurang-kurangnya memuat 3 kejadian. Setiap baris membawa angkanya: berapa kejadian
+pada slot itu sepanjang 2025 dan berapa porsinya. Arahkan kursor ke baris untuk membaca
+kalimat alasannya. Jenis yang kejadiannya terlalu tersebar (Curas) dinyatakan tidak punya
+slot — bukan dipaksakan.
+
+### Bagian kedua: pencocokan dengan kejadian nyata 2026
+
+Usulan dibandingkan dengan kejadian yang benar-benar terjadi pada 2026 (sejauh datanya
+ada). Empat angka, masing-masing dengan definisi yang tertulis di layar:
+
+| Angka | Artinya |
+|---|---|
+| **Kemiripan pola jam** | Seberapa mirip sebaran blok jam 2026 dengan 2025 (100% = identik) |
+| **Kemiripan pola wilayah** | Seberapa mirip sebaran kelurahan 2026 dengan 2025 |
+| **Ketepatan slot** | Berapa bagian slot usulan yang benar-benar mengalami kejadian jenis itu |
+| **Cakupan kejadian** | Berapa bagian kejadian 2026 (berjam, berkelurahan) yang jatuh di slot usulan |
+
+Hasil pertama: pola jam 84%, pola wilayah 75%, ketepatan slot 57%, cakupan 4%. Cakupan
+rendah bukan kesalahan: 30 slot dari 65 kelurahan × 8 blok memang hanya menjangkau
+sebagian kecil kejadian — berapa slot yang sanggup dipatroli adalah keputusan Pimpinan.
+
+> Seluruhnya **usulan** (`PROPOSED`): aturan penyusunan dan ukuran kemiripan resmi
+> belum ditetapkan pemilik proyek. Kejadian tanpa jam atau tanpa kelurahan disebut
+> jumlahnya dan tidak masuk slot mana pun.
+
+---
+
 ## 17. LAPORAN MASYARAKAT
 
 ### Bagaimana masyarakat mengirim laporan

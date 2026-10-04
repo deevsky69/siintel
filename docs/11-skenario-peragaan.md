@@ -19,7 +19,7 @@ Dua success criteria yang harus terjawab:
 | Akun utama | `demo.pimpinan` — satu-satunya peran yang boleh **memutuskan rekomendasi** |
 | Akun tindak lanjut | `demo.commandcenter` — satu-satunya peran yang boleh **menerima dan menyelesaikan peringatan** |
 | Akun pembanding | `demo.polsek` — dibatasi Polsek Tebet |
-| Waktu acuan | `DEMO_REFERENCE_TIME=2026-09-29T00:00:00+07:00` — posisi data Pusiknas; kosong berarti panel "24 jam terakhir" membaca rentang sesudah data berakhir |
+| Waktu acuan | `DEMO_REFERENCE_TIME=2026-01-01T00:00:00+07:00` dan `DISPLAY_DATA_UNTIL=2025-12-31` — aplikasi berdiri di awal 2026 dan hanya memperlihatkan kejadian sampai 2025 (keputusan 4 Oktober 2026) |
 | Data | **Asli**: 8.203 Laporan Polisi Curanmor/Curat/Curas Polres Metro Jakarta Selatan, Pusiknas posisi 29 September 2026. Tidak ada lagi data sintetis di tabel kejadian; tabel intelijen, patroli, laporan masyarakat, imbauan, keputusan, dan tindakan **mulai kosong** dan terisi hanya oleh peragaan |
 
 > **Ganti password kedua akun sebelum paparan.** Nilai yang dipakai selama pengembangan
@@ -171,6 +171,24 @@ layak dikatakan di depan penguji:
 - **Recall dapat dihitung** karena 571 kejadian yang luput dicatat sebagai *false
   negative* yang menunjuk kejadian nyatanya (CLAUDE.md §26).
 - Seluruh angka bertanda **`PROPOSED`** karena aturan pencocokan belum ditetapkan resmi.
+
+---
+
+## 6b. RENCANA PATROLI — "lalu apa yang harus dilakukan tahun ini?"
+
+Buka `/rencana-patroli`.
+
+**Klaim:** dari pola 2025 sistem mengusulkan slot patroli 2026, dan usulan itu dapat
+diuji terhadap kejadian nyata 2026 — bukan sekadar ditampilkan.
+
+Yang layak ditunjuk:
+
+- Setiap slot membawa angkanya (kejadian 2025 pada kelurahan × blok jam itu); arahkan
+  kursor untuk alasannya.
+- Empat angka kemiripan dengan definisi tertulis: pola jam 84%, pola wilayah 75%,
+  ketepatan slot 57%, cakupan 4%. Cakupan rendah dijelaskan terbuka: 30 slot dari 520
+  kemungkinan; berapa slot yang sanggup dipatroli adalah keputusan Pimpinan.
+- Curas tidak punya slot — sistem menyatakan "terlalu tersebar", bukan mengarang.
 
 ---
 

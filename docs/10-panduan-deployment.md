@@ -648,6 +648,7 @@ Yang wajib diisi:
 | `POSTGRES_PASSWORD` | keluaran `openssl rand -hex 24` |
 | `JWT_SECRET` | keluaran `openssl rand -base64 48` |
 | `DEMO_REFERENCE_TIME` | lihat peringatan di bawah |
+| `DISPLAY_DATA_UNTIL` | `2025-12-31` — layar hanya memuat kejadian sampai tanggal ini (keputusan 4 Oktober 2026); kosong = tanpa batas |
 | `ACME_EMAIL` | **hanya untuk JALUR B**; boleh dikosongkan pada JALUR A |
 
 **Peringatan tentang `DEMO_REFERENCE_TIME`.** Data asli Pusiknas berposisi 29 September 2026
@@ -656,10 +657,15 @@ sebenarnya, sehingga panel "24 jam terakhir" membaca rentang sesudah data berakh
 tampak **kosong**. Isi dengan posisi data:
 
 ```text
-DEMO_REFERENCE_TIME=2026-09-29T00:00:00+07:00
+DEMO_REFERENCE_TIME=2026-01-01T00:00:00+07:00
+DISPLAY_DATA_UNTIL=2025-12-31
 ```
 
-(Sampai 30 September 2026 nilainya `2025-12-31T21:00:00+07:00`, akhir dataset sintetis.)
+Sejak 4 Oktober 2026 aplikasi berdiri di **awal 2026**: layar memuat kejadian sampai
+31 Desember 2025, dan kejadian 2026 hanya dibaca pencocokan rencana patroli serta evaluasi
+mundur. (1–3 Oktober 2026 nilainya `2026-09-29T00:00:00+07:00`; sampai 30 September 2026
+`2025-12-31T21:00:00+07:00`, akhir dataset sintetis.) Pemindahannya ke produksi:
+`bash scripts/terapkan-awal-2026-produksi.sh`.
 
 Aplikasi menyatakan terbuka di antarmuka bahwa waktu acuan sedang dipakai — ini transparansi
 yang disengaja (`services/clock.py`), dan justru itu yang membuat klaim tetap dapat

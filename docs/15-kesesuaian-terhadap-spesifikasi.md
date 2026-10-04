@@ -182,6 +182,15 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | **Analitik blok 3 jam, peta kelurahan, label sumber data** | Keputusan 30 September 2026; layer peta `level=kelurahan`; "Pusiknas, posisi 29 September 2026" dibaca dari baris data |
 | **Produksi** | **Diterapkan 1–4 Oktober 2026** lewat `scripts/terapkan-data-asli-produksi.sh` (cadangan `~/siintel-cadangan/predpol-prod-20261001-035009.sql.gz`, skema 0010, data sintetis dihapus, 8.203 kejadian + 75 lokasi dimuat, 832 skor dan prediksi, 96 peringatan + rekomendasi, evaluasi mundur precision 0,010 / recall 0,259; `prod:periksa` lulus seluruhnya) |
 
+### Dikerjakan 4 Oktober 2026 — aplikasi berdiri di awal 2026
+
+| Pekerjaan | Keadaan |
+|---|---|
+| **Batas tampilan data** | Saringan ORM global (`services/visibility.py`): layar hanya memuat kejadian ≤ `DISPLAY_DATA_UNTIL` (31 Desember 2025); jam acuan 1 Januari 2026. Seeder, evaluasi mundur, dan pencocokan rencana menyatakan bypass eksplisit |
+| **Rencana patroli 2026 + pencocokan** | `/patrol-plan` dan `/patrol-plan/evaluation`, halaman `/rencana-patroli`: usulan kelurahan × blok 3 jam × jenis dari pola 2025 (PROPOSED), dicocokkan kejadian nyata 2026 — pola jam 84%, pola wilayah 75%, ketepatan slot 57%, cakupan 4% |
+| **Peta** | Klik kecamatan pada `/peta` membuka peta kelurahan berwarna (sudah sejak 1 Oktober 2026) |
+| **Produksi** | `scripts/terapkan-awal-2026-produksi.sh` menunggu dijalankan pemegang persetujuan |
+
 ### Masih tersisa
 
 | Urutan | Pekerjaan | Alasan |

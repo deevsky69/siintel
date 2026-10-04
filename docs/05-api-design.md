@@ -115,6 +115,8 @@ skema OpenAPI aplikasi yang benar-benar berjalan.
 | POST | `/predictions/run` | `prediction:run` — ✅ **ADA** |
 | POST | `/predictions/{code}/publish` | `prediction:publish` — ✅ **ADA**; sejak 1 Oktober 2026 juga **menerbitkan peringatan + rekomendasi** bila skor mencapai ambang terbit (respons membawa `issuance`) |
 | POST | `/predictions/publish-run` | `prediction:publish` — ✅ **ADA** (1 Oktober 2026): publikasi massal satu penjalanan (`prediction_date` + `horizon`), `dry_run` bawaan true, menolak akun bercakupan sebagian |
+| GET | `/patrol-plan` | `recommendation:read` — ✅ **ADA** (4 Oktober 2026): usulan slot patroli kelurahan × blok 3 jam × jenis untuk tahun sasaran dari pola tahun dasar (`config/patrol/plan-rules.yaml`, PROPOSED); tidak disimpan, dihitung saat diminta; menghormati cakupan Polsek |
+| GET | `/patrol-plan/evaluation` | `evaluation:read` — ✅ **ADA**: usulan dicocokkan kejadian nyata tahun sasaran — kemiripan pola jam, pola wilayah, ketepatan slot, cakupan kejadian (definisi pada `similarity_basis`, PROPOSED) |
 | POST | `/crimes` | `crime:write` — ✅ **ADA** |
 | POST | `/crimes/{code}/status` | `crime:write` — ✅ **ADA** |
 | POST | `/citizen-reports/{code}/status` | `citizen_report:write` — ✅ **ADA** |

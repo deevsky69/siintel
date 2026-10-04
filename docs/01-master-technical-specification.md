@@ -753,6 +753,8 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 | Jenis ancaman | 30 September 2026 | Mengikuti klasifikasi Laporan Polisi: **CURANMOR, CURAT, CURAS**. Bobot `pusiknas-2026-10-01` = angka U-02 utuh dengan `applies_to` tiga jenis; tujuh jenis rancangan sintetis dinyatakan `outside_scope` |
 | Jendela waktu | 30 September 2026 | Prediksi tetap **6 jam**; analitik menampilkan jam dalam **blok 3 jam** |
 | Taksonomi v2 (U-16) | 1 Oktober 2026 | `taksonomi-2026-10-01`: domain `data_group` dan `report_source` ditambahkan; nilai lama tidak berubah |
+| **Aplikasi berdiri di awal 2026** | 4 Oktober 2026 | Layar hanya memuat kejadian sampai 31 Desember 2025 (`DISPLAY_DATA_UNTIL`, saringan ORM global `services/visibility.py`); jam acuan `2026-01-01T00:00:00+07:00`. Kejadian 2026 tetap tersimpan, hanya dibaca pencocokan rencana patroli dan evaluasi mundur (3 Januari – 28 September 2026) |
+| **Rencana patroli tahunan** | 4 Oktober 2026 | Dari pola 2025 sistem mengusulkan slot kelurahan × blok 3 jam × jenis untuk 2026 (`/patrol-plan`), dicocokkan dengan kejadian nyata 2026 (`/patrol-plan/evaluation`). Parameter penyusunan (`config/patrol/plan-rules.yaml`) dan ukuran kemiripan resmi masih **PROPOSED** |
 
 Seluruhnya ditetapkan **memakai nilai yang sudah berlaku**, tanpa satu angka pun berubah,
 sehingga baris yang sudah tersimpan tetap sah dan tetap tertelusur. Ditetapkan berarti
@@ -772,6 +774,7 @@ Butir berikut **tidak diinvensi** dan memblokir task tertentu:
 | **Master satuan (`police_units`)** | Kosong sejak data asli: daftar unit sintetis dihapus dan daftar resmi belum diberikan; layar Operasi tidak dapat mencatat penugasan sampai ada |
 | **Perubahan sistem pelaporan 2024?** | Tren tahunan 3.992 → 1.884 → 1.237 → 1.090 (2023–Sep 2026) terlalu curam untuk dibaca sebagai penurunan kejahatan semata; perlu konfirmasi apakah cara pencatatan berubah |
 | **Jam pada Laporan Polisi** | Terutama Curat, jam yang tercatat dapat berupa waktu kejadian *diketahui*; pola jam dibaca dengan catatan itu (dinyatakan di layar) |
+| **Ukuran kemiripan rencana patroli** | Empat angka tersedia (pola jam, pola wilayah, ketepatan slot, cakupan). Hasil pertama 2025→Jan–Sep 2026: 84% / 75% / 57% / 4%. Mana yang menjadi ukuran resmi, dan berapa slot per jenis yang sanggup dipatroli, adalah keputusan pemilik proyek |
 | Ambang peringkat volume laporan (0,70 / 0,40) | Layar Pimpinan — dipisahkan dari U-22 pada 9 September 2026 |
 | Ukuran grid & batas GIS resmi (U-04) | TASK 011, 080–084 |
 | Matriks role-permission resmi + kewenangan approve (U-06, P-1…P-7) | TASK 051, 130 |
