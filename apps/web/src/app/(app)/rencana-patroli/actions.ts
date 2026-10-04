@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api";
-import { PLAN_DECISIONS, type PlanDecision, submitPlanDecision } from "@/lib/patrol-plan";
+import { PLAN_DECISIONS, type PlanDecision } from "@/lib/patrol-plan";
+import { submitPlanDecision } from "@/lib/patrol-plan-api";
 import type { PlanDecisionState } from "./decision-state";
 
 /**

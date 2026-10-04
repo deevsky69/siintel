@@ -1,6 +1,6 @@
 import { ApiError } from "@/lib/api";
 import { getProfile } from "@/lib/decisions";
-import { getPatrolPlan, getPatrolPlanEvaluation } from "@/lib/patrol-plan";
+import { getPatrolPlan, getPatrolPlanEvaluation } from "@/lib/patrol-plan-api";
 import { PatrolPlanView } from "./plan-view";
 
 export const dynamic = "force-dynamic";

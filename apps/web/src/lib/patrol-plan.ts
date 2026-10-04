@@ -1,5 +1,3 @@
-import { apiGet, apiPost } from "./api";
-
 /**
  * Rencana patroli tahunan (permintaan pemilik proyek 4 Oktober 2026).
  *
@@ -129,17 +127,12 @@ export type PlanEvaluation = {
   demo_clock: boolean;
 };
 
-export const getPatrolPlan = () => apiGet<PatrolPlan>("/patrol-plan");
-export const getPlanDecisions = () => apiGet<{ data: PlanDecisionRow[] }>("/patrol-plan/decisions");
-export const submitPlanDecision = (body: {
-  decision: PlanDecision;
-  reason?: string;
-  kept_slots?: SlotKey[];
-}) => apiPost<PlanDecisionRow>("/patrol-plan/decisions", body);
-
+// Pemanggil API ada di `patrol-plan-api.ts`: modul ini sengaja TIDAK mengimpor `./api`
+// (yang memuat `next/headers`) supaya tipe dan pembantunya aman dipakai komponen klien —
+// formulir keputusan menarik `plan-view.tsx`, dan `next build` menolak rantai impor yang
+// berujung di `next/headers` dari komponen klien.
 export const slotKeyOf = (slot: SlotKey) =>
   `${slot.threat_type}|${slot.kelurahan}|${slot.block_start}`;
-export const getPatrolPlanEvaluation = () => apiGet<PlanEvaluation>("/patrol-plan/evaluation");
 
 /** "84,3%" — atau tanda bahwa angkanya memang tidak dapat dihitung. */
 export function percentText(value: number | null | undefined): string {
