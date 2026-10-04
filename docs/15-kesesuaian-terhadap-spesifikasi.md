@@ -188,6 +188,7 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 |---|---|
 | **Batas tampilan data** | Saringan ORM global (`services/visibility.py`): layar hanya memuat kejadian ≤ `DISPLAY_DATA_UNTIL` (31 Desember 2025); jam acuan 1 Januari 2026. Seeder, evaluasi mundur, dan pencocokan rencana menyatakan bypass eksplisit |
 | **Rencana patroli 2026 + pencocokan** | `/patrol-plan` dan `/patrol-plan/evaluation`, halaman `/rencana-patroli`: usulan kelurahan × blok 3 jam × jenis dari pola 2025 (PROPOSED), dicocokkan kejadian nyata 2026 — pola jam 84%, pola wilayah 75%, ketepatan slot 57%, cakupan 4% |
+| **Keputusan Pimpinan atas rencana patroli** | Migration 0011 `patrol_plan_decisions`; `POST /patrol-plan/decisions` (setujui / setujui sebagian / tolak), usulan disalin saat diputus, keputusan terakhir yang berlaku, pencocokan mengikuti rencana yang berlaku; formulir di `/rencana-patroli` bagi pemegang `commander_decision:approve` |
 | **Peta** | Klik kecamatan pada `/peta` membuka peta kelurahan berwarna (sudah sejak 1 Oktober 2026) |
 | **Produksi** | **Diterapkan 4 Oktober 2026**: jam acuan 1 Januari 2026, batas tampilan 2025, 816 skor dan prediksi 24H, 32 peringatan + rekomendasi, evaluasi mundur 3 Jan–28 Sep 2026; `prod:periksa` lulus. Potret keadaan: `scripts/status-produksi.sh`; mesin dapat diulang: `scripts/jalankan-mesin-produksi.sh` |
 

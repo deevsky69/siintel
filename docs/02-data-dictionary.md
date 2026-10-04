@@ -231,6 +231,26 @@ Aturan integritas:
 Dengan ini precision **dan** recall dapat dihitung (CLAUDE.md §26; TASK 104/151).
 > **NOT SPECIFIED (U-03):** aturan pencocokan spasial/temporal antara kejadian aktual dan prediksi (toleransi jarak/waktu). `REQUIRES USER APPROVAL` sebelum angka evaluasi dipublikasikan.
 
+## 15a. `patrol_plan_decisions` — keputusan Pimpinan atas rencana patroli tahunan
+
+Migration 0011 (4 Oktober 2026). Usulan rencana patroli **tidak disimpan** — dihitung dari data saat dibuka — sehingga keputusan atasnya menyalin usulan yang dibaca saat memutus.
+
+| Field | Type | Req | Key | Keterangan |
+|---|---|---|---|---|
+| decision_id | uuid | Ya | PK | |
+| code | text | Ya | UQ | `PPD-0001` |
+| target_year | int | Ya | | Tahun sasaran rencana |
+| scope | text | Tidak | | Polsek bila keputusan dibatasi wilayah; NULL = seluruh Polres |
+| plan_version | text | Ya | | Versi aturan penyusunan (`config/patrol/plan-rules.yaml`) |
+| plan_snapshot | jsonb | Ya | | Usulan persis seperti yang dibaca pemutus (U-07) |
+| decision | text/enum | Ya | | APPROVED / MODIFIED / REJECTED (CHECK) |
+| reason | text | Tidak | | Wajib bila REJECTED (CHECK) |
+| kept_slots | jsonb | Tidak | | `[{threat_type, kelurahan, block_start}]`; wajib bila MODIFIED (CHECK). Hanya dapat memilih slot usulan |
+| decision_by | uuid | Ya | FK → users | |
+| decision_at | timestamptz | Ya | | |
+
+Yang **berlaku** adalah keputusan terakhir untuk `(target_year, scope)`; keputusan lama tidak dihapus (CLAUDE.md §29).
+
 ## 16. `roles`
 
 `role_id` uuid PK · `code` UQ (`ROLE-01`) · `role_name` · `level` smallint (1–6).

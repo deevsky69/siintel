@@ -120,8 +120,7 @@ def upgrade() -> None:
             sa.String(64),
             nullable=False,
             comment=(
-                "Ringkasan berkas SETELAH metadata dilucuti — "
-                "yang tersimpan, bukan yang diunggah."
+                "Ringkasan berkas SETELAH metadata dilucuti — yang tersimpan, bukan yang diunggah."
             ),
         ),
         sa.Column(

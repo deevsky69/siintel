@@ -123,6 +123,52 @@ describe("rencana patroli", () => {
     expect(screen.getByText(/Tahun sasaran dibandingkan sejauh datanya ada/)).toBeDefined();
   });
 
+  it("menyatakan rencana belum diputus, dan tidak menampilkan tombol bagi yang tidak berwenang", () => {
+    render(<PatrolPlanView plan={plan} evaluation={null} />);
+
+    expect(screen.getByText(/Belum diputus/)).toBeDefined();
+    expect(screen.queryByRole("button", { name: /Setujui seluruhnya/ })).toBeNull();
+  });
+
+  it("menampilkan keputusan yang berlaku beserta pejabat dan jumlah slot", () => {
+    render(
+      <PatrolPlanView
+        plan={{
+          ...plan,
+          decision: {
+            code: "PPD-0003",
+            decision: "MODIFIED",
+            reason: "satu regu",
+            kept_slots: [{ threat_type: "CURANMOR", kelurahan: "Cipete Utara", block_start: 3 }],
+            plan_version: "rencana-patroli-v1",
+            target_year: 2026,
+            scope: null,
+            decided_by: "Kapolres Uji",
+            decided_at: "2026-01-05T09:00:00+07:00",
+            proposed_slots: 1,
+            slots_in_force: 1,
+          },
+          in_force: { slots: 1, keys: [] },
+        }}
+        evaluation={null}
+      />,
+    );
+
+    expect(screen.getByText("Disetujui dengan perubahan")).toBeDefined();
+    expect(screen.getByText("Kapolres Uji")).toBeDefined();
+    expect(screen.getByText(/PPD-0003/)).toBeDefined();
+    expect(screen.getByText(/Pertimbangan: satu regu/)).toBeDefined();
+  });
+
+  it("memberi pemegang kewenangan tiga pilihan keputusan yang sejajar", () => {
+    render(<PatrolPlanView plan={plan} evaluation={null} canDecide />);
+
+    expect(screen.getByRole("button", { name: /Setujui seluruhnya/ })).toBeDefined();
+    expect(screen.getByRole("button", { name: /Setujui sebagian/ })).toBeDefined();
+    expect(screen.getByRole("button", { name: /^Tolak$/ })).toBeDefined();
+    expect(screen.getByRole("button", { name: /Catat Keputusan/ })).toBeDefined();
+  });
+
   it("menandai angka yang tidak dapat dihitung, bukan menulis nol", () => {
     expect(percentText(null)).toBe("—");
     expect(percentText(12.34)).toBe("12,3%");

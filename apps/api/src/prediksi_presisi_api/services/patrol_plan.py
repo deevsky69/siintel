@@ -43,7 +43,7 @@ from sqlalchemy import Integer, cast, func, select
 from sqlalchemy.orm import Session
 
 from ..api.analysis import HOUR_BLOCK_STARTS, hour_block_label, hour_block_of
-from ..models import CrimeIncident, Location
+from ..models import CrimeIncident, Location, PatrolPlanDecision
 from ..seeding.paths import REPO_ROOT
 from . import risk_engine as risk
 from . import visibility
@@ -534,3 +534,116 @@ def evaluate_plan(session: Session, plan: PatrolPlan) -> dict[str, Any]:
             "ketepatan slot dihitung atas kejadian yang sudah tercatat, bukan setahun penuh."
         ),
     }
+
+
+# ---------------------------------------------------------------------------
+# Keputusan Pimpinan
+# ---------------------------------------------------------------------------
+
+DECISION_BASIS = (
+    "Keputusan menyalin usulan yang dibaca saat memutus (plan_snapshot) dan tidak ditimpa; "
+    "yang berlaku adalah keputusan TERAKHIR untuk tahun sasaran dan cakupan yang sama. "
+    "APPROVED: seluruh slot usulan berlaku. MODIFIED: hanya slot yang dipertahankan "
+    "(kept_slots) berlaku; slot di luar usulan tidak dapat ditambahkan di sini. REJECTED: "
+    "tidak ada slot yang berlaku, alasannya wajib. Pencocokan dengan kejadian nyata "
+    "dihitung atas slot yang berlaku."
+)
+
+
+def slot_key(threat_type: str, kelurahan: str, block_start: int) -> tuple[str, str, int]:
+    return (threat_type.upper(), kelurahan, int(block_start))
+
+
+def latest_decision(
+    session: Session, target_year: int, polsek: str | None
+) -> PatrolPlanDecision | None:
+    """Keputusan yang berlaku: yang terakhir untuk tahun sasaran dan cakupan ini."""
+    query = select(PatrolPlanDecision).where(PatrolPlanDecision.target_year == target_year)
+    query = (
+        query.where(PatrolPlanDecision.scope.is_(None))
+        if polsek is None
+        else query.where(PatrolPlanDecision.scope == polsek)
+    )
+    return session.scalar(
+        query.order_by(PatrolPlanDecision.decision_at.desc(), PatrolPlanDecision.code.desc())
+    )
+
+
+def decision_as_dict(decision: PatrolPlanDecision | None) -> dict[str, Any] | None:
+    if decision is None:
+        return None
+    return {
+        "code": decision.code,
+        "decision": decision.decision,
+        "reason": decision.reason,
+        "kept_slots": decision.kept_slots,
+        "plan_version": decision.plan_version,
+        "target_year": decision.target_year,
+        "scope": decision.scope,
+        "decided_by": decision.decided_by.full_name or decision.decided_by.username,
+        "decided_at": decision.decision_at,
+        "proposed_slots": sum(
+            len(threat.get("slots", [])) for threat in decision.plan_snapshot.get("threats", [])
+        ),
+        "slots_in_force": _slots_in_force_count(decision),
+    }
+
+
+def _slots_in_force_count(decision: PatrolPlanDecision) -> int:
+    if decision.decision == "REJECTED":
+        return 0
+    if decision.decision == "MODIFIED":
+        return len(decision.kept_slots or [])
+    return sum(len(threat.get("slots", [])) for threat in decision.plan_snapshot.get("threats", []))
+
+
+def apply_decision(plan: PatrolPlan, decision: PatrolPlanDecision | None) -> PatrolPlan:
+    """Rencana yang BERLAKU: usulan disaring menurut keputusan terakhir.
+
+    Tanpa keputusan, yang berlaku adalah usulan apa adanya — dan responsnya menyatakan
+    bahwa ia belum diputus. Slot yang dipertahankan dicocokkan menurut kuncinya
+    (jenis, kelurahan, blok), bukan menurut peringkat: peringkat dapat bergeser bila
+    data dasar berubah, kuncinya tidak.
+    """
+    if decision is None or decision.decision == "APPROVED":
+        return plan
+    kept: set[tuple[str, str, int]] = set()
+    if decision.decision == "MODIFIED":
+        kept = {
+            slot_key(str(row["threat_type"]), str(row["kelurahan"]), int(row["block_start"]))
+            for row in decision.kept_slots or []
+        }
+    filtered = PatrolPlan(
+        rules=plan.rules,
+        basis_from=plan.basis_from,
+        basis_to=plan.basis_to,
+        target_year=plan.target_year,
+        polsek=plan.polsek,
+    )
+    for threat in plan.threats:
+        slots = [
+            slot
+            for slot in threat.slots
+            if slot_key(slot.unit.threat_type, slot.unit.kelurahan, slot.unit.block) in kept
+        ]
+        filtered.threats.append(
+            ThreatPlan(
+                threat_type=threat.threat_type,
+                slots=slots,
+                basis_total=threat.basis_total,
+                basis_with_hour=threat.basis_with_hour,
+                basis_unknown_time=threat.basis_unknown_time,
+                basis_unknown_kelurahan=threat.basis_unknown_kelurahan,
+            )
+        )
+    return filtered
+
+
+def next_decision_code(session: Session) -> str:
+    latest = session.scalar(
+        select(PatrolPlanDecision.code)
+        .where(PatrolPlanDecision.code.regexp_match("^PPD-[0-9]+$"))
+        .order_by(func.length(PatrolPlanDecision.code).desc(), PatrolPlanDecision.code.desc())
+    )
+    number = 1 if latest is None else int(latest.rsplit("-", 1)[-1]) + 1
+    return f"PPD-{number:04d}"

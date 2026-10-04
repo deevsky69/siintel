@@ -29,6 +29,7 @@ from .intelligence_report import IntelligenceReport
 from .location import Location
 from .operational_action import OperationalAction
 from .patrol_activity import PatrolActivity
+from .patrol_plan_decision import PatrolPlanDecision
 from .police_unit import PoliceUnit
 from .prediction import Prediction
 from .prediction_actual import PredictionActual
@@ -52,6 +53,7 @@ __all__ = [
     "Location",
     "OperationalAction",
     "PatrolActivity",
+    "PatrolPlanDecision",
     "Permission",
     "PoliceUnit",
     "Prediction",

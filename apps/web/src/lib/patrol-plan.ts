@@ -1,4 +1,4 @@
-import { apiGet } from "./api";
+import { apiGet, apiPost } from "./api";
 
 /**
  * Rencana patroli tahunan (permintaan pemilik proyek 4 Oktober 2026).
@@ -34,6 +34,31 @@ export type ThreatPlan = {
   covered_share_percent: number;
 };
 
+export const PLAN_DECISIONS = ["APPROVED", "MODIFIED", "REJECTED"] as const;
+export type PlanDecision = (typeof PLAN_DECISIONS)[number];
+
+export const PLAN_DECISION_LABELS: Record<PlanDecision, string> = {
+  APPROVED: "Disetujui",
+  MODIFIED: "Disetujui dengan perubahan",
+  REJECTED: "Ditolak",
+};
+
+export type SlotKey = { threat_type: string; kelurahan: string; block_start: number };
+
+export type PlanDecisionRow = {
+  code: string;
+  decision: PlanDecision;
+  reason: string | null;
+  kept_slots: SlotKey[] | null;
+  plan_version: string;
+  target_year: number;
+  scope: string | null;
+  decided_by: string;
+  decided_at: string;
+  proposed_slots: number;
+  slots_in_force: number;
+};
+
 export type PatrolPlan = {
   version: string;
   status: string;
@@ -44,6 +69,11 @@ export type PatrolPlan = {
   rules: { basis_months: number; max_slots_per_threat: number; minimum_incidents: number };
   threats: ThreatPlan[];
   plan_basis: string;
+  /** Keputusan terakhir untuk tahun dan cakupan ini; null = belum diputus. */
+  decision?: PlanDecisionRow | null;
+  /** Slot yang BERLAKU menurut keputusan terakhir (= usulan bila belum diputus). */
+  in_force?: { slots: number; keys: SlotKey[] };
+  decision_basis?: string;
   reference_time: string;
   demo_clock: boolean;
 };
@@ -90,6 +120,9 @@ export type PlanEvaluation = {
     area_similarity_percent: number | null;
   };
   per_threat: ThreatEvaluation[];
+  decision?: PlanDecisionRow | null;
+  /** "in_force" bila dihitung atas rencana yang diputus, "proposed" bila belum diputus. */
+  evaluated_plan?: "in_force" | "proposed";
   similarity_basis: string;
   partial_year_basis: string;
   reference_time: string;
@@ -97,6 +130,15 @@ export type PlanEvaluation = {
 };
 
 export const getPatrolPlan = () => apiGet<PatrolPlan>("/patrol-plan");
+export const getPlanDecisions = () => apiGet<{ data: PlanDecisionRow[] }>("/patrol-plan/decisions");
+export const submitPlanDecision = (body: {
+  decision: PlanDecision;
+  reason?: string;
+  kept_slots?: SlotKey[];
+}) => apiPost<PlanDecisionRow>("/patrol-plan/decisions", body);
+
+export const slotKeyOf = (slot: SlotKey) =>
+  `${slot.threat_type}|${slot.kelurahan}|${slot.block_start}`;
 export const getPatrolPlanEvaluation = () => apiGet<PlanEvaluation>("/patrol-plan/evaluation");
 
 /** "84,3%" — atau tanda bahwa angkanya memang tidak dapat dihitung. */

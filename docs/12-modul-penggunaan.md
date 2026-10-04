@@ -869,6 +869,24 @@ sebagian kecil kejadian — berapa slot yang sanggup dipatroli adalah keputusan 
 > belum ditetapkan pemilik proyek. Kejadian tanpa jam atau tanpa kelurahan disebut
 > jumlahnya dan tidak masuk slot mana pun.
 
+### Bagian ketiga: keputusan Pimpinan
+
+Usulan baru menjadi **rencana yang berlaku** setelah diputus. Pemegang kewenangan
+keputusan komando (Pimpinan) melihat tiga tombol sejajar:
+
+| Tombol | Artinya |
+|---|---|
+| **Setujui seluruhnya** | Seluruh slot usulan berlaku |
+| **Setujui sebagian** | Tiap slot menjadi kotak centang; yang tidak dicentang dilepas. Slot di luar usulan tidak dapat ditambahkan di sini |
+| **Tolak** | Tidak ada slot yang berlaku; alasan wajib |
+
+Keputusan tercatat beserta nama pejabat, waktu, pertimbangan, dan **salinan usulan yang
+dibaca saat memutus** — sehingga bila data berubah dan usulan ikut berubah, apa yang
+pernah diputus tetap dapat ditelusuri. Keputusan baru menggantikan yang berlaku tanpa
+menghapus riwayat, dan **pencocokan dengan kejadian nyata dihitung atas rencana yang
+berlaku**, bukan atas usulan mentah. Peran lain melihat keputusan yang berlaku beserta
+pejabatnya, tanpa tombol.
+
 ---
 
 ## 17. LAPORAN MASYARAKAT

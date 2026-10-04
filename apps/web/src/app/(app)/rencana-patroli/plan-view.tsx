@@ -4,11 +4,15 @@ import { StatusNotice } from "@/components/warnings/status-notice";
 import {
   longDate,
   type PatrolPlan,
+  PLAN_DECISION_LABELS,
+  type PlanDecisionRow,
   type PlanEvaluation,
   percentText,
+  slotKeyOf,
   type ThreatEvaluation,
   type ThreatPlan,
 } from "@/lib/patrol-plan";
+import { PlanDecisionForm } from "./plan-decision-form";
 
 function Metric({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
@@ -31,9 +35,12 @@ function Metric({ label, value, hint }: { label: string; value: string; hint: st
 export function PatrolPlanView({
   plan,
   evaluation,
+  canDecide = false,
 }: {
   plan: PatrolPlan;
   evaluation: PlanEvaluation | null;
+  /** Pemegang `commander_decision:approve`; penolakan sesungguhnya tetap di backend. */
+  canDecide?: boolean;
 }) {
   const resultOf = new Map(
     (evaluation?.per_threat ?? []).map((row) => [row.threat_type, row] as const),
@@ -67,13 +74,18 @@ export function PatrolPlanView({
               menjangkau kejadian yang polanya berulang; slot di bawah batas minimum tidak diusulkan
               karena satu-dua kejadian setahun bukan pola.
             </p>
-            {plan.threats.map((threat) => (
-              <ThreatSlots
-                key={threat.threat_type}
-                threat={threat}
-                result={resultOf.get(threat.threat_type)}
-              />
-            ))}
+            <DecisionBanner decision={plan.decision ?? null} inForce={plan.in_force?.slots} />
+            {canDecide ? (
+              <PlanDecisionForm plan={plan} resultOf={resultOf} />
+            ) : (
+              plan.threats.map((threat) => (
+                <ThreatSlots
+                  key={threat.threat_type}
+                  threat={threat}
+                  result={resultOf.get(threat.threat_type)}
+                />
+              ))
+            )}
           </div>
         )}
       </Panel>
@@ -83,7 +95,45 @@ export function PatrolPlanView({
   );
 }
 
-function ThreatSlots({ threat, result }: { threat: ThreatPlan; result?: ThreatEvaluation }) {
+function DecisionBanner({
+  decision,
+  inForce,
+}: {
+  decision: PlanDecisionRow | null;
+  inForce: number | undefined;
+}) {
+  if (decision === null) {
+    return (
+      <p className="rounded border border-base-800 bg-base-850 px-3 py-2 text-xs text-ink-muted">
+        <span className="text-ink">Belum diputus.</span> Sampai Pimpinan memutuskan, usulan ini
+        belum menjadi rencana yang berlaku.
+      </p>
+    );
+  }
+  return (
+    <p className="rounded border border-accent/30 bg-accent/5 px-3 py-2 text-xs text-ink-muted">
+      <span className="font-heading font-semibold text-accent">
+        {PLAN_DECISION_LABELS[decision.decision]}
+      </span>{" "}
+      oleh <span className="text-ink">{decision.decided_by}</span> pada{" "}
+      {new Date(decision.decided_at).toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })} WIB (
+      {decision.code}) — {inForce ?? decision.slots_in_force} dari {decision.proposed_slots} slot
+      usulan berlaku.
+      {decision.reason ? <> Pertimbangan: {decision.reason}</> : null}
+    </p>
+  );
+}
+
+export function ThreatSlots({
+  threat,
+  result,
+  selectable = false,
+}: {
+  threat: ThreatPlan;
+  result?: ThreatEvaluation;
+  /** Menampilkan kotak centang "dipertahankan" per slot (formulir keputusan MODIFIED). */
+  selectable?: boolean;
+}) {
   const actualOf = new Map(
     (result?.slot_results ?? []).map(
       (row) => [`${row.kelurahan}|${row.block_start}`, row] as const,
@@ -111,6 +161,7 @@ function ThreatSlots({ threat, result }: { threat: ThreatPlan; result?: ThreatEv
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-base-800">
+                {selectable ? <th className="stat-label pb-1.5">Patroli</th> : null}
                 <th className="stat-label pb-1.5">#</th>
                 <th className="stat-label pb-1.5">Kelurahan</th>
                 <th className="stat-label pb-1.5">Kecamatan</th>
@@ -129,6 +180,17 @@ function ThreatSlots({ threat, result }: { threat: ThreatPlan; result?: ThreatEv
                     className="border-b border-base-800/60 last:border-0"
                     title={slot.why}
                   >
+                    {selectable ? (
+                      <td className="py-1.5">
+                        <input
+                          type="checkbox"
+                          name="kept"
+                          value={slotKeyOf(slot)}
+                          defaultChecked
+                          aria-label={`Pertahankan ${slot.kelurahan} ${slot.block_label}`}
+                        />
+                      </td>
+                    ) : null}
                     <td className="py-1.5 font-mono text-ink-muted">{slot.rank}</td>
                     <td className="py-1.5 text-ink">{slot.kelurahan}</td>
                     <td className="py-1.5 text-ink-muted">{slot.kecamatan}</td>

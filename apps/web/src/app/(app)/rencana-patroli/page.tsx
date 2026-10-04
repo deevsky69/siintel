@@ -1,4 +1,5 @@
 import { ApiError } from "@/lib/api";
+import { getProfile } from "@/lib/decisions";
 import { getPatrolPlan, getPatrolPlanEvaluation } from "@/lib/patrol-plan";
 import { PatrolPlanView } from "./plan-view";
 
@@ -12,13 +13,20 @@ export const dynamic = "force-dynamic";
  * panel pencocokan, bukan menggagalkan seluruh halaman.
  */
 export default async function PatrolPlanPage() {
-  const [plan, evaluation] = await Promise.all([
+  const [plan, evaluation, profile] = await Promise.all([
     getPatrolPlan(),
     getPatrolPlanEvaluation().catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 403) return null;
       throw error;
     }),
+    getProfile(),
   ]);
 
-  return <PatrolPlanView plan={plan} evaluation={evaluation} />;
+  return (
+    <PatrolPlanView
+      plan={plan}
+      evaluation={evaluation}
+      canDecide={profile.permissions.includes("commander_decision:approve")}
+    />
+  );
 }

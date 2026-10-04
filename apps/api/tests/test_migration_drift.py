@@ -55,6 +55,7 @@ EXPECTED_TABLES = {
     # TASK 014 — operasional
     "commander_decisions",
     "operational_actions",
+    "patrol_plan_decisions",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat
     "citizen_report_attachments",
