@@ -9,6 +9,7 @@ import {
   MATCH_HINTS,
   MATCH_LABELS,
   MATCH_TYPES,
+  type ThresholdSweep,
 } from "@/lib/evaluation";
 
 function MetricCard({
@@ -50,9 +51,12 @@ function MetricCard({
 export function EvaluationView({
   metrics,
   summary,
+  sweep = null,
 }: {
   metrics: EvaluationMetrics;
   summary: EvaluationSummary;
+  /** Precision/recall bila ambang terbit dinaikkan — bahan keputusan ambang. */
+  sweep?: ThresholdSweep | null;
 }) {
   const precisionPercent = formatPercent(metrics.precision);
   const recallPercent = formatPercent(metrics.recall);
@@ -145,6 +149,7 @@ export function EvaluationView({
         )}
       </Panel>
 
+      {sweep && sweep.rows.length > 0 ? <SweepPanel sweep={sweep} /> : null}
       <div className="grid grid-cols-12 gap-3">
         <div className="col-span-12 xl:col-span-7">
           <Panel
@@ -241,5 +246,62 @@ export function EvaluationView({
         </div>
       </div>
     </div>
+  );
+}
+
+function SweepPanel({ sweep }: { sweep: ThresholdSweep }) {
+  const base = sweep.rows[0];
+  const bestPrecision = Math.max(...sweep.rows.map((row) => row.precision ?? 0));
+  const flat = base?.precision !== null && bestPrecision - (base?.precision ?? 0) < 0.02;
+  return (
+    <Panel
+      title="Bila Ambang Terbit Dinaikkan"
+      action={<span className="panel-action">ambang berlaku {sweep.current_floor}</span>}
+    >
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-xs">
+          <thead>
+            <tr className="border-b border-base-800">
+              <th className="stat-label pb-2">Ambang</th>
+              <th className="stat-label pb-2 text-right">Peringatan/hari</th>
+              <th className="stat-label pb-2 text-right">Precision</th>
+              <th className="stat-label pb-2 text-right">Recall</th>
+              <th className="stat-label pb-2 text-right">Terbukti</th>
+              <th className="stat-label pb-2 text-right">Luput</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sweep.rows.map((row) => (
+              <tr
+                key={row.threshold}
+                className={`border-b border-base-800/60 last:border-0 ${
+                  row.threshold === sweep.current_floor ? "text-ink" : "text-ink-muted"
+                }`}
+              >
+                <td className="py-1.5 font-mono">{row.threshold}</td>
+                <td className="py-1.5 text-right font-mono">
+                  {row.warnings_per_day?.toLocaleString("id-ID") ?? "—"}
+                </td>
+                <td className="py-1.5 text-right font-mono">{formatRatio(row.precision)}</td>
+                <td className="py-1.5 text-right font-mono">{formatRatio(row.recall)}</td>
+                <td className="py-1.5 text-right font-mono">{row.hits}</td>
+                <td className="py-1.5 text-right font-mono">{row.false_negatives}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
+        {flat ? (
+          <>
+            <strong className="text-ink">Menaikkan ambang tidak menaikkan precision</strong> — yang
+            turun hanya jumlah peringatan dan recall. Artinya skor aturan saat ini tidak membedakan
+            hari yang akan ada kejadian dari hari yang tidak; yang perlu diperbaiki adalah cara skor
+            dihitung, bukan ambangnya.{" "}
+          </>
+        ) : null}
+        {sweep.basis}
+      </p>
+    </Panel>
   );
 }

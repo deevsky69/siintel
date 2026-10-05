@@ -117,7 +117,9 @@ export default async function DashboardPage({
             })}{" "}
             WIB
           </span>
-          , sesuai posisi data kejadian terakhir.
+          {summary.display_data_until
+            ? ` — layar memuat kejadian sampai ${new Date(`${summary.display_data_until}T00:00:00+07:00`).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" })}; kejadian sesudahnya hanya dipakai pencocokan.`
+            : ", sesuai posisi data kejadian terakhir."}
         </div>
       ) : null}
 

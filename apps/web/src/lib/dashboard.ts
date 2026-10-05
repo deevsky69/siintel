@@ -9,6 +9,8 @@ export type UnitCount = { status: string; count: number };
 export type DashboardSummary = {
   reference_time: string;
   demo_clock: boolean;
+  /** Batas tampilan kejadian (YYYY-MM-DD); null = tanpa batas. */
+  display_data_until?: string | null;
   assessment_date: string | null;
   security_index: number;
   security_index_basis: string;

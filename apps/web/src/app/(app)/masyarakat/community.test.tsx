@@ -7,7 +7,7 @@ import { CommunityView } from "./community-view";
 const BASIS =
   "Laporan masyarakat BELUM memengaruhi risk score sama sekali: tidak ada jalur dari " +
   "citizen_reports ke risk_scores maupun predictions pada prototipe ini. `urgency_score` " +
-  "dan `verification_score` adalah nilai sintetis berstatus DEMO, bukan hasil penilaian model.";
+  "dan `verification_score` diisi petugas saat triase (MANUAL); kosong berarti belum dinilai.";
 
 const UNMAPPED_BASIS =
   "Laporan yang koordinatnya belum jatuh pada sel grid mana pun. Lokasinya tidak ditebak " +
@@ -85,11 +85,11 @@ describe("community signal dashboard", () => {
     expect(screen.getAllByText(/BELUM memengaruhi risk score sama sekali/).length).toBe(1);
   });
 
-  it("menyebut urgensi dan verifikasi sebagai nilai sintetis, bukan hasil model", () => {
+  it("menyebut urgensi dan verifikasi sebagai isian petugas, bukan hasil model", () => {
     render(<CommunityView summary={summary} reports={reports} filters={noFilter} />);
 
-    expect(screen.getAllByText(/nilai\s+sintetis berstatus/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/bukan hasil penilaian model/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/diisi petugas\s+saat triase/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/tidak ada penilaian\s+otomatis/i).length).toBeGreaterThan(0);
   });
 
   it("tidak mengklaim ada deteksi duplikasi atau spam", () => {

@@ -56,6 +56,7 @@ from ...models import (
     Recommendation,
 )
 from ...services import clock
+from ...services import patrol_plan as planning
 from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
 
 router = APIRouter(tags=["notifikasi"])
@@ -135,6 +136,38 @@ def notifications(
                 ],
             }
         )
+
+    # --- Rencana patroli tahunan yang belum diputus (5 Oktober 2026) -------------------
+    if _holds(current, "commander_decision:approve"):
+        polsek = jurisdiction_filter(current, "commander_decision:approve")
+        try:
+            plan = planning.build_plan(session, polsek)
+        except planning.PatrolPlanError:
+            plan = None
+        if plan is not None and any(threat.slots for threat in plan.threats):
+            decision = planning.latest_decision(session, plan.target_year, polsek)
+            if decision is None:
+                proposed = sum(len(threat.slots) for threat in plan.threats)
+                groups.append(
+                    {
+                        "kind": "PATROL_PLAN",
+                        "title": f"Rencana patroli {plan.target_year} belum diputus",
+                        "action": "Setujui, setujui sebagian, atau tolak",
+                        "href": "/rencana-patroli",
+                        "total": 1,
+                        "items": [
+                            {
+                                "code": f"RENCANA-{plan.target_year}",
+                                "headline": (
+                                    f"{proposed} slot usulan dari pola {plan.basis_from.year}"
+                                ),
+                                "detail": (
+                                    "Usulan belum menjadi rencana yang berlaku sampai diputus"
+                                ),
+                            }
+                        ],
+                    }
+                )
 
     # --- Rekomendasi yang menunggu keputusan komandan ---------------------------------
     if _holds(current, "commander_decision:approve"):

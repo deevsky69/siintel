@@ -72,3 +72,24 @@ export function formatPercent(value: number | null): string | null {
 export const getEvaluationMetrics = () => apiGet<EvaluationMetrics>("/evaluation/metrics");
 
 export const getEvaluationSummary = () => apiGet<EvaluationSummary>("/evaluation/summary");
+
+/** Satu baris "bila ambang dinaikkan menjadi T". */
+export type SweepRow = {
+  threshold: number;
+  hits: number;
+  false_positives: number;
+  false_negatives: number;
+  precision: number | null;
+  recall: number | null;
+  warnings_per_day: number | null;
+};
+
+export type ThresholdSweep = {
+  current_floor: number;
+  evaluated_days: number;
+  rows: SweepRow[];
+  status: string;
+  basis: string;
+};
+
+export const getThresholdSweep = () => apiGet<ThresholdSweep>("/evaluation/threshold-sweep");

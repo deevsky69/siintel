@@ -139,3 +139,67 @@ def summary(
         "status": "PROPOSED",
         "basis": evaluation_basis(),
     }
+
+
+#: Ambang yang dicoba pada tabel "bila ambang dinaikkan". Mulai dari ambang yang berlaku
+#: supaya baris pertama sama dengan angka utama, lalu naik lima-lima sampai 95.
+SWEEP_STEP = 5
+SWEEP_TOP = 95
+
+SWEEP_BASIS = (
+    "Dihitung ulang dari baris evaluasi yang tersimpan: pada ambang T, HIT dan FALSE_POSITIVE "
+    "hanya dihitung bila skor prediksinya >= T, dan HIT yang skornya < T berpindah menjadi "
+    "FALSE_NEGATIVE. Tidak ada prediksi baru yang dibuat. Tabel ini bahan keputusan ambang "
+    "(U-01/U-03), bukan klaim: bila precision tidak naik ketika ambang dinaikkan, yang perlu "
+    "diperbaiki adalah cara skor dihitung, bukan ambangnya."
+)
+
+
+@router.get("/threshold-sweep", summary="Precision/recall bila ambang terbit dinaikkan")
+def threshold_sweep(
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("evaluation:read"),
+) -> dict[str, Any]:
+    floor = risk.load_thresholds().minimum_warning_score
+    rows = session.execute(
+        select(
+            PredictionActual.match_type, Prediction.risk_score, PredictionActual.evaluation_date
+        ).outerjoin(Prediction, Prediction.prediction_id == PredictionActual.prediction_id)
+    ).all()
+    days = len({row[2] for row in rows})
+    thresholds = list(range(floor, SWEEP_TOP + 1, SWEEP_STEP))
+    if thresholds and thresholds[-1] != SWEEP_TOP:
+        thresholds.append(SWEEP_TOP)
+    sweep: list[dict[str, Any]] = []
+    for threshold in thresholds:
+        hits = sum(
+            1 for m, score, _ in rows if m == "HIT" and score is not None and score >= threshold
+        )
+        fps = sum(
+            1
+            for m, score, _ in rows
+            if m == "FALSE_POSITIVE" and score is not None and score >= threshold
+        )
+        lost = sum(
+            1 for m, score, _ in rows if m == "HIT" and score is not None and score < threshold
+        )
+        fns = sum(1 for m, _s, _ in rows if m == "FALSE_NEGATIVE") + lost
+        issued = hits + fps
+        sweep.append(
+            {
+                "threshold": threshold,
+                "hits": hits,
+                "false_positives": fps,
+                "false_negatives": fns,
+                "precision": round(hits / issued, 3) if issued else None,
+                "recall": round(hits / (hits + fns), 3) if hits + fns else None,
+                "warnings_per_day": round(issued / days, 1) if days else None,
+            }
+        )
+    return {
+        "current_floor": floor,
+        "evaluated_days": days,
+        "rows": sweep,
+        "status": "PROPOSED",
+        "basis": SWEEP_BASIS,
+    }

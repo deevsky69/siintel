@@ -265,7 +265,7 @@ def test_every_response_states_that_reports_do_not_affect_risk_score(
         body = client.get(path, headers=headers).json()
         assert body["status"] == DATA_STATUS, path
         assert "BELUM memengaruhi risk score" in body["basis"], path
-        assert "sintetis" in body["basis"], path
+        assert "diisi petugas saat triase" in body["basis"], path
 
 
 def test_summary_counts_match_the_list_totals(client: TestClient, session: Session) -> None:

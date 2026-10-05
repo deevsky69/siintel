@@ -333,9 +333,9 @@ export function CommunityView({
         )}
 
         <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
-          <strong>Urgensi</strong> dan <strong>verifikasi</strong> pada tabel ini adalah nilai
-          sintetis berstatus {summary.status} — bukan hasil penilaian model, dan bukan dasar
-          tindakan. Deteksi duplikasi dan deteksi spam yang disyaratkan spesifikasi §4 belum
+          <strong>Urgensi</strong> dan <strong>verifikasi</strong> pada tabel ini diisi petugas saat
+          triase ({summary.status}); kosong berarti belum dinilai, dan tidak ada penilaian otomatis
+          di baliknya. Deteksi duplikasi dan deteksi spam yang disyaratkan spesifikasi §4 belum
           dibangun, sehingga laporan di sini belum tersaring dari kemungkinan pengulangan.
         </p>
       </Panel>

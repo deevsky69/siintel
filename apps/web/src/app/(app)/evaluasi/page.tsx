@@ -1,4 +1,4 @@
-import { getEvaluationMetrics, getEvaluationSummary } from "@/lib/evaluation";
+import { getEvaluationMetrics, getEvaluationSummary, getThresholdSweep } from "@/lib/evaluation";
 import { EvaluationView } from "./evaluation-view";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +11,11 @@ export const dynamic = "force-dynamic";
  * dasar perhitungannya.
  */
 export default async function EvaluationCenterPage() {
-  const [metrics, summary] = await Promise.all([getEvaluationMetrics(), getEvaluationSummary()]);
+  const [metrics, summary, sweep] = await Promise.all([
+    getEvaluationMetrics(),
+    getEvaluationSummary(),
+    getThresholdSweep(),
+  ]);
 
-  return <EvaluationView metrics={metrics} summary={summary} />;
+  return <EvaluationView metrics={metrics} summary={summary} sweep={sweep} />;
 }

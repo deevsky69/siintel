@@ -25,7 +25,7 @@ from ...models import (
     Prediction,
     RiskScore,
 )
-from ...services import clock
+from ...services import clock, visibility
 from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
@@ -157,6 +157,11 @@ def summary(
     return {
         "reference_time": now,
         "demo_clock": clock.is_demo_clock(),
+        # Batas tampilan kejadian (services/visibility.py) — dinyatakan di layar, bukan
+        # dibiarkan pembaca menebak mengapa 2026 tidak tampak.
+        "display_data_until": (
+            None if visibility.display_cutoff() is None else visibility.display_cutoff()
+        ),
         "assessment_date": latest_date,
         "security_index": max(0, SECURITY_INDEX_BASE - average_risk),
         "security_index_basis": (

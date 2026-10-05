@@ -42,8 +42,9 @@ from ..pagination import PageParams, page_params, paginate
 
 router = APIRouter(tags=["masyarakat"])
 
-#: Penanda mutu data, searah dengan Evaluation Center dan Warning Center.
-DATA_STATUS = "DEMO"
+#: Penanda mutu data. Sejak data asli (30 September 2026) tidak ada lagi laporan sintetis:
+#: urgensi dan verifikasi diisi petugas saat triase, dan kosong berarti belum dinilai.
+DATA_STATUS = "MANUAL"
 
 #: Jumlah wilayah teratas pada ringkasan.
 TOP_AREA_LIMIT = 5
@@ -57,8 +58,9 @@ BASIS = (
     "mensyaratkan laporan melewati klasifikasi, deteksi duplikasi, deteksi spam, "
     "pengelompokan lokasi, penilaian urgensi, dan validasi operator/analis sebelum boleh "
     "memengaruhi risiko — tidak satu pun tahapan itu sudah dibangun. `urgency_score` dan "
-    "`verification_score` adalah nilai sintetis berstatus DEMO, bukan hasil penilaian "
-    "model. Laporan tanpa tautan wilayah tidak diberikan kepada akun yang dibatasi wilayah."
+    "`verification_score` diisi petugas saat triase (MANUAL); kosong berarti belum dinilai, "
+    "dan tidak ada penilaian otomatis di baliknya. Laporan tanpa tautan wilayah tidak "
+    "diberikan kepada akun yang dibatasi wilayah."
 )
 
 #: Laporan tanpa `location_id` memang ada dan sengaja tidak dipetakan paksa (docs/02 §6).
