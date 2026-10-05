@@ -5,6 +5,7 @@ import {
   decisionSentence,
   effectiveInstruction,
   formatBriefDate,
+  patrolPlanSentence,
   riskLabel,
   situationSentence,
   threatSentence,
@@ -312,6 +313,40 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
 
         <Section
           number={5}
+          title="Rencana Patroli Tahun Ini"
+          lead={patrolPlanSentence(brief)}
+          bases={[brief.patrol_plan_basis]}
+        >
+          {brief.patrol_plan === null ? (
+            <Unavailable reason="Bagian ini tidak disertakan untuk akun ini." />
+          ) : brief.patrol_plan.top_slots.length === 0 ? (
+            <p className="text-xs text-ink-muted">
+              Tidak ada slot yang berlaku
+              {brief.patrol_plan.decision?.decision === "REJECTED"
+                ? ` — usulan ditolak${brief.patrol_plan.decision.reason ? `: ${brief.patrol_plan.decision.reason}` : ""}.`
+                : "."}
+            </p>
+          ) : (
+            <ol className="space-y-1.5">
+              {brief.patrol_plan.top_slots.map((slot) => (
+                <li
+                  key={`${slot.threat_type}-${slot.kelurahan}-${slot.block_label}`}
+                  className="border-l-2 border-base-700 pl-3 text-xs leading-relaxed"
+                >
+                  <p className="font-heading font-semibold text-ink">
+                    {slot.kelurahan}, {slot.kecamatan} · {slot.block_label} WIB
+                  </p>
+                  <p className="mt-0.5 text-ink-muted">
+                    {slot.threat_type} — {slot.incidents} kejadian pada tahun dasar
+                  </p>
+                </li>
+              ))}
+            </ol>
+          )}
+        </Section>
+
+        <Section
+          number={6}
           title="Ketepatan Model Sejauh Ini"
           lead={
             accuracy

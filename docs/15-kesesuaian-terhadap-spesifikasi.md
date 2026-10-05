@@ -192,6 +192,18 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | **Peta** | Klik kecamatan pada `/peta` membuka peta kelurahan berwarna (sudah sejak 1 Oktober 2026) |
 | **Produksi** | **Diterapkan 4 Oktober 2026**: jam acuan 1 Januari 2026, batas tampilan 2025, 816 skor dan prediksi 24H, 32 peringatan + rekomendasi, evaluasi mundur 3 Jan–28 Sep 2026; `prod:periksa` lulus. Potret keadaan: `scripts/status-produksi.sh`; mesin dapat diulang: `scripts/jalankan-mesin-produksi.sh` |
 
+### Iterasi perbaikan 5 Oktober 2026
+
+| Pekerjaan | Keadaan |
+|---|---|
+| Wilayah laporan masyarakat setingkat kelurahan | Pemilih kecamatan → kelurahan; lokasi peramban (termasuk laptop) mengisi kelurahan terdekat; backend menurunkan kelurahan terdekat dengan PostGIS bila tidak dipilih |
+| Tabel "bila ambang dinaikkan" | `/evaluation/threshold-sweep`: precision tetap ±1% pada ambang 70–95 — tuasnya model, bukan ambang |
+| Antrean Pimpinan | Rencana patroli yang belum diputus masuk `/notifications` |
+| Panel rincian kelurahan | Klik kelurahan pada peta yang diperbesar membuka rincian sel kelurahan itu |
+| Prediction Center | Baris VALIDATED (evaluasi) disembunyikan dari daftar kecuali diminta |
+| Executive Brief | Bagian "Rencana Patroli Tahun Ini" |
+| Laporan masyarakat | Urgensi/verifikasi dinyatakan sebagai isian petugas, bukan "nilai sintetis" |
+
 ### Masih tersisa
 
 | Urutan | Pekerjaan | Alasan |

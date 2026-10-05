@@ -373,6 +373,12 @@ bagi data yang pintu depannya terkunci.
 
 ---
 
+### Bagian baru sejak 5 Oktober 2026
+
+Brief memuat bagian **Rencana Patroli Tahun Ini**: sudah atau belum diputus Pimpinan,
+berapa slot yang berlaku dari usulan, dan tiga slot teratas yang berlaku (kelurahan, blok
+jam, jenis, kejadian tahun dasar). Bagian ketepatan model bergeser menjadi bagian keenam.
+
 ## 7. MEMASUKKAN DATA
 
 Menu **Data Entry**. Tiga formulir: **kejadian**, **laporan intelijen**, dan **triase

@@ -89,6 +89,22 @@ const brief: DailyBrief = {
     status: "PROPOSED",
   },
   accuracy_basis: "Aturan pencocokan final belum ditetapkan (U-03).",
+  patrol_plan: {
+    target_year: 2026,
+    proposed_slots: 30,
+    slots_in_force: 30,
+    decision: null,
+    top_slots: [
+      {
+        threat_type: "CURANMOR",
+        kelurahan: "Cipete Utara",
+        kecamatan: "Kebayoran Baru",
+        block_label: "03.00-06.00",
+        incidents: 11,
+      },
+    ],
+  },
+  patrol_plan_basis: "Usulan slot kelurahan x blok 3 jam dari pola tahun dasar (PROPOSED).",
 };
 
 /**
@@ -209,7 +225,7 @@ describe("dokumen executive brief", () => {
 
   it("menandai angka ketepatan model sebagai belum final", () => {
     render(<BriefDocument brief={brief} />);
-    const accuracy = section("5. Ketepatan Model Sejauh Ini");
+    const accuracy = section("6. Ketepatan Model Sejauh Ini");
 
     expect(accuracy.getByText("PROPOSED")).toBeDefined();
     expect(accuracy.getByText(/belum final/)).toBeDefined();

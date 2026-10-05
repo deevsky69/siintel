@@ -331,3 +331,18 @@ def test_sections_without_permission_are_omitted_with_a_reason(
     ):
         assert body[value] is None, value
         assert permission in body[basis], basis
+
+
+def test_the_brief_carries_the_patrol_plan_and_its_decision_state(
+    client: TestClient, session: Session
+) -> None:
+    """Pimpinan membaca rencana patroli tahun sasaran di brief, beserta sudah/belum diputus."""
+    headers = _auth(client, _make_user(session, "Pimpinan"))
+    brief = client.get("/api/v1/brief/daily", headers=headers).json()
+    plan = brief["patrol_plan"]
+    assert plan is not None, brief.get("patrol_plan_basis")
+    assert {"target_year", "proposed_slots", "slots_in_force", "decision", "top_slots"} <= set(plan)
+    assert plan["decision"] is None
+    assert plan["slots_in_force"] == plan["proposed_slots"]
+    assert len(plan["top_slots"]) <= 3
+    assert "PROPOSED" in brief["patrol_plan_basis"]

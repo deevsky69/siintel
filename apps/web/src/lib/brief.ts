@@ -93,9 +93,50 @@ export type DailyBrief = {
   pending_action_items: PendingActionItem[];
   pending_actions_basis: string;
 
+  /** Rencana patroli tahun sasaran beserta keadaan keputusannya (5 Oktober 2026). */
+  patrol_plan: BriefPatrolPlan | null;
+  patrol_plan_basis: string;
+
   accuracy: BriefAccuracy | null;
   accuracy_basis: string;
 };
+
+export type BriefPatrolPlan = {
+  target_year: number;
+  proposed_slots: number;
+  slots_in_force: number;
+  decision: {
+    code: string;
+    decision: string;
+    decided_by: string;
+    decided_at: string;
+    reason: string | null;
+  } | null;
+  top_slots: {
+    threat_type: string;
+    kelurahan: string;
+    kecamatan: string;
+    block_label: string;
+    incidents: number;
+  }[];
+};
+
+const PLAN_DECISION_WORDS: Record<string, string> = {
+  APPROVED: "disetujui seluruhnya",
+  MODIFIED: "disetujui sebagian",
+  REJECTED: "ditolak",
+};
+
+/** Kalimat pembuka bagian rencana patroli — disusun template, bukan model. */
+export function patrolPlanSentence(brief: DailyBrief): string | null {
+  const plan = brief.patrol_plan;
+  if (plan === null) return null;
+  if (plan.decision === null) {
+    return `Rencana patroli ${plan.target_year}: ${plan.proposed_slots} slot usulan belum diputus.`;
+  }
+  const word = PLAN_DECISION_WORDS[plan.decision.decision] ?? plan.decision.decision;
+  return `Rencana patroli ${plan.target_year} ${word} oleh ${plan.decision.decided_by}; ${plan.slots_in_force} dari ${plan.proposed_slots} slot usulan berlaku.`;
+}
 
 const MONTHS = [
   "Januari",

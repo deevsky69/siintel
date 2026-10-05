@@ -69,6 +69,7 @@ from ...models import (
     RiskScore,
 )
 from ...services import clock
+from ...services import patrol_plan as planning
 from ..deps import (
     CurrentUser,
     function_filter,
@@ -380,6 +381,50 @@ def _awaiting_action(session: Session, current: CurrentUser) -> dict[str, Any]:
     }
 
 
+def _patrol_plan(session: Session, current: CurrentUser) -> dict[str, Any]:
+    """Bagian 4b — rencana patroli tahun sasaran dan keputusan Pimpinan atasnya.
+
+    Dihitung dari data saat brief dibuka (usulan tidak disimpan), dan menyebut tiga slot
+    teratas yang BERLAKU supaya Pimpinan membaca tindakan, bukan hanya angka.
+    """
+    if not current.permissions.allows("recommendation:read"):
+        return {"patrol_plan": None, "patrol_plan_basis": _no_permission("recommendation:read")}
+    polsek = jurisdiction_filter(current, "recommendation:read")
+    try:
+        plan = planning.build_plan(session, polsek)
+    except planning.PatrolPlanError as error:
+        return {"patrol_plan": None, "patrol_plan_basis": str(error)}
+    decision = planning.latest_decision(session, plan.target_year, polsek)
+    in_force = planning.apply_decision(plan, decision)
+    slots = sorted(
+        (slot for threat in in_force.threats for slot in threat.slots),
+        key=lambda slot: (-slot.incidents, slot.unit.threat_type, slot.unit.kelurahan),
+    )
+    return {
+        "patrol_plan": {
+            "target_year": plan.target_year,
+            "proposed_slots": sum(len(threat.slots) for threat in plan.threats),
+            "slots_in_force": len(slots),
+            "decision": planning.decision_as_dict(decision),
+            "top_slots": [
+                {
+                    "threat_type": slot.unit.threat_type,
+                    "kelurahan": slot.unit.kelurahan,
+                    "kecamatan": slot.unit.kecamatan,
+                    "block_label": slot.as_dict()["block_label"],
+                    "incidents": slot.incidents,
+                }
+                for slot in slots[:3]
+            ],
+        },
+        "patrol_plan_basis": (
+            "Usulan slot kelurahan x blok 3 jam dari pola tahun dasar (config/patrol/"
+            "plan-rules.yaml, PROPOSED), dihitung saat brief dibuka. Yang berlaku mengikuti "
+            "keputusan terakhir Pimpinan; tanpa keputusan, usulan belum menjadi rencana."
+        ),
+    }
+
+
 def _accuracy(session: Session, current: CurrentUser) -> dict[str, Any]:
     """Bagian 6 — ketepatan model sejauh ini.
 
@@ -456,6 +501,7 @@ def daily(
     brief.update(_risk_picture(session, current))
     brief.update(_awaiting_decision(session, current))
     brief.update(_awaiting_action(session, current))
+    brief.update(_patrol_plan(session, current))
     brief.update(_accuracy(session, current))
 
     return brief
