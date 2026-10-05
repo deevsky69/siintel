@@ -23,6 +23,7 @@ export function RiskMap({
   months,
   level,
   overlay = null,
+  selectedKelurahan = null,
 }: {
   data: MapData;
   selected: string | null;
@@ -32,6 +33,8 @@ export function RiskMap({
   level: MapLevel;
   /** Baris per kelurahan untuk kecamatan terpilih; hanya ada pada tingkat `kelurahan`. */
   overlay?: KelurahanOverlay | null;
+  /** Kelurahan yang rinciannya sedang dibuka; hanya berarti pada tingkat `kelurahan`. */
+  selectedKelurahan?: string | null;
 }) {
   // Pada tingkat kelurahan kanvas menggambar baris kelurahan, dan skala kepekatan historis
   // mengikuti puncak antar-kelurahan — bukan puncak antar-kecamatan, yang akan membuat
@@ -154,7 +157,7 @@ export function RiskMap({
           <MapCanvas
             districts={canvasDistricts}
             layer={layer}
-            selected={selected}
+            selected={zoomed ? (selectedKelurahan ?? null) : selected}
             historical={canvasHistorical}
             months={months}
             level={level}

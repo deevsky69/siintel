@@ -327,7 +327,9 @@ export function DistrictDetail({
     <div className="space-y-4" {...REGION}>
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="truncate font-heading text-base font-bold text-ink">{detail.kecamatan}</h2>
+          <h2 className="truncate font-heading text-base font-bold text-ink">
+            {detail.kelurahan ? `Kelurahan ${detail.kelurahan}` : detail.kecamatan}
+          </h2>
           <p className="text-xs text-ink-muted">
             {detail.polsek ?? "Polsek tidak tercatat"} · {detail.grid_count} grid
           </p>

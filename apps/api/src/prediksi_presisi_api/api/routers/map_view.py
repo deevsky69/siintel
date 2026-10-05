@@ -151,7 +151,11 @@ def _latest_assessment_date(session: Session, polsek: str | None) -> Any:
 
 
 def _current_risk_rows(
-    session: Session, polsek: str | None, assessment_date: date, kecamatan: str | None = None
+    session: Session,
+    polsek: str | None,
+    assessment_date: date,
+    kecamatan: str | None = None,
+    kelurahan: str | None = None,
 ) -> list[Any]:
     """Sel risiko satu tanggal penilaian, sudah tersaring cakupan.
 
@@ -167,6 +171,8 @@ def _current_risk_rows(
     )
     if kecamatan is not None:
         query = query.where(Location.kecamatan == kecamatan)
+    if kelurahan is not None:
+        query = query.where(Location.kelurahan == kelurahan)
 
     return list(session.execute(query).all())
 
@@ -579,7 +585,9 @@ def historical(
     }
 
 
-def _area_predictions(session: Session, polsek: str | None, kecamatan: str) -> list[dict[str, Any]]:
+def _area_predictions(
+    session: Session, polsek: str | None, kecamatan: str, kelurahan: str | None = None
+) -> list[dict[str, Any]]:
     """Prediksi teratas satu kecamatan, lengkap dengan WHAT/WHERE/WHEN/RISK/CONFIDENCE/WHY.
 
     `dominant_factors` selalu ikut: menyembunyikan asal penjelasan membuat hasil aturan
@@ -596,7 +604,8 @@ def _area_predictions(session: Session, polsek: str | None, kecamatan: str) -> l
         .limit(AREA_PREDICTION_LIMIT),
         polsek,
     )
-
+    if kelurahan is not None:
+        query = query.where(Location.kelurahan == kelurahan)
     return [
         {
             "code": prediction.code,
@@ -621,7 +630,9 @@ def _area_predictions(session: Session, polsek: str | None, kecamatan: str) -> l
     ]
 
 
-def _area_history(session: Session, polsek: str | None, kecamatan: str) -> dict[str, Any]:
+def _area_history(
+    session: Session, polsek: str | None, kecamatan: str, kelurahan: str | None = None
+) -> dict[str, Any]:
     """Jumlah kejadian historis kecamatan beserta rentang data yang menghasilkannya.
 
     Rentang ikut dikembalikan agar angka dapat ditelusuri kembali ke data sumber —
@@ -638,6 +649,8 @@ def _area_history(session: Session, polsek: str | None, kecamatan: str) -> dict[
         .where(Location.kecamatan == kecamatan),
         polsek,
     )
+    if kelurahan is not None:
+        totals_query = totals_query.where(Location.kelurahan == kelurahan)
     total, date_from, date_to = session.execute(totals_query).one()
 
     by_type_query = _scoped(
@@ -649,7 +662,8 @@ def _area_history(session: Session, polsek: str | None, kecamatan: str) -> dict[
         .order_by(func.count().desc()),
         polsek,
     )
-
+    if kelurahan is not None:
+        by_type_query = by_type_query.where(Location.kelurahan == kelurahan)
     return {
         "total_incidents": int(total or 0),
         "date_from": date_from,
@@ -661,7 +675,9 @@ def _area_history(session: Session, polsek: str | None, kecamatan: str) -> dict[
     }
 
 
-def _area_warnings(session: Session, polsek: str | None, kecamatan: str) -> list[dict[str, Any]]:
+def _area_warnings(
+    session: Session, polsek: str | None, kecamatan: str, kelurahan: str | None = None
+) -> list[dict[str, Any]]:
     """Peringatan yang masih berstatus ACTIVE di kecamatan tersebut."""
     query = _scoped(
         select(EarlyWarning, Location, Prediction.code)
@@ -674,7 +690,8 @@ def _area_warnings(session: Session, polsek: str | None, kecamatan: str) -> list
         .order_by(EarlyWarning.risk_score.desc(), EarlyWarning.created_at.desc()),
         polsek,
     )
-
+    if kelurahan is not None:
+        query = query.where(Location.kelurahan == kelurahan)
     return [
         {
             "code": warning.code,
@@ -699,6 +716,9 @@ def area_detail(
     kecamatan: str = Path(description="Nama kecamatan persis seperti pada master lokasi"),
     session: Session = Depends(get_db),
     current: CurrentUser = require_permission("map:read"),
+    kelurahan: str | None = Query(
+        None, description="Persempit ke satu kelurahan pada kecamatan itu (5 Oktober 2026)"
+    ),
 ) -> dict[str, Any]:
     """Panel detail: potensi ancaman, jendela paling rawan, prediksi + WHY, riwayat, peringatan.
 
@@ -707,14 +727,17 @@ def area_detail(
     """
     polsek = _jurisdiction(current, "map:read")
 
-    area = session.execute(
-        _scoped(
-            select(Location.kecamatan, Location.polsek, func.count())
-            .where(Location.kecamatan == kecamatan)
-            .group_by(Location.kecamatan, Location.polsek),
-            polsek,
-        )
-    ).first()
+    area_query = _scoped(
+        select(Location.kecamatan, Location.polsek, func.count())
+        .where(Location.kecamatan == kecamatan)
+        .group_by(Location.kecamatan, Location.polsek),
+        polsek,
+    )
+    if kelurahan is not None:
+        # Dengan kelurahan, seluruh panel dipersempit ke sel kelurahan itu — satuan lokasi
+        # pada data asli — sehingga klik pada peta kelurahan menjawab rincian yang sama.
+        area_query = area_query.where(Location.kelurahan == kelurahan)
+    area = session.execute(area_query).first()
     if area is None:
         raise not_found()
 
@@ -724,7 +747,9 @@ def area_detail(
     windows: list[dict[str, Any]] = []
     weights_version: str | None = None
     if assessment_date is not None:
-        rows = _current_risk_rows(session, polsek, assessment_date, kecamatan=kecamatan)
+        rows = _current_risk_rows(
+            session, polsek, assessment_date, kecamatan=kecamatan, kelurahan=kelurahan
+        )
         aggregated = _aggregate_current_risk(rows)
         if aggregated:
             threats = aggregated[0]["threats"]
@@ -746,6 +771,7 @@ def area_detail(
         "reference_time": clock.reference_now(),
         "demo_clock": clock.is_demo_clock(),
         "kecamatan": area[0],
+        "kelurahan": kelurahan,
         "polsek": area[1],
         "grid_count": int(area[2]),
         "assessment_date": assessment_date,
@@ -753,9 +779,9 @@ def area_detail(
         "threats": threats,
         "critical_time_window": windows[0]["time_window"] if windows else None,
         "time_windows": windows,
-        "top_predictions": _area_predictions(session, polsek, kecamatan),
-        "history": _area_history(session, polsek, kecamatan),
-        "active_warnings": _area_warnings(session, polsek, kecamatan),
+        "top_predictions": _area_predictions(session, polsek, kecamatan, kelurahan),
+        "history": _area_history(session, polsek, kecamatan, kelurahan),
+        "active_warnings": _area_warnings(session, polsek, kecamatan, kelurahan),
         "aggregation_basis": AGGREGATION_BASIS,
         "time_window_basis": (
             "Jendela paling rawan adalah jendela dengan sel risiko tertinggi pada tanggal "

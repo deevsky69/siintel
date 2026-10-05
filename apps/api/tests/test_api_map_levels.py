@@ -117,3 +117,28 @@ def test_an_unknown_level_is_refused(client: TestClient, session: Session) -> No
     headers = _headers(client, session)
     response = client.get("/api/v1/map/current-risk?level=rt", headers=headers)
     assert response.status_code == 400, response.text
+
+
+def test_the_area_panel_can_be_narrowed_to_one_kelurahan(
+    client: TestClient, session: Session
+) -> None:
+    """Klik kelurahan membuka rincian yang sama, dipersempit ke sel kelurahan itu."""
+    headers = _headers(client, session)
+    coarse = client.get("/api/v1/map/current-risk", headers=headers).json()
+    kecamatan = coarse["areas"][0]["kecamatan"]
+    fine = client.get(
+        f"/api/v1/map/current-risk?level=kelurahan&kecamatan={kecamatan}", headers=headers
+    ).json()
+    named = [row for row in fine["areas"] if row["kelurahan"]]
+    assert named, "kecamatan tanpa kelurahan bernama"
+    kelurahan = named[0]["kelurahan"]
+
+    whole = client.get(f"/api/v1/map/area/{kecamatan}", headers=headers).json()
+    part = client.get(f"/api/v1/map/area/{kecamatan}?kelurahan={kelurahan}", headers=headers).json()
+    assert whole["kelurahan"] is None and part["kelurahan"] == kelurahan
+    assert part["grid_count"] <= whole["grid_count"]
+    assert part["history"]["total_incidents"] <= whole["history"]["total_incidents"]
+    assert all(row["kelurahan"] == kelurahan for row in part["top_predictions"])
+
+    unknown = client.get(f"/api/v1/map/area/{kecamatan}?kelurahan=Khayalan", headers=headers)
+    assert unknown.status_code == 404

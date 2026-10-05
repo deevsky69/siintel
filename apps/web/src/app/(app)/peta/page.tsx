@@ -35,6 +35,7 @@ export default async function PetaPage({
     layer?: string | string[];
     bulan?: string | string[];
     tingkat?: string | string[];
+    kelurahan?: string | string[];
   }>;
 }) {
   const params = await searchParams;
@@ -42,6 +43,8 @@ export default async function PetaPage({
   const layer = toMapLayer(typeof params.layer === "string" ? params.layer : null);
   const months = toHistoricalMonths(typeof params.bulan === "string" ? params.bulan : null);
   const level = toMapLevel(typeof params.tingkat === "string" ? params.tingkat : null);
+  const selectedKelurahan =
+    level === "kelurahan" && typeof params.kelurahan === "string" ? params.kelurahan : null;
 
   const data = await getMapData(undefined, months);
   const hasData = data.districts.some(
@@ -59,7 +62,7 @@ export default async function PetaPage({
 
   const selected = resolveSelectedDistrict(data, requested);
   const [detail, overlay] = await Promise.all([
-    selected === null ? null : getAreaDetail(selected),
+    selected === null ? null : getAreaDetail(selected, selectedKelurahan),
     // Lapisan kelurahan hanya diminta saat peta memang diperbesar ke satu kecamatan.
     level === "kelurahan" && selected !== null
       ? getKelurahanOverlay(selected, undefined, months)
@@ -75,6 +78,7 @@ export default async function PetaPage({
       months={months}
       level={level}
       overlay={overlay}
+      selectedKelurahan={selectedKelurahan}
     />
   );
 }

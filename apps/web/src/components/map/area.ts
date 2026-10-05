@@ -100,9 +100,13 @@ export function mapHref(
   layer: MapLayer = "current",
   months: HistoricalMonths = DEFAULT_HISTORICAL_MONTHS,
   level: MapLevel = "kecamatan",
+  kelurahan: string | null = null,
 ): string {
   const params = new URLSearchParams();
   if (kecamatan !== null) params.set("wilayah", kecamatan);
+  // Kelurahan terpilih hanya berarti pada tingkat kelurahan; di tingkat lain diabaikan
+  // supaya tautan tidak membawa parameter yang tidak berpengaruh.
+  if (level === "kelurahan" && kelurahan !== null) params.set("kelurahan", kelurahan);
   // Tingkat kecamatan tidak ditulis: ia bawaan, dan parameter yang hanya mengulang nilai
   // bawaan memanjangkan tautan yang dibagikan saat paparan tanpa mengubah apa pun.
   if (level !== "kecamatan") params.set("tingkat", level);

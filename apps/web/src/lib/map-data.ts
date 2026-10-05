@@ -200,6 +200,8 @@ export type AreaDetail = {
   reference_time: string;
   demo_clock: boolean;
   kecamatan: string;
+  /** Terisi bila panel dipersempit ke satu kelurahan. */
+  kelurahan?: string | null;
   polsek: string | null;
   grid_count: number;
   assessment_date: string | null;
@@ -454,9 +456,13 @@ export function buildKelurahanOverlay(
  * bocor. Antarmuka menghormati itu: keduanya menjadi `null`, dan panel menyatakan tidak
  * ada rincian yang dapat ditampilkan tanpa menebak alasannya.
  */
-export async function getAreaDetail(kecamatan: string): Promise<AreaDetail | null> {
+export async function getAreaDetail(
+  kecamatan: string,
+  kelurahan: string | null = null,
+): Promise<AreaDetail | null> {
   try {
-    return await apiGet<AreaDetail>(`/map/area/${encodeURIComponent(kecamatan)}`);
+    const query = kelurahan ? `?kelurahan=${encodeURIComponent(kelurahan)}` : "";
+    return await apiGet<AreaDetail>(`/map/area/${encodeURIComponent(kecamatan)}${query}`);
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) return null;
     throw error;

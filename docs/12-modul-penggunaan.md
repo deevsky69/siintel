@@ -446,7 +446,8 @@ Menu **Live Map**.
 4. **Klik** kecamatan itu untuk membuka rinciannya di panel kanan.
 5. Alamat halaman ikut berubah, sehingga tampilan itu **dapat dibagikan sebagai
    tautan** — berguna saat paparan.
-6. Tautan **Kelurahan** pada panel memperbesar peta ke satu kecamatan. Sejak data asli
+6. **Klik kelurahan** pada peta yang diperbesar membuka panel rincian kelurahan itu (potensi ancaman, jendela rawan, prediksi beserta alasannya, riwayat, peringatan aktif) — sejak 5 Oktober 2026.
+7. Tautan **Kelurahan** pada panel memperbesar peta ke satu kecamatan. Sejak data asli
    (1 Oktober 2026) kelurahan **diwarnai** dari sel penilaian setingkat kelurahan — satuan
    lokasi pada Laporan Polisi. Kejadian yang tidak mencantumkan kelurahan hanya terhitung
    pada angka kecamatan, dan layar menyebut jumlahnya.
