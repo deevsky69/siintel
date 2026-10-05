@@ -775,6 +775,8 @@ Butir berikut **tidak diinvensi** dan memblokir task tertentu:
 | **Perubahan sistem pelaporan 2024?** | Tren tahunan 3.992 → 1.884 → 1.237 → 1.090 (2023–Sep 2026) terlalu curam untuk dibaca sebagai penurunan kejahatan semata; perlu konfirmasi apakah cara pencatatan berubah |
 | **Jam pada Laporan Polisi** | Terutama Curat, jam yang tercatat dapat berupa waktu kejadian *diketahui*; pola jam dibaca dengan catatan itu (dinyatakan di layar) |
 | **Ukuran kemiripan rencana patroli** | Empat angka tersedia (pola jam, pola wilayah, ketepatan slot, cakupan). Hasil pertama 2025→Jan–Sep 2026: 84% / 75% / 57% / 4%. Mana yang menjadi ukuran resmi, dan berapa slot per jenis yang sanggup dipatroli, adalah keputusan pemilik proyek |
+| **Satuan operasional peringatan: harian atau mingguan** | Eksperimen 5 Oktober 2026 (docs/implementation-notes/016): pada satuan harian × 6 jam precision ≈1% untuk metode apa pun; pada satuan mingguan ≈8–11%. Mengubah satuan mengubah makna peringatan — keputusan pemilik proyek |
+| **Rencana patroli → pelaksanaan** | Slot yang disetujui belum terhubung ke pencatatan tindakan (`operational_actions` menuntut `commander_decisions` + `police_units`; `patrol_activity` belum dipakai API). Butuh keputusan alur (siapa mencatat, satuan apa, per slot atau per pekan) sebelum perubahan model data |
 | Ambang peringkat volume laporan (0,70 / 0,40) | Layar Pimpinan — dipisahkan dari U-22 pada 9 September 2026 |
 | Ukuran grid & batas GIS resmi (U-04) | TASK 011, 080–084 |
 | Matriks role-permission resmi + kewenangan approve (U-06, P-1…P-7) | TASK 051, 130 |
