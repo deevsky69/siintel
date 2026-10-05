@@ -84,6 +84,32 @@
                 android:minHeight="48dp"
                 android:padding="10dp" />
 
+            <TextView
+                android:id="@+id/kelurahanLabel"
+                style="@style/FieldLabel"
+                android:text="@string/label_kelurahan"
+                android:visibility="gone" />
+
+            <Spinner
+                android:id="@+id/kelurahanSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/box_field"
+                android:minHeight="48dp"
+                android:padding="10dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/kelurahanNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingExtra="3dp"
+                android:text="@string/kelurahan_note"
+                android:textColor="@color/ink_faint"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
             <TextView style="@style/FieldLabel" android:text="@string/label_place" />
 
             <EditText

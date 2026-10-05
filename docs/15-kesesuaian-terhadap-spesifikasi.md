@@ -203,6 +203,7 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | Prediction Center | Baris VALIDATED (evaluasi) disembunyikan dari daftar kecuali diminta |
 | Executive Brief | Bagian "Rencana Patroli Tahun Ini" |
 | Laporan masyarakat | Urgensi/verifikasi dinyatakan sebagai isian petugas, bukan "nilai sintetis" |
+| Android | Pemilih kelurahan + kelurahan terdekat dari lokasi (2.1.0), menyamai web; APK dibangun, belum diuji di perangkat |
 | Eksperimen model terlatih | Regresi logistik 2024–2025 → 2026 **tidak** lebih baik dari peringkat riwayat; tidak dipasang; satuan mingguan diusulkan (docs/implementation-notes/016) |
 
 ### Masih tersisa
@@ -222,7 +223,7 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 
 ### Android — keadaan per 9 September 2026
 
-**Satu APK**, bukan dua lagi (`id.polri.jaksel.laporpresisi`, 2.0.0). Layar mukanya dua
+**Satu APK**, bukan dua lagi (`id.polri.jaksel.laporpresisi`, 2.1.0 sejak 5 Oktober 2026: pemilih kelurahan dan usulan kelurahan terdekat dari lokasi, menyamai web; belum diperiksa di perangkat). Layar mukanya dua
 pintu: lapor untuk warga, masuk untuk petugas. Diperiksa langsung terhadap demo produksi
 pada 9 September 2026 — bukan terhadap emulator dan bukan terhadap ingatan.
 

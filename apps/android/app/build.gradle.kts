@@ -15,8 +15,8 @@ android {
         targetSdk = 34
         // Naik ke 2.0.0 karena aplikasinya berubah bentuk, bukan bertambah fitur: dua APK
         // menjadi satu, dan layar mukanya kini bukan formulir laporan.
-        versionCode = 2
-        versionName = "2.0.0"
+        versionCode = 3
+        versionName = "2.1.0"
 
         // Alamat API dibaca dari sini, bukan ditanam di kode: alamat produksi kelak
         // berbeda, dan pengujian lokal memakai alamat lain lagi

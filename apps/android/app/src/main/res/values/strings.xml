@@ -8,6 +8,10 @@
 
     <string name="label_category">Jenis kejadian</string>
     <string name="label_area">Kecamatan</string>
+    <string name="label_kelurahan">Kelurahan (bila tahu)</string>
+    <string name="kelurahan_skip">Tidak tahu / lewati</string>
+    <string name="kelurahan_note">Kelurahan membantu petugas menempatkan laporan di peta. Bila Anda membagikan lokasi, kelurahan terdekat terisi otomatis.</string>
+    <string name="kelurahan_suggested">Terisi otomatis dari lokasi Anda: %1$s (sekitar %2$d m dari titik pusat kelurahan). Ubah bila keliru.</string>
     <string name="label_place">Keterangan tempat (opsional)</string>
     <string name="hint_place">Misalnya: gang samping pasar, dekat halte</string>
     <string name="label_story">Apa yang Anda lihat</string>
@@ -24,7 +28,7 @@
     <string name="send_another">Kirim laporan lain</string>
 
     <string name="no_identity">Tanpa akun dan tanpa identitas. Aplikasi ini tidak meminta dan tidak menyimpan nama, nomor telepon, maupun alamat pelapor.</string>
-    <string name="coord_note">Lokasi laporan sebatas kecamatan yang Anda pilih, bukan titik tempat kejadian.</string>
+    <string name="coord_note">Lokasi laporan sebatas kecamatan/kelurahan yang Anda pilih, bukan titik tempat kejadian.</string>
 
     <string name="err_offline">Laporan tidak dapat dikirim karena sistem sedang tidak dapat dihubungi. Untuk keadaan mendesak, hubungi 110.</string>
     <string name="err_options">Pilihan isian gagal dimuat. Periksa sambungan Anda, lalu buka ulang aplikasi.</string>

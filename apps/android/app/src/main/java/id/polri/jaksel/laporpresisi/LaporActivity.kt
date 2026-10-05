@@ -114,6 +114,14 @@ class LaporActivity : AppCompatActivity() {
                 options = loaded
                 fill(views.categorySpinner, loaded.categories)
                 fill(views.areaSpinner, loaded.areas)
+                views.areaSpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        fillKelurahan(loaded.areas.getOrNull(position))
+                    }
+
+                    override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
+                }
+                fillKelurahan(loaded.areas.firstOrNull())
                 views.formGroup.visibility = View.VISIBLE
             } catch (failure: PublicApi.ApiFailure) {
                 views.formGroup.visibility = View.GONE
@@ -163,6 +171,7 @@ class LaporActivity : AppCompatActivity() {
                         // angkanya berarti menyatakan ketelitian yang tidak pernah diukur.
                         accuracyMetres = shared?.takeIf { it.hasAccuracy() }?.accuracy?.toDouble(),
                         attachments = staged.map { it.first.handle },
+                        kelurahan = selectedKelurahan(),
                     ),
                 )
                 showTicket(ticket)
@@ -263,6 +272,7 @@ class LaporActivity : AppCompatActivity() {
                 manager.removeUpdates(this)
                 shared = location
                 renderLocation()
+                suggestAreaFrom(location)
             }
 
             // Tiga metode berikut kosong tetapi WAJIB ada di Android 24–29: tanpa
@@ -328,6 +338,7 @@ class LaporActivity : AppCompatActivity() {
     private fun clearLocation() {
         shared = null
         renderLocation()
+        views.kelurahanNote.text = getString(R.string.kelurahan_note)
     }
 
     // ---------------------------------------------------------------------------------
@@ -404,6 +415,54 @@ class LaporActivity : AppCompatActivity() {
             }
         }
         return null
+    }
+
+    /** Teks baris pertama pemilih kelurahan: "tidak tahu", bukan nama kelurahan. */
+    private val skipKelurahan: String get() = getString(R.string.kelurahan_skip)
+
+    /**
+     * Isi ulang pemilih kelurahan untuk kecamatan yang dipilih (5 Oktober 2026).
+     *
+     * Kelurahan pilihan, bukan isian bebas, supaya selalu cocok dengan master lokasi dan
+     * laporan langsung terhubung ke peta kelurahan. Baris pertama "tidak tahu" menjaga
+     * kelurahan tetap opsional. Pada server lama (tanpa `areas`) pemilihnya disembunyikan.
+     */
+    private fun fillKelurahan(kecamatan: String?) {
+        val names = options?.detailedAreas
+            ?.firstOrNull { it.kecamatan == kecamatan }
+            ?.kelurahan?.map { it.name }
+            .orEmpty()
+        val visible = names.isNotEmpty()
+        views.kelurahanLabel.visibility = if (visible) View.VISIBLE else View.GONE
+        views.kelurahanSpinner.visibility = if (visible) View.VISIBLE else View.GONE
+        views.kelurahanNote.visibility = if (visible) View.VISIBLE else View.GONE
+        if (visible) fill(views.kelurahanSpinner, listOf(skipKelurahan) + names)
+    }
+
+    private fun selectedKelurahan(): String {
+        if (views.kelurahanSpinner.visibility != View.VISIBLE) return ""
+        val value = views.kelurahanSpinner.selectedItem?.toString().orEmpty()
+        return if (value == skipKelurahan) "" else value
+    }
+
+    /**
+     * Lokasi yang dibagikan mengusulkan kecamatan dan kelurahan terdekat. Pelapor tetap
+     * dapat mengubah keduanya; catatan di bawah pemilih menyebut bahwa ini usulan.
+     */
+    private fun suggestAreaFrom(location: Location) {
+        val areas = options?.detailedAreas.orEmpty()
+        val nearest = AreaNearest.nearest(areas, location.latitude, location.longitude) ?: return
+        val kecamatanIndex = options?.areas?.indexOf(nearest.kecamatan) ?: -1
+        if (kecamatanIndex >= 0) views.areaSpinner.setSelection(kecamatanIndex)
+        fillKelurahan(nearest.kecamatan)
+        val names = areas.firstOrNull { it.kecamatan == nearest.kecamatan }?.kelurahan?.map { it.name }.orEmpty()
+        val index = names.indexOf(nearest.kelurahan)
+        if (index >= 0) views.kelurahanSpinner.setSelection(index + 1)
+        views.kelurahanNote.text = getString(
+            R.string.kelurahan_suggested,
+            nearest.kelurahan,
+            nearest.distanceM.toInt(),
+        )
     }
 
     private fun fill(spinner: android.widget.Spinner, values: List<String>) {

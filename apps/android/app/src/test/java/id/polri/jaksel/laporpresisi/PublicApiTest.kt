@@ -23,6 +23,8 @@ class PublicApiTest {
     private val optionsBody = """
         {"categories":["Pencurian","Narkoba"],
          "kecamatan":["Tebet","Kebayoran Baru"],
+         "areas":[{"kecamatan":"Tebet","kelurahan":[{"name":"Tebet Timur","latitude":-6.2286,"longitude":106.8542}]},
+                  {"kecamatan":"Kebayoran Baru","kelurahan":[{"name":"Senayan","latitude":-6.2270,"longitude":106.8003}]}],
          "coordinate_basis":"Titik tengah kecamatan",
          "attachment_basis":"Metadata berkas dilucuti sebelum disimpan.",
          "max_attachments":3,
@@ -50,6 +52,7 @@ class PublicApiTest {
 
                 assertEquals(listOf("Pencurian", "Narkoba"), options.categories)
                 assertEquals(listOf("Tebet", "Kebayoran Baru"), options.areas)
+                assertEquals(listOf("Tebet Timur"), options.detailedAreas.first().kelurahan.map { it.name })
                 assertEquals("Titik tengah kecamatan", options.coordinateBasis)
                 assertEquals("GET", server.requestsTo("/api/v1/public/report-options").single().method)
             }
@@ -368,6 +371,26 @@ class PublicApiTest {
 
             assertEquals(3, options.maxAttachments)
             assertEquals(26214400L, options.maxAttachmentBytes)
+        }
+    }
+
+    @Test
+    fun `kelurahan dikirim hanya bila diisi`() = runBlocking {
+        FakeServer().use { server ->
+            server.on("/api/v1/public/citizen-reports", FakeServer.Reply(201, ticketBody))
+
+            PublicApi.submit(
+                server.base,
+                ReportDraft("Pencurian", "Tebet", "", "Motor hilang di depan rumah tadi malam.", kelurahan = "Tebet Timur"),
+            )
+            PublicApi.submit(
+                server.base,
+                ReportDraft("Pencurian", "Tebet", "", "Motor hilang di depan rumah tadi malam."),
+            )
+
+            val sent = server.requestsTo("/api/v1/public/citizen-reports").map { JSONObject(it.body) }
+            assertEquals("Tebet Timur", sent[0].getString("kelurahan"))
+            assertFalse(sent[1].has("kelurahan"))
         }
     }
 }

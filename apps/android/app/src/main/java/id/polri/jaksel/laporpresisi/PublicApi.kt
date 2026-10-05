@@ -43,12 +43,23 @@ object PublicApi {
 
     data class Options(
         val categories: List<String>,
+        /** Nama kecamatan, urutan server. */
         val areas: List<String>,
+        /**
+         * Kecamatan beserta kelurahannya dan titik pusat tiap kelurahan — untuk pemilih
+         * kelurahan dan untuk mengusulkan kelurahan terdekat dari lokasi yang dibagikan
+         * (5 Oktober 2026). Kosong pada server lama; aplikasi lalu bekerja seperti semula.
+         */
+        val detailedAreas: List<AreaOption> = emptyList(),
         val coordinateBasis: String,
         val attachmentBasis: String,
         val maxAttachments: Int,
         val maxAttachmentBytes: Long,
     )
+
+    data class Kelurahan(val name: String, val latitude: Double, val longitude: Double)
+
+    data class AreaOption(val kecamatan: String, val kelurahan: List<Kelurahan>)
 
     /** Satu berkas yang sudah dititipkan dan siap disebut saat mengirim laporan. */
     data class Staged(val handle: String, val kind: String, val byteSize: Long)
@@ -165,6 +176,25 @@ object PublicApi {
         Options(
             categories = json.getJSONArray("categories").toStringList(),
             areas = json.getJSONArray("kecamatan").toStringList(),
+            detailedAreas = json.optJSONArray("areas")?.let { areas ->
+                (0 until areas.length()).map { i ->
+                    val area = areas.getJSONObject(i)
+                    val kelurahan = area.optJSONArray("kelurahan")
+                    AreaOption(
+                        kecamatan = area.getString("kecamatan"),
+                        kelurahan = kelurahan?.let { list ->
+                            (0 until list.length()).map { j ->
+                                val row = list.getJSONObject(j)
+                                Kelurahan(
+                                    name = row.getString("name"),
+                                    latitude = row.getDouble("latitude"),
+                                    longitude = row.getDouble("longitude"),
+                                )
+                            }
+                        } ?: emptyList(),
+                    )
+                }
+            } ?: emptyList(),
             coordinateBasis = json.text("coordinate_basis"),
             attachmentBasis = json.text("attachment_basis"),
             maxAttachments = json.optInt("max_attachments", 0),
@@ -176,6 +206,8 @@ object PublicApi {
         val payload = JSONObject().apply {
             put("category", draft.category)
             put("kecamatan", draft.area)
+            // Kelurahan opsional: server menurunkannya sendiri dari koordinat bila kosong.
+            if (draft.kelurahan.isNotBlank()) put("kelurahan", draft.kelurahan)
             put("description", draft.story)
             // Field opsional hanya dikirim bila benar-benar diisi: backend menolak field
             // bernilai kosong, dan galat itu akan membingungkan pelapor yang justru tidak
@@ -363,4 +395,6 @@ data class ReportDraft(
     val accuracyMetres: Double? = null,
     /** Handle lampiran yang sudah dititipkan lewat [PublicApi.stage]. */
     val attachments: List<String> = emptyList(),
+    /** Kelurahan yang dipilih atau diusulkan dari lokasi; kosong bila pelapor tidak tahu. */
+    val kelurahan: String = "",
 )

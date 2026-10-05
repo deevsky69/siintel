@@ -257,7 +257,20 @@ Keduanya lolos kompilasi, lolos unit test, dan lolos build rilis.
 
 ---
 
-## 7. Yang belum dikerjakan
+## 7. Kelurahan pada laporan warga (5 Oktober 2026, versi 2.1.0)
+
+Mengikuti web: setelah memilih kecamatan, pelapor dapat memilih **kelurahan** (pilihan,
+bukan isian bebas; baris pertama "Tidak tahu / lewati"). Bila pelapor membagikan lokasi,
+kecamatan dan kelurahan **terdekat** terisi otomatis dari titik pusat kelurahan pada
+`report-options.areas` (`AreaNearest`, haversine, murni JVM dan teruji), dan catatannya
+menyebut jarak serta bahwa itu usulan. Pengiriman menyertakan `kelurahan` hanya bila diisi;
+server tetap menurunkan kelurahan terdekat sendiri dengan PostGIS bila kosong. Pada server
+lama tanpa `areas`, pemilih kelurahan disembunyikan dan aplikasi bekerja seperti 2.0.0.
+
+Unit test: 42 (empat suite), semuanya lulus. APK rilis: `~/siintel-rilis/presisi-2.1.0.apk`
+(masih kunci debug; lihat §5). Belum diperiksa di perangkat nyata.
+
+## 8. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau
   "Muat ulang" ditekan.
