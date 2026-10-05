@@ -71,6 +71,14 @@ def list_risk_scores(
     )
 
 
+#: Lihat komentar pada `list_predictions`.
+STATUS_VALIDATED = "VALIDATED"
+LISTING_BASIS = (
+    "Tanpa penyaring status, daftar menyembunyikan prediksi VALIDATED (sudah dibandingkan "
+    "dengan kenyataan oleh evaluasi mundur); minta status=VALIDATED untuk membacanya."
+)
+
+
 @router.get("/predictions", summary="Daftar prediksi")
 def list_predictions(
     session: Session = Depends(get_db),
@@ -95,11 +103,18 @@ def list_predictions(
         query = query.where(Prediction.threat_type == threat_type)
     if status:
         query = query.where(Prediction.status == status.upper())
+    else:
+        # Tanpa penyaring status, prediksi VALIDATED disembunyikan: sejak evaluasi mundur
+        # (1 Oktober 2026) ada puluhan ribu baris VALIDATED bertanggal lebih baru daripada
+        # penjalanan yang sedang berlaku, dan tanpa saringan ini halaman pertama Prediction
+        # Center memamerkan masa lalu yang sudah dinilai sebagai ramalan. Minta
+        # status=VALIDATED secara sadar untuk membacanya.
+        query = query.where(Prediction.status != STATUS_VALIDATED)
 
     total = session.scalar(select(func.count()).select_from(query.subquery())) or 0
     rows = session.execute(query.offset(params.offset).limit(params.page_size)).all()
 
-    return paginate(
+    listing = paginate(
         [
             {
                 "code": prediction.code,
@@ -123,6 +138,8 @@ def list_predictions(
         total,
         params,
     )
+    listing["listing_basis"] = LISTING_BASIS
+    return listing
 
 
 @router.get("/warnings", summary="Daftar peringatan dini")
