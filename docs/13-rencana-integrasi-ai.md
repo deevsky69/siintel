@@ -166,3 +166,15 @@ dasbor, dan berkas konfigurasi prompt yang diberi versi.
 3. Bila boleh: **API key Anthropic** yang ditaruh langsung di server pada
    `.env.production` (**jangan dikirim lewat percakapan**, dan jangan pernah masuk
    repository).
+
+
+---
+
+## Catatan 5 Oktober 2026 — eksperimen model terlatih pertama
+
+Regresi logistik pada unit kelurahan × jenis × jendela 6 jam × hari, dilatih 2024–2025 dan
+diuji 2026 dengan fitur yang hanya memakai kejadian yang sudah *dilaporkan*, **tidak
+mengalahkan** peringkat kepadatan historis (precision 0,011 vs 0,010 pada 77 peringatan/hari;
+AUC 0,78). Rincian dan kesimpulannya: `docs/implementation-notes/016-eksperimen-model-terlatih.md`.
+Arah yang disarankan bukan model yang lebih rumit, melainkan satuan waktu yang lebih kasar
+(mingguan) dan sumber data baru (POI, kegiatan, cuaca).

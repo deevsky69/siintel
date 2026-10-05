@@ -203,6 +203,7 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | Prediction Center | Baris VALIDATED (evaluasi) disembunyikan dari daftar kecuali diminta |
 | Executive Brief | Bagian "Rencana Patroli Tahun Ini" |
 | Laporan masyarakat | Urgensi/verifikasi dinyatakan sebagai isian petugas, bukan "nilai sintetis" |
+| Eksperimen model terlatih | Regresi logistik 2024–2025 → 2026 **tidak** lebih baik dari peringkat riwayat; tidak dipasang; satuan mingguan diusulkan (docs/implementation-notes/016) |
 
 ### Masih tersisa
 
