@@ -125,6 +125,8 @@ def test_the_public_options_leak_nothing_beyond_the_choices(client: TestClient) 
     # berkasnya diperlakukan — bukan isi sistem. Formulir memerlukannya untuk menolak
     # berkas terlalu besar sebelum jaringan dipakai sia-sia.
     assert set(body) == {
+        "areas",
+        "area_basis",
         "categories",
         "kecamatan",
         "max_description",
@@ -146,6 +148,9 @@ def test_the_response_returns_a_ticket_and_nothing_about_other_reports(
     # baru saja DIKIRIM pelapor itu sendiri, atau rahasia yang baru diterbitkan untuknya —
     # bukan sesuatu tentang laporan orang lain.
     assert set(body) == {
+        "kelurahan",
+        "area_source",
+        "area_basis",
         "ticket",
         "claim_token",
         "claim_basis",
@@ -519,3 +524,84 @@ def test_the_status_reply_never_leaks_internal_assessment(client: TestClient) ->
     ).json()
 
     assert {"urgency_score", "verification_score", "location_id", "latitude"}.isdisjoint(isi)
+
+
+# ---------------------------------------------------------------------------
+# Kelurahan (permintaan pemilik proyek 5 Oktober 2026)
+# ---------------------------------------------------------------------------
+
+
+def _a_kelurahan(session: Session) -> Location:
+    row = session.scalar(
+        select(Location).where(Location.kelurahan.is_not(None)).order_by(Location.grid_id)
+    )
+    assert row is not None
+    return row
+
+
+def test_the_options_list_kelurahan_per_kecamatan_with_their_centroids(
+    client: TestClient, session: Session
+) -> None:
+    body = client.get("/api/v1/public/report-options").json()
+    sample = _a_kelurahan(session)
+    area = next(row for row in body["areas"] if row["kecamatan"] == sample.kecamatan)
+    names = {row["name"] for row in area["kelurahan"]}
+    assert sample.kelurahan in names
+    first = area["kelurahan"][0]
+    assert {"name", "latitude", "longitude"} <= set(first)
+    assert "area_basis" in body
+
+
+def test_a_chosen_kelurahan_binds_the_report_to_that_master_location(
+    client: TestClient, session: Session
+) -> None:
+    sample = _a_kelurahan(session)
+    response = client.post(
+        "/api/v1/public/citizen-reports",
+        json=_payload(session, kecamatan=sample.kecamatan, kelurahan=sample.kelurahan),
+    )
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body["kelurahan"] == sample.kelurahan
+    assert body["area_source"] == "KELURAHAN_DIPILIH"
+    stored = session.scalar(select(CitizenReport).where(CitizenReport.code == body["ticket"]))
+    assert stored is not None and stored.location_id == sample.location_id
+
+
+def test_shared_coordinates_without_a_choice_pick_the_nearest_kelurahan(
+    client: TestClient, session: Session
+) -> None:
+    """Laporan dari laptop: lokasi peramban kasar, tetapi cukup untuk kelurahan terdekat."""
+    sample = _a_kelurahan(session)
+    response = client.post(
+        "/api/v1/public/citizen-reports",
+        json=_payload(
+            session,
+            kecamatan=sample.kecamatan,
+            latitude=float(sample.latitude) + 0.0005,
+            longitude=float(sample.longitude) - 0.0005,
+            accuracy_m=350,
+        ),
+    )
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body["kelurahan"] == sample.kelurahan
+    assert body["area_source"] == "KELURAHAN_TERDEKAT"
+
+
+def test_without_kelurahan_or_coordinates_the_report_stays_at_kecamatan_level(
+    client: TestClient, session: Session
+) -> None:
+    response = client.post("/api/v1/public/citizen-reports", json=_payload(session))
+    assert response.status_code == 201, response.text
+    assert response.json()["area_source"] == "KECAMATAN"
+
+
+def test_an_unknown_kelurahan_is_refused(client: TestClient, session: Session) -> None:
+    sample = _a_kelurahan(session)
+    response = client.post(
+        "/api/v1/public/citizen-reports",
+        json=_payload(session, kecamatan=sample.kecamatan, kelurahan="Kelurahan Khayalan"),
+    )
+    assert response.status_code == 400, response.text
+    assert response.json()["error"]["details"][0]["field"] == "kelurahan"

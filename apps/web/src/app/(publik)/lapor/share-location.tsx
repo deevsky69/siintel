@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Position = { latitude: number; longitude: number; accuracy: number };
+export type Position = { latitude: number; longitude: number; accuracy: number };
 
 /**
  * Tombol berbagi lokasi.
@@ -20,7 +20,12 @@ type Position = { latitude: number; longitude: number; accuracy: number };
  * pelapor yang menekan tombol dari rumahnya sedang mengirimkan letak rumahnya, bukan letak
  * kejadian. Ia berhak tahu itu sebelum menekan, dan berhak membatalkannya sesudahnya.
  */
-export function ShareLocation() {
+export function ShareLocation({
+  onPosition,
+}: {
+  /** Dipanggil saat lokasi diperoleh atau dihapus — pemilih wilayah memakainya untuk mengusulkan kelurahan. */
+  onPosition?: (position: Position | null) => void;
+}) {
   const [position, setPosition] = useState<Position | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
@@ -35,11 +40,13 @@ export function ShareLocation() {
     navigator.geolocation.getCurrentPosition(
       (found) => {
         setAsking(false);
-        setPosition({
+        const next = {
           latitude: found.coords.latitude,
           longitude: found.coords.longitude,
           accuracy: Math.round(found.coords.accuracy),
-        });
+        };
+        setPosition(next);
+        onPosition?.(next);
       },
       (failure) => {
         setAsking(false);
@@ -74,7 +81,10 @@ export function ShareLocation() {
           </p>
           <button
             type="button"
-            onClick={() => setPosition(null)}
+            onClick={() => {
+              setPosition(null);
+              onPosition?.(null);
+            }}
             className="mt-2 rounded border border-base-700 px-3 py-1.5 text-2xs uppercase tracking-wider text-ink-muted transition-colors hover:border-risk-critical/50 hover:text-risk-critical"
           >
             Hapus lokasi

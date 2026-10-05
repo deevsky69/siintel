@@ -43,6 +43,12 @@ vi.mock("next/navigation", () => ({
 const options: ReportOptions = {
   categories: ["Kejahatan Jalanan", "Pencurian Kendaraan"],
   kecamatan: ["Cilandak", "Tebet"],
+  areas: [
+    {
+      kecamatan: "Tebet",
+      kelurahan: [{ name: "Tebet Barat", latitude: -6.2305, longitude: 106.8475 }],
+    },
+  ],
   max_description: 1000,
   coordinate_basis: "Koordinat laporan diambil dari titik pusat kecamatan.",
   intake_basis: "Laporan masuk berstatus RECEIVED dan belum diverifikasi siapa pun.",
@@ -142,6 +148,8 @@ describe("formulir laporan masyarakat", () => {
     expect(names).toEqual([
       "category",
       "kecamatan",
+      // Kelurahan adalah wilayah, bukan identitas (5 Oktober 2026).
+      "kelurahan",
       "location_text",
       "incident_time",
       "description",

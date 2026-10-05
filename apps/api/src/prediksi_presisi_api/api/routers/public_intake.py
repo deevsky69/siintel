@@ -220,6 +220,20 @@ def load_report_categories() -> list[str]:
 # ---------------------------------------------------------------------------
 
 
+#: Bagaimana kelurahan laporan ditentukan; ikut dijawab supaya petugas tahu seberapa
+#: tepat wilayahnya. KELURAHAN_DIPILIH = pelapor memilih; KELURAHAN_TERDEKAT = diturunkan
+#: dari koordinat yang dibagikan; KECAMATAN = hanya kecamatan yang diketahui.
+AREA_SOURCE_CHOSEN = "KELURAHAN_DIPILIH"
+AREA_SOURCE_NEAREST = "KELURAHAN_TERDEKAT"
+AREA_SOURCE_KECAMATAN = "KECAMATAN"
+AREA_BASIS = (
+    "Kelurahan laporan: dipilih pelapor (KELURAHAN_DIPILIH), diturunkan dari kelurahan "
+    "terdekat pada kecamatan yang disebut bila pelapor membagikan lokasi tanpa memilih "
+    "(KELURAHAN_TERDEKAT), atau tidak diketahui sehingga laporan menunjuk master kecamatan "
+    "(KECAMATAN). Tanpa koordinat, titik laporan adalah titik pusat wilayah master itu."
+)
+
+
 class ReportRequest(BaseModel):
     # `extra="forbid"` disengaja. Bila pengirim menyertakan nama, nomor telepon, atau
     # `urgency_score`, ia menerima penolakan yang menyebutkan field-nya — bukan
@@ -229,6 +243,14 @@ class ReportRequest(BaseModel):
 
     category: str = Field(description="Salah satu kategori dari GET /public/report-options")
     kecamatan: str = Field(description="Kecamatan tempat kejadian")
+    kelurahan: str | None = Field(
+        default=None,
+        max_length=100,
+        description=(
+            "Kelurahan tempat kejadian (opsional). Bila kosong tetapi lokasi dibagikan, "
+            "kelurahan terdekat pada kecamatan itu yang dipakai."
+        ),
+    )
     description: str = Field(min_length=10, max_length=MAX_DESCRIPTION)
     location_text: str | None = Field(default=None, max_length=MAX_LOCATION_TEXT)
     incident_time: datetime | None = Field(
@@ -306,10 +328,31 @@ def report_options(session: Session = Depends(get_db)) -> dict[str, Any]:
             select(Location.kecamatan).where(Location.kecamatan.is_not(None)).distinct()
         ).all()
     )
+    areas: dict[str, list[dict[str, Any]]] = {}
+    for row in session.execute(
+        select(Location.kecamatan, Location.kelurahan, Location.latitude, Location.longitude)
+        .where(
+            Location.kelurahan.is_not(None),
+            Location.latitude.is_not(None),
+            Location.longitude.is_not(None),
+        )
+        .order_by(Location.kecamatan, Location.kelurahan)
+    ).all():
+        areas.setdefault(str(row[0]), []).append(
+            # Titik pusat kelurahan dari master lokasi — bukan data kejadian, bukan skor.
+            # Dipakai formulir untuk MENGUSULKAN kelurahan terdekat bila pelapor membagikan
+            # lokasinya; pelapor tetap yang menentukan.
+            {"name": str(row[1]), "latitude": float(row[2]), "longitude": float(row[3])}
+        )
     return {
         "categories": load_report_categories(),
         "kecamatan": sorted(str(name) for name in kecamatan),
+        "areas": [
+            {"kecamatan": name, "kelurahan": areas.get(name, [])}
+            for name in sorted(str(name) for name in kecamatan)
+        ],
         "max_description": MAX_DESCRIPTION,
+        "area_basis": AREA_BASIS,
         "coordinate_basis": COORDINATE_BASIS,
         "intake_basis": INTAKE_BASIS,
         "attachment_basis": ATTACHMENT_BASIS,
@@ -526,6 +569,53 @@ def submit_report(
             details=[{"field": "accuracy_m", "issue": "tanpa latitude/longitude tidak berarti"}],
         )
 
+    # Lokasi setingkat KELURAHAN bila dapat ditentukan (permintaan pemilik proyek 5 Oktober
+    # 2026): dari pilihan pelapor, atau — bila ia membagikan koordinat tanpa memilih — dari
+    # kelurahan terdekat pada kecamatan yang ia sebut. Tanpa keduanya, master kecamatan.
+    kelurahan_name = (payload.kelurahan or "").strip()
+    if kelurahan_name:
+        chosen = session.scalar(
+            select(Location).where(
+                Location.kecamatan == payload.kecamatan,
+                func.lower(Location.kelurahan) == kelurahan_name.lower(),
+                Location.latitude.is_not(None),
+                Location.longitude.is_not(None),
+            )
+        )
+        if chosen is None:
+            raise ApiError(
+                status.HTTP_400_BAD_REQUEST,
+                "Kelurahan tidak dikenal pada kecamatan itu.",
+                details=[{"field": "kelurahan", "issue": "pilih dari GET /public/report-options"}],
+            )
+        location = chosen
+        area_source = AREA_SOURCE_CHOSEN
+    elif payload.latitude is not None and payload.longitude is not None:
+        nearest = session.scalar(
+            select(Location)
+            .where(
+                Location.kecamatan == payload.kecamatan,
+                Location.kelurahan.is_not(None),
+                Location.latitude.is_not(None),
+                Location.longitude.is_not(None),
+            )
+            .order_by(
+                func.ST_Distance(
+                    Location.geom,
+                    func.ST_SetSRID(
+                        func.ST_MakePoint(float(payload.longitude), float(payload.latitude)),
+                        4326,
+                    ),
+                )
+            )
+            .limit(1)
+        )
+        if nearest is not None:
+            location = nearest
+        area_source = AREA_SOURCE_NEAREST if nearest is not None else AREA_SOURCE_KECAMATAN
+    else:
+        area_source = AREA_SOURCE_KECAMATAN
+
     # Master lokasi sudah disaring `is_not(None)` pada kueri di atas, tetapi tipenya tetap
     # nullable. Penegasan ini yang membuat pembaca — dan pemeriksa tipe — tahu mengapa.
     assert location.latitude is not None and location.longitude is not None  # noqa: S101
@@ -600,6 +690,8 @@ def submit_report(
         detail={
             "category": report.category,
             "kecamatan": payload.kecamatan,
+            "kelurahan": location.kelurahan,
+            "area_source": area_source,
             "channel": "PUBLIC",
             # Asal koordinat dan jumlah lampiran ikut dicatat: keduanya menentukan berapa
             # banyak data pribadi yang masuk lewat peristiwa ini, dan itu justru yang perlu
@@ -622,6 +714,9 @@ def submit_report(
         "reported_at": report.reported_at,
         "kecamatan": payload.kecamatan,
         "coordinate_source": report.coordinate_source,
+        "kelurahan": location.kelurahan,
+        "area_source": area_source,
+        "area_basis": AREA_BASIS,
         "attachments": len(staged),
         "message": (
             "Laporan Anda tercatat. Simpan nomor tiket ini untuk menanyakan "

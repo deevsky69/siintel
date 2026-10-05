@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useActionState } from "react";
 import type { ReportOptions, SubmitState } from "./actions";
 import { submitReport } from "./actions";
+import { AreaPicker } from "./area-picker";
 import { AttachFiles } from "./attach-files";
-import { ShareLocation } from "./share-location";
 
 /**
  * Formulir laporan masyarakat — tanpa akun, tanpa identitas.
@@ -93,24 +93,7 @@ export function ReportForm({ options }: { options: ReportOptions }) {
           </select>
         </label>
 
-        <label className="block">
-          <span className="stat-label">Kecamatan</span>
-          <select
-            name="kecamatan"
-            required
-            defaultValue=""
-            className="mt-1 w-full rounded border border-base-700 bg-base-950 px-3 py-2 text-sm text-ink focus:border-accent/60 focus:outline-none"
-          >
-            <option value="" disabled>
-              Pilih kecamatan
-            </option>
-            {options.kecamatan.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <AreaPicker areas={options.areas ?? []} kecamatanList={options.kecamatan} />
 
         <label className="block">
           <span className="stat-label">Keterangan tempat (opsional)</span>
@@ -122,8 +105,6 @@ export function ReportForm({ options }: { options: ReportOptions }) {
             className="mt-1 w-full rounded border border-base-700 bg-base-950 px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-accent/60 focus:outline-none"
           />
         </label>
-
-        <ShareLocation />
 
         <label className="block">
           <span className="stat-label">Waktu kejadian (opsional)</span>

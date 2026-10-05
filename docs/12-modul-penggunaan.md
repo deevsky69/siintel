@@ -927,6 +927,16 @@ Yang dijaga di sisi sistem:
 - **Lokasi sebatas kecamatan bila pelapor tidak membagikan titiknya.** Titik pada peta
   adalah pusat kecamatan, **bukan TKP sebenarnya**, dan itu dinyatakan di layar.
 
+### Wilayah laporan: kecamatan, kelurahan, dan lokasi (sejak 5 Oktober 2026)
+
+Formulir meminta **kecamatan** (wajib) dan **kelurahan** (bila tahu). Tombol **Bagikan
+lokasi saya** bekerja juga di laptop/komputer: peramban memberi lokasi kasar dari Wi-Fi
+atau alamat internet, dan dari titik itu **kelurahan terdekat terisi otomatis** — layar
+menyebut jaraknya dan pelapor dapat mengubahnya. Bila pelapor membagikan lokasi tanpa
+memilih kelurahan, sistem sendiri yang menentukan kelurahan terdekat pada kecamatan yang
+disebut. Petugas melihat dari mana kelurahan itu berasal: dipilih pelapor, diturunkan dari
+lokasi, atau hanya setingkat kecamatan.
+
 ### Bagaimana pelapor memeriksa status laporannya
 
 Pada aplikasi Android, tombol **Cek Status Laporan Saya** muncul setelah ponsel itu pernah

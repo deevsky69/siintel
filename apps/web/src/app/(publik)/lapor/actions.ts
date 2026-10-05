@@ -25,6 +25,11 @@ import { BASE_URL } from "@/lib/api";
 export type ReportOptions = {
   categories: string[];
   kecamatan: string[];
+  /** Kelurahan per kecamatan beserta titik pusatnya, untuk pemilih wilayah (5 Oktober 2026). */
+  areas: {
+    kecamatan: string;
+    kelurahan: { name: string; latitude: number; longitude: number }[];
+  }[];
   max_description: number;
   coordinate_basis: string;
   intake_basis: string;
@@ -170,6 +175,8 @@ export async function submitReport(_previous: SubmitState, form: FormData): Prom
   // dikenal maupun bernilai kosong, dan mengirim string kosong akan menjadi galat yang
   // membingungkan pelapor yang justru tidak mengisi apa-apa.
   if (locationText) body.location_text = locationText;
+  const kelurahan = String(form.get("kelurahan") ?? "").trim();
+  if (kelurahan) body.kelurahan = kelurahan;
   if (incidentTime) body.incident_time = new Date(incidentTime).toISOString();
 
   const client = await forwardedFor();

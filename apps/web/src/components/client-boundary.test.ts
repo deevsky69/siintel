@@ -59,6 +59,9 @@ const SRC = join(process.cwd(), "src");
  * gagal begitu sebuah komponen server mengimpornya.
  */
 const CALLBACK_ALLOWED: Record<string, string> = {
+  "app/(publik)/lapor/share-location.tsx":
+    "prop `onPosition` datang dari AreaPicker, yang juga komponen klien — pemilih wilayah " +
+    "mengusulkan kelurahan terdekat dari lokasi yang baru diperoleh, dan itu keadaan klien.",
   "components/shell/topbar.tsx":
     "prop `onMenu` datang dari ShellFrame, yang juga komponen klien — laci navigasi " +
     "memerlukan keadaan, dan keadaan tidak dapat hidup di komponen server.",

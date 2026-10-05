@@ -395,6 +395,13 @@ Audit: `CREATE_OPERATIONAL_ACTION`, `UPDATE_OPERATIONAL_ACTION`.
 | POST | `/public/attachments` | — ✅ **ADA** |
 | GET | `/public/alerts` | — ✅ **ADA** |
 
+**Kelurahan pada laporan (5 Oktober 2026).** `GET /public/report-options` kini memuat `areas`
+(kelurahan per kecamatan beserta titik pusatnya dari master lokasi — bukan data kejadian).
+`POST /public/citizen-reports` menerima `kelurahan` opsional; responsnya menyebut `kelurahan`
+dan `area_source`: `KELURAHAN_DIPILIH` (pelapor memilih), `KELURAHAN_TERDEKAT` (diturunkan
+PostGIS dari koordinat yang dibagikan, pada kecamatan yang disebut), atau `KECAMATAN`. Dengan
+itu laporan dari laptop pun terhubung ke peta kelurahan.
+
 **Token klaim — cara pelapor melihat status laporannya sendiri (menutup sebagian U-13).**
 
 `POST /public/citizen-reports` kini juga menjawab `claim_token`: 256 bit acak, diterbitkan
