@@ -121,9 +121,31 @@ build-tools 34.0.0), dan Gradle 8.7.
 export JAVA_HOME=/path/ke/jdk-17
 echo "sdk.dir=/path/ke/android-sdk" > local.properties
 
-gradle assembleRelease
+./gradlew assembleRelease
 # keluaran: app/build/outputs/apk/release/app-release.apk
 ```
+
+Gradle **wrapper** (`gradlew`, `gradlew.bat`, 8.9) ikut di repository sejak 6 Oktober 2026,
+supaya proyek dapat dibuka langsung di Android Studio pada mesin lain (termasuk Windows)
+tanpa memasang Gradle sendiri; Studio memakai JDK dan SDK bawaannya dan menulis
+`local.properties`-nya sendiri (berkas itu tidak di-commit).
+
+### Mengedit di Android Studio pada komputer lain
+
+Jembatannya **Git**, bukan berbagi berkas lewat jaringan — Gradle di atas SSHFS/Samba
+lambat dan rapuh.
+
+```text
+Windows (Android Studio)             Server (Claude Code lewat SSH)
+git clone … siintel                  /home/kim/siintel
+Open → folder apps/android           edit logika/API/test, bangun APK
+ubah tampilan, uji di ponsel         git pull ← git push
+git commit + git push                lanjut dari commit terbaru
+```
+
+Commit kecil dan sering; sebelum meminta Claude melanjutkan, pastikan perubahan sudah
+di-push. `PublicApi.kt`, `petugas/Api.kt`, dan logika pengiriman mengikuti kontrak backend —
+perubahan di sana sebaiknya dikoordinasikan lewat server.
 
 Alamat API bawaannya `https://siintel.awansurya.com`, dan dapat diganti tanpa menyunting
 kode:
