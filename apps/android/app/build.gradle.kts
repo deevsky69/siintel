@@ -32,8 +32,15 @@ android {
 
     buildFeatures {
         buildConfig = true
+        // ViewBinding tinggal untuk layar yang belum dipindahkan ke Compose; dilepas
+        // begitu layar terakhir pindah.
         viewBinding = true
+        compose = true
     }
+
+    // Kotlin 1.9.23 ↔ Compose Compiler 1.5.11 (pasangan resmi; pada Kotlin 2.x pasangan ini
+    // diganti plugin `org.jetbrains.kotlin.plugin.compose`).
+    composeOptions { kotlinCompilerExtensionVersion = "1.5.11" }
 
     buildTypes {
         release {
@@ -62,6 +69,16 @@ android {
 }
 
 dependencies {
+    // Jetpack Compose — keputusan pemilik proyek 7 Oktober 2026: tampilan dipindahkan dari
+    // XML ke Compose, layar demi layar, dimulai dari layar muka. BOM menyamakan versi
+    // seluruh artefak Compose.
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.activity:activity-compose:1.9.0")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.12.0")

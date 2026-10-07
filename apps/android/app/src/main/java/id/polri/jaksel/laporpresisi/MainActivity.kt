@@ -2,12 +2,14 @@ package id.polri.jaksel.laporpresisi
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
-import id.polri.jaksel.laporpresisi.databinding.ActivityHomeBinding
-import id.polri.jaksel.laporpresisi.databinding.ItemAlertBinding
 import id.polri.jaksel.laporpresisi.petugas.PetugasActivity
+import id.polri.jaksel.laporpresisi.ui.PresisiTheme
 import kotlinx.coroutines.launch
 
 /**
@@ -50,30 +52,30 @@ import kotlinx.coroutines.launch
  *
  * Kegagalan jaringan tidak menghalangi apa pun: bagiannya sekadar tidak muncul. Layar muka
  * harus tetap menawarkan tombol lapor pada jaringan terburuk sekalipun.
+ *
+ * ## Compose (7 Oktober 2026)
+ *
+ * Layar pertama yang dipindahkan dari XML ke Jetpack Compose, dan menjadi pola bagi
+ * layar lain: Activity memegang data dan jaringan dalam `mutableStateOf`, tampilan ada di
+ * [HomeScreen] yang murni dan dapat dipratinjau. Tidak ada ViewModel: layar ini tidak
+ * punya keadaan yang perlu selamat dari rotasi selain yang dimuat ulang pada `onResume`.
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
-    private lateinit var views: ActivityHomeBinding
+    private var state by mutableStateOf(HomeState(version = BuildConfig.VERSION_NAME))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        views = ActivityHomeBinding.inflate(layoutInflater)
-        setContentView(views.root)
-
-        views.versionText.text =
-            getString(R.string.version_label) + " ${BuildConfig.VERSION_NAME}"
-
-        views.reportButton.setOnClickListener {
-            startActivity(Intent(this, LaporActivity::class.java))
+        setContent {
+            PresisiTheme {
+                HomeScreen(
+                    state = state,
+                    onReport = { startActivity(Intent(this, LaporActivity::class.java)) },
+                    onOfficer = { startActivity(Intent(this, PetugasActivity::class.java)) },
+                    onCheckStatus = ::periksaStatus,
+                )
+            }
         }
-        views.officerButton.setOnClickListener {
-            startActivity(Intent(this, PetugasActivity::class.java))
-        }
-
-        views.statusButton.setOnClickListener { periksaStatus() }
-
-        muatImbauan()
-        tampilkanTombolStatus()
     }
 
     /**
@@ -97,8 +99,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun tampilkanTombolStatus() {
         val ada = TiketStore(this).semua().isNotEmpty()
-        views.statusButton.visibility = if (ada) View.VISIBLE else View.GONE
-        if (!ada) views.statusResult.visibility = View.GONE
+        state = state.copy(hasTicket = ada, statusResult = if (ada) state.statusResult else null)
     }
 
     /**
@@ -111,35 +112,25 @@ class MainActivity : AppCompatActivity() {
     private fun periksaStatus() {
         val store = TiketStore(this)
         val tiket = store.semua().firstOrNull() ?: return
-
-        views.statusResult.visibility = View.VISIBLE
-        views.statusResult.text = getString(R.string.home_status_checking)
+        state = state.copy(statusResult = getString(R.string.home_status_checking))
 
         lifecycleScope.launch {
             val status = PublicApi.statusLaporan(BuildConfig.API_BASE, tiket.code, tiket.claimToken)
-            views.statusResult.text = if (status == null) {
-                getString(R.string.home_status_none)
-            } else {
-                "${status.code} · ${status.statusLabel}\n${status.basis}"
-            }
+            state = state.copy(
+                statusResult = if (status == null) {
+                    getString(R.string.home_status_none)
+                } else {
+                    "${status.code} · ${status.statusLabel}\n${status.basis}"
+                },
+            )
         }
     }
 
     private fun muatImbauan() {
         lifecycleScope.launch {
-            val imbauan = PublicApi.imbauan(BuildConfig.API_BASE)
-            views.alertList.removeAllViews()
-
             // Disembunyikan seluruhnya bila kosong — termasuk ketika kosongnya karena
             // jaringan gagal. Judul tanpa isi terbaca seperti aplikasi yang rusak.
-            views.alertSection.visibility = if (imbauan.isEmpty()) View.GONE else View.VISIBLE
-
-            for (row in imbauan.take(MAX_ALERTS)) {
-                val card = ItemAlertBinding.inflate(layoutInflater, views.alertList, true)
-                val jam = row.timeWindow?.let { " · $it WIB" } ?: ""
-                card.alertHeadline.text = "${row.threatType} · ${row.areaText}$jam"
-                card.alertMessage.text = row.message
-            }
+            state = state.copy(alerts = PublicApi.imbauan(BuildConfig.API_BASE).take(MAX_ALERTS))
         }
     }
 
