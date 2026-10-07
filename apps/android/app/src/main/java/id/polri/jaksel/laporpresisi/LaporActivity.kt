@@ -6,15 +6,18 @@ import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.provider.OpenableColumns
-import android.view.View
-import android.widget.ArrayAdapter
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import id.polri.jaksel.laporpresisi.databinding.ActivityLaporBinding
+import id.polri.jaksel.laporpresisi.ui.PresisiTheme
 import kotlinx.coroutines.launch
 
 /**
@@ -36,22 +39,24 @@ import kotlinx.coroutines.launch
  *
  * Peringatan darurat diletakkan **di atas** formulir, bukan di bawah tombol kirim: orang
  * yang sedang panik tidak membaca catatan kaki.
+ *
+ * ## Compose (7 Oktober 2026)
+ *
+ * Tampilan ada di [LaporScreen]; Activity ini memegang [LaporState] dan segala yang
+ * menyentuh Android — izin, `LocationManager`, pemilih berkas, `ContentResolver`,
+ * `TiketStore` — lalu menyalurkannya sebagai perubahan keadaan.
  */
-class LaporActivity : AppCompatActivity() {
+class LaporActivity : ComponentActivity() {
 
     private companion object {
         /** Berapa lama menunggu satu titik sebelum menyerah. */
         const val LOCATION_TIMEOUT_MS = 20_000L
     }
 
-    private lateinit var views: ActivityLaporBinding
-    private var options: PublicApi.Options? = null
+    private var state by mutableStateOf(LaporState())
 
     /** Titik yang dibagikan pelapor; `null` selama ia belum menekan tombolnya. */
     private var shared: Location? = null
-
-    /** Lampiran yang sudah dititipkan ke server, beserta nama berkasnya untuk ditampilkan. */
-    private val staged = mutableListOf<Pair<PublicApi.Staged, String>>()
 
     /**
      * Izin lokasi diminta **saat tombolnya ditekan**, bukan saat layar dibuka.
@@ -65,7 +70,7 @@ class LaporActivity : AppCompatActivity() {
             if (granted.values.any { it }) {
                 readLocation()
             } else {
-                views.locationNote.text = getString(R.string.err_location_denied)
+                state = state.copy(locationNote = getString(R.string.err_location_denied))
             }
         }
 
@@ -81,20 +86,29 @@ class LaporActivity : AppCompatActivity() {
             if (chosen.isNotEmpty()) upload(chosen)
         }
 
+    private val actions = LaporActions(
+        onCategory = { state = state.copy(category = it, error = null) },
+        onKecamatan = {
+            // Kelurahan ikut dikosongkan: kelurahan milik kecamatan sebelumnya tidak sah
+            // untuk kecamatan yang baru.
+            state = state.copy(kecamatan = it, kelurahan = "", kelurahanSuggestion = null, error = null)
+        },
+        onKelurahan = { state = state.copy(kelurahan = it, kelurahanSuggestion = null) },
+        onPlace = { state = state.copy(place = it) },
+        onStory = { state = state.copy(story = it, error = null) },
+        onLocation = ::onLocationPressed,
+        onPickFiles = {
+            pickFiles.launch(
+                arrayOf("image/jpeg", "image/png", "image/webp", "audio/*", "video/mp4", "video/webm"),
+            )
+        },
+        onSend = ::submit,
+        onAgain = ::resetForAnother,
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        views = ActivityLaporBinding.inflate(layoutInflater)
-        setContentView(views.root)
-
-        views.sendButton.setOnClickListener { submit() }
-        views.againButton.setOnClickListener { resetForAnother() }
-        views.locationButton.setOnClickListener { onLocationPressed() }
-        views.attachButton.setOnClickListener {
-            pickFiles.launch(
-                arrayOf("image/jpeg", "image/png", "image/webp", "audio/*", "video/mp4", "video/webm")
-            )
-        }
-
+        setContent { PresisiTheme { LaporScreen(state, actions) } }
         loadOptions()
     }
 
@@ -107,27 +121,14 @@ class LaporActivity : AppCompatActivity() {
      * dikenal server.
      */
     private fun loadOptions() {
-        setBusy(true)
+        state = state.copy(busy = true)
         lifecycleScope.launch {
             try {
-                val loaded = PublicApi.options(BuildConfig.API_BASE)
-                options = loaded
-                fill(views.categorySpinner, loaded.categories)
-                fill(views.areaSpinner, loaded.areas)
-                views.areaSpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
-                        fillKelurahan(loaded.areas.getOrNull(position))
-                    }
-
-                    override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
-                }
-                fillKelurahan(loaded.areas.firstOrNull())
-                views.formGroup.visibility = View.VISIBLE
-            } catch (failure: PublicApi.ApiFailure) {
-                views.formGroup.visibility = View.GONE
-                showError(getString(R.string.err_options))
+                state = state.copy(options = PublicApi.options(BuildConfig.API_BASE), optionsFailed = false)
+            } catch (_: PublicApi.ApiFailure) {
+                state = state.copy(optionsFailed = true)
             } finally {
-                setBusy(false)
+                state = state.copy(busy = false)
             }
         }
     }
@@ -135,58 +136,48 @@ class LaporActivity : AppCompatActivity() {
     private fun submit() {
         // Pengiriman mustahil sebelum pilihan termuat: tanpa daftar kategori dan kecamatan
         // dari server, tidak ada nilai sah yang bisa dikirim.
-        if (options == null) return
-        val category = views.categorySpinner.selectedItem?.toString().orEmpty()
-        val area = views.areaSpinner.selectedItem?.toString().orEmpty()
-        val story = views.storyInput.text.toString().trim()
-
-        if (category.isBlank() || area.isBlank() || story.isBlank()) {
-            showError(getString(R.string.err_incomplete))
+        if (state.options == null) return
+        val story = state.story.trim()
+        if (state.category.isBlank() || state.kecamatan.isBlank() || story.isBlank()) {
+            state = state.copy(error = getString(R.string.err_incomplete))
             return
         }
         // Ambang yang sama dijaga backend (`min_length=10`). Diperiksa juga di sini bukan
         // sebagai pengaman melainkan agar pelapor tahu sebelum menunggu perjalanan jaringan.
         if (story.length < 10) {
-            showError(getString(R.string.err_short))
+            state = state.copy(error = getString(R.string.err_short))
             return
         }
 
-        hideError()
-        setBusy(true)
-        views.sendButton.isEnabled = false
-        views.sendButton.text = getString(R.string.sending)
-
+        state = state.copy(error = null, sending = true, busy = true)
         lifecycleScope.launch {
             try {
                 val ticket = PublicApi.submit(
                     BuildConfig.API_BASE,
                     ReportDraft(
-                        category = category,
-                        area = area,
-                        place = views.placeInput.text.toString().trim(),
+                        category = state.category,
+                        area = state.kecamatan,
+                        place = state.place.trim(),
                         story = story,
                         latitude = shared?.latitude,
                         longitude = shared?.longitude,
                         // Ketelitian hanya disertakan bila peranti melaporkannya. Menebak
                         // angkanya berarti menyatakan ketelitian yang tidak pernah diukur.
                         accuracyMetres = shared?.takeIf { it.hasAccuracy() }?.accuracy?.toDouble(),
-                        attachments = staged.map { it.first.handle },
-                        kelurahan = selectedKelurahan(),
+                        attachments = state.attachments.map { it.staged.handle },
+                        kelurahan = state.kelurahan,
                     ),
                 )
                 showTicket(ticket)
             } catch (failure: PublicApi.ApiFailure) {
-                showError(failure.readable)
+                state = state.copy(error = failure.readable)
             } finally {
-                setBusy(false)
-                views.sendButton.isEnabled = true
-                views.sendButton.text = getString(R.string.send)
+                state = state.copy(sending = false, busy = false)
             }
         }
     }
 
     private fun showTicket(ticket: PublicApi.Ticket) {
-        views.ticketText.text = ticket.code
         // Kode klaim disimpan terenkripsi di ponsel ini, dan TIDAK ditampilkan.
         //
         // Menampilkannya hanya akan mengundang pelapor menyalinnya ke tempat yang tidak
@@ -195,9 +186,7 @@ class LaporActivity : AppCompatActivity() {
         if (ticket.claimToken.isNotBlank()) {
             TiketStore(this).simpan(TiketStore.Tiket(ticket.code, ticket.claimToken))
         }
-        views.formGroup.visibility = View.GONE
-        views.sentGroup.visibility = View.VISIBLE
-        hideError()
+        state = state.copy(ticket = ticket.code, error = null)
     }
 
     /**
@@ -206,19 +195,13 @@ class LaporActivity : AppCompatActivity() {
      * Isian dikosongkan seluruhnya. Membiarkan keterangan sebelumnya tertinggal akan
      * membuat laporan kedua tidak sengaja mengulang isi laporan pertama — dan pada kanal
      * tanpa identitas, laporan berulang tidak dapat dibedakan dari laporan sungguhan.
+     * Lokasi dan lampiran ikut dilepas: laporan berikutnya adalah kejadian yang lain, dan
+     * membawa serta titik dan foto laporan sebelumnya menempelkan bukti yang salah pada
+     * peristiwa yang salah.
      */
     private fun resetForAnother() {
-        views.storyInput.text?.clear()
-        views.placeInput.text?.clear()
-        // Lokasi dan lampiran ikut dilepas. Laporan berikutnya adalah kejadian yang lain;
-        // membawa serta titik dan foto laporan sebelumnya akan menempelkan bukti yang salah
-        // pada peristiwa yang salah — kesalahan yang tidak terlihat sampai ada yang
-        // memeriksanya.
-        clearLocation()
-        staged.clear()
-        renderAttachments()
-        views.sentGroup.visibility = View.GONE
-        views.formGroup.visibility = View.VISIBLE
+        shared = null
+        state = LaporState(options = state.options)
     }
 
     // ---------------------------------------------------------------------------------
@@ -230,48 +213,47 @@ class LaporActivity : AppCompatActivity() {
             clearLocation()
             return
         }
-        val granted = listOf(
+        val permissions = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
-        ).any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
-
-        if (granted) readLocation() else askLocation.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            )
         )
+        val granted = permissions.any {
+            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+        }
+        if (granted) readLocation() else askLocation.launch(permissions)
     }
 
     /**
      * Mengambil satu titik, sekali saja.
      *
      * Memakai `LocationManager` bawaan, bukan pustaka lokasi Google: pustaka itu menuntut
-     * Play Services yang tidak ada pada sebagian perangkat, dan aplikasi yang dipasang
-     * warga sebaiknya membawa sesedikit mungkin yang tidak dapat mereka periksa.
-     *
-     * Titik terakhir yang diketahui **tidak** dipakai. Ia bisa berumur berjam-jam dan
-     * menunjuk tempat yang sudah lama ditinggalkan — dan titik yang salah lebih buruk
-     * daripada tidak ada titik, karena ia tetap dicatat sebagai "lokasi kejadian".
+     * Google Play Services — yang tidak ada pada sebagian perangkat, tidak ada pada
+     * emulator baku, dan menambah ketergantungan pada satu perusahaan untuk aplikasi
+     * yang dipasang warga.
      */
     private fun readLocation() {
         val manager = getSystemService(LOCATION_SERVICE) as? LocationManager
         val provider = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
             .firstOrNull { runCatching { manager?.isProviderEnabled(it) == true }.getOrDefault(false) }
-
         if (manager == null || provider == null) {
-            views.locationNote.text = getString(R.string.err_location)
+            state = state.copy(locationNote = getString(R.string.err_location))
             return
         }
-
-        views.locationButton.isEnabled = false
-        views.locationButton.text = getString(R.string.sharing_location)
+        state = state.copy(locationBusy = true, locationNote = null)
 
         val listener = object : android.location.LocationListener {
             override fun onLocationChanged(location: Location) {
                 manager.removeUpdates(this)
                 shared = location
-                renderLocation()
+                state = state.copy(
+                    location = SharedPoint(
+                        location.latitude,
+                        location.longitude,
+                        if (location.hasAccuracy()) location.accuracy.toDouble() else null,
+                    ),
+                    locationBusy = false,
+                    locationNote = null,
+                )
                 suggestAreaFrom(location)
             }
 
@@ -280,65 +262,49 @@ class LaporActivity : AppCompatActivity() {
             // berubah keadaan.
             @Deprecated("Diperlukan API 24–29")
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
-
             override fun onProviderEnabled(provider: String) = Unit
-
             override fun onProviderDisabled(provider: String) {
                 manager.removeUpdates(this)
-                views.locationButton.isEnabled = true
-                views.locationButton.text = getString(R.string.share_location)
-                views.locationNote.text = getString(R.string.err_location)
+                state = state.copy(locationBusy = false, locationNote = getString(R.string.err_location))
             }
         }
-
         try {
             manager.requestLocationUpdates(provider, 0L, 0f, listener, Looper.getMainLooper())
         } catch (_: SecurityException) {
-            views.locationButton.isEnabled = true
-            views.locationButton.text = getString(R.string.share_location)
-            views.locationNote.text = getString(R.string.err_location_denied)
+            state = state.copy(locationBusy = false, locationNote = getString(R.string.err_location_denied))
             return
         }
-
         // Batas waktu supaya pelapor tidak menunggu tanpa kepastian di dalam ruangan, di
         // mana sinyal satelit sering tidak pernah datang sama sekali.
-        views.locationButton.postDelayed({
-            if (shared == null) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (shared == null && state.locationBusy) {
                 manager.removeUpdates(listener)
-                views.locationButton.isEnabled = true
-                views.locationButton.text = getString(R.string.share_location)
-                views.locationNote.text = getString(R.string.err_location)
+                state = state.copy(locationBusy = false, locationNote = getString(R.string.err_location))
             }
         }, LOCATION_TIMEOUT_MS)
     }
 
-    private fun renderLocation() {
-        val location = shared
-        views.locationButton.isEnabled = true
-
-        if (location == null) {
-            views.locationText.visibility = View.GONE
-            views.locationButton.text = getString(R.string.share_location)
-            views.locationNote.text = getString(R.string.location_note)
-            return
-        }
-
-        views.locationText.visibility = View.VISIBLE
-        views.locationText.text = String.format(
-            java.util.Locale.US,
-            "%.5f, %.5f (±%.0f m)",
-            location.latitude,
-            location.longitude,
-            if (location.hasAccuracy()) location.accuracy else 0f,
-        )
-        views.locationButton.text = getString(R.string.clear_location)
-        views.locationNote.text = getString(R.string.location_note)
-    }
-
     private fun clearLocation() {
         shared = null
-        renderLocation()
-        views.kelurahanNote.text = getString(R.string.kelurahan_note)
+        state = state.copy(location = null, locationBusy = false, locationNote = null, kelurahanSuggestion = null)
+    }
+
+    /**
+     * Lokasi yang dibagikan mengusulkan kecamatan dan kelurahan terdekat. Pelapor tetap
+     * dapat mengubah keduanya; catatan di bawah pemilih menyebut bahwa ini usulan.
+     */
+    private fun suggestAreaFrom(location: Location) {
+        val areas = state.options?.detailedAreas.orEmpty()
+        val nearest = AreaNearest.nearest(areas, location.latitude, location.longitude) ?: return
+        state = state.copy(
+            kecamatan = nearest.kecamatan,
+            kelurahan = nearest.kelurahan,
+            kelurahanSuggestion = getString(
+                R.string.kelurahan_suggested,
+                nearest.kelurahan,
+                nearest.distanceM.toInt(),
+            ),
+        )
     }
 
     // ---------------------------------------------------------------------------------
@@ -346,13 +312,12 @@ class LaporActivity : AppCompatActivity() {
     // ---------------------------------------------------------------------------------
 
     private fun upload(chosen: List<Uri>) {
-        val limits = options ?: return
-        views.attachButton.isEnabled = false
-        views.attachButton.text = getString(R.string.uploading)
+        val limits = state.options ?: return
+        state = state.copy(uploading = true)
 
         lifecycleScope.launch {
             for (uri in chosen) {
-                if (staged.size >= limits.maxAttachments) break
+                if (state.attachments.size >= limits.maxAttachments) break
 
                 val name = displayName(uri)
                 val size = fileSize(uri)
@@ -360,41 +325,20 @@ class LaporActivity : AppCompatActivity() {
                 // lewat jaringan seluler. Server tetap memeriksanya sendiri — ini
                 // kenyamanan, bukan pengaman.
                 if (size != null && limits.maxAttachmentBytes > 0 && size > limits.maxAttachmentBytes) {
-                    showError("$name melebihi batas ${limits.maxAttachmentBytes / (1024 * 1024)} MB.")
+                    state = state.copy(error = "$name melebihi batas ${limits.maxAttachmentBytes / (1024 * 1024)} MB.")
                     continue
                 }
 
                 try {
                     val stream = contentResolver.openInputStream(uri) ?: continue
                     val media = contentResolver.getType(uri) ?: "application/octet-stream"
-                    val result = stream.use {
-                        PublicApi.stage(BuildConfig.API_BASE, it, name, media)
-                    }
-                    staged += result to name
+                    val result = stream.use { PublicApi.stage(BuildConfig.API_BASE, it, name, media) }
+                    state = state.copy(attachments = state.attachments + StagedFile(result, name))
                 } catch (failure: PublicApi.ApiFailure) {
-                    showError("$name: ${failure.readable}")
+                    state = state.copy(error = "$name: ${failure.readable}")
                 }
             }
-
-            renderAttachments()
-            views.attachButton.isEnabled = staged.size < limits.maxAttachments
-            views.attachButton.text = getString(
-                if (staged.size >= limits.maxAttachments) R.string.attachments_full
-                else R.string.pick_file
-            )
-        }
-    }
-
-    private fun renderAttachments() {
-        if (staged.isEmpty()) {
-            views.attachmentList.visibility = View.GONE
-            views.attachButton.isEnabled = true
-            views.attachButton.text = getString(R.string.pick_file)
-            return
-        }
-        views.attachmentList.visibility = View.VISIBLE
-        views.attachmentList.text = staged.joinToString("\n") { (file, name) ->
-            "• $name — ${maxOf(1L, file.byteSize / 1024)} KB"
+            state = state.copy(uploading = false)
         }
     }
 
@@ -415,74 +359,5 @@ class LaporActivity : AppCompatActivity() {
             }
         }
         return null
-    }
-
-    /** Teks baris pertama pemilih kelurahan: "tidak tahu", bukan nama kelurahan. */
-    private val skipKelurahan: String get() = getString(R.string.kelurahan_skip)
-
-    /**
-     * Isi ulang pemilih kelurahan untuk kecamatan yang dipilih (5 Oktober 2026).
-     *
-     * Kelurahan pilihan, bukan isian bebas, supaya selalu cocok dengan master lokasi dan
-     * laporan langsung terhubung ke peta kelurahan. Baris pertama "tidak tahu" menjaga
-     * kelurahan tetap opsional. Pada server lama (tanpa `areas`) pemilihnya disembunyikan.
-     */
-    private fun fillKelurahan(kecamatan: String?) {
-        val names = options?.detailedAreas
-            ?.firstOrNull { it.kecamatan == kecamatan }
-            ?.kelurahan?.map { it.name }
-            .orEmpty()
-        val visible = names.isNotEmpty()
-        views.kelurahanLabel.visibility = if (visible) View.VISIBLE else View.GONE
-        views.kelurahanSpinner.visibility = if (visible) View.VISIBLE else View.GONE
-        views.kelurahanNote.visibility = if (visible) View.VISIBLE else View.GONE
-        if (visible) fill(views.kelurahanSpinner, listOf(skipKelurahan) + names)
-    }
-
-    private fun selectedKelurahan(): String {
-        if (views.kelurahanSpinner.visibility != View.VISIBLE) return ""
-        val value = views.kelurahanSpinner.selectedItem?.toString().orEmpty()
-        return if (value == skipKelurahan) "" else value
-    }
-
-    /**
-     * Lokasi yang dibagikan mengusulkan kecamatan dan kelurahan terdekat. Pelapor tetap
-     * dapat mengubah keduanya; catatan di bawah pemilih menyebut bahwa ini usulan.
-     */
-    private fun suggestAreaFrom(location: Location) {
-        val areas = options?.detailedAreas.orEmpty()
-        val nearest = AreaNearest.nearest(areas, location.latitude, location.longitude) ?: return
-        val kecamatanIndex = options?.areas?.indexOf(nearest.kecamatan) ?: -1
-        if (kecamatanIndex >= 0) views.areaSpinner.setSelection(kecamatanIndex)
-        fillKelurahan(nearest.kecamatan)
-        val names = areas.firstOrNull { it.kecamatan == nearest.kecamatan }?.kelurahan?.map { it.name }.orEmpty()
-        val index = names.indexOf(nearest.kelurahan)
-        if (index >= 0) views.kelurahanSpinner.setSelection(index + 1)
-        views.kelurahanNote.text = getString(
-            R.string.kelurahan_suggested,
-            nearest.kelurahan,
-            nearest.distanceM.toInt(),
-        )
-    }
-
-    private fun fill(spinner: android.widget.Spinner, values: List<String>) {
-        spinner.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            values,
-        )
-    }
-
-    private fun setBusy(busy: Boolean) {
-        views.spinner.visibility = if (busy) View.VISIBLE else View.GONE
-    }
-
-    private fun showError(message: String) {
-        views.errorText.text = message
-        views.errorText.visibility = View.VISIBLE
-    }
-
-    private fun hideError() {
-        views.errorText.visibility = View.GONE
     }
 }
