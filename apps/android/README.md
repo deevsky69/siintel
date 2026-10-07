@@ -133,10 +133,17 @@ echo "sdk.dir=/path/ke/android-sdk" > local.properties
 # keluaran: app/build/outputs/apk/release/app-release.apk
 ```
 
-Gradle **wrapper** (`gradlew`, `gradlew.bat`, 8.9) ikut di repository sejak 6 Oktober 2026,
-supaya proyek dapat dibuka langsung di Android Studio pada mesin lain (termasuk Windows)
-tanpa memasang Gradle sendiri; Studio memakai JDK dan SDK bawaannya dan menulis
-`local.properties`-nya sendiri (berkas itu tidak di-commit).
+Gradle **wrapper** (`gradlew`, `gradlew.bat`, 8.14.3) ikut di repository sejak 6 Oktober
+2026, supaya proyek dapat dibuka langsung di Android Studio pada mesin lain (termasuk
+Windows) tanpa memasang Gradle sendiri. Studio menulis `local.properties`-nya sendiri
+(berkas itu tidak di-commit).
+
+**JDK dikunci di repo**, bukan di pengaturan Studio tiap mesin: `gradle/gradle-daemon-jvm.properties`
+meminta Java 17, dan plugin foojay di `settings.gradle.kts` mengunduhnya bila mesin tidak
+memilikinya (7 Oktober 2026). Latar belakangnya: Android Studio 2026.2 membawa Java 25, dan
+Gradle 8.x tidak berjalan di atasnya; tanpa kunci ini tiap mesin baru gagal sync dengan
+"Incompatible Gradle JVM version". Bila Studio menawarkan "migrate to Daemon toolchain",
+jawab tidak — sudah dilakukan.
 
 ### Mengedit di Android Studio pada komputer lain
 

@@ -10,6 +10,13 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+plugins {
+    // Mengunduh JDK yang diminta `gradle/gradle-daemon-jvm.properties` bila mesin ini tidak
+    // memilikinya (7 Oktober 2026). Tanpa ini, mesin yang hanya punya Java 25 bawaan
+    // Android Studio gagal sync karena Gradle 8.x tidak berjalan di atas Java 25.
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
