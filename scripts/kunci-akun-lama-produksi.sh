@@ -10,6 +10,14 @@ cd "$(dirname "$0")/.."
 COMPOSE=(docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml)
 PASSFILE="$HOME/siintel-demo-passwords.txt"
 
+# Perintah lock-user baru ada sejak 7 Oktober 2026: kontainer yang belum di-deploy tidak
+# mengenalnya, dan galat argparse-nya membingungkan. Periksa dulu, beri tahu dengan jelas.
+if ! "${COMPOSE[@]}" exec -T api python -m prediksi_presisi_api.cli --help 2>/dev/null | grep -q "lock-user"; then
+  echo "Kontainer API produksi masih memakai kode lama (belum ada perintah lock-user)."
+  echo "Jalankan dulu:  bash scripts/deploy-produksi.sh   lalu ulangi skrip ini."
+  exit 1
+fi
+
 for akun in demo.commandcenter demo.analyst; do
   echo "== mengunci $akun"
   "${COMPOSE[@]}" exec -T api python -m prediksi_presisi_api.cli lock-user "$akun"
