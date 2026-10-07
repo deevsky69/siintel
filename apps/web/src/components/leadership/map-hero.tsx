@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
-import type { MapLevel } from "@/components/map/area";
+import { type MapLevel, mapHref } from "@/components/map/area";
 import { RiskLegend } from "@/components/map/legend";
 import { MapCanvas } from "@/components/map/map-canvas";
 import { Panel } from "@/components/panel";
-import type { AreaDetail, MapData } from "@/lib/map-data";
+import type { AreaDetail, KelurahanOverlay, MapData } from "@/lib/map-data";
 import { type CitizenRow, type CrimeRow, jamKejadian } from "@/lib/reports";
 import { RISK_LABELS, RISK_TEXT, riskClassOf } from "@/lib/risk";
 import { HOME_AREA } from "@/lib/wilayah";
@@ -40,10 +40,16 @@ export function MapHero({
   crimes,
   reports,
   level,
+  kelurahan = null,
+  overlay = null,
 }: {
   data: MapData;
   selected: string | null;
   detail: AreaDetail | null;
+  /** Kelurahan yang rinciannya dibuka; hanya berarti pada tingkat `kelurahan`. */
+  kelurahan?: string | null;
+  /** Baris per kelurahan untuk kecamatan terpilih; hanya ada pada tingkat `kelurahan`. */
+  overlay?: KelurahanOverlay | null;
   /**
    * Beranda membuka pada tingkat wilayah hukum Polda Metro Jaya, bukan langsung pada
    * kecamatan. Alasannya bukan hiasan: pimpinan membaca posisi satuannya **di antara**
@@ -57,6 +63,12 @@ export function MapHero({
   reports: CitizenRow[] | null;
 }) {
   const scored = data.districts.filter((district) => district.current !== null);
+  // Pada tingkat kelurahan kanvas menggambar baris kelurahan dari lapisan yang diminta
+  // khusus; selebihnya baris kecamatan seperti biasa.
+  const zoomed = level === "kelurahan" && overlay !== null && selected !== null;
+  const crumb = "rounded px-1.5 py-0.5 text-xs transition-colors";
+  const crumbOn = "font-semibold text-ink";
+  const crumbOff = "text-ink-muted hover:text-accent";
 
   return (
     <div className="grid grid-cols-12 gap-3">
@@ -94,31 +106,45 @@ export function MapHero({
                   href="/?tingkat=kecamatan"
                   scroll={false}
                   aria-current={level === "kecamatan" ? "page" : undefined}
-                  className={`rounded px-1.5 py-0.5 text-xs transition-colors ${
-                    level === "kecamatan"
-                      ? "font-semibold text-ink"
-                      : "text-ink-muted hover:text-accent"
-                  }`}
+                  className={`${crumb} ${level === "kecamatan" ? crumbOn : crumbOff}`}
                 >
                   {HOME_AREA}
                 </Link>
+                {level === "kelurahan" && selected ? (
+                  <>
+                    <span aria-hidden="true" className="text-2xs text-ink-faint">
+                      &#8250;
+                    </span>
+                    <Link
+                      href={`/?tingkat=kelurahan&wilayah=${encodeURIComponent(selected)}`}
+                      scroll={false}
+                      aria-current="page"
+                      className={`${crumb} ${crumbOn}`}
+                    >
+                      Kecamatan {selected}
+                    </Link>
+                  </>
+                ) : null}
               </nav>
 
               <MapCanvas
-                districts={data.districts}
+                districts={zoomed ? overlay.districts : data.districts}
                 layer="current"
-                selected={selected}
+                selected={zoomed ? kelurahan : selected}
                 maxHeight="54vh"
-                level={level}
+                level={zoomed ? "kelurahan" : level === "kelurahan" ? "kecamatan" : level}
+                focus={zoomed ? selected : null}
                 // Klik tetap di beranda: rinciannya muncul di panel sebelah, bukan dengan
                 // meninggalkan halaman yang baru saja dibuka pengguna.
                 linkTo="home"
               />
-              {level === "kecamatan" ? <RiskLegend /> : null}
+              {level !== "polda" ? <RiskLegend /> : null}
               <p className="text-2xs leading-relaxed text-ink-faint">
                 {level === "polda"
                   ? `Hanya ${HOME_AREA} yang diwarnai — sebelas wilayah lain di luar wilayah hukum Polres ini. Klik untuk membuka peta kecamatannya.`
-                  : "Arahkan kursor untuk ringkasan, klik untuk rincian. Layer historis dan prediktif ada di peta lengkap."}
+                  : zoomed
+                    ? `Kelurahan di Kecamatan ${selected} diwarnai dari sel penilaian setingkat kelurahan. Klik kelurahan untuk rinciannya.`
+                    : "Arahkan kursor untuk ringkasan, klik kecamatan untuk membuka peta kelurahannya."}
               </p>
             </>
           )}
@@ -126,7 +152,16 @@ export function MapHero({
       </div>
 
       <div className="col-span-12 xl:col-span-4">
-        <Panel title={selected ?? "Rincian Wilayah"} className="h-full">
+        <Panel
+          title={
+            selected === null
+              ? "Rincian Wilayah"
+              : kelurahan
+                ? `${kelurahan}, ${selected}`
+                : selected
+          }
+          className="h-full"
+        >
           {selected === null ? (
             <EmptyState
               label={
@@ -140,7 +175,13 @@ export function MapHero({
               label={`Tidak ada rincian untuk ${selected}. Wilayah ini mungkin berada di luar kewenangan akun Anda.`}
             />
           ) : (
-            <AreaSummary detail={detail} kecamatan={selected} crimes={crimes} reports={reports} />
+            <AreaSummary
+              detail={detail}
+              kecamatan={selected}
+              kelurahan={kelurahan}
+              crimes={crimes}
+              reports={reports}
+            />
           )}
         </Panel>
       </div>
@@ -158,11 +199,13 @@ export function MapHero({
 function AreaSummary({
   detail,
   kecamatan,
+  kelurahan,
   crimes,
   reports,
 }: {
   detail: AreaDetail;
   kecamatan: string;
+  kelurahan: string | null;
   crimes: CrimeRow[] | null;
   reports: CitizenRow[] | null;
 }) {
@@ -245,7 +288,13 @@ function AreaSummary({
           Rincian lengkap
         </Link>
         <Link
-          href={`/peta?wilayah=${encodeURIComponent(kecamatan)}`}
+          href={mapHref(
+            kecamatan,
+            "current",
+            undefined,
+            kelurahan ? "kelurahan" : "kecamatan",
+            kelurahan,
+          )}
           className="rounded border border-base-700 px-2.5 py-1 text-2xs uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink"
         >
           Buka di peta

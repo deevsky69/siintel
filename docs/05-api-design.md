@@ -556,3 +556,8 @@ data**, bukan terhadap nama peran — sehingga tetap benar bila nama peran berub
 Audit `UPDATE_USER` memuat nilai sebelum dan sesudah untuk keempat bidang yang boleh
 berubah. **Nilai bidang kredensial tidak pernah masuk ke sana** — hanya namanya, dan hanya
 pada catatan penolakan.
+
+
+### Catatan 7 Oktober 2026 — `GET /recommendations`
+
+Setiap baris kini membawa `threat_type`, `time_window`, `risk_score`, `kecamatan`, `kelurahan` dari prediksi sumbernya (tambahan, kompatibel ke belakang), supaya layar rekomendasi menjawab apa/di mana/kapan/seberapa besar tanpa membuka layar lain.

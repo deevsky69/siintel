@@ -19,7 +19,12 @@ import {
   getTrends,
 } from "@/lib/dashboard";
 import { getLeadership } from "@/lib/leadership";
-import { getAreaDetail, getMapData, resolveSelectedDistrict } from "@/lib/map-data";
+import {
+  getAreaDetail,
+  getKelurahanOverlay,
+  getMapData,
+  resolveSelectedDistrict,
+} from "@/lib/map-data";
 import { getCitizenReports, getCrimes } from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
@@ -58,7 +63,11 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ wilayah?: string | string[]; tingkat?: string | string[] }>;
+  searchParams: Promise<{
+    wilayah?: string | string[];
+    tingkat?: string | string[];
+    kelurahan?: string | string[];
+  }>;
 }) {
   const params = await searchParams;
   const requested = typeof params.wilayah === "string" ? params.wilayah : null;
@@ -70,6 +79,9 @@ export default async function DashboardPage({
       : requested !== null
         ? "kecamatan"
         : "polda";
+  // Kelurahan terpilih hanya berarti saat peta memang diperbesar ke satu kecamatan.
+  const selectedKelurahan =
+    level === "kelurahan" && typeof params.kelurahan === "string" ? params.kelurahan : null;
 
   const [summary, trends, outlook, warnings, map, board] = await Promise.all([
     getSummary(),
@@ -89,17 +101,32 @@ export default async function DashboardPage({
   // Ketiganya diambil bersamaan; kegagalan salah satu tidak menjatuhkan dua lainnya.
   // `null` berarti kanal itu di luar kewenangan pembaca — dinyatakan apa adanya di panel,
   // bukan ditampilkan sebagai daftar kosong yang artinya berbeda jauh.
-  const [detail, crimes, reports] = selected
+  const [detail, crimes, reports, overlay] = selected
     ? await Promise.all([
-        getAreaDetail(selected),
-        getCrimes({ kecamatan: selected, page_size: 4 })
-          .then((page) => page.data)
+        getAreaDetail(selected, selectedKelurahan),
+        getCrimes({ kecamatan: selected, page_size: selectedKelurahan ? 40 : 4 })
+          .then((page) =>
+            (selectedKelurahan
+              ? page.data.filter((row) => row.kelurahan === selectedKelurahan)
+              : page.data
+            ).slice(0, 4),
+          )
           .catch(() => null),
         getCitizenReports({ page_size: 60 })
-          .then((page) => page.data.filter((row) => row.kecamatan === selected).slice(0, 4))
+          .then((page) =>
+            page.data
+              .filter(
+                (row) =>
+                  row.kecamatan === selected &&
+                  (selectedKelurahan === null || row.kelurahan === selectedKelurahan),
+              )
+              .slice(0, 4),
+          )
           .catch(() => null),
+        // Lapisan kelurahan hanya diminta saat peta memang diperbesar ke satu kecamatan.
+        level === "kelurahan" ? getKelurahanOverlay(selected).catch(() => null) : null,
       ])
-    : [null, null, null];
+    : [null, null, null, null];
 
   const topWarning = warnings.data[0] ?? null;
   const recommendations = topWarning ? await getRecommendations(topWarning.code) : null;
@@ -128,6 +155,8 @@ export default async function DashboardPage({
       <MapHero
         data={map}
         selected={selected}
+        kelurahan={selectedKelurahan}
+        overlay={overlay}
         detail={detail}
         crimes={crimes}
         reports={reports}

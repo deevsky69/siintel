@@ -204,6 +204,8 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | Executive Brief | Bagian "Rencana Patroli Tahun Ini" |
 | Laporan masyarakat | Urgensi/verifikasi dinyatakan sebagai isian petugas, bukan "nilai sintetis" |
 | Android | Pemilih kelurahan + kelurahan terdekat dari lokasi (2.1.0), menyamai web; APK dibangun, belum diuji di perangkat |
+| Beranda → kelurahan | Peta beranda menyelam Polda → Jakarta Selatan → kecamatan → **kelurahan** (klik kecamatan membuka peta kelurahannya, klik kelurahan membuka rinciannya); remah roti tiga tingkat |
+| Rekomendasi untuk Pimpinan | Kartu daftar satu baris apa/di mana/kapan + skor; rincian dibuka dengan empat kunci (Apa, Di mana, Kapan, Risiko) sebelum kalimat usulan; yang menunggu diurutkan prioritas lalu skor; `GET /recommendations` membawa threat_type/time_window/risk_score/kecamatan/kelurahan |
 | Android 2.4.0 | Menu bawah mengikuti permission (Antrean, Peringatan, Laporan, Rekomendasi, Akun), halaman rincian dengan tindakan: terima/selesaikan peringatan, verifikasi laporan, keputusan Pimpinan; semua lewat endpoint web yang sama |
 | Android → Compose | Seluruh tampilan dipindahkan ke Jetpack Compose (2.2.0, 7 Oktober 2026) atas keputusan pemilik proyek; logika jaringan tidak berubah, unit test 42 lulus; belum diuji di perangkat |
 | Eksperimen model terlatih | Regresi logistik 2024–2025 → 2026 **tidak** lebih baik dari peringkat riwayat; tidak dipasang; satuan mingguan diusulkan (docs/implementation-notes/016) |

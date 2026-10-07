@@ -213,8 +213,11 @@ def list_recommendations(
     polsek = jurisdiction_filter(current, "recommendation:read")
     function = function_filter(current, "recommendation:read")
 
+    # Prediksi dan lokasi ikut dibawa (7 Oktober 2026): Pimpinan membaca APA, DI MANA, KAPAN,
+    # dan SEBERAPA BESAR sebelum membaca kalimat usulannya — tanpa ini layar rekomendasi
+    # hanya menampilkan kode prediksi yang harus dibuka di layar lain.
     query = (
-        select(Recommendation, Prediction.code, warning_alias.code)
+        select(Recommendation, Prediction, Location, warning_alias.code)
         .join(Prediction, Prediction.prediction_id == Recommendation.prediction_id)
         .join(Location, Location.location_id == Prediction.location_id)
         .outerjoin(warning_alias, warning_alias.warning_id == Recommendation.warning_id)
@@ -241,10 +244,15 @@ def list_recommendations(
                 "priority": recommendation.priority,
                 "status": recommendation.status,
                 "created_at": recommendation.created_at,
-                "prediction_code": prediction_code,
+                "prediction_code": prediction.code,
                 "warning_code": warning_code_row,
+                "threat_type": prediction.threat_type,
+                "time_window": prediction.time_window,
+                "risk_score": prediction.risk_score,
+                "kecamatan": location.kecamatan,
+                "kelurahan": location.kelurahan,
             }
-            for recommendation, prediction_code, warning_code_row in rows
+            for recommendation, prediction, location, warning_code_row in rows
         ],
         total,
         params,

@@ -380,6 +380,16 @@ Brief memuat bagian **Rencana Patroli Tahun Ini**: sudah atau belum diputus Pimp
 berapa slot yang berlaku dari usulan, dan tiga slot teratas yang berlaku (kelurahan, blok
 jam, jenis, kejadian tahun dasar). Bagian ketepatan model bergeser menjadi bagian keenam.
 
+### Catatan 7 Oktober 2026 — beranda dan rekomendasi
+
+- Peta beranda kini turun sampai **kelurahan**: klik Jakarta Selatan → kecamatan, klik
+  kecamatan → peta kelurahannya, klik kelurahan → rincian kelurahan di panel kanan. Remah
+  roti di atas peta menunjukkan tingkatnya dan dapat diklik untuk naik kembali.
+- Layar Rekomendasi disusun untuk dibaca Pimpinan cepat: tiap kartu satu baris
+  *apa · di mana · kapan* dengan skor; rincian dibuka dengan empat kunci (Apa, Di mana,
+  Kapan, Risiko) lalu kalimat usulan dan tiga tombol keputusan. Yang menunggu diurutkan
+  prioritas tinggi dahulu, lalu skor.
+
 ## 7. MEMASUKKAN DATA
 
 Menu **Data Entry**. Tiga formulir: **kejadian**, **laporan intelijen**, dan **triase

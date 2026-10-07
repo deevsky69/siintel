@@ -355,14 +355,16 @@ export function MapCanvas({
       return linkTo === "home" ? "/?tingkat=kecamatan" : mapHref(null, layer, months, "kecamatan");
     }
     // Kelurahan tidak dapat diselami lebih jauh, tetapi dapat DIBUKA rinciannya: sejak data
-    // asli sel penilaian memang setingkat kelurahan (5 Oktober 2026).
+    // asli sel penilaian memang setingkat kelurahan (5 Oktober 2026). Beranda ikut turun
+    // sampai kelurahan sejak 7 Oktober 2026 atas permintaan pemilik proyek.
     if (level === "kelurahan") {
-      return linkTo === "home" || focus == null
-        ? null
+      if (focus == null) return null;
+      return linkTo === "home"
+        ? `/?tingkat=kelurahan&wilayah=${encodeURIComponent(focus)}&kelurahan=${encodeURIComponent(name)}`
         : mapHref(focus, layer, months, "kelurahan", name);
     }
     return linkTo === "home"
-      ? `/?tingkat=kecamatan&wilayah=${encodeURIComponent(name)}`
+      ? `/?tingkat=kelurahan&wilayah=${encodeURIComponent(name)}`
       : mapHref(name, layer, months, "kelurahan");
   };
 

@@ -2,8 +2,10 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import {
   type DecisionRow,
+  headlineOf,
   indexDecisions,
   type RecommendationRow,
+  sortForDecision,
   splitByDecision,
 } from "@/lib/decisions";
 import { RecommendationBoard } from "./recommendation-board";
@@ -24,6 +26,11 @@ const pendingRow: RecommendationRow = {
   created_at: "2025-12-27T02:30:00+00:00",
   prediction_code: "PRD-00035",
   warning_code: "WRN-0053",
+  threat_type: "CURANMOR",
+  time_window: "18:00-23:59",
+  risk_score: 78,
+  kecamatan: "Pasar Minggu",
+  kelurahan: "Pejaten Timur",
 };
 
 const decidedRow: RecommendationRow = {
@@ -82,6 +89,42 @@ describe("pembagian rekomendasi", () => {
   it("menautkan keputusan ke rekomendasinya", () => {
     expect(indexDecisions([decision]).get("REC-0102")?.code).toBe("DEC-0064");
   });
+
+  it("mengurutkan yang menunggu menurut prioritas lalu skor, bukan waktu", () => {
+    const low = {
+      ...pendingRow,
+      code: "A",
+      priority: "LOW",
+      risk_score: 99,
+      created_at: "2025-01-01",
+    };
+    const highSmall = {
+      ...pendingRow,
+      code: "B",
+      priority: "HIGH",
+      risk_score: 60,
+      created_at: "2025-01-03",
+    };
+    const highBig = {
+      ...pendingRow,
+      code: "C",
+      priority: "HIGH",
+      risk_score: 80,
+      created_at: "2025-01-02",
+    };
+    expect(sortForDecision([low, highSmall, highBig]).map((row) => row.code)).toEqual([
+      "C",
+      "B",
+      "A",
+    ]);
+  });
+
+  it("menyusun satu baris apa/di mana/kapan", () => {
+    expect(headlineOf(pendingRow)).toBe("CURANMOR · Pejaten Timur, Pasar Minggu · 18:00-23:59");
+    expect(
+      headlineOf({ ...pendingRow, threat_type: null, kelurahan: null, time_window: null }),
+    ).toBe("Pasar Minggu");
+  });
 });
 
 describe("papan rekomendasi", () => {
@@ -104,6 +147,15 @@ describe("papan rekomendasi", () => {
 
     expect(detail().getByText(/Tambah patroli pada jam/)).toBeDefined();
     expect(detail().getByRole("link", { name: "PRD-00035" })).toBeDefined();
+  });
+
+  it("membuka rincian dengan apa, di mana, kapan, dan risiko sebelum kalimat usulan", () => {
+    board();
+
+    expect(detail().getByText("CURANMOR")).toBeDefined();
+    expect(detail().getByText("Pejaten Timur, Pasar Minggu")).toBeDefined();
+    expect(detail().getByText("18:00-23:59")).toBeDefined();
+    expect(detail().getByText(/78\/100/)).toBeDefined();
   });
 
   it("membuka formulir keputusan bagi pejabat berwenang", () => {

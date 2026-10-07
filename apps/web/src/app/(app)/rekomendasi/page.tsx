@@ -3,6 +3,7 @@ import {
   getProfile,
   getRecommendations,
   indexDecisions,
+  sortForDecision,
   splitByDecision,
 } from "@/lib/decisions";
 import { RecommendationBoard } from "./recommendation-board";
@@ -30,7 +31,11 @@ export default async function RecommendationPage({
     getProfile(),
   ]);
 
-  const { pending, decided } = splitByDecision(recommendations.data);
+  const split = splitByDecision(recommendations.data);
+  // Yang menunggu diurutkan menurut urutan memutuskan (prioritas, lalu skor), bukan urutan
+  // arsip; yang sudah diputus tetap berurut waktu.
+  const pending = sortForDecision(split.pending);
+  const decided = split.decided;
 
   // Yang menunggu keputusan dibuka lebih dulu: itulah yang menuntut tindakan pejabat.
   const selected =
