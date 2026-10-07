@@ -29,7 +29,10 @@ from .models import User
 from .security.passwords import hash_password
 from .services import backtest as backtesting
 
-MINIMUM_LENGTH = 12
+#: Diturunkan dari 12 ke 10 pada 7 Oktober 2026 atas keputusan pemilik proyek untuk
+#: kata sandi peragaan (`A-12345678`). Pengaman teknis, bukan kebijakan resmi (U-05);
+#: naikkan kembali sebelum pilot.
+MINIMUM_LENGTH = 10
 
 
 def set_password(username: str, password: str | None = None) -> int:

@@ -781,7 +781,7 @@ Butir berikut **tidak diinvensi** dan memblokir task tertentu:
 | Ambang peringkat volume laporan (0,70 / 0,40) | Layar Pimpinan — dipisahkan dari U-22 pada 9 September 2026 |
 | Ukuran grid & batas GIS resmi (U-04) | TASK 011, 080–084 |
 | Matriks role-permission resmi + kewenangan approve (U-06, P-1…P-7) | TASK 051, 130 |
-| Kebijakan kredensial (panjang/rotasi password, MFA, SSO) (U-05) | TASK 050 |
+| Kebijakan kredensial (panjang/rotasi password, MFA, SSO) (U-05) | TASK 050. Sementara: panjang minimum CLI diturunkan 12 → 10 pada 7 Oktober 2026 atas keputusan pemilik proyek untuk kata sandi peragaan; naikkan kembali sebelum pilot |
 | Alur operasional resmi & state machine (U-08) | TASK 110–142 |
 | Sumber konten Executive Brief (U-11) | modul MVP #12 |
 | Identitas pelapor, bukti, dan status LAPOR PRESISI (U-13) | PHASE 17 |

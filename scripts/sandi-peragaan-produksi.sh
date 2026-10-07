@@ -5,14 +5,14 @@
 #
 #   SANDI='kata-sandi-baru' bash scripts/sandi-peragaan-produksi.sh
 #
-# Server menolak kata sandi di bawah 12 karakter (pengaman teknis; kebijakan resmi
+# Server menolak kata sandi di bawah 10 karakter (pengaman teknis; kebijakan resmi
 # menunggu U-05). Skrip ini tidak pernah mencetak kata sandinya.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 : "${SANDI:?Isi variabel SANDI, mis. SANDI='...' bash scripts/sandi-peragaan-produksi.sh}"
-if (( ${#SANDI} < 12 )); then
-  echo "Kata sandi minimal 12 karakter (sekarang ${#SANDI})." >&2
+if (( ${#SANDI} < 10 )); then
+  echo "Kata sandi minimal 10 karakter (sekarang ${#SANDI})." >&2
   exit 1
 fi
 
