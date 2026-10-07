@@ -112,6 +112,14 @@ aplikasi.
 
 ---
 
+## Tampilan: Jetpack Compose
+
+Sejak 7 Oktober 2026 (2.2.0) seluruh layar digambar Compose. Tiap layar punya pasangan
+`XxxScreen` (tampilan murni, dengan `@Preview` yang dapat dilihat di Android Studio tanpa
+perangkat) dan `XxxActivity` (pemegang keadaan dan segala yang menyentuh Android). Komponen
+dan palet ada di `ui/`. Mengubah rupa aplikasi biasanya cukup di `ui/Components.kt` dan
+`ui/Theme.kt`.
+
 ## Membangun
 
 Perkakas tidak ikut di repository. Yang dibutuhkan: JDK 17, Android SDK (platform 34,

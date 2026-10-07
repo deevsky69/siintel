@@ -1,16 +1,15 @@
 package id.polri.jaksel.laporpresisi.petugas
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import id.polri.jaksel.laporpresisi.BuildConfig
 import id.polri.jaksel.laporpresisi.R
-import id.polri.jaksel.laporpresisi.databinding.ActivityPetugasBinding
-import id.polri.jaksel.laporpresisi.databinding.ItemQueueBinding
-import id.polri.jaksel.laporpresisi.databinding.ItemReportBinding
+import id.polri.jaksel.laporpresisi.ui.PresisiTheme
 import kotlinx.coroutines.launch
 
 /**
@@ -42,78 +41,71 @@ import kotlinx.coroutines.launch
  *
  * Kata sandi **tidak pernah disimpan**. Petugas yang kehilangan ponselnya kehilangan sesi,
  * bukan kata sandinya.
+ *
+ * ## Compose (7 Oktober 2026)
+ *
+ * Tampilan ada di [PetugasScreen]; Activity ini memegang [PetugasState], token, dan sesi.
  */
-class PetugasActivity : AppCompatActivity() {
+class PetugasActivity : ComponentActivity() {
 
-    private companion object {
-        /** Nilai `kind` dari `GET /notifications` untuk antrean laporan warga. */
-        const val KIND_CITIZEN_REPORT = "CITIZEN_REPORT"
-    }
-
-    private lateinit var views: ActivityPetugasBinding
+    private var state by mutableStateOf(
+        PetugasState(version = "${BuildConfig.VERSION_NAME} · Android ${android.os.Build.VERSION.RELEASE}"),
+    )
     private lateinit var tokens: TokenStore
     private lateinit var session: Session
 
+    private val actions = PetugasActions(
+        onUsername = { state = state.copy(username = it, loginError = null) },
+        onPassword = { state = state.copy(password = it, loginError = null) },
+        onSignIn = ::signIn,
+        onRefresh = ::loadQueues,
+        onSignOut = { signOut(null) },
+        onVerify = ::verify,
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        views = ActivityPetugasBinding.inflate(layoutInflater)
-        setContentView(views.root)
         tokens = TokenStore(this)
         session = Session(BuildConfig.API_BASE, tokens)
-
-        views.versionText.text = getString(
-            R.string.version_label,
-        ) + " ${BuildConfig.VERSION_NAME} · Android ${android.os.Build.VERSION.RELEASE}"
-
-        views.loginButton.setOnClickListener { signIn() }
-        views.refreshButton.setOnClickListener { loadQueues() }
-        views.logoutButton.setOnClickListener { signOut(null) }
-
-        val existing = tokens.accessToken
-        if (existing == null) showLogin(null) else loadQueues()
+        setContent { PresisiTheme { PetugasScreen(state, actions) } }
+        if (tokens.accessToken == null) showLogin(null) else loadQueues()
     }
 
     private fun signIn() {
-        val username = views.usernameInput.text.toString().trim()
-        val password = views.passwordInput.text.toString()
-
+        val username = state.username.trim()
+        val password = state.password
         if (username.isBlank() || password.isBlank()) {
-            showLoginError(getString(R.string.err_credentials))
+            state = state.copy(loginError = getString(R.string.err_credentials))
             return
         }
-
-        busy(true)
-        views.loginButton.isEnabled = false
-        views.loginButton.text = getString(R.string.signing_in)
-
+        state = state.copy(signingIn = true, busy = true, loginError = null)
         lifecycleScope.launch {
             try {
                 val granted = Api.login(BuildConfig.API_BASE, username, password)
                 tokens.accessToken = granted.accessToken
                 tokens.refreshToken = granted.refreshToken
-                // Kata sandi dihapus dari layar begitu ditukar dengan token: membiarkannya
-                // tertinggal di kolom berarti ia terbaca siapa pun yang meminjam ponselnya.
-                views.passwordInput.text?.clear()
+                // Kata sandi dihapus dari keadaan begitu ditukar dengan token: membiarkannya
+                // tertinggal berarti ia terbaca siapa pun yang meminjam ponselnya.
+                state = state.copy(password = "")
                 loadQueues()
             } catch (failure: Api.Failure) {
-                showLoginError(failure.readable)
+                state = state.copy(loginError = failure.readable)
             } finally {
-                busy(false)
-                views.loginButton.isEnabled = true
-                views.loginButton.text = getString(R.string.sign_in)
+                state = state.copy(signingIn = false, busy = false)
             }
         }
     }
 
     private fun loadQueues() {
         if (tokens.accessToken == null) return showLogin(null)
-
-        busy(true)
+        state = state.copy(busy = true)
         lifecycleScope.launch {
             try {
                 val profile = session.run { Api.profile(BuildConfig.API_BASE, it) }
                 val feed = session.run { Api.notifications(BuildConfig.API_BASE, it) }
-                render(profile, feed)
+                // Keterangan dikembalikan ke bunyi aslinya: pesan galat dari pemuatan yang
+                // gagal sebelumnya tidak boleh tertinggal setelah pemuatan berikutnya berhasil.
+                state = state.copy(profile = profile, feed = feed, note = null, loginError = null)
             } catch (failure: Api.Failure) {
                 if (failure.unauthorized) {
                     signOut(getString(R.string.err_session))
@@ -121,112 +113,39 @@ class PetugasActivity : AppCompatActivity() {
                     // Kegagalan jaringan tidak menjatuhkan sesi: token masih sah, dan
                     // memaksa masuk ulang setiap kali sinyal buruk membuat aplikasi ini
                     // tidak dapat dipakai di lapangan.
-                    showLoginErrorOnHome(failure.readable)
+                    state = state.copy(note = failure.readable)
                 }
             } finally {
-                busy(false)
-            }
-        }
-    }
-
-    private fun render(profile: Api.Profile, feed: Api.Feed) {
-        views.loginGroup.visibility = View.GONE
-        views.homeGroup.visibility = View.VISIBLE
-        // Keterangan dikembalikan ke bunyi aslinya: pesan galat dari pemuatan yang gagal
-        // sebelumnya tidak boleh tertinggal di layar setelah pemuatan berikutnya berhasil.
-        views.queueNote.text = getString(R.string.queue_note)
-
-        views.whoText.text = profile.name
-        views.roleText.text = profile.role
-        views.totalText.text = feed.total.toString()
-        views.totalText.setTextColor(
-            ContextCompat.getColor(this, if (feed.total > 0) R.color.critical else R.color.ink_faint),
-        )
-
-        views.queueList.removeAllViews()
-        if (feed.queues.isEmpty()) {
-            val empty = LayoutInflater.from(this)
-                .inflate(R.layout.item_queue, views.queueList, false)
-            ItemQueueBinding.bind(empty).apply {
-                queueTitle.text = getString(R.string.queue_empty)
-                queueCount.visibility = View.GONE
-                queueAction.visibility = View.GONE
-                queueItems.visibility = View.GONE
-            }
-            views.queueList.addView(empty)
-            return
-        }
-
-        for (queue in feed.queues) {
-            val row = LayoutInflater.from(this).inflate(R.layout.item_queue, views.queueList, false)
-            ItemQueueBinding.bind(row).apply {
-                queueTitle.text = queue.title
-                queueCount.text = queue.total.toString()
-                queueCount.setTextColor(
-                    ContextCompat.getColor(
-                        this@PetugasActivity,
-                        if (queue.total > 0) R.color.critical else R.color.ink_faint,
-                    ),
-                )
-                queueAction.text = queue.action
-                queueItems.text = if (queue.items.isEmpty()) {
-                    // Antrean kosong tetap digambar: "nol peringatan menunggu" adalah kabar
-                    // baik, dan menghilangkan barisnya membuat pembaca tidak dapat
-                    // membedakan "tidak ada" dari "tidak diperiksa".
-                    "Tidak ada yang menunggu."
-                } else if (queue.kind == KIND_CITIZEN_REPORT) {
-                    // Laporan warga digambar satu per satu di bawah, masing-masing dengan
-                    // tombolnya. Merangkumnya di sini akan menampilkan isi yang sama dua kali.
-                    ""
-                } else {
-                    queue.items.joinToString("\n") { "• ${it.headline} — ${it.detail}" }
-                }
-                queueItems.visibility =
-                    if (queueItems.text.isNullOrBlank()) View.GONE else View.VISIBLE
-            }
-            views.queueList.addView(row)
-
-            if (queue.kind == KIND_CITIZEN_REPORT) {
-                for (item in queue.items) addReportRow(item)
+                state = state.copy(busy = false)
             }
         }
     }
 
     /**
-     * Satu laporan warga yang dapat diverifikasi langsung dari ponsel.
+     * Memverifikasi satu laporan warga dari ponsel.
      *
-     * Tombolnya dinonaktifkan begitu ditekan dan tidak dinyalakan kembali bila berhasil:
+     * Tombolnya dimatikan selama berjalan dan tidak dinyalakan kembali bila berhasil:
      * laporan yang sudah berpindah status tidak lagi ada di antrean, dan menekannya kedua
      * kali akan dijawab `409` oleh server. Antrean dimuat ulang sesudahnya supaya yang
      * terlihat di layar adalah keadaan sesungguhnya, bukan tebakan aplikasi.
      */
-    private fun addReportRow(item: Api.QueueItem) {
-        val row = LayoutInflater.from(this).inflate(R.layout.item_report, views.queueList, false)
-        ItemReportBinding.bind(row).apply {
-            reportCode.text = item.code
-            reportHeadline.text = item.headline
-            reportDetail.text = item.detail
-            verifyButton.setOnClickListener {
-                verifyButton.isEnabled = false
-                verifyButton.text = getString(R.string.verifying)
-                lifecycleScope.launch {
-                    try {
-                        session.run { Api.verifyReport(BuildConfig.API_BASE, it, item.code) }
-                        showLoginErrorOnHome(getString(R.string.verified_done, item.code))
-                        loadQueues()
-                    } catch (failure: Api.Failure) {
-                        verifyButton.isEnabled = true
-                        verifyButton.text = getString(R.string.verify)
-                        if (failure.unauthorized) {
-                            signOut(getString(R.string.err_session))
-                        } else {
-                            showLoginErrorOnHome(failure.readable)
-                        }
-                    }
+    private fun verify(code: String) {
+        state = state.copy(verifying = state.verifying + code)
+        lifecycleScope.launch {
+            try {
+                session.run { Api.verifyReport(BuildConfig.API_BASE, it, code) }
+                state = state.copy(note = getString(R.string.verified_done, code))
+                loadQueues()
+            } catch (failure: Api.Failure) {
+                if (failure.unauthorized) {
+                    signOut(getString(R.string.err_session))
+                } else {
+                    state = state.copy(note = failure.readable)
                 }
+            } finally {
+                state = state.copy(verifying = state.verifying - code)
             }
         }
-        views.queueList.addView(row)
     }
 
     private fun signOut(reason: String?) {
@@ -235,25 +154,6 @@ class PetugasActivity : AppCompatActivity() {
     }
 
     private fun showLogin(reason: String?) {
-        views.homeGroup.visibility = View.GONE
-        views.loginGroup.visibility = View.VISIBLE
-        if (reason == null) hideLoginError() else showLoginError(reason)
-    }
-
-    private fun showLoginError(message: String) {
-        views.loginError.text = message
-        views.loginError.visibility = View.VISIBLE
-    }
-
-    private fun showLoginErrorOnHome(message: String) {
-        views.queueNote.text = message
-    }
-
-    private fun hideLoginError() {
-        views.loginError.visibility = View.GONE
-    }
-
-    private fun busy(active: Boolean) {
-        views.spinner.visibility = if (active) View.VISIBLE else View.GONE
+        state = state.copy(profile = null, feed = null, password = "", loginError = reason, verifying = emptySet())
     }
 }

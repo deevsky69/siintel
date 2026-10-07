@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * Komponen bersama ketiga layar. Padanan `box_field`, `box_critical`, `FieldLabel`, dan
- * `OutlineButton` pada XML — satu tempat untuk mengubah rupa seluruh aplikasi.
+ * Komponen bersama ketiga layar — satu tempat untuk mengubah rupa seluruh aplikasi.
+ * (Pengganti `box_field`, `box_critical`, `FieldLabel`, dan `OutlineButton` pada XML lama.)
  */
 
 private val BoxShape = RoundedCornerShape(8.dp)
@@ -42,7 +42,7 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier) {
     Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, modifier = modifier)
 }
 
-/** Kotak bergaris tipis (`box_field`): wadah isian, kartu, dan panel. */
+/** Kotak bergaris tipis: wadah isian, kartu, dan panel. */
 @Composable
 fun Panel(
     modifier: Modifier = Modifier,
@@ -59,7 +59,7 @@ fun Panel(
     )
 }
 
-/** Kotak bergaris merah (`box_critical`): darurat dan imbauan. */
+/** Kotak bergaris merah: darurat dan imbauan. */
 @Composable
 fun CriticalPanel(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) =
     Panel(modifier, borderColor = PresisiColors.Critical, content = content)

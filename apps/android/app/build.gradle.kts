@@ -13,10 +13,10 @@ android {
         // dapat dipasang pada ponsel murah yang sudah lama, bukan hanya pada ponsel baru.
         minSdk = 24
         targetSdk = 34
-        // Naik ke 2.0.0 karena aplikasinya berubah bentuk, bukan bertambah fitur: dua APK
-        // menjadi satu, dan layar mukanya kini bukan formulir laporan.
-        versionCode = 3
-        versionName = "2.1.0"
+        // 2.0.0: dua APK menjadi satu. 2.1.0: kelurahan pada laporan. 2.2.0: seluruh
+        // tampilan dipindahkan ke Jetpack Compose (7 Oktober 2026).
+        versionCode = 4
+        versionName = "2.2.0"
 
         // Alamat API dibaca dari sini, bukan ditanam di kode: alamat produksi kelak
         // berbeda, dan pengujian lokal memakai alamat lain lagi
@@ -32,9 +32,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-        // ViewBinding tinggal untuk layar yang belum dipindahkan ke Compose; dilepas
-        // begitu layar terakhir pindah.
-        viewBinding = true
         compose = true
     }
 
@@ -80,9 +77,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     // Penyimpanan token petugas. Dipakai daripada SharedPreferences biasa karena token
     // adalah kredensial: pada ponsel yang di-root, preferensi biasa terbaca aplikasi lain.

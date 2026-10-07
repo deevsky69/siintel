@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.sp
 
 /**
  * Palet PRESISI — mengikuti aplikasi web (dasar biru malam, aksen sian) supaya warga dan
- * petugas mengenali keduanya sebagai satu sistem. Nilainya SAMA dengan `res/values/colors.xml`
- * yang masih dipakai layar XML; keduanya dihapus bersama saat layar terakhir pindah ke Compose.
+ * petugas mengenali keduanya sebagai satu sistem. `res/values/colors.xml` menyimpan nilai
+ * yang sama untuk tema jendela dan latar ikon peluncur; ubah keduanya bersama.
  *
  * Aplikasi selalu gelap, apa pun pengaturan ponsel: palet terang belum dirancang, dan
  * "terang seadanya" dari Material akan terlihat seperti aplikasi lain.

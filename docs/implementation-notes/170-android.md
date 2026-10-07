@@ -270,7 +270,34 @@ lama tanpa `areas`, pemilih kelurahan disembunyikan dan aplikasi bekerja seperti
 Unit test: 42 (empat suite), semuanya lulus. APK rilis: `~/siintel-rilis/presisi-2.1.0.apk`
 (masih kunci debug; lihat §5). Belum diperiksa di perangkat nyata.
 
-## 8. Yang belum dikerjakan
+## 8. Jetpack Compose (7 Oktober 2026, versi 2.2.0)
+
+Keputusan pemilik proyek (opsi B): seluruh tampilan dipindahkan dari XML/ViewBinding ke
+Jetpack Compose supaya mudah dipoles di Android Studio. Polanya sama di tiga layar:
+
+| Layar | Tampilan murni (+ `@Preview`) | Pemegang keadaan |
+|---|---|---|
+| Muka | `HomeScreen` / `HomeState` | `MainActivity` |
+| Lapor | `LaporScreen` / `LaporState` / `LaporActions` | `LaporActivity` (izin, lokasi, berkas, tiket) |
+| Petugas | `PetugasScreen` / `PetugasState` / `PetugasActions` | `PetugasActivity` (token, sesi) |
+
+- `ui/Theme.kt`: palet yang sama dengan web, selalu gelap. `ui/Components.kt`: Panel,
+  CriticalPanel, PrimaryButton, SecondaryButton, SectionLabel, Hint, InputField, Picker
+  (pengganti Spinner), ErrorBox, ScreenHeader — satu tempat untuk mengubah rupa.
+- Activity memegang `mutableStateOf(State)`; tidak ada ViewModel karena tidak ada keadaan
+  yang perlu selamat dari rotasi selain yang dimuat ulang.
+- Logika jaringan (`PublicApi`, `petugas/Api`, `Session`, `TokenStore`, `TiketStore`,
+  `AreaNearest`) **tidak disentuh**; unit testnya tetap 42 dan lulus.
+- Dibuang: enam layout XML, dua drawable, gaya `FieldLabel`/`OutlineButton`, pustaka
+  AppCompat/Material/ConstraintLayout. Tema jendela kini turunan `android:Theme.Material`.
+  APK rilis 6,7 MB (2.1.0: 5,6 MB; dengan Compose + pustaka lama sempat 9,7 MB).
+- Kotlin 1.9.23 ↔ Compose Compiler 1.5.11, BOM 2024.06.00. Naik ke Kotlin 2.x berarti
+  mengganti `composeOptions` dengan plugin `org.jetbrains.kotlin.plugin.compose`.
+
+Belum diperiksa di perangkat nyata; pratinjau Compose di Android Studio adalah langkah
+pemeriksaan pertama, ponsel lewat USB langkah kedua.
+
+## 9. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau
   "Muat ulang" ditekan.

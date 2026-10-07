@@ -204,6 +204,7 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | Executive Brief | Bagian "Rencana Patroli Tahun Ini" |
 | Laporan masyarakat | Urgensi/verifikasi dinyatakan sebagai isian petugas, bukan "nilai sintetis" |
 | Android | Pemilih kelurahan + kelurahan terdekat dari lokasi (2.1.0), menyamai web; APK dibangun, belum diuji di perangkat |
+| Android → Compose | Seluruh tampilan dipindahkan ke Jetpack Compose (2.2.0, 7 Oktober 2026) atas keputusan pemilik proyek; logika jaringan tidak berubah, unit test 42 lulus; belum diuji di perangkat |
 | Eksperimen model terlatih | Regresi logistik 2024–2025 → 2026 **tidak** lebih baik dari peringkat riwayat; tidak dipasang; satuan mingguan diusulkan (docs/implementation-notes/016) |
 
 ### Masih tersisa
