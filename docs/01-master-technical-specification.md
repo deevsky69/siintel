@@ -745,6 +745,7 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 |---|---|---|
 | Bobot risk score (U-02) | 9 September 2026 | `config/risk/risk-weights.yaml` versi `dummy-v1` |
 | Threshold early warning & batas kelas risiko (U-01) | 9 September 2026 | `config/risk/warning-thresholds.yaml` versi `dummy-v1` |
+| Jumlah peran dan akun peragaan | 7 Oktober 2026 | Empat peran (Pimpinan, Polsek, Fungsi, Administrator) dipertahankan; akun peragaan empat, dua akun tinggalan dikunci |
 | Pemetaan status wilayah Aman/Waspada/Siaga (U-22) | 9 September 2026 | `leadership_display.area_status`, Siaga = HIGH + CRITICAL |
 | Taksonomi nilai (U-16) | 9 September 2026 | `config/taxonomy/mappings.yaml` versi `taksonomi-2026-09-01`, 20 domain |
 | Prediksi tanpa kelas risiko | 9 September 2026 | Prediksi tetap skor mentah; tangga kelas hanya bagi penilaian keadaan berjalan |

@@ -51,6 +51,7 @@
     "prod:migrate": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api alembic upgrade head",
     "prod:seed": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.seeding all",
     "prod:password": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.cli set-password",
+    "prod:lock": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.cli lock-user",
     "prod:users": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml exec api python -m prediksi_presisi_api.cli list-users",
     "prod:caddy:up": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.caddy.yml up -d",
     "prod:preview": "docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml -f infra/docker/docker-compose.preview.yml up -d",

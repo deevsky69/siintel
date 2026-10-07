@@ -63,6 +63,23 @@ def set_password(username: str, password: str | None = None) -> int:
     return 0
 
 
+def lock_user(username: str) -> int:
+    """Mengunci akun: tidak dapat masuk, tetapi barisnya tetap ada.
+
+    Dihapus tidak mungkin dan tidak diinginkan: jejak audit merujuk ke akun ini
+    (append-only), dan tindakan yang pernah dicatatnya harus tetap tertelusur ke pelakunya.
+    """
+    with get_session_factory()() as session, session.begin():
+        user = session.scalar(select(User).where(User.username == username))
+        if user is None:
+            print(f"Pengguna '{username}' tidak ditemukan.", file=sys.stderr)
+            return 1
+        user.password_hash = "!"  # noqa: S105 — penanda terkunci, bukan hash
+        user.status = "INACTIVE"
+    print(f"Akun '{username}' dikunci.")
+    return 0
+
+
 def list_users() -> int:
     with get_session_factory()() as session:
         users = session.scalars(select(User).order_by(User.code)).all()
@@ -101,6 +118,8 @@ def main(argv: list[str] | None = None) -> int:
     password.add_argument("username")
 
     sub.add_parser("list-users", help="Menampilkan daftar pengguna dan status kredensialnya")
+    lock = sub.add_parser("lock-user", help="Mengunci akun (tidak dapat masuk; baris tetap ada)")
+    lock.add_argument("username")
     backtest = sub.add_parser(
         "backtest", help="Evaluasi mundur: prediksi H-1 dibandingkan kejadian nyata hari H"
     )
@@ -115,6 +134,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if arguments.command == "set-password":
         return set_password(arguments.username)
+    if arguments.command == "lock-user":
+        return lock_user(arguments.username)
     if arguments.command == "backtest":
         return run_backtest(arguments.dari, arguments.sampai, arguments.horizon, arguments.dry_run)
     return list_users()

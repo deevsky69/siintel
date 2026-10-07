@@ -6,10 +6,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -318,5 +326,80 @@ fun BrandHeader(title: String, subtitle: String, compact: Boolean = false, modif
                 modifier = Modifier.padding(top = 4.dp),
             )
         }
+    }
+}
+
+
+// ---------------------------------------------------------------------------------
+// Kerangka layar
+// ---------------------------------------------------------------------------------
+
+/** Lebar isi terbesar: di tablet dan layar lebar isi tidak melebar sampai sulit dibaca. */
+private val MaxContentWidth = 560.dp
+
+/**
+ * Kerangka yang sama untuk ketiga layar: latar, gulir, tepi, lebar maksimum di layar lebar,
+ * dan indikator sibuk di atas. Layar hanya menyusun isinya.
+ */
+@Composable
+fun ScreenScaffold(
+    busy: Boolean = false,
+    horizontalPadding: Dp = 20.dp,
+    verticalPadding: Dp = 20.dp,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Box(Modifier.fillMaxSize()) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = horizontalPadding, vertical = verticalPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Column(Modifier.widthIn(max = MaxContentWidth).fillMaxWidth(), content = content)
+            }
+            if (busy) {
+                CircularProgressIndicator(
+                    color = PresisiColors.Accent,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 8.dp),
+                )
+            }
+        }
+    }
+}
+
+/** Pil angka: merah bila ada yang menunggu, pudar bila nol. */
+@Composable
+fun CountPill(total: Int, modifier: Modifier = Modifier) {
+    val live = total > 0
+    Text(
+        total.toString(),
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        color = if (live) PresisiColors.Base950 else PresisiColors.InkFaint,
+        modifier = modifier
+            .background(if (live) PresisiColors.Critical else PresisiColors.Base800, RoundedCornerShape(999.dp))
+            .padding(horizontal = 10.dp, vertical = 3.dp),
+    )
+}
+
+/** Kepingan ringkas: ikon + angka + label, untuk baris ringkasan antrean. */
+@Composable
+fun StatChip(icon: ImageVector, total: Int, label: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier
+            .background(PresisiColors.Base900, BoxShape)
+            .border(1.dp, if (total > 0) PresisiColors.Accent.copy(alpha = 0.5f) else PresisiColors.Base700, BoxShape)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, contentDescription = null, tint = if (total > 0) PresisiColors.Accent else PresisiColors.InkFaint, modifier = Modifier.size(16.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(total.toString(), fontWeight = FontWeight.Bold, color = PresisiColors.Ink, fontSize = 15.sp)
+        Spacer(Modifier.width(6.dp))
+        Text(label, style = MaterialTheme.typography.bodySmall)
     }
 }

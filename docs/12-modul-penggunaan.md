@@ -71,10 +71,11 @@ melaksanakan sekaligus.
 | **Fungsi** | Menindaklanjuti sesuai fungsi masing-masing | **Hanya fungsinya sendiri** | Menulis laporan intelijen dan kegiatan fungsinya |
 | **Polsek** | Bertindak di wilayah hukumnya | **Hanya polseknya sendiri** | Menerima peringatan di wilayahnya; mencatat laporan masyarakat |
 
-> **Empat peran, bukan enam.** Command Center dan Analyst dilebur ke Administrator pada
-> 1 September 2026 atas keputusan pemilik proyek. Akun `demo.commandcenter` dan
-> `demo.analyst` masih dapat masuk, tetapi keduanya kini berperan Administrator; untuk
-> peragaan gunakan `demo.admin`.
+> **Empat peran, empat akun peragaan.** Command Center dan Analyst dilebur ke Administrator
+> pada 1 September 2026 atas keputusan pemilik proyek. Pada 7 Oktober 2026 pemilik proyek
+> menetapkan akun peragaan cukup empat — `demo.pimpinan`, `demo.polsek`, `demo.fungsi`,
+> `demo.admin` — dan dua akun tinggalan (`demo.commandcenter`, `demo.analyst`) dikunci
+> (`scripts/kunci-akun-lama-produksi.sh`), bukan dihapus, supaya jejak auditnya tetap utuh.
 
 ### 3.2 Penjelasan tiap peran
 

@@ -1,14 +1,10 @@
 package id.polri.jaksel.laporpresisi
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +16,6 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,6 +31,7 @@ import id.polri.jaksel.laporpresisi.ui.Hint
 import id.polri.jaksel.laporpresisi.ui.PresisiColors
 import id.polri.jaksel.laporpresisi.ui.PresisiTheme
 import id.polri.jaksel.laporpresisi.ui.PrimaryButton
+import id.polri.jaksel.laporpresisi.ui.ScreenScaffold
 import id.polri.jaksel.laporpresisi.ui.SecondaryButton
 import id.polri.jaksel.laporpresisi.ui.SectionLabel
 
@@ -60,73 +56,65 @@ fun HomeScreen(
     onOfficer: () -> Unit,
     onCheckStatus: () -> Unit,
 ) {
-    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            BrandHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle))
+    ScreenScaffold(horizontalPadding = 24.dp, verticalPadding = 32.dp) {
+    BrandHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle))
 
+    Text(
+        stringResource(R.string.home_lead),
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.padding(top = 20.dp),
+    )
+
+    CriticalPanel(Modifier.padding(top = 20.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.Call, contentDescription = null, tint = PresisiColors.Critical, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(10.dp))
             Text(
-                stringResource(R.string.home_lead),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 20.dp),
-            )
-
-            CriticalPanel(Modifier.padding(top = 20.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.Call, contentDescription = null, tint = PresisiColors.Critical, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        stringResource(R.string.emergency_title),
-                        color = PresisiColors.Critical,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                    )
-                }
-            }
-
-            if (state.alerts.isNotEmpty()) {
-                Spacer(Modifier.height(20.dp))
-                SectionLabel(stringResource(R.string.home_alerts_title), icon = Icons.Outlined.Notifications)
-                for (row in state.alerts) {
-                    AlertCard(row, Modifier.padding(top = 8.dp))
-                }
-                Hint(stringResource(R.string.home_alerts_basis), Modifier.padding(top = 8.dp))
-            }
-
-            Spacer(Modifier.height(26.dp))
-            PrimaryButton(stringResource(R.string.home_report), onClick = onReport, icon = Icons.Outlined.Edit)
-            Hint(stringResource(R.string.home_report_hint), Modifier.padding(top = 8.dp))
-
-            if (state.hasTicket) {
-                Spacer(Modifier.height(12.dp))
-                SecondaryButton(stringResource(R.string.home_status), onClick = onCheckStatus, icon = Icons.Outlined.Search)
-                state.statusResult?.let {
-                    Text(
-                        it,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontSize = 13.sp,
-                        modifier = Modifier.padding(top = 8.dp),
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-            SecondaryButton(stringResource(R.string.home_officer), onClick = onOfficer, icon = Icons.Outlined.Lock)
-            Hint(stringResource(R.string.home_officer_hint), Modifier.padding(top = 8.dp))
-
-            Text(
-                "${stringResource(R.string.version_label)} ${state.version}",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .padding(top = 32.dp)
-                    .align(Alignment.CenterHorizontally),
+                stringResource(R.string.emergency_title),
+                color = PresisiColors.Critical,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
             )
         }
+    }
+
+    if (state.alerts.isNotEmpty()) {
+        Spacer(Modifier.height(20.dp))
+        SectionLabel(stringResource(R.string.home_alerts_title), icon = Icons.Outlined.Notifications)
+        for (row in state.alerts) {
+            AlertCard(row, Modifier.padding(top = 8.dp))
+        }
+        Hint(stringResource(R.string.home_alerts_basis), Modifier.padding(top = 8.dp))
+    }
+
+    Spacer(Modifier.height(26.dp))
+    PrimaryButton(stringResource(R.string.home_report), onClick = onReport, icon = Icons.Outlined.Edit)
+    Hint(stringResource(R.string.home_report_hint), Modifier.padding(top = 8.dp))
+
+    if (state.hasTicket) {
+        Spacer(Modifier.height(12.dp))
+        SecondaryButton(stringResource(R.string.home_status), onClick = onCheckStatus, icon = Icons.Outlined.Search)
+        state.statusResult?.let {
+            Text(
+                it,
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+    }
+
+    Spacer(Modifier.height(24.dp))
+    SecondaryButton(stringResource(R.string.home_officer), onClick = onOfficer, icon = Icons.Outlined.Lock)
+    Hint(stringResource(R.string.home_officer_hint), Modifier.padding(top = 8.dp))
+
+    Text(
+        "${stringResource(R.string.version_label)} ${state.version}",
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier
+            .padding(top = 32.dp)
+            .align(Alignment.CenterHorizontally),
+    )
     }
 }
 

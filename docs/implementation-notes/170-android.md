@@ -317,6 +317,22 @@ bagikan lokasi "tidak muncul apa-apa".
 
 Unit test 42 lulus, `assembleRelease` lulus. Belum diperiksa ulang di perangkat.
 
+### 9.1 Layar petugas per peran dan kerangka responsif (7 Oktober 2026, masih 2.3.0)
+
+Permintaan pemilik proyek: tampilan untuk Pimpinan, Polsek, Fungsi, dan Administrator
+yang responsif dan sederhana. Satu layar tetap dipakai keempatnya — isi antreannya
+ditentukan server menurut kewenangan — tetapi rupanya kini mengikuti peran:
+
+- Kartu "siapa saya": ikon peran (Pimpinan bintang, Polsek lokasi, Fungsi perkakas,
+  Administrator pengaturan), nama peran beraksen, satu kalimat tugas yang bunyinya dari
+  docs/12, dan pil jumlah total yang menunggu.
+- Baris **ringkasan** kepingan per jenis antrean (peringatan, laporan, keputusan,
+  rencana, prediksi, operasi) dengan ikon; menggulir mendatar di layar sempit.
+- Kartu antrean berikon jenis dan pil angka; antrean nol tidak diulang sebagai kartu;
+  bila semuanya nol tampil "tidak ada yang menunggu" bertanda centang hijau.
+- `ScreenScaffold` bersama ketiga layar: gulir, tepi, indikator sibuk, dan **lebar isi
+  maksimum 560 dp** sehingga di tablet isi tetap di tengah dan terbaca.
+
 ## 10. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau

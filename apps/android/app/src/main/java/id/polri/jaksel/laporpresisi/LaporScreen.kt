@@ -1,15 +1,11 @@
 package id.polri.jaksel.laporpresisi
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,7 +20,6 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,6 +42,7 @@ import id.polri.jaksel.laporpresisi.ui.Picker
 import id.polri.jaksel.laporpresisi.ui.PresisiColors
 import id.polri.jaksel.laporpresisi.ui.PresisiTheme
 import id.polri.jaksel.laporpresisi.ui.PrimaryButton
+import id.polri.jaksel.laporpresisi.ui.ScreenScaffold
 import id.polri.jaksel.laporpresisi.ui.SecondaryButton
 import id.polri.jaksel.laporpresisi.ui.SectionLabel
 
@@ -107,51 +103,33 @@ class LaporActions(
 
 @Composable
 fun LaporScreen(state: LaporState, actions: LaporActions) {
-    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-        Box(Modifier.fillMaxSize()) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(20.dp),
-            ) {
-                BrandHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle), compact = true)
+    ScreenScaffold(busy = state.busy) {
+        BrandHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle), compact = true)
 
-                CriticalPanel(Modifier.padding(top = 18.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.Call, contentDescription = null, tint = PresisiColors.Critical, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            stringResource(R.string.emergency_title),
-                            color = PresisiColors.Critical,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
-                        )
-                    }
-                    Text(
-                        stringResource(R.string.emergency_body),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = PresisiColors.InkMuted,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                }
-
-                when {
-                    state.ticket != null -> SentPanel(state.ticket, actions.onAgain)
-                    state.optionsFailed -> ErrorBox(stringResource(R.string.err_options), Modifier.padding(top = 18.dp))
-                    state.options != null -> ReportForm(state, actions)
-                    else -> Hint(stringResource(R.string.loading_options), Modifier.padding(top = 18.dp))
-                }
-            }
-
-            if (state.busy) {
-                CircularProgressIndicator(
-                    color = PresisiColors.Accent,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 8.dp),
+        CriticalPanel(Modifier.padding(top = 18.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.Call, contentDescription = null, tint = PresisiColors.Critical, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.emergency_title),
+                    color = PresisiColors.Critical,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
                 )
             }
+            Text(
+                stringResource(R.string.emergency_body),
+                style = MaterialTheme.typography.bodySmall,
+                color = PresisiColors.InkMuted,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+
+        when {
+            state.ticket != null -> SentPanel(state.ticket, actions.onAgain)
+            state.optionsFailed -> ErrorBox(stringResource(R.string.err_options), Modifier.padding(top = 18.dp))
+            state.options != null -> ReportForm(state, actions)
+            else -> Hint(stringResource(R.string.loading_options), Modifier.padding(top = 18.dp))
         }
     }
 }

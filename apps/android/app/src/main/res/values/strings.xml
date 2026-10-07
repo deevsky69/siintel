@@ -52,6 +52,13 @@
     <string name="err_credentials">Lengkapi nama pengguna dan kata sandi.</string>
     <string name="err_session">Sesi Anda berakhir. Masuk kembali untuk melanjutkan.</string>
     <string name="version_label">Versi</string>
+    <!-- Satu kalimat per peran di kepala layar petugas; bunyinya mengikuti docs/12 §peran. -->
+    <string name="role_pimpinan">Memutuskan rekomendasi, rencana patroli, dan publikasi imbauan.</string>
+    <string name="role_polsek">Menerima peringatan dan laporan warga di wilayah hukum polsek.</string>
+    <string name="role_fungsi">Menindaklanjuti sesuai fungsi masing-masing.</string>
+    <string name="role_admin">Menyiapkan data, mesin, peringatan harian, dan akun.</string>
+    <string name="queue_all_clear">Tidak ada yang menunggu Anda saat ini.</string>
+    <string name="queue_summary">Ringkasan</string>
 
     <!-- "Info sekitar" pada spesifikasi §4. Kalimat dasarnya menyebut dari mana imbauan
          berasal, karena warga yang membacanya berhak tahu bahwa ia melewati keputusan
