@@ -1,6 +1,7 @@
 package id.polri.jaksel.laporpresisi.petugas
 
 import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -233,6 +234,61 @@ class ApiTest {
             // memaksanya masuk kembali karena menekan laporan yang bukan wilayahnya.
             assertEquals(false, (failure as Api.Failure).unauthorized)
             assertEquals("Laporan tidak ditemukan.", failure.readable)
+        }
+    }
+
+    @Test
+    fun `daftar peringatan, laporan, dan rekomendasi diurai dari amplop data`() {
+        val warnings = Api.parseWarnings(
+            """{"data":[{"code":"WRN-00012","severity":"HIGH","threat_type":"CURANMOR","time_window":"18:00-23:59",
+               "risk_score":78,"confidence":40,"status":"ACTIVE","kecamatan":"Tebet","kelurahan":"Tebet Timur",
+               "created_at":"2026-01-03T06:00:00+07:00","prediction_code":"PRD-1"}],"pagination":{"total_items":1}}""",
+        )
+        assertEquals(1, warnings.size)
+        assertEquals("Tebet Timur", warnings[0].kelurahan)
+        assertEquals(78, warnings[0].riskScore)
+
+        val reports = Api.parseReports(
+            """{"data":[{"code":"CR-2026-0042","reported_at":"2026-01-03T07:00:00+07:00","category":"Pencurian",
+               "description":"Motor hilang.","location_text":null,"status":"RECEIVED","kecamatan":"Tebet",
+               "kelurahan":null,"attachments":2}],"pagination":{}}""",
+        )
+        assertEquals("", reports[0].locationText)
+        assertEquals("", reports[0].kelurahan)
+        assertEquals(2, reports[0].attachments)
+
+        val recommendations = Api.parseRecommendations(
+            """{"data":[{"code":"REC-0007","recommended_function":"Samapta","recommendation_text":"Patroli.",
+               "priority":"HIGH","status":"PENDING_REVIEW","created_at":"2026-01-03T06:00:00+07:00",
+               "prediction_code":"PRD-1","warning_code":null}],"pagination":{}}""",
+        )
+        assertEquals("Samapta", recommendations[0].function)
+        assertEquals("", recommendations[0].warningCode)
+    }
+
+    @Test
+    fun `keputusan MODIFIED membawa teks baru, REJECTED hanya alasan`() = runBlocking {
+        FakeServer().use { server ->
+            server.on("/api/v1/recommendations/REC-0007/decisions", FakeServer.Reply(201, """{"code":"DEC-0090"}"""))
+            Api.decide(server.base, "T", "REC-0007", "MODIFIED", "", "Patroli 2 regu")
+            Api.decide(server.base, "T", "REC-0007", "REJECTED", "Sudah ditangani", null)
+            val sent = server.requestsTo("/api/v1/recommendations/REC-0007/decisions").map { JSONObject(it.body) }
+            assertEquals("MODIFIED", sent[0].getString("decision"))
+            assertEquals("Patroli 2 regu", sent[0].getString("modified_text"))
+            assertFalse(sent[0].has("reason"))
+            assertEquals("Sudah ditangani", sent[1].getString("reason"))
+            assertFalse(sent[1].has("modified_text"))
+        }
+    }
+
+    @Test
+    fun `terima dan selesaikan peringatan memakai jalur yang sama dengan web`() = runBlocking {
+        FakeServer().use { server ->
+            server.on("/api/v1/warnings/WRN-00012/acknowledge", FakeServer.Reply(200, """{"status":"ACKNOWLEDGED"}"""))
+            server.on("/api/v1/warnings/WRN-00012/resolve", FakeServer.Reply(200, """{"status":"RESOLVED"}"""))
+            assertEquals("ACKNOWLEDGED", Api.acknowledgeWarning(server.base, "T", "WRN-00012"))
+            assertEquals("RESOLVED", Api.resolveWarning(server.base, "T", "WRN-00012"))
+            assertEquals("POST", server.requestsTo("/api/v1/warnings/WRN-00012/resolve").single().method)
         }
     }
 }

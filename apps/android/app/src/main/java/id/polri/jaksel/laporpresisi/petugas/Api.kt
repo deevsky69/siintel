@@ -71,6 +71,47 @@ object Api {
 
     data class Feed(val role: String, val total: Int, val queues: List<Queue>)
 
+    // ---- daftar + rincian (7 Oktober 2026) -------------------------------------------
+    // Bentuknya mengikuti GET /warnings, /citizen-reports, /recommendations apa adanya;
+    // tidak ada angka yang dihitung di ponsel.
+
+    data class Warning(
+        val code: String,
+        val severity: String,
+        val threatType: String,
+        val timeWindow: String,
+        val riskScore: Int,
+        val confidence: Int,
+        val status: String,
+        val kecamatan: String,
+        val kelurahan: String,
+        val createdAt: String,
+        val predictionCode: String,
+    )
+
+    data class Report(
+        val code: String,
+        val reportedAt: String,
+        val category: String,
+        val description: String,
+        val locationText: String,
+        val status: String,
+        val kecamatan: String,
+        val kelurahan: String,
+        val attachments: Int,
+    )
+
+    data class Recommendation(
+        val code: String,
+        val function: String,
+        val text: String,
+        val priority: String,
+        val status: String,
+        val createdAt: String,
+        val predictionCode: String,
+        val warningCode: String,
+    )
+
     /** Badan respons beserta headernya — headernya diperlukan hanya untuk `Set-Cookie`. */
     internal class Reply(val body: String, val headers: Map<String, List<String>>)
 
@@ -131,6 +172,110 @@ object Api {
 
     suspend fun notifications(base: String, token: String): Feed = withContext(Dispatchers.IO) {
         parseFeed(call(base, "/api/v1/notifications", "GET", null, token, null).body)
+    }
+
+    /** Seratus teratas: cukup untuk ponsel, dan server tetap yang menyaring wilayah. */
+    private const val PAGE = "page_size=100"
+
+    suspend fun warnings(base: String, token: String): List<Warning> = withContext(Dispatchers.IO) {
+        parseWarnings(call(base, "/api/v1/warnings?$PAGE", "GET", null, token, null).body)
+    }
+
+    suspend fun reports(base: String, token: String): List<Report> = withContext(Dispatchers.IO) {
+        parseReports(call(base, "/api/v1/citizen-reports?$PAGE", "GET", null, token, null).body)
+    }
+
+    suspend fun recommendations(base: String, token: String): List<Recommendation> =
+        withContext(Dispatchers.IO) {
+            parseRecommendations(call(base, "/api/v1/recommendations?$PAGE", "GET", null, token, null).body)
+        }
+
+    /** Menerima peringatan (ACTIVE → ACKNOWLEDGED). Server memeriksa kewenangan dan wilayah. */
+    suspend fun acknowledgeWarning(base: String, token: String, code: String): String =
+        withContext(Dispatchers.IO) {
+            JSONObject(call(base, "/api/v1/warnings/$code/acknowledge", "POST", "{}", token, null).body)
+                .optString("status")
+        }
+
+    /** Menutup peringatan (→ RESOLVED). */
+    suspend fun resolveWarning(base: String, token: String, code: String): String =
+        withContext(Dispatchers.IO) {
+            JSONObject(call(base, "/api/v1/warnings/$code/resolve", "POST", "{}", token, null).body)
+                .optString("status")
+        }
+
+    /**
+     * Keputusan Pimpinan atas satu rekomendasi: APPROVED, MODIFIED (wajib teks baru), atau
+     * REJECTED. Aturan isinya dijaga server; di sini hanya diteruskan.
+     */
+    suspend fun decide(
+        base: String,
+        token: String,
+        code: String,
+        decision: String,
+        reason: String?,
+        modifiedText: String?,
+    ): String = withContext(Dispatchers.IO) {
+        val payload = JSONObject().put("decision", decision)
+        if (!reason.isNullOrBlank()) payload.put("reason", reason)
+        if (!modifiedText.isNullOrBlank()) payload.put("modified_text", modifiedText)
+        JSONObject(call(base, "/api/v1/recommendations/$code/decisions", "POST", payload.toString(), token, null).body)
+            .optString("code")
+    }
+
+    internal fun parseWarnings(body: String): List<Warning> {
+        val rows = JSONObject(body).getJSONArray("data")
+        return (0 until rows.length()).map { index ->
+            val row = rows.getJSONObject(index)
+            Warning(
+                code = row.text("code"),
+                severity = row.text("severity"),
+                threatType = row.text("threat_type"),
+                timeWindow = row.text("time_window"),
+                riskScore = row.optInt("risk_score"),
+                confidence = row.optInt("confidence"),
+                status = row.text("status"),
+                kecamatan = row.text("kecamatan"),
+                kelurahan = row.text("kelurahan"),
+                createdAt = row.text("created_at"),
+                predictionCode = row.text("prediction_code"),
+            )
+        }
+    }
+
+    internal fun parseReports(body: String): List<Report> {
+        val rows = JSONObject(body).getJSONArray("data")
+        return (0 until rows.length()).map { index ->
+            val row = rows.getJSONObject(index)
+            Report(
+                code = row.text("code"),
+                reportedAt = row.text("reported_at"),
+                category = row.text("category"),
+                description = row.text("description"),
+                locationText = row.text("location_text"),
+                status = row.text("status"),
+                kecamatan = row.text("kecamatan"),
+                kelurahan = row.text("kelurahan"),
+                attachments = row.optInt("attachments"),
+            )
+        }
+    }
+
+    internal fun parseRecommendations(body: String): List<Recommendation> {
+        val rows = JSONObject(body).getJSONArray("data")
+        return (0 until rows.length()).map { index ->
+            val row = rows.getJSONObject(index)
+            Recommendation(
+                code = row.text("code"),
+                function = row.text("recommended_function"),
+                text = row.text("recommendation_text"),
+                priority = row.text("priority"),
+                status = row.text("status"),
+                createdAt = row.text("created_at"),
+                predictionCode = row.text("prediction_code"),
+                warningCode = row.text("warning_code"),
+            )
+        }
     }
 
     internal fun parseProfile(body: String): Profile {

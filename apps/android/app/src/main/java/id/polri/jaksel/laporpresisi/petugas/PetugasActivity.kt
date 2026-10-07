@@ -2,6 +2,7 @@ package id.polri.jaksel.laporpresisi.petugas
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,17 +16,19 @@ import kotlinx.coroutines.launch
 /**
  * PRESISI Petugas — masuk, lalu antrean pekerjaan menurut kewenangan (PHASE 17, TASK 171).
  *
- * ## Apa yang ditampilkan, dan mengapa hanya itu
+ * ## Apa yang ditampilkan, dan mengapa
  *
- * Aplikasi ini **tidak menyalin seluruh layar web ke ponsel**. Yang dibawa ke ponsel adalah
- * satu-satunya hal yang benar-benar berguna di luar meja kerja: **apa yang menunggu saya
- * kerjakan sekarang.** Peta, analitik, dan penilaian risiko menuntut layar lebar dan waktu
- * membaca; memaksakannya ke ponsel menghasilkan tiruan yang lebih buruk dari aslinya.
+ * Sampai 7 Oktober 2026 layar ini sengaja hanya satu: "apa yang menunggu saya". Pemilik
+ * proyek kemudian meminta menu dan rincian, maka kini ada **menu bawah** yang tabnya
+ * mengikuti permission dari `/auth/me` — Antrean dan Akun selalu; Peringatan, Laporan,
+ * Rekomendasi hanya bila servernya memberi hak baca — dan **halaman rincian** per baris
+ * dengan tindakan yang kewenangannya dipegang akun itu: terima/selesaikan peringatan,
+ * verifikasi laporan, keputusan Pimpinan atas rekomendasi. Peta, analitik, dan evaluasi
+ * tetap di web: menuntut layar lebar dan waktu membaca.
  *
- * Isinya berbeda menurut peran, dan perbedaannya **ditentukan server**: `GET /notifications`
- * mengikat tiap antrean ke permission tindakan. Pimpinan melihat rekomendasi yang menunggu
- * keputusannya; petugas Polsek melihat peringatan dan laporan warga. Aplikasi ini hanya
- * menggambar apa yang dikirim — ia tidak memutuskan apa pun tentang kewenangan.
+ * Isi tiap tab datang dari endpoint yang sama dengan web (`/warnings`, `/citizen-reports`,
+ * `/recommendations`); aplikasi ini tidak menghitung dan tidak memutuskan apa pun tentang
+ * kewenangan — server yang menyaring wilayah dan menolak tindakan yang tidak sah.
  *
  * ## Sesi
  *
@@ -36,15 +39,8 @@ import kotlinx.coroutines.launch
  * setelah tujuh hari, atau ketika akunnya dinonaktifkan.
  *
  * Penolakan yang tidak dapat dipulihkan (`401` yang bertahan) menjatuhkan sesi dan
- * mengembalikan pengguna ke layar masuk beserta alasannya — bukan layar kosong yang tampak
- * rusak. Gangguan jaringan **tidak** menjatuhkan sesi.
- *
- * Kata sandi **tidak pernah disimpan**. Petugas yang kehilangan ponselnya kehilangan sesi,
- * bukan kata sandinya.
- *
- * ## Compose (7 Oktober 2026)
- *
- * Tampilan ada di [PetugasScreen]; Activity ini memegang [PetugasState], token, dan sesi.
+ * mengembalikan pengguna ke layar masuk beserta alasannya. Gangguan jaringan **tidak**
+ * menjatuhkan sesi. Kata sandi **tidak pernah disimpan**.
  */
 class PetugasActivity : ComponentActivity() {
 
@@ -58,16 +54,34 @@ class PetugasActivity : ComponentActivity() {
         onUsername = { state = state.copy(username = it, loginError = null) },
         onPassword = { state = state.copy(password = it, loginError = null) },
         onSignIn = ::signIn,
-        onRefresh = ::loadQueues,
+        onRefresh = ::reloadCurrent,
         onSignOut = { signOut(null) },
-        onVerify = ::verify,
+        onTab = ::openTab,
+        onOpen = ::openDetail,
+        onBack = { state = state.copy(detail = null) },
+        onVerify = { code -> act(code, { Api.verifyReport(BuildConfig.API_BASE, it, code) }, R.string.verified_done) },
+        onAcknowledge = { code -> act(code, { Api.acknowledgeWarning(BuildConfig.API_BASE, it, code) }, R.string.verified_done) },
+        onResolve = { code -> act(code, { Api.resolveWarning(BuildConfig.API_BASE, it, code) }, R.string.verified_done) },
+        onDecisionChoice = { state = state.copy(decisionChoice = it) },
+        onDecisionReason = { state = state.copy(decisionReason = it) },
+        onDecisionText = { state = state.copy(decisionText = it) },
+        onDecide = ::decide,
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tokens = TokenStore(this)
         session = Session(BuildConfig.API_BASE, tokens)
-        setContent { PresisiTheme { PetugasScreen(state, actions) } }
+        setContent {
+            PresisiTheme {
+                // Tombol kembali sistem menutup rincian dulu, lalu kembali ke tab Antrean,
+                // baru keluar dari layar — seperti yang diharapkan dari aplikasi bermenu.
+                BackHandler(enabled = state.detail != null || state.tab != Tab.ANTREAN) {
+                    state = if (state.detail != null) state.copy(detail = null) else state.copy(tab = Tab.ANTREAN)
+                }
+                PetugasScreen(state, actions)
+            }
+        }
         if (tokens.accessToken == null) showLogin(null) else loadQueues()
     }
 
@@ -96,6 +110,26 @@ class PetugasActivity : ComponentActivity() {
         }
     }
 
+    /** Memuat ulang apa pun yang sedang dilihat: antrean, atau daftar tab aktif. */
+    private fun reloadCurrent() {
+        when (state.detail?.tab ?: state.tab) {
+            Tab.PERINGATAN -> loadList(Tab.PERINGATAN, force = true)
+            Tab.LAPORAN -> loadList(Tab.LAPORAN, force = true)
+            Tab.REKOMENDASI -> loadList(Tab.REKOMENDASI, force = true)
+            else -> loadQueues()
+        }
+    }
+
+    private fun openTab(tab: Tab) {
+        state = state.copy(tab = tab, detail = null)
+        loadList(tab)
+    }
+
+    private fun openDetail(ref: DetailRef) {
+        state = state.copy(tab = ref.tab, detail = ref, decisionChoice = "APPROVED", decisionReason = "", decisionText = "")
+        loadList(ref.tab)
+    }
+
     private fun loadQueues() {
         if (tokens.accessToken == null) return showLogin(null)
         state = state.copy(busy = true)
@@ -121,31 +155,69 @@ class PetugasActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * Memverifikasi satu laporan warga dari ponsel.
-     *
-     * Tombolnya dimatikan selama berjalan dan tidak dinyalakan kembali bila berhasil:
-     * laporan yang sudah berpindah status tidak lagi ada di antrean, dan menekannya kedua
-     * kali akan dijawab `409` oleh server. Antrean dimuat ulang sesudahnya supaya yang
-     * terlihat di layar adalah keadaan sesungguhnya, bukan tebakan aplikasi.
-     */
-    private fun verify(code: String) {
-        state = state.copy(verifying = state.verifying + code)
+    /** Memuat daftar satu tab; sekali saja kecuali [force], supaya berpindah tab tidak lambat. */
+    private fun loadList(tab: Tab, force: Boolean = false) {
+        val loaded = when (tab) {
+            Tab.PERINGATAN -> state.warnings != null
+            Tab.LAPORAN -> state.reports != null
+            Tab.REKOMENDASI -> state.recommendations != null
+            else -> return
+        }
+        if (loaded && !force) return
+        state = state.copy(busy = true)
         lifecycleScope.launch {
             try {
-                session.run { Api.verifyReport(BuildConfig.API_BASE, it, code) }
-                state = state.copy(note = getString(R.string.verified_done, code))
-                loadQueues()
-            } catch (failure: Api.Failure) {
-                if (failure.unauthorized) {
-                    signOut(getString(R.string.err_session))
-                } else {
-                    state = state.copy(note = failure.readable)
+                state = when (tab) {
+                    Tab.PERINGATAN -> state.copy(warnings = session.run { Api.warnings(BuildConfig.API_BASE, it) })
+                    Tab.LAPORAN -> state.copy(reports = session.run { Api.reports(BuildConfig.API_BASE, it) })
+                    Tab.REKOMENDASI -> state.copy(recommendations = session.run { Api.recommendations(BuildConfig.API_BASE, it) })
+                    else -> state
                 }
+            } catch (failure: Api.Failure) {
+                if (failure.unauthorized) signOut(getString(R.string.err_session)) else state = state.copy(note = failure.readable)
             } finally {
-                state = state.copy(verifying = state.verifying - code)
+                state = state.copy(busy = false)
             }
         }
+    }
+
+    /**
+     * Satu tindakan atas satu kode: tombolnya dimatikan selama berjalan, lalu antrean dan
+     * daftar yang bersangkutan dimuat ulang supaya yang terlihat adalah keadaan sesungguhnya,
+     * bukan tebakan aplikasi. Server yang memutuskan boleh atau tidak.
+     */
+    private fun act(code: String, request: suspend (String) -> Any, doneMessage: Int) {
+        state = state.copy(acting = state.acting + code)
+        lifecycleScope.launch {
+            try {
+                session.run(request)
+                state = state.copy(note = getString(doneMessage, code))
+                reloadAfterAction()
+            } catch (failure: Api.Failure) {
+                if (failure.unauthorized) signOut(getString(R.string.err_session)) else state = state.copy(note = failure.readable)
+            } finally {
+                state = state.copy(acting = state.acting - code)
+            }
+        }
+    }
+
+    private fun decide(code: String) {
+        val choice = state.decisionChoice
+        if (choice == "MODIFIED" && state.decisionText.isBlank()) {
+            state = state.copy(note = getString(R.string.err_decision_text))
+            return
+        }
+        act(
+            code,
+            { Api.decide(BuildConfig.API_BASE, it, code, choice, state.decisionReason, state.decisionText) },
+            R.string.decision_done,
+        )
+    }
+
+    private fun reloadAfterAction() {
+        val tab = state.detail?.tab ?: state.tab
+        if (tab == Tab.PERINGATAN || tab == Tab.LAPORAN || tab == Tab.REKOMENDASI) loadList(tab, force = true)
+        loadQueues()
     }
 
     private fun signOut(reason: String?) {
@@ -154,6 +226,6 @@ class PetugasActivity : ComponentActivity() {
     }
 
     private fun showLogin(reason: String?) {
-        state = state.copy(profile = null, feed = null, password = "", loginError = reason, verifying = emptySet())
+        state = PetugasState(version = state.version, username = state.username, loginError = reason)
     }
 }

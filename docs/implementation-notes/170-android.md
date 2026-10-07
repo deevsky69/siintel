@@ -333,7 +333,31 @@ ditentukan server menurut kewenangan — tetapi rupanya kini mengikuti peran:
 - `ScreenScaffold` bersama ketiga layar: gulir, tepi, indikator sibuk, dan **lebar isi
   maksimum 560 dp** sehingga di tablet isi tetap di tengah dan terbaca.
 
-## 10. Yang belum dikerjakan
+## 10. Menu bawah dan rincian (7 Oktober 2026, versi 2.4.0)
+
+Masukan pemilik proyek: "kenapa tidak ada menu" dan "tidak bisa melihat list detailnya".
+Batas lama (satu layar antrean) dilepas atas permintaan itu; batas barunya: yang masuk ke
+ponsel adalah **daftar dan tindakan lapangan**, bukan peta/analitik/evaluasi.
+
+| Tab | Syarat tampil (permission dari `/auth/me`) | Sumber | Tindakan di rincian |
+|---|---|---|---|
+| Antrean | selalu | `/notifications` | baris WARNING/CITIZEN_REPORT/DECISION membuka rincian |
+| Peringatan | `warning:read` | `/warnings?page_size=100` | Terima (`warning:acknowledge`), Selesaikan (`warning:resolve`) |
+| Laporan | `citizen_report:read` | `/citizen-reports?page_size=100` | Verifikasi (`citizen_report:write`) |
+| Rekomendasi | `recommendation:read` | `/recommendations?page_size=100` | Keputusan Pimpinan APPROVED/MODIFIED/REJECTED (`commander_decision:approve`) |
+| Akun | selalu | profil | daftar kewenangan, keluar |
+
+- Tab yang tampil hanya mengikuti permission; server tetap menolak tindakan yang tidak
+  sah — tombol di ponsel bukan kewenangan.
+- Tombol kembali sistem: tutup rincian → ke Antrean → keluar layar (`BackHandler`).
+- Daftar dimuat sekali per sesi dan dimuat ulang setelah tiap tindakan atau tombol muat
+  ulang; "seratus teratas" dinyatakan di layar bila kode tidak ditemukan.
+- Tidak ada pustaka navigasi: keadaan `tab` + `detail` pada `PetugasState`.
+
+Unit test 45 (3 baru: pengurai daftar, badan keputusan, jalur terima/selesaikan). Belum
+diperiksa di perangkat.
+
+## 11. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau
   "Muat ulang" ditekan.
