@@ -9,6 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import id.polri.jaksel.laporpresisi.ui.BrandHeader
 import id.polri.jaksel.laporpresisi.ui.CriticalPanel
 import id.polri.jaksel.laporpresisi.ui.Hint
 import id.polri.jaksel.laporpresisi.ui.PresisiColors
@@ -57,16 +68,7 @@ fun HomeScreen(
                 .padding(horizontal = 24.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.Center,
         ) {
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium)
-                Text(
-                    stringResource(R.string.subtitle).uppercase(),
-                    fontSize = 12.sp,
-                    letterSpacing = 2.sp,
-                    color = PresisiColors.InkMuted,
-                    modifier = Modifier.padding(top = 4.dp),
-                )
-            }
+            BrandHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle))
 
             Text(
                 stringResource(R.string.home_lead),
@@ -75,17 +77,21 @@ fun HomeScreen(
             )
 
             CriticalPanel(Modifier.padding(top = 20.dp)) {
-                Text(
-                    stringResource(R.string.emergency_title),
-                    color = PresisiColors.Critical,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Outlined.Call, contentDescription = null, tint = PresisiColors.Critical, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text(
+                        stringResource(R.string.emergency_title),
+                        color = PresisiColors.Critical,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                    )
+                }
             }
 
             if (state.alerts.isNotEmpty()) {
                 Spacer(Modifier.height(20.dp))
-                SectionLabel(stringResource(R.string.home_alerts_title))
+                SectionLabel(stringResource(R.string.home_alerts_title), icon = Icons.Outlined.Notifications)
                 for (row in state.alerts) {
                     AlertCard(row, Modifier.padding(top = 8.dp))
                 }
@@ -93,12 +99,12 @@ fun HomeScreen(
             }
 
             Spacer(Modifier.height(26.dp))
-            PrimaryButton(stringResource(R.string.home_report), onClick = onReport)
+            PrimaryButton(stringResource(R.string.home_report), onClick = onReport, icon = Icons.Outlined.Edit)
             Hint(stringResource(R.string.home_report_hint), Modifier.padding(top = 8.dp))
 
             if (state.hasTicket) {
                 Spacer(Modifier.height(12.dp))
-                SecondaryButton(stringResource(R.string.home_status), onClick = onCheckStatus)
+                SecondaryButton(stringResource(R.string.home_status), onClick = onCheckStatus, icon = Icons.Outlined.Search)
                 state.statusResult?.let {
                     Text(
                         it,
@@ -110,7 +116,7 @@ fun HomeScreen(
             }
 
             Spacer(Modifier.height(24.dp))
-            SecondaryButton(stringResource(R.string.home_officer), onClick = onOfficer)
+            SecondaryButton(stringResource(R.string.home_officer), onClick = onOfficer, icon = Icons.Outlined.Lock)
             Hint(stringResource(R.string.home_officer_hint), Modifier.padding(top = 8.dp))
 
             Text(

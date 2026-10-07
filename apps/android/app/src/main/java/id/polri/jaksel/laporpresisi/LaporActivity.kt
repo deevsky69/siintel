@@ -2,12 +2,15 @@ package id.polri.jaksel.laporpresisi
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.provider.OpenableColumns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -51,6 +54,9 @@ class LaporActivity : ComponentActivity() {
     private companion object {
         /** Berapa lama menunggu satu titik sebelum menyerah. */
         const val LOCATION_TIMEOUT_MS = 20_000L
+
+        /** Titik terakhir yang lebih muda dari ini dipakai tanpa menunggu penyedia. */
+        const val RECENT_FIX_MS = 2 * 60_000L
     }
 
     private var state by mutableStateOf(LaporState())
@@ -70,7 +76,14 @@ class LaporActivity : ComponentActivity() {
             if (granted.values.any { it }) {
                 readLocation()
             } else {
-                state = state.copy(locationNote = getString(R.string.err_location_denied))
+                // Setelah ditolak dua kali (Android 11+) sistem tidak menampilkan dialog lagi
+                // dan `shouldShowRequestPermissionRationale` menjadi false: satu-satunya jalan
+                // adalah pengaturan aplikasi, maka tombolnya ditawarkan.
+                val forever = !shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
+                state = state.copy(
+                    locationNote = getString(if (forever) R.string.err_location_forever else R.string.err_location_denied),
+                    locationSettingsNeeded = forever,
+                )
             }
         }
 
@@ -97,6 +110,11 @@ class LaporActivity : ComponentActivity() {
         onPlace = { state = state.copy(place = it) },
         onStory = { state = state.copy(story = it, error = null) },
         onLocation = ::onLocationPressed,
+        onOpenSettings = {
+            startActivity(
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null)),
+            )
+        },
         onPickFiles = {
             pickFiles.launch(
                 arrayOf("image/jpeg", "image/png", "image/webp", "audio/*", "video/mp4", "video/webm"),
@@ -230,46 +248,65 @@ class LaporActivity : ComponentActivity() {
      * Google Play Services — yang tidak ada pada sebagian perangkat, tidak ada pada
      * emulator baku, dan menambah ketergantungan pada satu perusahaan untuk aplikasi
      * yang dipasang warga.
+     *
+     * Ditulis ulang 7 Oktober 2026 setelah pemilik proyek mendapati tombolnya "tidak muncul
+     * apa-apa" di ponsel: versi lama hanya meminta ke SATU penyedia (GPS lebih dahulu), dan
+     * di dalam ruangan sinyal satelit tidak pernah datang sampai waktu habis. Kini:
+     * (1) titik terakhir yang diketahui dipakai bila masih segar, (2) semua penyedia yang
+     * menyala diminta sekaligus dan yang pertama menjawab dipakai, (3) layanan lokasi yang
+     * mati dilaporkan apa adanya, bukan sebagai "gagal".
      */
     private fun readLocation() {
         val manager = getSystemService(LOCATION_SERVICE) as? LocationManager
-        val provider = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
-            .firstOrNull { runCatching { manager?.isProviderEnabled(it) == true }.getOrDefault(false) }
-        if (manager == null || provider == null) {
+        if (manager == null) {
             state = state.copy(locationNote = getString(R.string.err_location))
             return
         }
-        state = state.copy(locationBusy = true, locationNote = null)
+        val candidates = buildList {
+            add(LocationManager.GPS_PROVIDER)
+            add(LocationManager.NETWORK_PROVIDER)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) add(LocationManager.FUSED_PROVIDER)
+        }
+        val providers = candidates.filter { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
+        if (providers.isEmpty()) {
+            state = state.copy(locationNote = getString(R.string.err_location_off))
+            return
+        }
+        state = state.copy(locationBusy = true, locationNote = null, locationSettingsNeeded = false)
+
+        try {
+            // Titik terakhir yang diketahui ponsel — biasanya ada dan langsung tersedia.
+            val recent = providers
+                .mapNotNull { manager.getLastKnownLocation(it) }
+                .maxByOrNull { it.time }
+            if (recent != null && System.currentTimeMillis() - recent.time < RECENT_FIX_MS) {
+                accept(recent)
+                return
+            }
+        } catch (_: SecurityException) {
+            state = state.copy(locationBusy = false, locationNote = getString(R.string.err_location_denied))
+            return
+        }
 
         val listener = object : android.location.LocationListener {
             override fun onLocationChanged(location: Location) {
                 manager.removeUpdates(this)
-                shared = location
-                state = state.copy(
-                    location = SharedPoint(
-                        location.latitude,
-                        location.longitude,
-                        if (location.hasAccuracy()) location.accuracy.toDouble() else null,
-                    ),
-                    locationBusy = false,
-                    locationNote = null,
-                )
-                suggestAreaFrom(location)
+                accept(location)
             }
 
             // Tiga metode berikut kosong tetapi WAJIB ada di Android 24–29: tanpa
             // implementasinya, sistem melempar AbstractMethodError saat penyedia lokasi
-            // berubah keadaan.
+            // berubah keadaan. Penyedia yang mati tidak lagi menggagalkan: penyedia lain
+            // masih berjalan, dan batas waktu di bawah yang memutuskan.
             @Deprecated("Diperlukan API 24–29")
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
             override fun onProviderEnabled(provider: String) = Unit
-            override fun onProviderDisabled(provider: String) {
-                manager.removeUpdates(this)
-                state = state.copy(locationBusy = false, locationNote = getString(R.string.err_location))
-            }
+            override fun onProviderDisabled(provider: String) = Unit
         }
         try {
-            manager.requestLocationUpdates(provider, 0L, 0f, listener, Looper.getMainLooper())
+            for (provider in providers) {
+                manager.requestLocationUpdates(provider, 0L, 0f, listener, Looper.getMainLooper())
+            }
         } catch (_: SecurityException) {
             state = state.copy(locationBusy = false, locationNote = getString(R.string.err_location_denied))
             return
@@ -284,9 +321,29 @@ class LaporActivity : ComponentActivity() {
         }, LOCATION_TIMEOUT_MS)
     }
 
+    private fun accept(location: Location) {
+        shared = location
+        state = state.copy(
+            location = SharedPoint(
+                location.latitude,
+                location.longitude,
+                if (location.hasAccuracy()) location.accuracy.toDouble() else null,
+            ),
+            locationBusy = false,
+            locationNote = null,
+        )
+        suggestAreaFrom(location)
+    }
+
     private fun clearLocation() {
         shared = null
-        state = state.copy(location = null, locationBusy = false, locationNote = null, kelurahanSuggestion = null)
+        state = state.copy(
+            location = null,
+            locationBusy = false,
+            locationNote = null,
+            locationSettingsNeeded = false,
+            kelurahanSuggestion = null,
+        )
     }
 
     /**

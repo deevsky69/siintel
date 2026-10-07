@@ -1,10 +1,15 @@
 package id.polri.jaksel.laporpresisi.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,13 +23,19 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
+import id.polri.jaksel.laporpresisi.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,12 +45,19 @@ import androidx.compose.ui.unit.sp
  * (Pengganti `box_field`, `box_critical`, `FieldLabel`, dan `OutlineButton` pada XML lama.)
  */
 
-private val BoxShape = RoundedCornerShape(8.dp)
+private val BoxShape = RoundedCornerShape(14.dp)
+private val ButtonShape = RoundedCornerShape(12.dp)
 
 /** Label huruf kapital kecil di atas isian atau bagian. */
 @Composable
-fun SectionLabel(text: String, modifier: Modifier = Modifier) {
-    Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, modifier = modifier)
+fun SectionLabel(text: String, modifier: Modifier = Modifier, icon: ImageVector? = null) {
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        if (icon != null) {
+            Icon(icon, contentDescription = null, tint = PresisiColors.Accent, modifier = Modifier.size(14.dp))
+            Spacer(Modifier.width(6.dp))
+        }
+        Text(text.uppercase(), style = MaterialTheme.typography.labelSmall)
+    }
 }
 
 /** Kotak bergaris tipis: wadah isian, kartu, dan panel. */
@@ -71,11 +89,12 @@ fun PrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    icon: ImageVector? = null,
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        shape = BoxShape,
+        shape = ButtonShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = PresisiColors.Accent,
             contentColor = PresisiColors.Base950,
@@ -84,6 +103,10 @@ fun PrimaryButton(
         ),
         modifier = modifier.fillMaxWidth().height(52.dp),
     ) {
+        if (icon != null) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(10.dp))
+        }
         Text(text, fontSize = 15.sp, fontWeight = FontWeight.Bold)
     }
 }
@@ -96,11 +119,12 @@ fun SecondaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     fullWidth: Boolean = true,
+    icon: ImageVector? = null,
 ) {
     OutlinedButton(
         onClick = onClick,
         enabled = enabled,
-        shape = BoxShape,
+        shape = ButtonShape,
         border = BorderStroke(1.dp, if (enabled) PresisiColors.Base700 else PresisiColors.Base800),
         colors = ButtonDefaults.outlinedButtonColors(
             containerColor = PresisiColors.Base900,
@@ -109,6 +133,10 @@ fun SecondaryButton(
         ),
         modifier = (if (fullWidth) modifier.fillMaxWidth() else modifier).height(48.dp),
     ) {
+        if (icon != null) {
+            Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+        }
         Text(text, fontSize = 14.sp)
     }
 }
@@ -246,17 +274,49 @@ fun ErrorBox(message: String?, modifier: Modifier = Modifier) {
     }
 }
 
-/** Kepala layar: nama aplikasi dan satuan, kecil, di tengah. */
+/** Lambang PRESISI (perisai + sasaran), dari `res/drawable/ic_logo.xml`. */
 @Composable
-fun ScreenHeader(title: String, subtitle: String, modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxWidth(), horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-        Text(title, style = MaterialTheme.typography.titleMedium, fontSize = 20.sp)
-        Text(
-            subtitle.uppercase(),
-            fontSize = 10.sp,
-            letterSpacing = 1.5.sp,
-            color = PresisiColors.InkMuted,
-            modifier = Modifier.padding(top = 2.dp),
-        )
+fun BrandMark(size: Dp, modifier: Modifier = Modifier) {
+    Image(
+        painterResource(R.drawable.ic_logo),
+        contentDescription = null,
+        modifier = modifier.size(size),
+    )
+}
+
+/**
+ * Kepala layar: lambang, nama aplikasi, dan satuan.
+ *
+ * [compact] = satu baris kecil untuk layar isian; selain itu lambang besar di tengah
+ * untuk layar muka.
+ */
+@Composable
+fun BrandHeader(title: String, subtitle: String, compact: Boolean = false, modifier: Modifier = Modifier) {
+    if (compact) {
+        Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            BrandMark(36.dp)
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(title, style = MaterialTheme.typography.titleMedium, fontSize = 18.sp, letterSpacing = 2.sp)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = PresisiColors.InkMuted)
+            }
+        }
+    } else {
+        Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            BrandMark(96.dp)
+            Text(
+                title,
+                style = MaterialTheme.typography.headlineMedium,
+                letterSpacing = 4.sp,
+                modifier = Modifier.padding(top = 12.dp),
+            )
+            Text(
+                subtitle.uppercase(),
+                fontSize = 11.sp,
+                letterSpacing = 2.sp,
+                color = PresisiColors.InkMuted,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
     }
 }

@@ -5,9 +5,8 @@
   tersendiri. Dipakai di layar muka, kepala layar, dan ikon peluncur.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp"
+    android:width="96dp" android:height="96dp"
     android:viewportWidth="96" android:viewportHeight="96">
-    <group android:scaleX="0.62" android:scaleY="0.62" android:pivotX="48" android:pivotY="48">
     <!-- perisai -->
     <path android:fillColor="#0A1424"
         android:pathData="M48,8 L82,20 V46 C82,66 66,80 48,88 C30,80 14,66 14,46 V20 Z" />
@@ -22,5 +21,4 @@
         android:pathData="M48,22 V32 M48,64 V74 M22,48 H32 M64,48 H74" />
     <path android:fillColor="#22D3EE"
         android:pathData="M48,42 A6,6 0 1 1 47.9,42 Z" />
-    </group>
 </vector>

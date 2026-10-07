@@ -12,7 +12,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,6 +39,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.polri.jaksel.laporpresisi.R
+import id.polri.jaksel.laporpresisi.ui.BrandHeader
 import id.polri.jaksel.laporpresisi.ui.ErrorBox
 import id.polri.jaksel.laporpresisi.ui.Hint
 import id.polri.jaksel.laporpresisi.ui.InputField
@@ -36,7 +47,6 @@ import id.polri.jaksel.laporpresisi.ui.Panel
 import id.polri.jaksel.laporpresisi.ui.PresisiColors
 import id.polri.jaksel.laporpresisi.ui.PresisiTheme
 import id.polri.jaksel.laporpresisi.ui.PrimaryButton
-import id.polri.jaksel.laporpresisi.ui.ScreenHeader
 import id.polri.jaksel.laporpresisi.ui.SecondaryButton
 import id.polri.jaksel.laporpresisi.ui.SectionLabel
 
@@ -81,7 +91,7 @@ fun PetugasScreen(state: PetugasState, actions: PetugasActions) {
                     .verticalScroll(rememberScrollState())
                     .padding(20.dp),
             ) {
-                ScreenHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle))
+                BrandHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle), compact = true)
                 if (state.profile == null) LoginForm(state, actions) else QueueBoard(state, actions)
                 Text(
                     "${stringResource(R.string.version_label)} ${state.version}",
@@ -124,6 +134,7 @@ private fun LoginForm(state: PetugasState, actions: PetugasActions) {
             text = stringResource(if (state.signingIn) R.string.signing_in else R.string.sign_in),
             onClick = actions.onSignIn,
             enabled = !state.signingIn,
+            icon = Icons.Outlined.Lock,
             modifier = Modifier.padding(top = 16.dp),
         )
         Hint(stringResource(R.string.login_note), Modifier.padding(top = 12.dp))
@@ -137,14 +148,20 @@ private fun QueueBoard(state: PetugasState, actions: PetugasActions) {
 
     Column(Modifier.padding(top = 18.dp)) {
         Panel {
-            Text(profile.name, style = MaterialTheme.typography.titleMedium, fontSize = 15.sp)
-            Text(
-                profile.role.uppercase(),
-                fontSize = 10.sp,
-                letterSpacing = 1.2.sp,
-                color = PresisiColors.InkMuted,
-                modifier = Modifier.padding(top = 2.dp),
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.Person, contentDescription = null, tint = PresisiColors.Accent, modifier = Modifier.size(28.dp))
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Text(profile.name, style = MaterialTheme.typography.titleMedium, fontSize = 15.sp)
+                    Text(
+                        profile.role.uppercase(),
+                        fontSize = 10.sp,
+                        letterSpacing = 1.2.sp,
+                        color = PresisiColors.InkMuted,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+            }
         }
 
         Row(
@@ -153,7 +170,7 @@ private fun QueueBoard(state: PetugasState, actions: PetugasActions) {
                 .padding(top = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SectionLabel(stringResource(R.string.queue_title), Modifier.weight(1f))
+            SectionLabel(stringResource(R.string.queue_title), Modifier.weight(1f), icon = Icons.Outlined.Notifications)
             if (feed != null) Count(feed.total, size = 14.sp)
         }
 
@@ -181,8 +198,8 @@ private fun QueueBoard(state: PetugasState, actions: PetugasActions) {
 
         Spacer(Modifier.height(16.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            SecondaryButton(stringResource(R.string.refresh), onClick = actions.onRefresh, fullWidth = false)
-            SecondaryButton(stringResource(R.string.sign_out), onClick = actions.onSignOut, fullWidth = false)
+            SecondaryButton(stringResource(R.string.refresh), onClick = actions.onRefresh, fullWidth = false, icon = Icons.Outlined.Refresh)
+            SecondaryButton(stringResource(R.string.sign_out), onClick = actions.onSignOut, fullWidth = false, icon = Icons.AutoMirrored.Outlined.ExitToApp)
         }
     }
 }
@@ -265,6 +282,7 @@ private fun ReportCard(
             onClick = onVerify,
             enabled = !verifying,
             fullWidth = false,
+            icon = Icons.Outlined.Done,
             modifier = Modifier.padding(top = 10.dp),
         )
     }

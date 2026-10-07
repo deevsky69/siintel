@@ -10,7 +10,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import id.polri.jaksel.laporpresisi.ui.BrandHeader
 import id.polri.jaksel.laporpresisi.ui.CriticalPanel
 import id.polri.jaksel.laporpresisi.ui.ErrorBox
 import id.polri.jaksel.laporpresisi.ui.Hint
@@ -34,7 +47,6 @@ import id.polri.jaksel.laporpresisi.ui.Picker
 import id.polri.jaksel.laporpresisi.ui.PresisiColors
 import id.polri.jaksel.laporpresisi.ui.PresisiTheme
 import id.polri.jaksel.laporpresisi.ui.PrimaryButton
-import id.polri.jaksel.laporpresisi.ui.ScreenHeader
 import id.polri.jaksel.laporpresisi.ui.SecondaryButton
 import id.polri.jaksel.laporpresisi.ui.SectionLabel
 
@@ -61,6 +73,8 @@ data class LaporState(
     val locationBusy: Boolean = false,
     /** Catatan di bawah tombol lokasi; `null` berarti bunyi bawaan. */
     val locationNote: String? = null,
+    /** Izin lokasi ditolak permanen: tawarkan membuka pengaturan aplikasi. */
+    val locationSettingsNeeded: Boolean = false,
     /** Catatan di bawah pemilih kelurahan bila terisi otomatis dari lokasi. */
     val kelurahanSuggestion: String? = null,
     val attachments: List<StagedFile> = emptyList(),
@@ -85,6 +99,7 @@ class LaporActions(
     val onPlace: (String) -> Unit,
     val onStory: (String) -> Unit,
     val onLocation: () -> Unit,
+    val onOpenSettings: () -> Unit,
     val onPickFiles: () -> Unit,
     val onSend: () -> Unit,
     val onAgain: () -> Unit,
@@ -100,15 +115,19 @@ fun LaporScreen(state: LaporState, actions: LaporActions) {
                     .verticalScroll(rememberScrollState())
                     .padding(20.dp),
             ) {
-                ScreenHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle))
+                BrandHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle), compact = true)
 
                 CriticalPanel(Modifier.padding(top = 18.dp)) {
-                    Text(
-                        stringResource(R.string.emergency_title),
-                        color = PresisiColors.Critical,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp,
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Call, contentDescription = null, tint = PresisiColors.Critical, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            stringResource(R.string.emergency_title),
+                            color = PresisiColors.Critical,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                        )
+                    }
                     Text(
                         stringResource(R.string.emergency_body),
                         style = MaterialTheme.typography.bodySmall,
@@ -191,7 +210,7 @@ private fun ReportForm(state: LaporState, actions: LaporActions) {
         Hint(stringResource(R.string.privacy_warning), Modifier.padding(top = 6.dp))
 
         // ----- Lokasi -----
-        SectionLabel(stringResource(R.string.label_location), Modifier.padding(top = 16.dp))
+        SectionLabel(stringResource(R.string.label_location), Modifier.padding(top = 16.dp), icon = Icons.Outlined.LocationOn)
         state.location?.let { point ->
             Text(
                 String.format(
@@ -207,23 +226,38 @@ private fun ReportForm(state: LaporState, actions: LaporActions) {
                 modifier = Modifier.padding(top = 6.dp),
             )
         }
-        SecondaryButton(
-            text = stringResource(
-                when {
-                    state.locationBusy -> R.string.sharing_location
-                    state.location != null -> R.string.clear_location
-                    else -> R.string.share_location
-                },
-            ),
-            onClick = actions.onLocation,
-            enabled = !state.locationBusy,
-            fullWidth = false,
-            modifier = Modifier.padding(top = 6.dp),
-        )
+        Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            SecondaryButton(
+                text = stringResource(
+                    when {
+                        state.locationBusy -> R.string.sharing_location
+                        state.location != null -> R.string.clear_location
+                        else -> R.string.share_location
+                    },
+                ),
+                onClick = actions.onLocation,
+                enabled = !state.locationBusy,
+                fullWidth = false,
+                icon = if (state.location != null) Icons.Outlined.Clear else Icons.Outlined.LocationOn,
+            )
+            if (state.locationBusy) {
+                Spacer(Modifier.width(12.dp))
+                CircularProgressIndicator(color = PresisiColors.Accent, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+            }
+        }
+        if (state.locationSettingsNeeded) {
+            SecondaryButton(
+                text = stringResource(R.string.open_app_settings),
+                onClick = actions.onOpenSettings,
+                fullWidth = false,
+                icon = Icons.Outlined.Settings,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+        }
         Hint(state.locationNote ?: stringResource(R.string.location_note), Modifier.padding(top = 6.dp))
 
         // ----- Lampiran -----
-        SectionLabel(stringResource(R.string.label_attachments), Modifier.padding(top = 16.dp))
+        SectionLabel(stringResource(R.string.label_attachments), Modifier.padding(top = 16.dp), icon = Icons.Outlined.AddCircle)
         if (state.attachments.isNotEmpty()) {
             Text(
                 state.attachments.joinToString("\n") { "• ${it.name} — ${maxOf(1L, it.staged.byteSize / 1024)} KB" },
@@ -244,6 +278,7 @@ private fun ReportForm(state: LaporState, actions: LaporActions) {
             onClick = actions.onPickFiles,
             enabled = !state.uploading && !full,
             fullWidth = false,
+            icon = Icons.Outlined.AddCircle,
             modifier = Modifier.padding(top = 6.dp),
         )
         Hint(stringResource(R.string.attachment_note), Modifier.padding(top = 6.dp))
@@ -254,6 +289,7 @@ private fun ReportForm(state: LaporState, actions: LaporActions) {
             text = stringResource(if (state.sending) R.string.sending else R.string.send),
             onClick = actions.onSend,
             enabled = !state.sending,
+            icon = Icons.Outlined.Send,
             modifier = Modifier.padding(top = 16.dp),
         )
         Hint(stringResource(R.string.no_identity), Modifier.padding(top = 14.dp))
@@ -269,6 +305,14 @@ private fun ReportForm(state: LaporState, actions: LaporActions) {
 private fun SentPanel(ticket: String, onAgain: () -> Unit) {
     Panel(Modifier.padding(top = 28.dp)) {
         Column(Modifier.fillMaxWidth().padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                Icons.Outlined.CheckCircle,
+                contentDescription = null,
+                tint = PresisiColors.Ok,
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(bottom = 10.dp),
+            )
             Text(
                 stringResource(R.string.sent_title).uppercase(),
                 color = PresisiColors.Accent,
@@ -316,7 +360,7 @@ private val PREVIEW_OPTIONS = PublicApi.Options(
     maxAttachmentBytes = 26_214_400,
 )
 
-private val NO_ACTIONS = LaporActions({}, {}, {}, {}, {}, {}, {}, {}, {})
+private val NO_ACTIONS = LaporActions({}, {}, {}, {}, {}, {}, {}, {}, {}, {})
 
 @Preview(showBackground = true, backgroundColor = 0xFF050B18, widthDp = 360, heightDp = 1400)
 @Composable

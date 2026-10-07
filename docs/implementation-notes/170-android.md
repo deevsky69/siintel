@@ -297,7 +297,27 @@ Jetpack Compose supaya mudah dipoles di Android Studio. Polanya sama di tiga lay
 Belum diperiksa di perangkat nyata; pratinjau Compose di Android Studio adalah langkah
 pemeriksaan pertama, ponsel lewat USB langkah kedua.
 
-## 9. Yang belum dikerjakan
+## 9. Lambang, ikon, dan lokasi yang tangguh (7 Oktober 2026, versi 2.3.0)
+
+Masukan pemilik proyek setelah mencoba 2.2.0 di ponsel: "desain terlalu kaku" dan tombol
+bagikan lokasi "tidak muncul apa-apa".
+
+- **Lambang** `res/drawable/ic_logo.xml` (perisai + sasaran, buatan sendiri, bukan lambang
+  kedinasan) dipakai di layar muka (besar), kepala layar lapor/petugas (ringkas), dan ikon
+  peluncur. Komponen `BrandHeader`/`BrandMark`.
+- **Ikon** Material (paket inti yang sudah ikut material3, tanpa dependensi baru) pada
+  tombol dan label bagian: lapor, masuk, cek status, 110, imbauan, lokasi, lampiran,
+  kirim, tiket, profil, muat ulang, keluar, verifikasi. Sudut kartu 14 dp, tombol 12 dp.
+- **Lokasi**: versi lama meminta ke satu penyedia (GPS dahulu) dan di dalam ruangan
+  menunggu 20 detik tanpa tanda. Kini titik terakhir yang diketahui (< 2 menit) dipakai
+  seketika; bila tidak ada, semua penyedia yang menyala (GPS, jaringan, fused di Android
+  12+) diminta sekaligus; ada indikator berputar selama menunggu; layanan lokasi yang mati
+  dan izin yang ditolak permanen dilaporkan apa adanya, yang terakhir dengan tombol
+  "Buka pengaturan aplikasi".
+
+Unit test 42 lulus, `assembleRelease` lulus. Belum diperiksa ulang di perangkat.
+
+## 10. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau
   "Muat ulang" ditekan.

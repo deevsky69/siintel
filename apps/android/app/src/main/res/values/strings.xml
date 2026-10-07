@@ -77,6 +77,9 @@
     <string name="location_note">Yang dikirim adalah titik tempat Anda berada sekarang, dan itu dicatat sebagai lokasi kejadian. Jangan menekannya bila Anda sudah tidak berada di tempat kejadian.</string>
     <string name="err_location_denied">Izin lokasi ditolak. Laporan tetap dapat dikirim tanpa lokasi.</string>
     <string name="err_location">Lokasi tidak dapat diambil. Laporan tetap dapat dikirim tanpa lokasi.</string>
+    <string name="err_location_off">Layanan lokasi ponsel sedang mati. Nyalakan Lokasi dari pengaturan cepat, lalu coba lagi.</string>
+    <string name="err_location_forever">Izin lokasi ditolak permanen. Buka pengaturan aplikasi untuk mengizinkannya, atau kirim laporan tanpa lokasi.</string>
+    <string name="open_app_settings">Buka pengaturan aplikasi</string>
 
     <string name="label_attachments">Foto, suara, atau video (opsional)</string>
     <string name="pick_file">Pilih berkas</string>
