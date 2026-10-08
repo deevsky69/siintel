@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
@@ -53,18 +54,20 @@ import androidx.compose.ui.unit.sp
  * (Pengganti `box_field`, `box_critical`, `FieldLabel`, dan `OutlineButton` pada XML lama.)
  */
 
-private val BoxShape = RoundedCornerShape(14.dp)
-private val ButtonShape = RoundedCornerShape(12.dp)
+private val BoxShape = RoundedCornerShape(18.dp)
+private val ButtonShape = RoundedCornerShape(14.dp)
 
 /** Label huruf kapital kecil di atas isian atau bagian. */
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier, icon: ImageVector? = null) {
+    // Huruf biasa, bukan kapital semua (8 Oktober 2026): label kapital berjarak lebar di
+    // mana-mana membuat layar terbaca kaku seperti dasbor mesin.
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         if (icon != null) {
-            Icon(icon, contentDescription = null, tint = PresisiColors.Accent, modifier = Modifier.size(14.dp))
+            Icon(icon, contentDescription = null, tint = PresisiColors.Accent, modifier = Modifier.size(15.dp))
             Spacer(Modifier.width(6.dp))
         }
-        Text(text.uppercase(), style = MaterialTheme.typography.labelSmall)
+        Text(text, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = PresisiColors.InkMuted)
     }
 }
 
@@ -75,14 +78,76 @@ fun Panel(
     borderColor: Color = PresisiColors.Base700,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    // Permukaan terisi dengan garis tipis yang samar: kotak bergaris tegas di setiap elemen
+    // adalah yang membuat tampilan terasa "buatan mesin".
     Column(
         modifier
             .fillMaxWidth()
             .background(PresisiColors.Base900, BoxShape)
-            .border(1.dp, borderColor, BoxShape)
-            .padding(14.dp),
+            .border(1.dp, borderColor.copy(alpha = if (borderColor == PresisiColors.Base700) 0.55f else 1f), BoxShape)
+            .padding(16.dp),
         content = content,
     )
+}
+
+/**
+ * Kartu tugas untuk beranda petugas: angka besar, judul, tindakan, satu contoh isi. Dapat
+ * diketuk. Merah bila darurat; pudar bila nol.
+ */
+@Composable
+fun TaskCard(
+    icon: ImageVector,
+    title: String,
+    count: Int,
+    action: String,
+    sample: String?,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    alarm: Boolean = false,
+) {
+    val live = count > 0
+    val tint = if (alarm && live) PresisiColors.Critical else if (live) PresisiColors.Accent else PresisiColors.InkFaint
+    Row(
+        modifier
+            .fillMaxWidth()
+            .background(if (alarm && live) PresisiColors.Critical.copy(alpha = 0.12f) else PresisiColors.Base900, BoxShape)
+            .border(1.dp, if (alarm && live) PresisiColors.Critical.copy(alpha = 0.7f) else PresisiColors.Base700.copy(alpha = 0.55f), BoxShape)
+            .let { if (onClick != null) it.clickable(onClick = onClick) else it }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            count.toString(),
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            color = tint,
+            modifier = Modifier.width(52.dp),
+        )
+        Column(Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(title, style = MaterialTheme.typography.titleMedium, fontSize = 15.sp)
+            }
+            Text(if (live) action else "Tidak ada yang menunggu", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 2.dp))
+            if (live && !sample.isNullOrBlank()) {
+                Text(sample, style = MaterialTheme.typography.bodyMedium, fontSize = 13.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+            }
+        }
+    }
+}
+
+/** Angka ringkas berlabel, untuk baris situasi di beranda petugas. */
+@Composable
+fun StatBox(label: String, value: String, modifier: Modifier = Modifier, color: Color = PresisiColors.Ink) {
+    Column(
+        modifier
+            .background(PresisiColors.Base800.copy(alpha = 0.6f), RoundedCornerShape(14.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+    ) {
+        Text(value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = color)
+        Text(label, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 2.dp))
+    }
 }
 
 /** Kotak bergaris merah: darurat dan imbauan. */

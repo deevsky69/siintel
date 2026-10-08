@@ -187,9 +187,11 @@ class PetugasActivity : ComponentActivity() {
             try {
                 val profile = session.run { Api.profile(BuildConfig.API_BASE, it) }
                 val feed = session.run { Api.notifications(BuildConfig.API_BASE, it) }
+                // Ringkasan situasi boleh gagal tanpa menjatuhkan beranda: angkanya pelengkap.
+                val summary = runCatching { session.run { Api.summary(BuildConfig.API_BASE, it) } }.getOrNull()
                 // Keterangan dikembalikan ke bunyi aslinya: pesan galat dari pemuatan yang
                 // gagal sebelumnya tidak boleh tertinggal setelah pemuatan berikutnya berhasil.
-                state = state.copy(profile = profile, feed = feed, note = if (quiet) state.note else null, loginError = null)
+                state = state.copy(profile = profile, feed = feed, summary = summary ?: state.summary, note = if (quiet) state.note else null, loginError = null)
                 announcePanic(feed)
                 // Daftar darurat ikut disegarkan saat polling supaya tab Darurat tidak basi.
                 if (quiet && state.panics != null) loadList(Tab.DARURAT, force = true)

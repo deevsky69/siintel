@@ -63,7 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.polri.jaksel.laporpresisi.R
 import id.polri.jaksel.laporpresisi.ui.BrandHeader
-import id.polri.jaksel.laporpresisi.ui.CountPill
+import id.polri.jaksel.laporpresisi.ui.BrandMark
 import id.polri.jaksel.laporpresisi.ui.ErrorBox
 import id.polri.jaksel.laporpresisi.ui.Hint
 import id.polri.jaksel.laporpresisi.ui.InputField
@@ -74,7 +74,8 @@ import id.polri.jaksel.laporpresisi.ui.PrimaryButton
 import id.polri.jaksel.laporpresisi.ui.ScreenScaffold
 import id.polri.jaksel.laporpresisi.ui.SecondaryButton
 import id.polri.jaksel.laporpresisi.ui.SectionLabel
-import id.polri.jaksel.laporpresisi.ui.StatChip
+import id.polri.jaksel.laporpresisi.ui.StatBox
+import id.polri.jaksel.laporpresisi.ui.TaskCard
 
 /** Nilai `kind` dari `GET /notifications` untuk antrean laporan warga. */
 const val KIND_CITIZEN_REPORT = "CITIZEN_REPORT"
@@ -120,6 +121,7 @@ data class PetugasState(
     val version: String = "",
     val tab: Tab = Tab.ANTREAN,
     val detail: DetailRef? = null,
+    val summary: Api.Summary? = null,
     val panics: List<Api.Panic>? = null,
     val warnings: List<Api.Warning>? = null,
     val reports: List<Api.Report>? = null,
@@ -242,7 +244,7 @@ fun PetugasScreen(state: PetugasState, actions: PetugasActions) {
                     val detail = state.detail
                     when {
                         detail != null -> DetailPage(detail, state, actions)
-                        state.tab == Tab.ANTREAN -> QueueBoard(state, actions)
+                        state.tab == Tab.ANTREAN -> HomeBoard(state, actions)
                         state.tab == Tab.DARURAT -> PanicList(state, actions)
                         state.tab == Tab.PERINGATAN -> WarningList(state, actions)
                         state.tab == Tab.LAPORAN -> ReportList(state, actions)
@@ -261,6 +263,15 @@ fun PetugasScreen(state: PetugasState, actions: PetugasActions) {
     }
 }
 
+/** Label tab mengikuti peran: bagi Pimpinan tab usulan adalah tempat MEMUTUSKAN. */
+@Composable
+private fun tabLabel(tab: Tab, state: PetugasState): String =
+    if (tab == Tab.REKOMENDASI && state.profile?.role.equals("Pimpinan", ignoreCase = true)) {
+        stringResource(R.string.tab_decisions)
+    } else {
+        stringResource(tab.label)
+    }
+
 @Composable
 private fun BottomMenu(state: PetugasState, actions: PetugasActions) {
     NavigationBar(containerColor = PresisiColors.Base900, tonalElevation = 0.dp) {
@@ -269,7 +280,9 @@ private fun BottomMenu(state: PetugasState, actions: PetugasActions) {
                 selected = state.tab == tab,
                 onClick = { actions.onTab(tab) },
                 icon = { Icon(tab.icon, contentDescription = null) },
-                label = { Text(stringResource(tab.label), fontSize = 11.sp) },
+                // Satu baris, tidak dipenggal ("Rekomend/asi" pada layar sempit, 8 Oktober 2026):
+                // kata yang terlalu panjang diganti, bukan dipotong.
+                label = { Text(tabLabel(tab, state), fontSize = 10.sp, maxLines = 1, softWrap = false) },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = PresisiColors.Base950,
                     selectedTextColor = PresisiColors.Accent,
@@ -335,118 +348,96 @@ private fun PageTitle(text: String, icon: ImageVector, trailing: @Composable () 
 // Antrean
 // ---------------------------------------------------------------------------------
 
+private fun greeting(hour: Int): Int = when (hour) {
+    in 4..10 -> R.string.greet_morning
+    in 11..14 -> R.string.greet_day
+    in 15..18 -> R.string.greet_afternoon
+    else -> R.string.greet_night
+}
+
+/**
+ * Beranda petugas per peran (8 Oktober 2026), hasil penelitian aplikasi sejenis:
+ *
+ * - Aplikasi komando (Motorola PSCore, Adashi LiveView): komandan membuka dengan gambaran
+ *   situasi dan daftar yang menunggu keputusannya — bukan daftar panjang.
+ * - Aplikasi petugas lapangan (Tyler ShieldForce, Spillman CAD Touch): "panggilan" berurut
+ *   kemendesakan, berwarna menurut status, tindakan satu ketuk.
+ *
+ * Maka beranda ini: sapaan, situasi dalam dua–tiga angka (hanya yang relevan bagi peran),
+ * lalu kartu tugas berurut kemendesakan — darurat paling atas. Isi kartunya datang dari
+ * `/notifications`, yang sudah berbeda menurut kewenangan; layar hanya menata.
+ */
 @Composable
-private fun QueueBoard(state: PetugasState, actions: PetugasActions) {
+private fun HomeBoard(state: PetugasState, actions: PetugasActions) {
     val profile = state.profile ?: return
     val feed = state.feed
     val look = roleLook(profile.role)
+    val role = profile.role.lowercase()
+    val hour = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("Asia/Jakarta")).get(java.util.Calendar.HOUR_OF_DAY)
 
-    BrandHeader(stringResource(R.string.app_name), stringResource(R.string.subtitle), compact = true)
-    Column(Modifier.padding(top = 16.dp)) {
-        Panel {
+    // Sapaan
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        BrandMark(40.dp)
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text("${stringResource(greeting(hour))},", style = MaterialTheme.typography.bodyMedium)
+            Text(profile.name, style = MaterialTheme.typography.titleMedium, fontSize = 18.sp)
+        }
+        Icon(look.icon, contentDescription = null, tint = PresisiColors.Accent, modifier = Modifier.size(26.dp))
+    }
+    Text(
+        "${profile.role}${profile.polsek.takeIf { it.isNotBlank() }?.let { " · $it" } ?: ""}${profile.function.takeIf { it.isNotBlank() }?.let { " · $it" } ?: ""} — ${stringResource(look.tagline)}",
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.padding(top = 6.dp),
+    )
+
+    // Situasi: hanya angka yang berarti bagi peran ini.
+    val summary = state.summary
+    if (summary != null && role != "fungsi") {
+        SectionLabel(stringResource(R.string.home_situation), Modifier.padding(top = 18.dp))
+        Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (role == "pimpinan" || role == "administrator") {
+                StatBox(stringResource(R.string.stat_security), summary.securityIndex.toString(), Modifier.weight(1f), color = scoreColor(100 - summary.securityIndex).takeIf { summary.securityIndex < 70 } ?: PresisiColors.Ok)
+            }
+            StatBox(stringResource(R.string.stat_incidents), summary.incidents24h.toString(), Modifier.weight(1f))
+            StatBox(stringResource(R.string.stat_warnings), summary.activeWarnings.toString(), Modifier.weight(1f), color = if (summary.activeWarnings > 0) PresisiColors.Warning else PresisiColors.Ink)
+        }
+    }
+
+    // Tugas, berurut kemendesakan — darurat paling atas (sudah begitu dari server).
+    SectionLabel(stringResource(R.string.home_tasks), Modifier.padding(top = 18.dp))
+    when {
+        feed == null -> Hint(stringResource(R.string.list_loading), Modifier.padding(top = 8.dp))
+        feed.queues.isEmpty() -> Panel(Modifier.padding(top = 8.dp)) {
+            Text(stringResource(R.string.queue_empty), style = MaterialTheme.typography.bodyMedium, fontSize = 13.sp)
+        }
+        feed.total == 0 -> Panel(Modifier.padding(top = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(look.icon, contentDescription = null, tint = PresisiColors.Accent, modifier = Modifier.size(30.dp))
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(profile.name, style = MaterialTheme.typography.titleMedium, fontSize = 15.sp)
-                    Text(
-                        profile.role.uppercase(),
-                        fontSize = 10.sp,
-                        letterSpacing = 1.2.sp,
-                        color = PresisiColors.Accent,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
-                }
-                if (feed != null) CountPill(feed.total)
-            }
-            Text(
-                stringResource(look.tagline),
-                style = MaterialTheme.typography.bodySmall,
-                color = PresisiColors.InkMuted,
-                modifier = Modifier.padding(top = 10.dp),
-            )
-        }
-
-        if (feed != null) {
-            if (feed.queues.isNotEmpty() && !state.compact) {
-                SectionLabel(stringResource(R.string.queue_summary), Modifier.padding(top = 18.dp))
-                Row(
-                    Modifier.fillMaxWidth().padding(top = 8.dp).horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    for (queue in feed.queues) {
-                        StatChip(kindIcon(queue.kind), queue.total, kindShortLabel(queue.kind))
-                    }
-                }
-            }
-
-            SectionLabel(stringResource(R.string.queue_title), Modifier.padding(top = 18.dp))
-            when {
-                feed.queues.isEmpty() -> Panel(Modifier.padding(top = 8.dp)) {
-                    Text(stringResource(R.string.queue_empty), style = MaterialTheme.typography.bodyMedium, fontSize = 13.sp)
-                }
-                feed.total == 0 -> Panel(Modifier.padding(top = 8.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = PresisiColors.Ok, modifier = Modifier.size(22.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Text(stringResource(R.string.queue_all_clear), style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-                else -> for (queue in feed.queues) {
-                    if (queue.total == 0) continue
-                    QueueCard(queue, actions, Modifier.padding(top = 8.dp))
-                }
+                Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = PresisiColors.Ok, modifier = Modifier.size(22.dp))
+                Spacer(Modifier.width(10.dp))
+                Text(stringResource(R.string.home_all_clear), style = MaterialTheme.typography.bodyMedium)
             }
         }
-
-        Hint(state.note ?: stringResource(R.string.queue_note), Modifier.padding(top = 10.dp))
-        Spacer(Modifier.height(12.dp))
-        SecondaryButton(stringResource(R.string.refresh), onClick = actions.onRefresh, fullWidth = false, icon = Icons.Outlined.Refresh)
-    }
-}
-
-/** Satu antrean. Baris yang punya halaman rincian dapat diketuk. */
-@Composable
-private fun QueueCard(queue: Api.Queue, actions: PetugasActions, modifier: Modifier = Modifier) {
-    val target = kindDetailTab(queue.kind)
-    val alarm = queue.kind == "PANIC" && queue.total > 0
-    Panel(modifier, borderColor = if (alarm) PresisiColors.Critical else PresisiColors.Base700) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(kindIcon(queue.kind), contentDescription = null, tint = PresisiColors.Accent, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) {
-                Text(queue.title, style = MaterialTheme.typography.titleMedium, fontSize = 14.sp)
-                Text(queue.action, style = MaterialTheme.typography.bodySmall, color = PresisiColors.InkMuted)
+        else -> Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            for (queue in feed.queues.sortedByDescending { it.total > 0 }) {
+                val target = kindDetailTab(queue.kind)
+                val first = queue.items.firstOrNull()
+                TaskCard(
+                    icon = kindIcon(queue.kind),
+                    title = queue.title,
+                    count = queue.total,
+                    action = if (target == null && queue.total > 0) "${queue.action} · ${stringResource(R.string.home_web_only)}" else queue.action,
+                    sample = first?.let { "${it.headline} — ${it.detail}" },
+                    onClick = if (target != null && queue.total > 0) {
+                        { if (first != null && queue.total == 1) actions.onOpen(DetailRef(target, first.code)) else actions.onTab(target) }
+                    } else null,
+                    alarm = queue.kind == "PANIC",
+                )
             }
-            CountPill(queue.total, Modifier.padding(start = 8.dp))
-        }
-        if (queue.items.isNotEmpty()) {
-            Column(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                for (item in queue.items) {
-                    val row = Modifier
-                        .fillMaxWidth()
-                        .let { if (target != null) it.clickable { actions.onOpen(DetailRef(target, item.code)) } else it }
-                        .padding(vertical = 4.dp)
-                    Row(row, verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text(item.headline, style = MaterialTheme.typography.bodyLarge, fontSize = 13.sp)
-                            if (item.detail.isNotBlank()) Text(item.detail, style = MaterialTheme.typography.bodySmall)
-                        }
-                        if (target != null) {
-                            Icon(
-                                Icons.AutoMirrored.Outlined.List,
-                                contentDescription = null,
-                                tint = PresisiColors.InkFaint,
-                                modifier = Modifier.size(18.dp),
-                            )
-                        }
-                    }
-                }
-            }
-            if (target == null) Hint(stringResource(R.string.open_in_web), Modifier.padding(top = 6.dp))
         }
     }
+
+    Hint(state.note ?: stringResource(R.string.queue_note), Modifier.padding(top = 10.dp))
 }
 
 // ---------------------------------------------------------------------------------

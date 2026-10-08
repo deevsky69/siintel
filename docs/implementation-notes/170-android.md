@@ -391,7 +391,41 @@ penyaringan tampilan, bukan kewenangan.
 
 Unit test 47, `assembleRelease` lulus. Belum diperiksa di perangkat.
 
-## 13. Yang belum dikerjakan
+## 13. Penyusunan ulang per peran setelah penelitian aplikasi sejenis (8 Oktober 2026, versi 2.7.0)
+
+Masukan pemilik proyek: layar muka terlalu padat (tiga tombol bertumpuk), label menu bawah
+terpenggal ("Rekomend/asi"), tampilan kaku "seperti buatan AI", dan permintaan agar isi per
+peran diteliti dari aplikasi sejenis — bukan sekadar menaruh data.
+
+### Yang diteliti dan apa yang diambil
+
+| Rujukan | Yang diambil |
+|---|---|
+| Aplikasi komando: Motorola PSCore / PremierOne Mobile, Adashi LiveView | Komandan membuka dengan *gambaran situasi* (common operating picture) dan hal yang menunggu keputusannya; peringatan darurat (duress) selalu paling atas |
+| Aplikasi petugas lapangan: Tyler ShieldForce, Spillman CAD Touch | Antrean "panggilan" berurut kemendesakan, berwarna menurut status, tindakan satu ketuk (terima/tindak), peta untuk menuju lokasi |
+| Aplikasi darurat warga: 112 India (UX4G), SOS Grab, JAKI/JakLapor | Satu tombol darurat besar dan sederhana; laporan non-darurat terpisah; imbauan sekitar; sedikit pilihan |
+| Polri Super App Presisi | Panggilan darurat dan laporan online berdampingan sebagai layanan warga |
+
+### Hasilnya
+
+- **Warga**: lambang kecil + satu kalimat; **TOMBOL DARURAT** besar; satu tombol **Lapor**;
+  cek status sebagai baris teks; imbauan dilipat menjadi satu baris berjumlah; masuk
+  petugas sebagai tautan kecil di bawah. Tidak ada lagi tiga tombol bertumpuk.
+- **Petugas, beranda per peran** (`HomeBoard`): sapaan menurut jam; baris *Situasi* dari
+  `/dashboard/summary` (Pimpinan & Administrator: indeks keamanan, kejadian 24 jam,
+  peringatan aktif; Polsek: kejadian dan peringatan wilayahnya; Fungsi: tanpa angka);
+  lalu **kartu tugas** berurut kemendesakan dari `/notifications` — darurat paling atas,
+  angka besar, satu contoh isi, ketuk membuka daftar atau langsung rinciannya bila hanya satu.
+- **Menu bawah**: label satu baris tanpa pemenggalan; "Rekomendasi" menjadi **Usulan**,
+  dan bagi Pimpinan **Keputusan**; Pimpinan tanpa tab Peringatan.
+- **Rupa**: sudut lebih membulat (18 dp), permukaan terisi dengan garis samar alih-alih
+  kotak bergaris tegas, label huruf biasa (bukan kapital berjarak), angka besar sebagai
+  pembawa makna.
+
+Isi tiap peran tetap ditentukan server lewat permission; layar hanya menata. Unit test 47,
+`assembleRelease` lulus. Belum diperiksa di perangkat.
+
+## 14. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau
   "Muat ulang" ditekan.

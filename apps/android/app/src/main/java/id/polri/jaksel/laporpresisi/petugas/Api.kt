@@ -78,6 +78,19 @@ object Api {
 
     data class Feed(val role: String, val total: Int, val queues: List<Queue>)
 
+    /** Empat angka dari `GET /dashboard/summary`, sudah dibatasi cakupan akun oleh server. */
+    data class Summary(val securityIndex: Int, val incidents24h: Int, val activeWarnings: Int, val predictions24h: Int)
+
+    suspend fun summary(base: String, token: String): Summary = withContext(Dispatchers.IO) {
+        val json = JSONObject(call(base, "/api/v1/dashboard/summary", "GET", null, token, null).body)
+        Summary(
+            securityIndex = json.optInt("security_index"),
+            incidents24h = json.optInt("incidents_24h"),
+            activeWarnings = json.optInt("active_warnings"),
+            predictions24h = json.optInt("predictions_24h"),
+        )
+    }
+
     /** Satu permintaan bantuan darurat dari aplikasi warga (8 Oktober 2026). */
     data class Panic(
         val code: String,
