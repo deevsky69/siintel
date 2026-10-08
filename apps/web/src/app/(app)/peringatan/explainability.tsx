@@ -1,3 +1,4 @@
+import { Why } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { factorLabel, formatWib, type PredictionDetail, type WarningDetail } from "@/lib/warnings";
@@ -25,8 +26,11 @@ function Meta({ label, value }: { label: string; value: string | number }) {
 /**
  * Panel WHY: prediksi sumber sebuah peringatan beserta faktor dominannya.
  *
- * `source` tiap faktor **selalu** ikut tampil. Menyembunyikannya akan membuat hasil
- * aturan terbaca sebagai temuan model, dan itu persis yang dilarang CLAUDE.md §27.
+ * Disusun ulang 8 Oktober 2026 atas permintaan pemilik proyek: yang tampil lebih dulu hanya
+ * empat hal yang menentukan tindakan — skor, keyakinan, jendela, lokasi. Faktor penjelas,
+ * versi model, dan kode-kode teknis ada di balik satu tombol "Mengapa?". Tidak ada yang
+ * dibuang: `source` tiap faktor tetap ikut tampil saat dibuka, karena menyembunyikannya akan
+ * membuat hasil aturan terbaca sebagai temuan model (CLAUDE.md §27).
  */
 export function ExplainabilityPanel({
   warning,
@@ -68,65 +72,71 @@ export function ExplainabilityPanel({
       title="Dasar Peringatan (WHY)"
       action={<span className="panel-action">{prediction.code}</span>}
     >
-      <dl className="mb-3 grid grid-cols-2 gap-x-3 gap-y-2.5">
-        <Meta label="Peringatan" value={warning.code} />
-        <Meta label="Prediksi" value={prediction.code} />
-        <Meta label="Tanggal Prediksi" value={prediction.prediction_date} />
-        <Meta label="Horizon" value={prediction.forecast_horizon} />
-        <Meta label="Versi Model" value={prediction.model_version ?? "—"} />
-        <Meta label="Status Prediksi" value={prediction.status} />
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
         <Meta label="Risk Score" value={`${prediction.risk_score}/100`} />
         <Meta
           label="Confidence"
           value={prediction.confidence !== null ? `${prediction.confidence}%` : "—"}
         />
+        <Meta label="Jendela" value={prediction.time_window ?? "—"} />
+        <Meta
+          label="Lokasi"
+          value={`${prediction.kecamatan}${prediction.kelurahan ? ` — ${prediction.kelurahan}` : ""}`}
+        />
       </dl>
 
-      <h3 className="stat-label mb-2 border-t border-base-800 pt-3">Faktor Dominan</h3>
-
-      {factors.length === 0 ? (
-        <p className="text-xs text-ink-muted">Tidak ada faktor penjelas pada prediksi ini.</p>
-      ) : (
-        <ul className="space-y-2">
-          {factors.map((factor) => (
-            <li key={`${factor.factor}-${factor.source}`}>
-              <div className="flex items-center gap-2">
-                <span className="flex-1 text-xs text-ink">{factorLabel(factor.factor)}</span>
-                <SourceBadge source={factor.source} />
-                <span className="w-12 text-right font-mono text-xs text-ink">
-                  {factor.contribution.toLocaleString("id-ID", {
-                    minimumFractionDigits: 3,
-                    maximumFractionDigits: 3,
-                  })}
+      <Why label="Mengapa peringatan ini terbit?">
+        <h3 className="stat-label mb-2">Faktor Dominan</h3>
+        {factors.length === 0 ? (
+          <p className="text-xs text-ink-muted">Tidak ada faktor penjelas pada prediksi ini.</p>
+        ) : (
+          <ul className="space-y-2">
+            {factors.map((factor) => (
+              <li key={`${factor.factor}-${factor.source}`}>
+                <div className="flex items-center gap-2">
+                  <span className="flex-1 text-xs text-ink">{factorLabel(factor.factor)}</span>
+                  <SourceBadge source={factor.source} />
+                  <span className="w-12 text-right font-mono text-xs text-ink">
+                    {factor.contribution.toLocaleString("id-ID", {
+                      minimumFractionDigits: 3,
+                      maximumFractionDigits: 3,
+                    })}
+                  </span>
+                </div>
+                <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-base-800">
+                  <span
+                    className="block h-full rounded-full bg-accent/70"
+                    style={{ width: `${Math.min(100, Math.max(0, factor.contribution * 100))}%` }}
+                  />
                 </span>
-              </div>
-              <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-base-800">
-                <span
-                  className="block h-full rounded-full bg-accent/70"
-                  style={{ width: `${Math.min(100, Math.max(0, factor.contribution * 100))}%` }}
-                />
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
+              </li>
+            ))}
+          </ul>
+        )}
 
-      {sources.length > 0 ? (
-        <div className="mt-3 space-y-1 border-t border-base-800 pt-3">
-          {sources.map((source) => (
-            <p key={source} className="text-2xs leading-relaxed text-ink-muted">
-              <span className="font-mono text-ink">{source}</span> —{" "}
-              {SOURCE_NOTE[source] ?? "Asal penjelasan tidak dikenali."}
-            </p>
-          ))}
-        </div>
-      ) : null}
+        {sources.length > 0 ? (
+          <div className="mt-3 space-y-1 border-t border-base-800 pt-3">
+            {sources.map((source) => (
+              <p key={source} className="text-2xs leading-relaxed text-ink-muted">
+                <span className="font-mono text-ink">{source}</span> —{" "}
+                {SOURCE_NOTE[source] ?? "Asal penjelasan tidak dikenali."}
+              </p>
+            ))}
+          </div>
+        ) : null}
 
-      <p className="mt-2 text-2xs leading-relaxed text-ink-muted">
-        Jendela prediksi {prediction.time_window ?? "—"} · lokasi {prediction.kecamatan}
-        {prediction.kelurahan ? ` — ${prediction.kelurahan}` : ""} · peringatan terbit{" "}
-        {formatWib(warning.created_at)}.
-      </p>
+        <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2.5 border-t border-base-800 pt-3">
+          <Meta label="Peringatan" value={warning.code} />
+          <Meta label="Prediksi" value={prediction.code} />
+          <Meta label="Tanggal Prediksi" value={prediction.prediction_date} />
+          <Meta label="Horizon" value={prediction.forecast_horizon} />
+          <Meta label="Versi Model" value={prediction.model_version ?? "—"} />
+          <Meta label="Status Prediksi" value={prediction.status} />
+        </dl>
+        <p className="mt-2 text-2xs leading-relaxed text-ink-muted">
+          Peringatan terbit {formatWib(warning.created_at)}.
+        </p>
+      </Why>
     </Panel>
   );
 }

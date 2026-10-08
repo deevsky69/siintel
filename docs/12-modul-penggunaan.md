@@ -390,6 +390,13 @@ jam, jenis, kejadian tahun dasar). Bagian ketepatan model bergeser menjadi bagia
   Kapan, Risiko) lalu kalimat usulan dan tiga tombol keputusan. Yang menunggu diurutkan
   prioritas tinggi dahulu, lalu skor.
 
+### Catatan 8 Oktober 2026 — informasi dilipat
+
+Atas permintaan pemilik proyek, kalimat **dasar perhitungan** (asal angka, cara agregasi,
+versi ambang) dan **faktor penjelas** (WHY) tidak lagi tampil di muka. Keduanya ada di
+balik tombol kecil "+ Dasar perhitungan" atau "+ Mengapa?" pada panel yang bersangkutan;
+klik untuk membuka. Tidak ada yang dihapus — ketertelusuran tetap satu klik jauhnya.
+
 ## 7. MEMASUKKAN DATA
 
 Menu **Data Entry**. Tiga formulir: **kejadian**, **laporan intelijen**, dan **triase

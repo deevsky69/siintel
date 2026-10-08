@@ -1,3 +1,4 @@
+import { Basis, Why } from "@/components/basis";
 import type {
   AreaDetail,
   AreaPrediction,
@@ -55,11 +56,6 @@ function formatDate(value: string | null): string {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="stat-label mb-2">{children}</h3>;
-}
-
-/** Keterangan asal angka dari backend — diteruskan apa adanya, tidak diringkas ulang. */
-function Basis({ children }: { children: React.ReactNode }) {
-  return <p className="mt-2 text-2xs leading-relaxed text-ink-faint">{children}</p>;
 }
 
 /**
@@ -237,9 +233,8 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
         </div>
       </dl>
 
-      {/* WHY */}
-      <div className="mt-2.5 border-t border-base-800 pt-2">
-        <p className="stat-label mb-1.5">Why</p>
+      {/* WHY — dilipat: angka dulu, alasan bila diminta (8 Oktober 2026). */}
+      <Why className="mt-2.5">
         {prediction.dominant_factors.length === 0 ? (
           <p className="text-xs text-ink-muted">Tidak ada faktor dominan yang tercatat.</p>
         ) : (
@@ -263,7 +258,7 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
             ))}
           </ul>
         )}
-      </div>
+      </Why>
 
       <p className="mt-2 font-mono text-2xs text-ink-faint">
         {prediction.code} · {formatDate(prediction.prediction_date)} ·{" "}

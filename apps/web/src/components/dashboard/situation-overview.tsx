@@ -1,3 +1,4 @@
+import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import type { DashboardSummary } from "@/lib/dashboard";
 import { RISK_TEXT, riskClassOf } from "@/lib/risk";
@@ -35,9 +36,9 @@ export function SituationOverview({ summary }: { summary: DashboardSummary }) {
             <span className="text-sm text-ink-muted">/100</span>
           </div>
         </div>
-        <p className="flex-1 text-2xs leading-relaxed text-ink-muted">
-          {summary.security_index_basis}
-        </p>
+        <div className="flex-1">
+          <Basis>{summary.security_index_basis}</Basis>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { Basis } from "@/components/basis";
 import { triageReport } from "./actions";
 import { EntryFeedback } from "./entry-feedback";
 import { ENTRY_IDLE } from "./entry-state";
@@ -100,9 +101,9 @@ export function TriageForm({
         </span>
       </label>
 
-      <p className="mt-4 rounded border border-base-800 bg-base-850 px-3 py-2 text-2xs leading-relaxed text-ink-muted">
+      <Basis className="mt-4" label="Arti verifikasi">
         <strong className="text-ink">Verifikasi bukan sekadar label.</strong> {verificationBasis}
-      </p>
+      </Basis>
 
       <EntryFeedback state={state} noun="Perubahan status" />
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { Why } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import type { PredictionRow } from "@/lib/prediction-center";
@@ -185,10 +186,7 @@ function Detail({ prediction, canPublish }: { prediction: PredictionRow; canPubl
         </div>
       </dl>
 
-      <section className="rounded border border-base-800 px-3 py-2.5">
-        <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-ink">
-          Mengapa (WHY)
-        </h3>
+      <Why label="Mengapa (WHY) — lihat faktor penjelas" className="mt-0">
         {factors.length > 0 ? (
           <ul className="mt-2 space-y-1">
             {factors.map((factor) => (
@@ -224,7 +222,7 @@ function Detail({ prediction, canPublish }: { prediction: PredictionRow; canPubl
           Versi aturan <code>{prediction.model_version ?? "—"}</code>. Bukan nama model: tidak ada
           model terlatih di balik angka ini, dan seluruh faktor di atas berlabel <code>RULE</code>.
         </p>
-      </section>
+      </Why>
 
       <section className="rounded border border-base-800 px-3 py-2.5">
         <h3 className="font-heading text-xs font-semibold uppercase tracking-wider text-ink">

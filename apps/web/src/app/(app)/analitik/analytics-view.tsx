@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import type {
@@ -241,8 +242,8 @@ function TrendPanel({ trend }: { trend: TrendResponse }) {
             </ul>
           </details>
 
-          <p className="text-2xs leading-relaxed text-ink-faint">{trend.mean_basis}</p>
-          <p className="text-2xs leading-relaxed text-ink-faint">{trend.peak_basis}</p>
+          <Basis>{trend.mean_basis}</Basis>
+          <Basis>{trend.peak_basis}</Basis>
         </>
       )}
     </Panel>
@@ -409,8 +410,8 @@ function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
             </ul>
           </details>
 
-          <p className="text-2xs leading-relaxed text-ink-faint">{pattern.cell_basis}</p>
-          <p className="text-2xs leading-relaxed text-ink-faint">{pattern.time_basis}</p>
+          <Basis>{pattern.cell_basis}</Basis>
+          <Basis>{pattern.time_basis}</Basis>
         </>
       )}
     </Panel>
@@ -538,11 +539,9 @@ function SpatialPanel({ spatial }: { spatial: SpatialPatternResponse }) {
             </div>
           </details>
 
-          <p className="text-2xs leading-relaxed text-ink-faint">{spatial.share_basis}</p>
-          <p className="text-2xs leading-relaxed text-ink-faint">{spatial.comparison_basis}</p>
-          <p className="rounded border border-base-800 bg-base-850 p-2.5 text-xs leading-relaxed text-ink-muted">
-            {spatial.rate_basis}
-          </p>
+          <Basis>{spatial.share_basis}</Basis>
+          <Basis>{spatial.comparison_basis}</Basis>
+          <Basis label="Cara membaca angka laju">{spatial.rate_basis}</Basis>
         </>
       )}
     </Panel>
@@ -591,8 +590,8 @@ export function AnalyticsView({
             Buka Crime Pattern DNA →
           </Link>
         </p>
-        <p className="text-2xs leading-relaxed text-ink-faint">{trend.analysis_basis}</p>
-        <p className="text-2xs leading-relaxed text-ink-faint">{trend.scope_basis}</p>
+        <Basis>{trend.analysis_basis}</Basis>
+        <Basis>{trend.scope_basis}</Basis>
         {selection.threatType ? (
           <p className="text-2xs leading-relaxed text-ink-faint">
             Penyaring jenis <span className="text-ink">{threatLabel(selection.threatType)}</span>{" "}

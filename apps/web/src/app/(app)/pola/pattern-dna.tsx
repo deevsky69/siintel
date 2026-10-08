@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { dataSourceLabel } from "@/lib/analytics";
@@ -226,7 +227,7 @@ function RepeatPanel({ repeat }: { repeat: RepeatProfile }) {
         </div>
       )}
 
-      <p className="text-2xs leading-relaxed text-ink-faint">{repeat.basis}</p>
+      <Basis>{repeat.basis}</Basis>
     </DimensionPanel>
   );
 }
@@ -290,7 +291,7 @@ export function PatternDna({
         <p className="rounded border border-base-800 bg-base-850 p-2.5 text-xs leading-relaxed text-ink-muted">
           {analysisBasis}
         </p>
-        <p className="text-2xs leading-relaxed text-ink-faint">{scopeBasis}</p>
+        <Basis>{scopeBasis}</Basis>
         {profile ? (
           <p className="text-2xs leading-relaxed text-ink-faint">{profile.sample_note}</p>
         ) : null}
@@ -312,7 +313,7 @@ export function PatternDna({
             {profile.when.map((distribution) => (
               <Distribution key={distribution.id} distribution={distribution} />
             ))}
-            <p className="text-2xs leading-relaxed text-ink-faint">{profile.time_basis}</p>
+            <Basis>{profile.time_basis}</Basis>
           </DimensionPanel>
 
           <DimensionPanel code="HOW" name="Modus" className="col-span-12 xl:col-span-3">

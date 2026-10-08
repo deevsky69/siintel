@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import {
@@ -299,13 +300,13 @@ export function AdminBoard({
           </ul>
         )}
 
-        <div className="mt-4 space-y-2 border-t border-base-800 pt-4 text-xs leading-relaxed text-ink-muted">
-          {/* Pernyataan ini berdiri di layar, bukan hanya di dalam formulir: yang perlu tahu
-              bahwa password ditetapkan lewat perintah di server adalah siapa pun yang membuka
-              halaman ini, termasuk akun yang tidak berwenang mengubah penugasan. */}
+        {/* Pernyataan ini tetap di layar (siapa pun yang membuka halaman ini perlu tahu bahwa
+            password ditetapkan lewat perintah di server), tetapi dilipat supaya tidak
+            mendahului daftar akunnya. */}
+        <Basis className="mt-4" label="Ketentuan kredensial dan status akun">
           <p>{directory.credential_basis}</p>
           <p>{directory.lifecycle_basis}</p>
-        </div>
+        </Basis>
       </Panel>
 
       <Panel title={selected ? `Penugasan · ${selected.username}` : "Penugasan"}>
@@ -334,9 +335,9 @@ export function AdminBoard({
           </ul>
         )}
 
-        <p className="mt-4 border-t border-base-800 pt-4 text-xs leading-relaxed text-ink-muted">
+        <Basis className="mt-4" label="Sumber katalog">
           {catalogue.source_basis}
-        </p>
+        </Basis>
       </Panel>
     </div>
   );

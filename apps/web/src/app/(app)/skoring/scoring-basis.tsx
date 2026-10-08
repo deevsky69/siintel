@@ -1,3 +1,4 @@
+import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
 import type { ScoringConfig, ScoringVersion } from "@/lib/scoring";
@@ -33,7 +34,7 @@ function FactorRow({
       <th scope="row" className="py-2 pr-3 text-left font-normal">
         <span className="text-ink">{factorLabel(factor)}</span>
         <span className="ml-2 font-mono text-2xs text-ink-muted">{factor}</span>
-        {basis ? <p className="mt-1 text-2xs leading-relaxed text-ink-muted">{basis}</p> : null}
+        {basis ? <Basis>{basis}</Basis> : null}
       </th>
       <td
         className={`py-2 pr-3 text-right font-heading text-sm font-bold tabular-nums ${
@@ -146,7 +147,9 @@ export function ScoringBasis({ config }: { config: ScoringConfig }) {
       </StatusNotice>
 
       <Panel title="Yang Dihitung Layar Ini">
-        <p className="text-xs leading-relaxed text-ink-muted">{config.score_basis}</p>
+        <Basis className="mt-0" label="Cara skor dihitung">
+          {config.score_basis}
+        </Basis>
         <dl className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-4">
           <div className="rounded border border-base-800 bg-base-850 px-3 py-2">
             <dt className="stat-label">Versi Bobot</dt>
@@ -173,7 +176,7 @@ export function ScoringBasis({ config }: { config: ScoringConfig }) {
             </dd>
           </div>
         </dl>
-        <p className="mt-3 text-2xs leading-relaxed text-ink-muted">{config.persistence_basis}</p>
+        <Basis>{config.persistence_basis}</Basis>
       </Panel>
 
       <Panel

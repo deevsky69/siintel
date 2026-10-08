@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import type { MapData } from "@/lib/map-data";
@@ -63,7 +64,7 @@ export function MapPanel({ data }: { data: MapData }) {
               </span>
             </p>
           ) : null}
-          <p className="text-2xs leading-relaxed text-ink-faint">{data.currentRiskBasis}</p>
+          <Basis>{data.currentRiskBasis}</Basis>
         </>
       )}
     </Panel>

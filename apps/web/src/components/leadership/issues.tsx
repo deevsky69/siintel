@@ -1,3 +1,4 @@
+import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import type { LeadershipBoard } from "@/lib/leadership";
 
@@ -59,7 +60,7 @@ export function ProminentIssues({ issues }: { issues: LeadershipBoard["prominent
         </ul>
       )}
 
-      <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{issues.basis}</p>
+      <Basis>{issues.basis}</Basis>
     </Panel>
   );
 }

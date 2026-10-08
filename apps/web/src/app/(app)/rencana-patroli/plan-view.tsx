@@ -1,3 +1,4 @@
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
@@ -51,8 +52,11 @@ export function PatrolPlanView({
     <div className="space-y-3">
       <StatusNotice status={plan.status} tone="caution">
         Usulan, bukan perintah. Aturan penyusunannya (versi <code>{plan.version}</code>) dan ukuran
-        kemiripannya belum ditetapkan pemilik proyek. {plan.plan_basis}
+        kemiripannya belum ditetapkan pemilik proyek.
       </StatusNotice>
+      <Basis className="mt-0" label="Cara usulan disusun">
+        {plan.plan_basis}
+      </Basis>
 
       <Panel
         title={`Rencana Patroli ${plan.target_year}`}
@@ -240,8 +244,11 @@ function EvaluationPanel({ evaluation }: { evaluation: PlanEvaluation }) {
     >
       <div className="space-y-3">
         <StatusNotice status={evaluation.status} tone="caution">
-          {evaluation.similarity_basis} {evaluation.partial_year_basis}
+          Ukuran kemiripan berstatus usulan sampai ditetapkan pemilik proyek.
         </StatusNotice>
+        <Basis className="mt-0" label="Cara kemiripan dihitung">
+          {evaluation.similarity_basis} {evaluation.partial_year_basis}
+        </Basis>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           <Metric
             label="Kemiripan pola jam"

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import type { AreaDetail, KelurahanOverlay, MapData } from "@/lib/map-data";
 import { HOME_AREA, shapesAt } from "@/lib/wilayah";
@@ -216,13 +217,13 @@ export function RiskMap({
             (ODbL), disederhanakan untuk keperluan gambar.
           </p>
 
-          <p className="text-2xs leading-relaxed text-ink-faint">
+          <Basis>
             {layer === "historical"
               ? data.historicalBasis
               : layer === "current"
                 ? data.currentRiskBasis
                 : data.predictiveBasis}
-          </p>
+          </Basis>
         </Panel>
       </div>
 

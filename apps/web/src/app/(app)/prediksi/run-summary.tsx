@@ -1,3 +1,4 @@
+import { Basis } from "@/components/basis";
 import type { RunForecast, RunResult } from "@/lib/prediction-center";
 import {
   baselineAgeText,
@@ -213,9 +214,7 @@ export function RunSummary({ result }: { result: RunResult }) {
               </li>
             ))}
           </ul>
-          <p className="mt-1 text-2xs leading-relaxed text-ink-muted">
-            {result.not_predicted_basis}
-          </p>
+          <Basis>{result.not_predicted_basis}</Basis>
         </div>
       ) : null}
 
@@ -233,9 +232,9 @@ export function RunSummary({ result }: { result: RunResult }) {
         </div>
       ) : null}
 
-      <p className="text-2xs leading-relaxed text-ink-muted">{result.horizon_basis}</p>
-      <p className="text-2xs leading-relaxed text-ink-muted">{result.projection_basis}</p>
-      <p className="text-2xs leading-relaxed text-ink-muted">{result.confidence_basis}</p>
+      <Basis>{result.horizon_basis}</Basis>
+      <Basis>{result.projection_basis}</Basis>
+      <Basis>{result.confidence_basis}</Basis>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
 import type { AlertCandidate, PublicAlert } from "@/lib/public-alerts";
@@ -153,7 +154,7 @@ export function AlertBoard({
                 ))}
               </ul>
             )}
-            <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{listBasis}</p>
+            <Basis>{listBasis}</Basis>
           </Panel>
 
           <Panel
@@ -219,9 +220,7 @@ export function AlertBoard({
                 ))}
               </ul>
             )}
-            {canPublish ? (
-              <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{draftBasis}</p>
-            ) : null}
+            {canPublish ? <Basis>{draftBasis}</Basis> : null}
           </Panel>
         </div>
       </div>

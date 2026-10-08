@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { AREA_STATUS_TONE, getLeadership, REPORT_LEVEL_TONE, toneOf } from "@/lib/leadership";
@@ -111,7 +112,7 @@ export default async function WilayahPage() {
           Wilayah dengan banyak laporan tetapi skor rendah biasanya bukan wilayah yang memburuk,
           melainkan wilayah yang <strong>warganya rajin melapor</strong> — dan sebaliknya.
         </p>
-        <p className="mt-1.5 text-2xs leading-relaxed text-ink-faint">{board.area_status.basis}</p>
+        <Basis>{board.area_status.basis}</Basis>
       </Panel>
     </div>
   );

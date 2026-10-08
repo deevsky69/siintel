@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import {
@@ -205,10 +206,8 @@ function ReportDetail({
         <DetailRow label="Urgensi" value={scoreText(report.urgency)} />
       </dl>
 
-      {/* Ditempatkan tepat di bawah ketiga angka itu, bukan di kaki halaman. */}
-      <p className="rounded border border-base-800 bg-base-850 p-2.5 text-xs leading-relaxed text-ink-muted">
-        {assessmentBasis}
-      </p>
+      {/* Tepat di bawah ketiga angka itu, dilipat sampai diminta. */}
+      <Basis label="Cara angka penilaian dibaca">{assessmentBasis}</Basis>
     </Panel>
   );
 }
@@ -260,8 +259,8 @@ export function ReportBoard({
           }
         />
 
-        <p className="text-2xs leading-relaxed text-ink-faint">{page.filter_basis}</p>
-        <p className="text-2xs leading-relaxed text-ink-faint">{page.scope_basis}</p>
+        <Basis>{page.filter_basis}</Basis>
+        <Basis>{page.scope_basis}</Basis>
       </Panel>
 
       <Panel

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { changeReportStatus } from "@/app/(app)/masyarakat/actions";
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { Attachments } from "@/components/reports/attachments";
@@ -185,8 +186,9 @@ export function CommunityView({
   return (
     <div className="space-y-3">
       <StatusNotice status={summary.status} tone="caution">
-        Laporan masyarakat <strong>belum memengaruhi risk score</strong>. {summary.basis}
+        Laporan masyarakat <strong>belum memengaruhi risk score</strong>.
       </StatusNotice>
+      <Basis className="mt-0">{summary.basis}</Basis>
 
       <Panel
         title="Sinyal Masyarakat"

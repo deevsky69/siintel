@@ -1,3 +1,4 @@
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
@@ -65,8 +66,11 @@ export function EvaluationView({
   return (
     <div className="space-y-3">
       <StatusNotice status={metrics.status} tone="caution">
-        Angka pada halaman ini <strong>belum final</strong>. {metrics.basis}
+        Angka pada halaman ini <strong>belum final</strong>.
       </StatusNotice>
+      <Basis className="mt-0" label="Aturan pencocokan yang dipakai">
+        {metrics.basis}
+      </Basis>
       {metrics.evaluated_from && metrics.evaluated_to ? (
         <p className="text-xs leading-relaxed text-ink-muted">
           Periode evaluasi <span className="text-ink">{metrics.evaluated_from}</span> s.d.{" "}
@@ -300,8 +304,8 @@ function SweepPanel({ sweep }: { sweep: ThresholdSweep }) {
             dihitung, bukan ambangnya.{" "}
           </>
         ) : null}
-        {sweep.basis}
       </p>
+      <Basis>{sweep.basis}</Basis>
     </Panel>
   );
 }

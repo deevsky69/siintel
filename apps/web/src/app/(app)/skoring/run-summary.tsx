@@ -1,3 +1,4 @@
+import { Basis } from "@/components/basis";
 import type { RunCell, RunProfile, RunResult } from "@/lib/scoring";
 import { contributionText, factorLabel, factorValue, profileLabel, weightPercent } from "./display";
 
@@ -134,7 +135,7 @@ function ProfileBlock({ profile }: { profile: RunProfile }) {
               </li>
             ))}
           </ul>
-          <p className="mt-1 text-2xs leading-relaxed text-ink-muted">{profile.unscored_basis}</p>
+          <Basis>{profile.unscored_basis}</Basis>
         </div>
       ) : null}
 
@@ -207,8 +208,8 @@ export function RunSummary({ result }: { result: RunResult }) {
         <ProfileBlock key={profile.profile} profile={profile} />
       ))}
 
-      <p className="text-2xs leading-relaxed text-ink-muted">{result.score_basis}</p>
-      <p className="text-2xs leading-relaxed text-ink-muted">{result.persistence_basis}</p>
+      <Basis>{result.score_basis}</Basis>
+      <Basis>{result.persistence_basis}</Basis>
     </div>
   );
 }

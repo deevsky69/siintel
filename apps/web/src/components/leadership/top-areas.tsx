@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import type { LeadershipBoard } from "@/lib/leadership";
 import { REPORT_LEVEL_TONE, toneOf } from "@/lib/leadership";
@@ -91,7 +92,7 @@ export function TopReportAreas({ top }: { top: LeadershipBoard["top_report_areas
         </p>
       ) : null}
 
-      <p className="mt-2 text-2xs leading-relaxed text-ink-faint">{top.basis}</p>
+      <Basis>{top.basis}</Basis>
     </Panel>
   );
 }

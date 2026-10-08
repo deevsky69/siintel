@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Basis } from "@/components/basis";
 import {
   actionSentence,
   type DailyBrief,
@@ -82,13 +83,11 @@ function Section({
       </h2>
       {lead ? <p className="mt-2 text-base leading-relaxed text-ink">{lead}</p> : null}
       {children ? <div className="mt-3">{children}</div> : null}
-      <div className="mt-3 space-y-1">
+      <Basis className="mt-3" label="Dasar angka bagian ini">
         {bases.map((basis) => (
-          <p key={basis} className="text-2xs leading-relaxed text-ink-faint">
-            Dasar: {basis}
-          </p>
+          <p key={basis}>Dasar: {basis}</p>
         ))}
-      </div>
+      </Basis>
     </section>
   );
 }
@@ -166,7 +165,9 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
             </dd>
           </div>
         </dl>
-        <p className="mt-4 text-xs leading-relaxed text-ink-muted">{brief.scope_basis}</p>
+        <Basis className="mt-4" label="Cakupan dan waktu acuan">
+          <p>{brief.scope_basis}</p>
+        </Basis>
         {brief.demo_clock ? (
           <p className="mt-2 rounded border border-accent/25 bg-accent/5 px-3 py-2 text-xs leading-relaxed text-accent-soft">
             <span className="badge mr-2 bg-accent/15 text-accent">Waktu Acuan</span>

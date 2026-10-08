@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import { getScoringConfig } from "@/lib/scoring";
 
@@ -37,7 +38,7 @@ export default async function PengaturanPage() {
           <Stat label="Sel Lokasi" value={String(config.coverage.locations)} />
         </div>
 
-        <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{config.config_basis}</p>
+        <Basis>{config.config_basis}</Basis>
       </Panel>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">

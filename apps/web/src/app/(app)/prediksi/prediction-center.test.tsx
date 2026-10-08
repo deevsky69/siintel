@@ -190,7 +190,8 @@ describe("rincian prediksi", () => {
     expect(screen.getByText("Kapan (WHEN)")).toBeDefined();
     expect(screen.getByText("Risiko (RISK)")).toBeDefined();
     expect(screen.getByText("Keyakinan (CONFIDENCE)")).toBeDefined();
-    expect(screen.getByText("Mengapa (WHY)")).toBeDefined();
+    // WHY dilipat sejak 8 Oktober 2026: judulnya menjadi tombol pembuka, isinya tetap di DOM.
+    expect(screen.getByText(/Mengapa \(WHY\)/)).toBeDefined();
   });
 
   it("menyatakan sendiri bahwa tidak ada model terlatih di baliknya", () => {

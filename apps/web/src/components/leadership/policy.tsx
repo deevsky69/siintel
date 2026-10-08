@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import type { LeadershipBoard } from "@/lib/leadership";
 
@@ -52,7 +53,7 @@ export function PolicyRecommendations({ policy }: { policy: LeadershipBoard["pol
                         berarti aturan yang benar-benar dijalankan, bukan temuan model. */}
                     <span className="font-mono text-2xs text-ink-faint">{row.source}</span>
                   </div>
-                  <p className="mt-0.5 text-2xs leading-relaxed text-ink-muted">{row.basis}</p>
+                  <Basis>{row.basis}</Basis>
                 </div>
                 <span
                   aria-hidden
@@ -66,7 +67,7 @@ export function PolicyRecommendations({ policy }: { policy: LeadershipBoard["pol
         </ol>
       )}
 
-      <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{policy.basis}</p>
+      <Basis>{policy.basis}</Basis>
     </Panel>
   );
 }

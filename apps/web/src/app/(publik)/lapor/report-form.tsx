@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { Basis } from "@/components/basis";
 import type { ReportOptions, SubmitState } from "./actions";
 import { submitReport } from "./actions";
 import { AreaPicker } from "./area-picker";
@@ -146,7 +147,7 @@ export function ReportForm({ options }: { options: ReportOptions }) {
           {pending ? "Mengirim…" : "Kirim laporan"}
         </button>
 
-        <p className="text-2xs leading-relaxed text-ink-faint">{options.coordinate_basis}</p>
+        <Basis>{options.coordinate_basis}</Basis>
       </div>
     </form>
   );
