@@ -34,6 +34,8 @@ permissions:
   role: [read, manage]
   audit: [read]          # sengaja tanpa write/delete — audit bersifat append-only
   config: [read, manage]
+  # Tombol darurat warga — keputusan pemilik proyek 8 Oktober 2026 (migrasi 0012).
+  panic: [read, acknowledge]
 
 roles:
   Pimpinan:
@@ -57,6 +59,7 @@ roles:
       - citizen_report:read
       - community_feedback:read
       - evaluation:read
+      - panic:read
       # DIPINDAHKAN dari Administrator, 1 September 2026 — keputusan pemilik proyek.
       #
       # Yang bergantung pada alat ukur adalah yang memerintahkan pengukurannya.
@@ -176,6 +179,8 @@ roles:
       - citizen_report:read
       - citizen_report:write
       - evaluation:read
+      - panic:read
+      - panic:acknowledge
 
   # BELUM DIPUTUSKAN — `audit:read` dicabut sementara dari peran Polsek.
   #
@@ -262,3 +267,5 @@ roles:
       - audit:read
       - config:manage
       - config:read
+      - panic:read
+      - panic:acknowledge

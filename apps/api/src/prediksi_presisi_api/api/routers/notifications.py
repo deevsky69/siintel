@@ -52,6 +52,7 @@ from ...models import (
     EarlyWarning,
     Location,
     OperationalAction,
+    PanicEvent,
     Prediction,
     Recommendation,
 )
@@ -97,6 +98,45 @@ def notifications(
     tetap menerima daftar yang berbeda.
     """
     groups: list[dict[str, Any]] = []
+
+    # --- Permintaan bantuan darurat (8 Oktober 2026) — SELALU paling atas ---------------
+    # Diikat ke `panic:read`, bukan permission tindakan: keputusan pemilik proyek adalah
+    # Pimpinan ikut diberi tahu meski yang menerima adalah Polsek/Administrator.
+    if _holds(current, "panic:read"):
+        polsek = jurisdiction_filter(current, "panic:read")
+        base = select(PanicEvent).where(PanicEvent.status == "OPEN")
+        if polsek is not None:
+            base = base.join(Location, Location.location_id == PanicEvent.location_id).where(
+                Location.polsek == polsek
+            )
+        panic_rows = session.scalars(
+            base.order_by(PanicEvent.pressed_at.desc()).limit(SAMPLE_LIMIT)
+        ).all()
+        panic_total = session.scalar(select(func.count()).select_from(base.subquery()))
+        groups.append(
+            {
+                "kind": "PANIC",
+                "title": "Permintaan bantuan darurat",
+                "action": "Terima dan tindak lanjuti sekarang",
+                "href": "/panic",
+                "total": int(panic_total or 0),
+                "items": [
+                    {
+                        "code": event.code,
+                        "headline": (
+                            f"{event.location.kelurahan}, {event.location.kecamatan}"
+                            if event.location
+                            else "Lokasi tidak dikirim"
+                        ),
+                        "detail": (
+                            f"ditekan {event.pressed_at.astimezone(clock.JAKARTA):%H:%M} WIB"
+                            + (f" · {event.note}" if event.note else "")
+                        ),
+                    }
+                    for event in panic_rows
+                ],
+            }
+        )
 
     # --- Peringatan yang belum diterima siapa pun -------------------------------------
     if _holds(current, "warning:acknowledge"):

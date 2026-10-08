@@ -56,6 +56,7 @@ EXPECTED_TABLES = {
     "commander_decisions",
     "operational_actions",
     "patrol_plan_decisions",
+    "panic_events",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat
     "citizen_report_attachments",

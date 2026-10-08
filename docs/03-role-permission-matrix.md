@@ -20,7 +20,7 @@
 > alih-alih dinomori ulang, supaya rujukan lama pada dokumen dan catatan implementasi
 > tidak berpindah arti.
 >
-> Administrator karenanya memegang 40 dari 43 permission. Dua yang sengaja berada di
+> Administrator karenanya memegang 42 dari 45 permission. Dua yang sengaja berada di
 > luar jangkauannya milik Pimpinan: `commander_decision:approve` (yang mengusulkan tidak
 > boleh menjadi yang memutuskan) dan `evaluation:run` (yang menghasilkan angka tidak
 > boleh menilai ketepatannya sendiri).
@@ -88,7 +88,7 @@ python3 scripts/matriks-rbac.py --tulis
 Alasannya konkret: sampai 9 September 2026 tabel ini ditulis tangan, dan ia sudah
 menyimpang jauh. Ia masih memuat kolom Command Center dan Analyst — dua peran yang
 dihapus 1 September 2026 — dan memberi Administrator sekadar `read` pada hampir seluruh
-resource, padahal peran itu sesungguhnya memegang 40 dari 43 permission. Dokumen yang
+resource, padahal peran itu sesungguhnya memegang 42 dari 45 permission. Dokumen yang
 bertentangan dengan konfigurasi yang dijalankan lebih berbahaya daripada dokumen yang
 tidak ada, karena ia tetap dibaca sebagai kebenaran.
 
@@ -121,8 +121,9 @@ permission atas resource tersebut.
 | role | — | — | — | read, manage(ALL) |
 | audit | read(ALL) | — | — | read(ALL) |
 | config | read(ALL) | — | — | read, manage(ALL) |
+| panic | read(ALL) | — | read, acknowledge(OWN_JURISDICTION) | read, acknowledge(ALL) |
 
-Jumlah permission per peran: Pimpinan 23, Fungsi 17, Polsek 22, Administrator 40.
+Jumlah permission per peran: Pimpinan 24, Fungsi 17, Polsek 24, Administrator 42.
 
 <!-- matriks:selesai -->
 

@@ -28,6 +28,7 @@ from .early_warning import EarlyWarning
 from .intelligence_report import IntelligenceReport
 from .location import Location
 from .operational_action import OperationalAction
+from .panic_event import PanicEvent
 from .patrol_activity import PatrolActivity
 from .patrol_plan_decision import PatrolPlanDecision
 from .police_unit import PoliceUnit
@@ -52,6 +53,7 @@ __all__ = [
     "IntelligenceReport",
     "Location",
     "OperationalAction",
+    "PanicEvent",
     "PatrolActivity",
     "PatrolPlanDecision",
     "Permission",
