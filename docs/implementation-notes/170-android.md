@@ -367,7 +367,31 @@ kalimat usulan; kode prediksi/peringatan/waktu dibuat menjadi satu baris kecil d
 Server lama tanpa field itu: tajuk jatuh ke "Untuk {fungsi}", skor tidak digambar (null,
 bukan 0) — diuji di `ApiTest`. Unit test 45, `assembleRelease` lulus.
 
-## 12. Yang belum dikerjakan
+## 12. Tombol darurat dan tampilan ringkas per peran (8 Oktober 2026, versi 2.6.0)
+
+**Warga.** Tombol merah besar di layar muka, dua langkah (tekan → dialog konfirmasi
+dengan keterangan opsional). Lokasi dicari secepat mungkin: titik terakhir yang diketahui
+dipakai apa pun umurnya, bila tidak ada menunggu penyedia paling lama 8 detik, lalu
+permintaan dikirim apa pun hasilnya — permintaan tidak pernah tertahan oleh lokasi atau
+izin. Setelah terkirim: kode dan kelurahan yang dikirim, dan pengingat 110.
+
+**Petugas.** Tab **Darurat** (`panic:read`) dengan Terima/Tutup (`panic:acknowledge`) dan
+tombol membuka titik di aplikasi peta ponsel (`geo:` intent). Selama layar terbuka antrean
+diperiksa tiap 30 detik; permintaan OPEN yang baru dibunyikan sebagai notifikasi sistem
+(saluran "darurat", penting tinggi; izin `POST_NOTIFICATIONS` diminta di Android 13+).
+**Batasnya dinyatakan:** ponsel yang aplikasinya tertutup tidak diberi tahu — itu menuntut
+layanan dorong pihak ketiga (Firebase), yang sejak awal dihindari (tanpa Play Services) dan
+menjadi keputusan tersendiri.
+
+**Tampilan ringkas** (`PetugasState.compact`, semua peran selain Administrator): baris
+kepingan ringkasan disembunyikan, kode prediksi/peringatan/waktu dibuat pada rincian
+disembunyikan, daftar kewenangan di Akun disembunyikan; Pimpinan tidak mendapat tab
+Peringatan (cukup Darurat dan Rekomendasi). Server tetap mengirim data yang sama — ini
+penyaringan tampilan, bukan kewenangan.
+
+Unit test 47, `assembleRelease` lulus. Belum diperiksa di perangkat.
+
+## 13. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau
   "Muat ulang" ditekan.

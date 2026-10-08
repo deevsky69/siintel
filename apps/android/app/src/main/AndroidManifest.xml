@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Notifikasi sistem untuk permintaan darurat yang masuk selama aplikasi petugas
+         terbuka (Android 13+ meminta izin ini saat dijalankan). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Lokasi diminta hanya bila warga menekan "Bagikan lokasi saya", dan hanya yang
          KASAR maupun halus untuk satu pengambilan — bukan pemantauan di latar belakang.

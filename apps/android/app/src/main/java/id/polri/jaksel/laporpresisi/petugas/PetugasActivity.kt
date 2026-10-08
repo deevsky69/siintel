@@ -1,7 +1,19 @@
 package id.polri.jaksel.laporpresisi.petugas
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
@@ -66,7 +78,27 @@ class PetugasActivity : ComponentActivity() {
         onDecisionReason = { state = state.copy(decisionReason = it) },
         onDecisionText = { state = state.copy(decisionText = it) },
         onDecide = ::decide,
+        onPanicAcknowledge = { code -> act(code, { Api.acknowledgePanic(BuildConfig.API_BASE, it, code) }, R.string.verified_done) },
+        onPanicCloseNote = { state = state.copy(panicCloseNote = it) },
+        onPanicClose = { code ->
+            act(code, { Api.closePanic(BuildConfig.API_BASE, it, code, state.panicCloseNote) }, R.string.verified_done)
+            state = state.copy(panicCloseNote = "")
+        },
     )
+
+    /** Izin notifikasi (Android 13+) diminta sekali setelah antrean pertama termuat. */
+    private val askNotifications =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
+    /** Kode darurat OPEN yang sudah dibunyikan, supaya tidak berbunyi lagi tiap polling. */
+    private val announced = mutableSetOf<String>()
+    private val poller = Handler(Looper.getMainLooper())
+    private val pollTask = object : Runnable {
+        override fun run() {
+            if (tokens.accessToken != null && state.profile != null) loadQueues(quiet = true)
+            poller.postDelayed(this, POLL_MS)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +115,23 @@ class PetugasActivity : ComponentActivity() {
             }
         }
         if (tokens.accessToken == null) showLogin(null) else loadQueues()
+    }
+
+    /**
+     * Selama layar terbuka antrean diperiksa tiap [POLL_MS]: inilah "pemberitahuan" bagi
+     * petugas tanpa layanan dorong pihak ketiga. Permintaan darurat baru dibunyikan sebagai
+     * notifikasi sistem. Ponsel yang aplikasinya tertutup TIDAK diberi tahu — dinyatakan di
+     * docs/implementation-notes/170 §12.
+     */
+    override fun onResume() {
+        super.onResume()
+        poller.removeCallbacks(pollTask)
+        poller.postDelayed(pollTask, POLL_MS)
+    }
+
+    override fun onPause() {
+        poller.removeCallbacks(pollTask)
+        super.onPause()
     }
 
     private fun signIn() {
@@ -113,6 +162,7 @@ class PetugasActivity : ComponentActivity() {
     /** Memuat ulang apa pun yang sedang dilihat: antrean, atau daftar tab aktif. */
     private fun reloadCurrent() {
         when (state.detail?.tab ?: state.tab) {
+            Tab.DARURAT -> loadList(Tab.DARURAT, force = true)
             Tab.PERINGATAN -> loadList(Tab.PERINGATAN, force = true)
             Tab.LAPORAN -> loadList(Tab.LAPORAN, force = true)
             Tab.REKOMENDASI -> loadList(Tab.REKOMENDASI, force = true)
@@ -130,16 +180,20 @@ class PetugasActivity : ComponentActivity() {
         loadList(ref.tab)
     }
 
-    private fun loadQueues() {
+    private fun loadQueues(quiet: Boolean = false) {
         if (tokens.accessToken == null) return showLogin(null)
-        state = state.copy(busy = true)
+        if (!quiet) state = state.copy(busy = true)
         lifecycleScope.launch {
             try {
                 val profile = session.run { Api.profile(BuildConfig.API_BASE, it) }
                 val feed = session.run { Api.notifications(BuildConfig.API_BASE, it) }
                 // Keterangan dikembalikan ke bunyi aslinya: pesan galat dari pemuatan yang
                 // gagal sebelumnya tidak boleh tertinggal setelah pemuatan berikutnya berhasil.
-                state = state.copy(profile = profile, feed = feed, note = null, loginError = null)
+                state = state.copy(profile = profile, feed = feed, note = if (quiet) state.note else null, loginError = null)
+                announcePanic(feed)
+                // Daftar darurat ikut disegarkan saat polling supaya tab Darurat tidak basi.
+                if (quiet && state.panics != null) loadList(Tab.DARURAT, force = true)
+                if (!quiet) ensureNotificationPermission()
             } catch (failure: Api.Failure) {
                 if (failure.unauthorized) {
                     signOut(getString(R.string.err_session))
@@ -155,9 +209,49 @@ class PetugasActivity : ComponentActivity() {
         }
     }
 
+    private fun ensureNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    /** Membunyikan notifikasi sistem untuk tiap permintaan darurat OPEN yang belum pernah dibunyikan. */
+    private fun announcePanic(feed: Api.Feed) {
+        val group = feed.queues.firstOrNull { it.kind == "PANIC" } ?: return
+        val fresh = group.items.filter { announced.add(it.code) }
+        if (fresh.isEmpty()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) return
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            manager.createNotificationChannel(
+                NotificationChannel(PANIC_CHANNEL, getString(R.string.panic_notification_channel), NotificationManager.IMPORTANCE_HIGH),
+            )
+        }
+        val open = PendingIntent.getActivity(
+            this, 0, Intent(this, PetugasActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        for (item in fresh) {
+            val notification = NotificationCompat.Builder(this, PANIC_CHANNEL)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle(getString(R.string.panic_notification_title))
+                .setContentText(getString(R.string.panic_notification_body, item.headline, item.detail))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setAutoCancel(true)
+                .setContentIntent(open)
+                .build()
+            manager.notify(item.code.hashCode(), notification)
+        }
+    }
+
     /** Memuat daftar satu tab; sekali saja kecuali [force], supaya berpindah tab tidak lambat. */
     private fun loadList(tab: Tab, force: Boolean = false) {
         val loaded = when (tab) {
+            Tab.DARURAT -> state.panics != null
             Tab.PERINGATAN -> state.warnings != null
             Tab.LAPORAN -> state.reports != null
             Tab.REKOMENDASI -> state.recommendations != null
@@ -171,6 +265,10 @@ class PetugasActivity : ComponentActivity() {
                 // mengambil `state` sebelum menunggu dan menimpa perubahan yang terjadi di
                 // sela-selanya (ganti tab, antrean selesai dimuat) dengan keadaan basi.
                 when (tab) {
+                    Tab.DARURAT -> {
+                        val rows = session.run { Api.panicEvents(BuildConfig.API_BASE, it) }
+                        state = state.copy(panics = rows, note = null)
+                    }
                     Tab.PERINGATAN -> {
                         val rows = session.run { Api.warnings(BuildConfig.API_BASE, it) }
                         state = state.copy(warnings = rows, note = null)
@@ -228,13 +326,18 @@ class PetugasActivity : ComponentActivity() {
 
     private fun reloadAfterAction() {
         val tab = state.detail?.tab ?: state.tab
-        if (tab == Tab.PERINGATAN || tab == Tab.LAPORAN || tab == Tab.REKOMENDASI) loadList(tab, force = true)
+        if (tab != Tab.ANTREAN && tab != Tab.AKUN) loadList(tab, force = true)
         loadQueues()
     }
 
     private fun signOut(reason: String?) {
         tokens.clear()
         showLogin(reason)
+    }
+
+    private companion object {
+        const val POLL_MS = 30_000L
+        const val PANIC_CHANNEL = "darurat"
     }
 
     private fun showLogin(reason: String?) {

@@ -97,6 +97,36 @@ object PublicApi {
         val message: String,
     )
 
+    /** Jawaban server atas penekanan tombol darurat. */
+    data class PanicReceipt(val code: String, val kelurahan: String, val kecamatan: String, val message: String)
+
+    /**
+     * Menekan tombol darurat (8 Oktober 2026). Titik peranti dikirim bila ada; tanpa titik
+     * pun permintaan tetap diterima — petugas yang membaca akan tahu bahwa lokasinya tidak
+     * dikirim. Tanpa identitas, seperti laporan.
+     */
+    suspend fun panic(
+        baseUrl: String,
+        latitude: Double?,
+        longitude: Double?,
+        accuracyMetres: Double?,
+        note: String?,
+    ): PanicReceipt = withContext(Dispatchers.IO) {
+        val payload = JSONObject()
+        if (latitude != null && longitude != null) {
+            payload.put("latitude", latitude).put("longitude", longitude)
+            if (accuracyMetres != null) payload.put("accuracy_m", accuracyMetres)
+        }
+        if (!note.isNullOrBlank()) payload.put("note", note.trim())
+        val json = JSONObject(post("$baseUrl/api/v1/public/panic", payload.toString()))
+        PanicReceipt(
+            code = json.text("code"),
+            kelurahan = json.text("kelurahan"),
+            kecamatan = json.text("kecamatan"),
+            message = json.text("message"),
+        )
+    }
+
     /** Kegagalan yang sudah diterjemahkan menjadi kalimat yang pantas dibaca warga. */
     class ApiFailure(val readable: String) : Exception(readable)
 

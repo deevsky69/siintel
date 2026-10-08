@@ -204,6 +204,7 @@ perubahan skema dan kontrak API, dan itu keputusan pemilik proyek (sisa U-13).
 | Executive Brief | Bagian "Rencana Patroli Tahun Ini" |
 | Laporan masyarakat | Urgensi/verifikasi dinyatakan sebagai isian petugas, bukan "nilai sintetis" |
 | Android | Pemilih kelurahan + kelurahan terdekat dari lokasi (2.1.0), menyamai web; APK dibangun, belum diuji di perangkat |
+| Tombol darurat (panic button) | Dibangun 8 Oktober 2026 atas keputusan pemilik proyek: tabel `panic_events` (0012), `POST /public/panic`, antrean `/panic` + Terima/Tutup, kelompok PANIC paling atas di notifikasi, spanduk merah web, tombol di Android warga, tab Darurat + polling + notifikasi sistem di Android petugas. Terbuka: waktu tanggap/eskalasi, notifikasi dorong |
 | Informasi dilipat | Kalimat `*_basis` dan faktor penjelas di seluruh layar web dipindahkan ke `<details>` terlipat (`components/basis.tsx`: Basis, Why) — tetap ada, dibuka saat diminta (keputusan pemilik proyek 8 Oktober 2026) |
 | Beranda → kelurahan | Peta beranda menyelam Polda → Jakarta Selatan → kecamatan → **kelurahan** (klik kecamatan membuka peta kelurahannya, klik kelurahan membuka rinciannya); remah roti tiga tingkat |
 | Rekomendasi untuk Pimpinan | Kartu daftar satu baris apa/di mana/kapan + skor; rincian dibuka dengan empat kunci (Apa, Di mana, Kapan, Risiko) sebelum kalimat usulan; yang menunggu diurutkan prioritas lalu skor; `GET /recommendations` membawa threat_type/time_window/risk_score/kecamatan/kelurahan |

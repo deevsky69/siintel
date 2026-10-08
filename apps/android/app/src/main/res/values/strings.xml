@@ -105,6 +105,28 @@
     <!-- "Info sekitar" pada spesifikasi §4. Kalimat dasarnya menyebut dari mana imbauan
          berasal, karena warga yang membacanya berhak tahu bahwa ia melewati keputusan
          pejabat berwenang — bukan angka yang bocor dari sistem. -->
+    <!-- Tombol darurat (8 Oktober 2026) -->
+    <string name="panic_button">TOMBOL DARURAT</string>
+    <string name="panic_hint">Menekan tombol ini mengirim lokasi Anda ke petugas Polsek, Administrator, dan Pimpinan. Untuk keadaan mengancam jiwa, tetap hubungi 110.</string>
+    <string name="panic_confirm_title">Kirim permintaan bantuan?</string>
+    <string name="panic_confirm_body">Lokasi Anda saat ini akan dikirim ke petugas. Jangan menekan bila tidak sedang dalam keadaan darurat.</string>
+    <string name="panic_confirm_yes">Kirim sekarang</string>
+    <string name="panic_confirm_no">Batal</string>
+    <string name="panic_note_hint">Keterangan singkat (opsional)</string>
+    <string name="panic_sending">Mengirim permintaan bantuan…</string>
+    <string name="panic_sent">Permintaan bantuan tercatat: %1$s</string>
+    <string name="panic_sent_area">Lokasi yang dikirim: %1$s</string>
+    <string name="panic_sent_no_area">Lokasi tidak dapat diambil; petugas melihat permintaan tanpa titik.</string>
+    <string name="panic_failed">Permintaan gagal dikirim: %1$s Hubungi 110.</string>
+    <string name="panic_call_110">Hubungi 110</string>
+    <string name="tab_panic">Darurat</string>
+    <string name="panic_take">Terima</string>
+    <string name="panic_close">Tutup</string>
+    <string name="panic_basis">Permintaan bantuan dari aplikasi warga, tanpa identitas. Diterima berarti seseorang bertanggung jawab menindaklanjuti; waktu tanggap resmi belum ditetapkan.</string>
+    <string name="panic_notification_channel">Permintaan bantuan darurat</string>
+    <string name="panic_notification_title">Permintaan bantuan darurat</string>
+    <string name="panic_notification_body">%1$s · %2$s</string>
+    <string name="panic_open_map">Buka titik di peta</string>
     <string name="home_status">Cek Status Laporan Saya</string>
     <string name="home_status_checking">Memeriksa…</string>
     <string name="home_status_none">Status laporan tidak dapat diambil. Periksa jaringan, lalu coba lagi.</string>

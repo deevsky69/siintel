@@ -88,12 +88,15 @@ object Perm {
     const val REPORT_WRITE = "citizen_report:write"
     const val RECOMMENDATION_READ = "recommendation:read"
     const val DECIDE = "commander_decision:approve"
+    const val PANIC_READ = "panic:read"
+    const val PANIC_ACK = "panic:acknowledge"
 }
 
 /** Menu bawah. Yang tampil bergantung permission dari `/auth/me`; ANTREAN dan AKUN selalu. */
 enum class Tab(val label: Int, val icon: ImageVector, val requires: String?) {
     ANTREAN(R.string.tab_queue, Icons.Outlined.Notifications, null),
-    PERINGATAN(R.string.tab_warnings, Icons.Outlined.Warning, Perm.WARNING_READ),
+    DARURAT(R.string.tab_panic, Icons.Outlined.Warning, Perm.PANIC_READ),
+    PERINGATAN(R.string.tab_warnings, Icons.Outlined.Info, Perm.WARNING_READ),
     LAPORAN(R.string.tab_reports, Icons.Outlined.Edit, Perm.REPORT_READ),
     REKOMENDASI(R.string.tab_recommendations, Icons.Outlined.ThumbUp, Perm.RECOMMENDATION_READ),
     AKUN(R.string.tab_account, Icons.Outlined.AccountCircle, null),
@@ -117,15 +120,29 @@ data class PetugasState(
     val version: String = "",
     val tab: Tab = Tab.ANTREAN,
     val detail: DetailRef? = null,
+    val panics: List<Api.Panic>? = null,
     val warnings: List<Api.Warning>? = null,
     val reports: List<Api.Report>? = null,
     val recommendations: List<Api.Recommendation>? = null,
     val decisionChoice: String = "APPROVED",
     val decisionReason: String = "",
     val decisionText: String = "",
+    val panicCloseNote: String = "",
 ) {
     fun allows(permission: String): Boolean = profile?.permissions?.contains(permission) == true
-    val tabs: List<Tab> get() = Tab.entries.filter { it.requires == null || allows(it.requires) }
+
+    /** Administrator melihat semua; peran lain mendapat tampilan ringkas (8 Oktober 2026). */
+    val compact: Boolean get() = profile?.role?.equals("Administrator", ignoreCase = true) != true
+
+    /**
+     * Tab mengikuti permission; untuk Pimpinan daftar Peringatan disembunyikan — keputusan
+     * pemilik proyek: cukup yang penting (darurat, rekomendasi yang menunggu keputusan).
+     */
+    val tabs: List<Tab>
+        get() = Tab.entries.filter { tab ->
+            (tab.requires == null || allows(tab.requires)) &&
+                !(tab == Tab.PERINGATAN && profile?.role.equals("Pimpinan", ignoreCase = true))
+        }
 }
 
 class PetugasActions(
@@ -144,6 +161,9 @@ class PetugasActions(
     val onDecisionReason: (String) -> Unit,
     val onDecisionText: (String) -> Unit,
     val onDecide: (String) -> Unit,
+    val onPanicAcknowledge: (String) -> Unit,
+    val onPanicCloseNote: (String) -> Unit,
+    val onPanicClose: (String) -> Unit,
 )
 
 private data class RoleLook(val icon: ImageVector, val tagline: Int)
@@ -157,7 +177,8 @@ private fun roleLook(role: String): RoleLook = when (role.lowercase()) {
 }
 
 private fun kindIcon(kind: String): ImageVector = when (kind) {
-    "WARNING" -> Icons.Outlined.Warning
+    "PANIC" -> Icons.Outlined.Warning
+    "WARNING" -> Icons.Outlined.Info
     KIND_CITIZEN_REPORT -> Icons.Outlined.Edit
     "DECISION" -> Icons.Outlined.ThumbUp
     "PATROL_PLAN" -> Icons.Outlined.DateRange
@@ -166,6 +187,7 @@ private fun kindIcon(kind: String): ImageVector = when (kind) {
 }
 
 private fun kindShortLabel(kind: String): String = when (kind) {
+    "PANIC" -> "darurat"
     "WARNING" -> "peringatan"
     KIND_CITIZEN_REPORT -> "laporan"
     "DECISION" -> "keputusan"
@@ -177,6 +199,7 @@ private fun kindShortLabel(kind: String): String = when (kind) {
 
 /** Antrean mana yang punya halaman rincian di ponsel; selebihnya hanya di web. */
 private fun kindDetailTab(kind: String): Tab? = when (kind) {
+    "PANIC" -> Tab.DARURAT
     "WARNING" -> Tab.PERINGATAN
     KIND_CITIZEN_REPORT -> Tab.LAPORAN
     "DECISION" -> Tab.REKOMENDASI
@@ -220,6 +243,7 @@ fun PetugasScreen(state: PetugasState, actions: PetugasActions) {
                     when {
                         detail != null -> DetailPage(detail, state, actions)
                         state.tab == Tab.ANTREAN -> QueueBoard(state, actions)
+                        state.tab == Tab.DARURAT -> PanicList(state, actions)
                         state.tab == Tab.PERINGATAN -> WarningList(state, actions)
                         state.tab == Tab.LAPORAN -> ReportList(state, actions)
                         state.tab == Tab.REKOMENDASI -> RecommendationList(state, actions)
@@ -345,7 +369,7 @@ private fun QueueBoard(state: PetugasState, actions: PetugasActions) {
         }
 
         if (feed != null) {
-            if (feed.queues.isNotEmpty()) {
+            if (feed.queues.isNotEmpty() && !state.compact) {
                 SectionLabel(stringResource(R.string.queue_summary), Modifier.padding(top = 18.dp))
                 Row(
                     Modifier.fillMaxWidth().padding(top = 8.dp).horizontalScroll(rememberScrollState()),
@@ -386,7 +410,8 @@ private fun QueueBoard(state: PetugasState, actions: PetugasActions) {
 @Composable
 private fun QueueCard(queue: Api.Queue, actions: PetugasActions, modifier: Modifier = Modifier) {
     val target = kindDetailTab(queue.kind)
-    Panel(modifier) {
+    val alarm = queue.kind == "PANIC" && queue.total > 0
+    Panel(modifier, borderColor = if (alarm) PresisiColors.Critical else PresisiColors.Base700) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(kindIcon(queue.kind), contentDescription = null, tint = PresisiColors.Accent, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(10.dp))
@@ -523,6 +548,107 @@ private fun ReportList(state: PetugasState, actions: PetugasActions) =
         )
     }
 
+// ---------------------------------------------------------------------------------
+// Darurat
+// ---------------------------------------------------------------------------------
+
+private fun panicStatusLabel(status: String): String = when (status) {
+    "OPEN" -> "BELUM DITERIMA"
+    "ACKNOWLEDGED" -> "DITANGANI"
+    "CLOSED" -> "SELESAI"
+    else -> status
+}
+
+@Composable
+private fun PanicList(state: PetugasState, actions: PetugasActions) =
+    ListPage(stringResource(R.string.tab_panic), Icons.Outlined.Warning, state.panics, stringResource(R.string.panic_basis), state, actions) { e ->
+        Panel(
+            Modifier.clickable { actions.onOpen(DetailRef(Tab.DARURAT, e.code)) },
+            borderColor = if (e.status == "OPEN") PresisiColors.Critical else PresisiColors.Base700,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.Warning, contentDescription = null, tint = if (e.status == "OPEN") PresisiColors.Critical else PresisiColors.InkFaint, modifier = Modifier.size(22.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        listOf(e.kelurahan, e.kecamatan).filter { it.isNotBlank() }.joinToString(", ").ifBlank { "Lokasi tidak dikirim" },
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        "${e.code} · ${shortTime(e.pressedAt)}${if (e.note.isNotBlank()) " · ${e.note}" else ""}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    )
+                }
+                Text(
+                    panicStatusLabel(e.status),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp,
+                    color = if (e.status == "OPEN") PresisiColors.Critical else PresisiColors.InkFaint,
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
+        }
+    }
+
+@Composable
+private fun PanicDetail(e: Api.Panic, state: PetugasState, actions: PetugasActions, acting: Boolean) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Panel(borderColor = if (e.status == "OPEN") PresisiColors.Critical else PresisiColors.Base700) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                listOf(e.kelurahan, e.kecamatan).filter { it.isNotBlank() }.joinToString(", ").ifBlank { "Lokasi tidak dikirim" },
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f),
+            )
+            Text(panicStatusLabel(e.status), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = if (e.status == "OPEN") PresisiColors.Critical else PresisiColors.InkFaint)
+        }
+        Field("Ditekan", shortTime(e.pressedAt))
+        Field("Keterangan", e.note)
+        Field("Ketelitian titik", e.accuracyM?.let { "±${it.toInt()} m" } ?: "")
+        Field("Diterima oleh", e.acknowledgedBy)
+        Field("Ditutup oleh", if (e.closedBy.isNotBlank()) "${e.closedBy}${if (e.closingNote.isNotBlank()) " — ${e.closingNote}" else ""}" else "")
+        if (e.latitude != null && e.longitude != null) {
+            SecondaryButton(
+                text = stringResource(R.string.panic_open_map),
+                onClick = {
+                    val uri = android.net.Uri.parse("geo:${e.latitude},${e.longitude}?q=${e.latitude},${e.longitude}(${android.net.Uri.encode(e.code)})")
+                    runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri)) }
+                },
+                fullWidth = false,
+                icon = Icons.Outlined.Place,
+                modifier = Modifier.padding(top = 12.dp),
+            )
+        }
+        if (e.status != "CLOSED" && state.allows(Perm.PANIC_ACK)) {
+            Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                if (e.status == "OPEN") {
+                    PrimaryButton(
+                        text = stringResource(R.string.panic_take),
+                        onClick = { actions.onPanicAcknowledge(e.code) },
+                        enabled = !acting,
+                        icon = Icons.Outlined.Done,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+            InputField(stringResource(R.string.decision_reason).replace("Alasan", "Catatan penutupan"), state.panicCloseNote, actions.onPanicCloseNote, minLines = 2, maxLength = 2000)
+            SecondaryButton(
+                text = stringResource(R.string.panic_close),
+                onClick = { actions.onPanicClose(e.code) },
+                enabled = !acting,
+                fullWidth = false,
+                icon = Icons.Outlined.CheckCircle,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+    }
+}
+
 /** Urutan memutuskan: prioritas tinggi dahulu, lalu skor terbesar, lalu yang paling lama menunggu. */
 private val PRIORITY_RANK = mapOf("HIGH" to 0, "MEDIUM" to 1, "LOW" to 2)
 
@@ -635,6 +761,15 @@ private fun DetailPage(detail: DetailRef, state: PetugasState, actions: PetugasA
     DetailHeader(detail.code, actions)
     val acting = detail.code in state.acting
     when (detail.tab) {
+        Tab.DARURAT -> {
+            val e = state.panics?.firstOrNull { it.code == detail.code }
+            when {
+                state.panics == null -> Hint(stringResource(R.string.list_loading))
+                e == null -> ErrorBox(stringResource(R.string.detail_not_found, detail.code))
+                else -> PanicDetail(e, state, actions, acting)
+            }
+            Hint(stringResource(R.string.panic_basis), Modifier.padding(top = 12.dp))
+        }
         Tab.PERINGATAN -> {
             val w = state.warnings?.firstOrNull { it.code == detail.code }
             when {
@@ -650,7 +785,7 @@ private fun DetailPage(detail: DetailRef, state: PetugasState, actions: PetugasA
                     Field(stringResource(R.string.label_score), "${w.riskScore} / 100")
                     Field(stringResource(R.string.label_confidence), "${w.confidence} / 100")
                     Field(stringResource(R.string.label_created), shortTime(w.createdAt))
-                    Field("Prediksi", w.predictionCode)
+                    if (!state.compact) Field("Prediksi", w.predictionCode)
                     Row(Modifier.padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         if (w.status == "ACTIVE" && state.allows(Perm.WARNING_ACK)) {
                             SecondaryButton(stringResource(R.string.acknowledge), onClick = { actions.onAcknowledge(w.code) }, enabled = !acting, fullWidth = false, icon = Icons.Outlined.Done)
@@ -725,8 +860,8 @@ private fun DetailPage(detail: DetailRef, state: PetugasState, actions: PetugasA
                         }
                         Text("USULAN SISTEM", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 12.dp))
                         Text(r.text, style = MaterialTheme.typography.bodyLarge, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
-                        // Ketertelusuran, kecil, paling bawah.
-                        Text(
+                        // Ketertelusuran, kecil, paling bawah — hanya untuk Administrator.
+                        if (!state.compact) Text(
                             listOf(r.code, "prediksi ${r.predictionCode}", r.warningCode.takeIf { it.isNotBlank() }?.let { "peringatan $it" }, "dibuat ${shortTime(r.createdAt)}")
                                 .filterNotNull().joinToString(" · "),
                             fontFamily = FontFamily.Monospace,
@@ -797,13 +932,15 @@ private fun AccountPage(state: PetugasState, actions: PetugasActions) {
         )
         Text(stringResource(roleLook(profile.role).tagline), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
     }
-    SectionLabel(stringResource(R.string.account_permissions), Modifier.padding(top = 16.dp))
-    Panel(Modifier.padding(top = 8.dp)) {
-        if (profile.permissions.isEmpty()) {
-            Text("—", style = MaterialTheme.typography.bodyMedium)
-        } else {
-            for (permission in profile.permissions.sorted()) {
-                Text(permission, fontFamily = FontFamily.Monospace, fontSize = 12.sp, color = PresisiColors.InkMuted)
+    if (!state.compact) {
+        SectionLabel(stringResource(R.string.account_permissions), Modifier.padding(top = 16.dp))
+        Panel(Modifier.padding(top = 8.dp)) {
+            if (profile.permissions.isEmpty()) {
+                Text("—", style = MaterialTheme.typography.bodyMedium)
+            } else {
+                for (permission in profile.permissions.sorted()) {
+                    Text(permission, fontFamily = FontFamily.Monospace, fontSize = 12.sp, color = PresisiColors.InkMuted)
+                }
             }
         }
     }
@@ -816,7 +953,7 @@ private fun AccountPage(state: PetugasState, actions: PetugasActions) {
 // Pratinjau
 // ---------------------------------------------------------------------------------
 
-private val NO_ACTIONS = PetugasActions({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+private val NO_ACTIONS = PetugasActions({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
 
 private val PREVIEW_PROFILE = Api.Profile(
     "Bripka Contoh", "Polsek",

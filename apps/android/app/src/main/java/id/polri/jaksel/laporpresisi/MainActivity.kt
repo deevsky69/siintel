@@ -1,8 +1,17 @@
 package id.polri.jaksel.laporpresisi
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +73,12 @@ class MainActivity : ComponentActivity() {
 
     private var state by mutableStateOf(HomeState(version = BuildConfig.VERSION_NAME))
 
+    /** Izin lokasi diminta saat tombol darurat dikonfirmasi; ditolak pun permintaan tetap dikirim. */
+    private val askLocation =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
+            if (granted.values.any { it }) locateThenSend() else sendPanic(null)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -73,6 +88,10 @@ class MainActivity : ComponentActivity() {
                     onReport = { startActivity(Intent(this, LaporActivity::class.java)) },
                     onOfficer = { startActivity(Intent(this, PetugasActivity::class.java)) },
                     onCheckStatus = ::periksaStatus,
+                    onPanicPress = { state = state.copy(panic = PanicState.Confirming) },
+                    onPanicCancel = { state = state.copy(panic = PanicState.Idle) },
+                    onPanicNote = { state = state.copy(panicNote = it) },
+                    onPanicConfirm = ::confirmPanic,
                 )
             }
         }
@@ -134,8 +153,89 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // ---------------------------------------------------------------------------------
+    // Tombol darurat (8 Oktober 2026)
+    // ---------------------------------------------------------------------------------
+
+    private fun confirmPanic() {
+        state = state.copy(panic = PanicState.Sending)
+        val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        val granted = permissions.any { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+        if (granted) locateThenSend() else askLocation.launch(permissions)
+    }
+
+    /**
+     * Mencari titik secepat mungkin: titik terakhir yang diketahui dipakai bila ada (umur
+     * berapa pun — pada keadaan darurat titik lima menit lalu lebih berharga daripada tidak
+     * ada), bila tidak ada menunggu penyedia paling lama [PANIC_LOCATION_WAIT_MS], lalu kirim
+     * apa pun hasilnya. Permintaan TIDAK PERNAH tertahan oleh lokasi.
+     */
+    private fun locateThenSend() {
+        val manager = getSystemService(LOCATION_SERVICE) as? LocationManager
+        if (manager == null) return sendPanic(null)
+        val providers = buildList {
+            add(LocationManager.GPS_PROVIDER)
+            add(LocationManager.NETWORK_PROVIDER)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) add(LocationManager.FUSED_PROVIDER)
+        }.filter { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
+        try {
+            val recent = providers.mapNotNull { manager.getLastKnownLocation(it) }.maxByOrNull { it.time }
+            if (recent != null) return sendPanic(recent)
+            if (providers.isEmpty()) return sendPanic(null)
+            var sent = false
+            val listener = object : android.location.LocationListener {
+                override fun onLocationChanged(location: Location) {
+                    manager.removeUpdates(this)
+                    if (!sent) {
+                        sent = true
+                        sendPanic(location)
+                    }
+                }
+
+                @Deprecated("Diperlukan API 24–29")
+                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) = Unit
+                override fun onProviderEnabled(provider: String) = Unit
+                override fun onProviderDisabled(provider: String) = Unit
+            }
+            for (provider in providers) manager.requestLocationUpdates(provider, 0L, 0f, listener, Looper.getMainLooper())
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (!sent) {
+                    sent = true
+                    manager.removeUpdates(listener)
+                    sendPanic(null)
+                }
+            }, PANIC_LOCATION_WAIT_MS)
+        } catch (_: SecurityException) {
+            sendPanic(null)
+        }
+    }
+
+    private fun sendPanic(location: Location?) {
+        lifecycleScope.launch {
+            try {
+                val receipt = PublicApi.panic(
+                    BuildConfig.API_BASE,
+                    location?.latitude,
+                    location?.longitude,
+                    location?.takeIf { it.hasAccuracy() }?.accuracy?.toDouble(),
+                    state.panicNote,
+                )
+                val area = listOf(receipt.kelurahan, receipt.kecamatan)
+                    .filter { it.isNotBlank() }
+                    .joinToString(", ")
+                    .ifBlank { null }
+                state = state.copy(panic = PanicState.Sent(receipt.code, area), panicNote = "")
+            } catch (failure: PublicApi.ApiFailure) {
+                state = state.copy(panic = PanicState.Failed(failure.readable))
+            }
+        }
+    }
+
     private companion object {
         /** Layar muka bukan arsip: yang berguna dibaca adalah yang paling dekat berlaku. */
         const val MAX_ALERTS = 3
+
+        /** Berapa lama menunggu titik baru sebelum permintaan darurat dikirim tanpa titik. */
+        const val PANIC_LOCATION_WAIT_MS = 8_000L
     }
 }

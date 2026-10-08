@@ -1,4 +1,5 @@
 import { NotificationBell } from "@/components/shell/notification-bell";
+import { PanicBanner } from "@/components/shell/panic-banner";
 import { ShellFrame } from "@/components/shell/shell-frame";
 import { Sidebar } from "@/components/shell/sidebar";
 import { getPendingDecisionCount, getProfile } from "@/lib/dashboard";
@@ -35,6 +36,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       notifications={feed ? <NotificationBell feed={feed} /> : null}
       sidebar={<Sidebar permissions={profile.permissions} pendingDecisions={pendingDecisions} />}
     >
+      <PanicBanner feed={feed} />
       {children}
     </ShellFrame>
   );

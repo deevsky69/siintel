@@ -313,4 +313,21 @@ class ApiTest {
             assertEquals("POST", server.requestsTo("/api/v1/warnings/WRN-00012/resolve").single().method)
         }
     }
+
+    @Test
+    fun `permintaan darurat diurai, titik null tetap null`() {
+        val rows = Api.parsePanic(
+            """{"data":[{"code":"PNC-0001","pressed_at":"2026-10-08T10:05:00+07:00","status":"OPEN",
+               "latitude":-6.2286,"longitude":106.8542,"accuracy_m":12.5,"kecamatan":"Tebet","kelurahan":"Tebet Timur",
+               "polsek":"Polsek Tebet","note":"Ada orang bersenjata","acknowledged_at":null,"acknowledged_by":null,
+               "closed_at":null,"closed_by":null,"closing_note":null},
+               {"code":"PNC-0002","pressed_at":"2026-10-08T10:06:00+07:00","status":"OPEN","latitude":null,"longitude":null,
+               "accuracy_m":null,"kecamatan":null,"kelurahan":null,"polsek":null,"note":null,"acknowledged_at":null,
+               "acknowledged_by":null,"closed_at":null,"closed_by":null,"closing_note":null}],"open_total":2,"basis":""}""",
+        )
+        assertEquals("Tebet Timur", rows[0].kelurahan)
+        assertEquals(12.5, rows[0].accuracyM!!, 0.001)
+        assertNull(rows[1].latitude)
+        assertEquals("", rows[1].kelurahan)
+    }
 }

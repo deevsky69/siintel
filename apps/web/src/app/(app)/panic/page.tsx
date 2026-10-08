@@ -1,115 +1,119 @@
-import Link from "next/link";
+import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
-import { getCitizenReports } from "@/lib/reports";
+import { getProfile } from "@/lib/dashboard";
+import { getPanicEvents, mapLink, PANIC_STATUS_LABELS, type PanicRow } from "@/lib/panic";
+import { formatWib } from "@/lib/warnings";
+import { PanicActions } from "./panic-actions";
 
 export const dynamic = "force-dynamic";
 
-/** Status yang berarti laporan masih menunggu tindakan seseorang. */
-const WAITING = new Set(["RECEIVED", "VERIFIED", "FORWARDED"]);
-
-/** Ambang tampilan untuk "mendesak". Bukan ambang resmi — lihat catatan di layar. */
-const URGENT_FROM = 70;
-
 /**
- * Panic Button — antrean permintaan bantuan mendesak (TASK 161).
+ * Panic Button — antrean permintaan bantuan darurat dari aplikasi warga.
  *
- * ## Yang perlu diketahui sebelum membaca kode ini
- *
- * **Kanal panic button yang sebenarnya belum ada.** Tombol darurat sekali-tekan menuntut
- * dua hal yang belum dimiliki sistem ini: aplikasi di tangan warga yang dapat mengirim
- * lokasi seketika (LAPOR PRESISI, PHASE 17), dan **komitmen respons** — siapa yang
- * menerima, dalam berapa lama, dan apa yang terjadi bila tidak ada yang menjawab.
- *
- * Yang kedua bukan pekerjaan teknis. Tombol darurat yang menjanjikan bantuan tanpa ada
- * yang berkewajiban datang lebih berbahaya daripada tidak ada tombol sama sekali: ia
- * membuat orang berhenti mencari pertolongan lain.
- *
- * Karena itu layar ini **tidak berpura-pura** menjadi kanal itu. Ia menampilkan hal
- * terdekat yang benar-benar ada — laporan masyarakat berurgensi tinggi yang belum
- * tertangani — dan menyatakan perbedaannya di bagian paling atas, bukan di catatan kaki.
+ * Sampai 8 Oktober 2026 layar ini sengaja bukan kanal sungguhan (yang kurang adalah
+ * komitmen respons, bukan teknik). Pemilik proyek kemudian menetapkan penerimanya —
+ * Administrator, Polsek wilayah itu, Pimpinan — dan kanalnya dibangun. Yang masih
+ * PROPOSED: waktu tanggap dan eskalasi bila tidak ada yang menerima; karena itu 110
+ * tetap disebut sebagai jalur resmi pada layar warga.
  */
 export default async function PanicPage() {
-  const page = await getCitizenReports({ page_size: 100 });
-
-  const waiting = page.data
-    .filter((row) => WAITING.has(row.status))
-    .filter((row) => (row.urgency_score ?? 0) >= URGENT_FROM)
-    .sort((a, b) => (b.urgency_score ?? 0) - (a.urgency_score ?? 0));
+  const [page, profile] = await Promise.all([getPanicEvents(), getProfile()]);
+  const canAct = profile.permissions.includes("panic:acknowledge");
+  const open = page.data.filter((row) => row.status === "OPEN");
+  const handling = page.data.filter((row) => row.status === "ACKNOWLEDGED");
+  const closed = page.data.filter((row) => row.status === "CLOSED").slice(0, 20);
 
   return (
     <div className="space-y-3">
-      {/* Ditempatkan paling atas, bukan sebagai catatan kaki: pembaca yang mengira layar
-          ini adalah kanal darurat sungguhan akan mengandalkannya. */}
-      <div className="rounded border border-risk-critical/40 bg-risk-critical/10 px-3.5 py-3">
-        <p className="stat-label text-risk-critical">Kanal darurat belum tersambung</p>
-        <p className="mt-1.5 text-xs leading-relaxed text-ink">
-          Tombol darurat sekali-tekan <strong>belum ada</strong>. Ia menuntut aplikasi di tangan
-          warga yang dapat mengirim lokasi seketika, dan — yang lebih menentukan —{" "}
-          <strong>komitmen respons</strong>: siapa yang menerima, dalam berapa lama, dan apa yang
-          terjadi bila tidak ada yang menjawab.
+      <div
+        className={`rounded border px-3.5 py-3 ${
+          open.length > 0
+            ? "border-risk-critical/60 bg-risk-critical/10"
+            : "border-base-800 bg-base-900/60"
+        }`}
+      >
+        <p className={`stat-label ${open.length > 0 ? "text-risk-critical" : ""}`}>
+          {open.length > 0
+            ? `${open.length} permintaan bantuan belum diterima`
+            : "Tidak ada permintaan bantuan yang belum diterima"}
         </p>
-        <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">
-          Yang kedua bukan pekerjaan teknis, dan tidak boleh diputuskan dari sisi ini. Tombol
-          darurat yang menjanjikan bantuan tanpa ada yang berkewajiban datang lebih berbahaya
-          daripada tidak ada tombol sama sekali — ia membuat orang berhenti mencari pertolongan
-          lain. Untuk keadaan darurat, jalur yang berlaku tetap <strong>110</strong>.
+        <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+          Ditekan dari aplikasi warga, tanpa identitas. Untuk keadaan mengancam jiwa, jalur resmi
+          tetap <strong className="text-ink">110</strong>.
         </p>
       </div>
 
-      <Panel
-        title="Laporan Mendesak yang Belum Tertangani"
-        action={
-          <span className="text-2xs text-ink-faint">
-            urgensi ≥ {URGENT_FROM} · dari {page.data.length} laporan terbaru
-          </span>
-        }
-      >
-        {waiting.length === 0 ? (
-          <EmptyState label="Tidak ada laporan berurgensi tinggi yang masih menunggu tindakan." />
-        ) : (
-          <ul className="space-y-2">
-            {waiting.map((row) => (
-              <li
-                key={row.code}
-                className="border-t border-base-800 pt-2 first:border-t-0 first:pt-0"
-              >
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="font-mono text-sm font-bold text-risk-critical">
-                    {row.urgency_score}
-                  </span>
-                  <span className="text-xs text-ink">{row.category}</span>
-                  <span className="rounded border border-base-700 px-1.5 py-0.5 text-2xs text-ink-muted">
-                    {row.status}
-                  </span>
-                  <span className="ml-auto font-mono text-2xs text-ink-faint">{row.code}</span>
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-ink-muted">
-                  {row.description ?? "Tanpa keterangan."}
-                </p>
-                <p className="mt-0.5 text-2xs text-ink-faint">
-                  {row.reported_at.slice(0, 16).replace("T", " ")} ·{" "}
-                  {row.kecamatan ?? "tanpa lokasi"}
-                  {row.location_text ? ` · ${row.location_text}` : ""}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
+      <Group title="Belum Diterima" rows={open} canAct={canAct} empty="Tidak ada." alarm />
+      <Group title="Sedang Ditangani" rows={handling} canAct={canAct} empty="Tidak ada." />
+      <Group title="Selesai (20 terakhir)" rows={closed} canAct={false} empty="Belum ada." />
 
-        <p className="mt-3 text-2xs leading-relaxed text-ink-faint">
-          Ambang urgensi {URGENT_FROM} adalah <strong>ambang tampilan</strong>, bukan ambang resmi —
-          dan skor urgensinya sendiri berstatus DEMO, bukan hasil penilaian model. Daftar ini
-          menyaring laporan yang sudah masuk; ia <strong>bukan</strong> antrean panggilan darurat.
-        </p>
-        <p className="mt-1.5 text-2xs leading-relaxed text-ink-faint">
-          Seluruh laporan masyarakat, termasuk yang tidak mendesak, ada di{" "}
-          <Link href="/masyarakat" className="underline hover:text-ink-muted">
-            Laporan Masyarakat
-          </Link>
-          .
-        </p>
-      </Panel>
+      <Basis>{page.basis}</Basis>
     </div>
+  );
+}
+
+function Group({
+  title,
+  rows,
+  canAct,
+  empty,
+  alarm = false,
+}: {
+  title: string;
+  rows: PanicRow[];
+  canAct: boolean;
+  empty: string;
+  alarm?: boolean;
+}) {
+  return (
+    <Panel title={title} action={<span className="panel-action">{rows.length}</span>}>
+      {rows.length === 0 ? (
+        <EmptyState label={empty} />
+      ) : (
+        <ul className="space-y-2">
+          {rows.map((row) => (
+            <li
+              key={row.code}
+              className={`rounded border p-3 ${alarm ? "border-risk-critical/40 bg-risk-critical/5" : "border-base-800"}`}
+            >
+              <div className="flex flex-wrap items-baseline gap-2">
+                <span className="font-mono text-sm font-bold text-ink">{row.code}</span>
+                <span className="text-xs text-ink">
+                  {row.kelurahan ? `${row.kelurahan}, ${row.kecamatan}` : "Lokasi tidak dikirim"}
+                </span>
+                <span className="rounded border border-base-700 px-1.5 py-0.5 text-2xs text-ink-muted">
+                  {PANIC_STATUS_LABELS[row.status] ?? row.status}
+                </span>
+                <span className="ml-auto text-2xs text-ink-faint">{formatWib(row.pressed_at)}</span>
+              </div>
+              {row.note ? <p className="mt-1 text-xs text-ink-muted">{row.note}</p> : null}
+              <p className="mt-1 text-2xs text-ink-faint">
+                {mapLink(row) ? (
+                  <a
+                    href={mapLink(row) ?? "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    Buka titik di peta
+                    {row.accuracy_m !== null ? ` (±${Math.round(row.accuracy_m)} m)` : ""}
+                  </a>
+                ) : (
+                  "Tanpa titik peranti."
+                )}
+                {row.acknowledged_by
+                  ? ` · diterima ${row.acknowledged_by} ${formatWib(row.acknowledged_at ?? "")}`
+                  : ""}
+                {row.closed_by
+                  ? ` · ditutup ${row.closed_by}${row.closing_note ? `: ${row.closing_note}` : ""}`
+                  : ""}
+              </p>
+              {canAct ? <PanicActions code={row.code} status={row.status} /> : null}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Panel>
   );
 }

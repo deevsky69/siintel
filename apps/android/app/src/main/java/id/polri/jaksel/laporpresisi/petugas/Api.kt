@@ -78,6 +78,22 @@ object Api {
 
     data class Feed(val role: String, val total: Int, val queues: List<Queue>)
 
+    /** Satu permintaan bantuan darurat dari aplikasi warga (8 Oktober 2026). */
+    data class Panic(
+        val code: String,
+        val pressedAt: String,
+        val status: String,
+        val latitude: Double?,
+        val longitude: Double?,
+        val accuracyM: Double?,
+        val kecamatan: String,
+        val kelurahan: String,
+        val note: String,
+        val acknowledgedBy: String,
+        val closedBy: String,
+        val closingNote: String,
+    )
+
     // ---- daftar + rincian (7 Oktober 2026) -------------------------------------------
     // Bentuknya mengikuti GET /warnings, /citizen-reports, /recommendations apa adanya;
     // tidak ada angka yang dihitung di ponsel.
@@ -192,6 +208,45 @@ object Api {
 
     suspend fun notifications(base: String, token: String): Feed = withContext(Dispatchers.IO) {
         parseFeed(call(base, "/api/v1/notifications", "GET", null, token, null).body)
+    }
+
+    suspend fun panicEvents(base: String, token: String): List<Panic> = withContext(Dispatchers.IO) {
+        parsePanic(call(base, "/api/v1/panic?limit=100", "GET", null, token, null).body)
+    }
+
+    suspend fun acknowledgePanic(base: String, token: String, code: String): String =
+        withContext(Dispatchers.IO) {
+            JSONObject(call(base, "/api/v1/panic/$code/acknowledge", "POST", "{}", token, null).body)
+                .optString("status")
+        }
+
+    suspend fun closePanic(base: String, token: String, code: String, note: String?): String =
+        withContext(Dispatchers.IO) {
+            val payload = JSONObject()
+            if (!note.isNullOrBlank()) payload.put("note", note.trim())
+            JSONObject(call(base, "/api/v1/panic/$code/close", "POST", payload.toString(), token, null).body)
+                .optString("status")
+        }
+
+    internal fun parsePanic(body: String): List<Panic> {
+        val rows = JSONObject(body).getJSONArray("data")
+        return (0 until rows.length()).map { index ->
+            val row = rows.getJSONObject(index)
+            Panic(
+                code = row.text("code"),
+                pressedAt = row.text("pressed_at"),
+                status = row.text("status"),
+                latitude = if (row.isNull("latitude")) null else row.optDouble("latitude"),
+                longitude = if (row.isNull("longitude")) null else row.optDouble("longitude"),
+                accuracyM = if (row.isNull("accuracy_m")) null else row.optDouble("accuracy_m"),
+                kecamatan = row.text("kecamatan"),
+                kelurahan = row.text("kelurahan"),
+                note = row.text("note"),
+                acknowledgedBy = row.text("acknowledged_by"),
+                closedBy = row.text("closed_by"),
+                closingNote = row.text("closing_note"),
+            )
+        }
     }
 
     /** Seratus teratas: cukup untuk ponsel, dan server tetap yang menyaring wilayah. */

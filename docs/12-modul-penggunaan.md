@@ -397,6 +397,17 @@ versi ambang) dan **faktor penjelas** (WHY) tidak lagi tampil di muka. Keduanya 
 balik tombol kecil "+ Dasar perhitungan" atau "+ Mengapa?" pada panel yang bersangkutan;
 klik untuk membuka. Tidak ada yang dihapus — ketertelusuran tetap satu klik jauhnya.
 
+### Tombol darurat (8 Oktober 2026)
+
+Aplikasi warga memuat **TOMBOL DARURAT** merah di layar muka: tekan, konfirmasi, dan
+lokasi ponsel (bila ada) terkirim tanpa identitas. Di sisi petugas, permintaan itu muncul
+**paling atas** pada lonceng antrean dan sebagai **spanduk merah** di setiap halaman web
+bagi Administrator, Polsek wilayahnya, dan Pimpinan; menu **Panic Button** memuat
+antreannya dengan tombol **Terima** dan **Tutup** (Polsek dan Administrator). Aplikasi
+petugas di ponsel memeriksa antrean tiap 30 detik selama terbuka dan membunyikan
+notifikasi sistem untuk permintaan baru. Yang belum ada: dering ke ponsel yang
+aplikasinya tertutup, serta waktu tanggap resmi — 110 tetap jalur resmi.
+
 ## 7. MEMASUKKAN DATA
 
 Menu **Data Entry**. Tiga formulir: **kejadian**, **laporan intelijen**, dan **triase

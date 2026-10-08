@@ -118,7 +118,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         href: "/panic",
         label: "Panic Button",
         icon: "panic",
-        permissions: ["citizen_report:read"],
+        permissions: ["panic:read"],
         hint: "Permintaan bantuan darurat",
       },
       {
