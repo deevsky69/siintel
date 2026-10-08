@@ -73,3 +73,6 @@ var/lampiran/
 /*.pptx
 /*.ppt
 /*.docx
+
+# Lampiran hasil test lokal (attachment store tanpa ATTACHMENT_DIR)
+apps/var/
