@@ -124,6 +124,8 @@
          pejabat berwenang — bukan angka yang bocor dari sistem. -->
     <!-- Tombol darurat (8 Oktober 2026) -->
     <string name="panic_button">TOMBOL DARURAT</string>
+    <string name="panic_button_short">Darurat — kirim lokasi saya</string>
+    <string name="panic_hint_short">Mengirim lokasi Anda ke petugas. Keadaan mengancam jiwa: hubungi 110.</string>
     <string name="panic_hint">Menekan tombol ini mengirim lokasi Anda ke petugas Polsek, Administrator, dan Pimpinan. Untuk keadaan mengancam jiwa, tetap hubungi 110.</string>
     <string name="panic_confirm_title">Kirim permintaan bantuan?</string>
     <string name="panic_confirm_body">Lokasi Anda saat ini akan dikirim ke petugas. Jangan menekan bila tidak sedang dalam keadaan darurat.</string>

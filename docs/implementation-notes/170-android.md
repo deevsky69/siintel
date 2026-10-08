@@ -425,6 +425,14 @@ peran diteliti dari aplikasi sejenis — bukan sekadar menaruh data.
 Isi tiap peran tetap ditentukan server lewat permission; layar hanya menata. Unit test 47,
 `assembleRelease` lulus. Belum diperiksa di perangkat.
 
+### 13.1 Ukuran dan letak tombol darurat (8 Oktober 2026, pilihan B)
+
+Pemilik proyek menanyakan apakah tombol darurat harus sebesar itu dan di halaman depan.
+Diputuskan: tetap di halaman depan (semua aplikasi darurat yang diteliti menaruhnya di
+layar pertama tanpa navigasi), tetapi **berukuran sama dengan tombol Lapor dan di bawahnya**
+— mencolok karena warnanya, bukan ukurannya (pola SOS Grab, bukan 112 India yang seluruh
+aplikasinya memang untuk darurat). Konfirmasi dua langkah tetap.
+
 ## 14. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau

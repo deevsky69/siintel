@@ -106,19 +106,20 @@ fun HomeScreen(
             modifier = Modifier.padding(top = 18.dp),
         )
 
-        // 1. Darurat — satu-satunya hal yang dibutuhkan orang yang panik.
-        PanicSection(state, onPanicPress)
-
-        // 2. Lapor — tindakan utama.
+        // 1. Lapor — tindakan utama aplikasi ini.
         PrimaryButton(
             stringResource(R.string.home_report),
             onClick = onReport,
             icon = Icons.Outlined.Edit,
-            modifier = Modifier.padding(top = 14.dp),
+            modifier = Modifier.padding(top = 20.dp),
         )
         if (state.hasTicket) {
             StatusRow(state.statusResult, onCheckStatus)
         }
+
+        // 2. Darurat — tepat di bawahnya, berukuran sama, mencolok karena warnanya
+        //    (pilihan B pemilik proyek, 8 Oktober 2026; pola SOS Grab, bukan 112 India).
+        PanicSection(state, onPanicPress)
 
         // 3. Imbauan — satu baris, dibuka bila diminta.
         if (state.alerts.isNotEmpty()) {
@@ -181,7 +182,7 @@ private fun PanicConfirmDialog(note: String, onNote: (String) -> Unit, onConfirm
  */
 @Composable
 private fun PanicSection(state: HomeState, onPress: () -> Unit) {
-    Column(Modifier.padding(top = 20.dp)) {
+    Column(Modifier.padding(top = 10.dp)) {
         when (val panic = state.panic) {
             is PanicState.Sent -> CriticalPanel {
                 Text(stringResource(R.string.panic_sent, panic.code), color = PresisiColors.Ok, fontWeight = FontWeight.Bold, fontSize = 14.sp)
@@ -203,35 +204,30 @@ private fun PanicSection(state: HomeState, onPress: () -> Unit) {
             Button(
                 onClick = onPress,
                 enabled = !sending,
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PresisiColors.Critical,
                     contentColor = PresisiColors.Ink,
                     disabledContainerColor = PresisiColors.Critical.copy(alpha = 0.6f),
                     disabledContentColor = PresisiColors.Ink,
                 ),
-                modifier = Modifier.fillMaxWidth().height(88.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
             ) {
                 if (sending) {
-                    CircularProgressIndicator(color = PresisiColors.Ink, strokeWidth = 2.dp, modifier = Modifier.size(22.dp))
-                    Spacer(Modifier.width(12.dp))
+                    CircularProgressIndicator(color = PresisiColors.Ink, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(10.dp))
                     Text(stringResource(R.string.panic_sending), fontWeight = FontWeight.Bold)
                 } else {
-                    Icon(Icons.Outlined.Warning, contentDescription = null, modifier = Modifier.size(30.dp))
-                    Spacer(Modifier.width(14.dp))
-                    Column {
-                        Text(stringResource(R.string.panic_button), fontWeight = FontWeight.Bold, fontSize = 19.sp, letterSpacing = 1.sp)
-                        Text("Kirim lokasi saya ke petugas", fontSize = 12.sp, color = PresisiColors.Ink.copy(alpha = 0.85f))
-                    }
+                    Icon(Icons.Outlined.Warning, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text(stringResource(R.string.panic_button_short), fontWeight = FontWeight.Bold, fontSize = 15.sp)
                 }
             }
             Text(
-                stringResource(R.string.emergency_title),
-                color = PresisiColors.Critical,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 13.sp,
+                stringResource(R.string.panic_hint_short),
+                style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
             )
         }
     }
