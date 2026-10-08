@@ -1,3 +1,9 @@
+/*
+ * 8 Oktober 2026, keputusan pemilik proyek: menu "Imbauan Publik" dan "Dokumen Intelijen"
+ * dihapus dari navigasi. Halamannya (/imbauan, /intelijen) dan API-nya tidak dihapus —
+ * imbauan yang beredar tetap dibaca aplikasi warga, dan dokumen intelijen tetap masuk
+ * lewat formulir Input. Yang hilang hanya jalan masuknya dari menu.
+ */
 /**
  * Menu utama — kelompok dan submenu.
  *
@@ -66,9 +72,9 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         href: "/informasi",
         label: "Informasi Terbaru",
         icon: "feed",
-        // Menggabungkan tiga jenis catatan, jadi cukup salah satunya untuk bermakna.
-        permissions: ["crime:read", "citizen_report:read", "intelligence:read"],
-        hint: "Laporan dan kejadian terbaru dari seluruh kanal",
+        // Dua kanal (kejadian dan laporan masyarakat); cukup salah satunya untuk bermakna.
+        permissions: ["crime:read", "citizen_report:read"],
+        hint: "Kejadian terbaru dan laporan masyarakat",
       },
       {
         href: "/peta",
@@ -83,15 +89,6 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         icon: "warning",
         permissions: ["warning:read"],
         hint: "Peringatan yang menunggu tindakan",
-      },
-      {
-        href: "/imbauan",
-        label: "Imbauan Publik",
-        icon: "community",
-        // `public_alert:read`, bukan `:publish`: yang tidak dapat menerbitkan tetap
-        // berhak melihat apa yang sedang beredar atas nama satuannya.
-        permissions: ["public_alert:read"],
-        hint: "Yang sudah diumumkan kepada masyarakat",
       },
     ],
   },
@@ -204,13 +201,6 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         icon: "recommendation",
         permissions: ["recommendation:read"],
         hint: "Usulan kelurahan dan blok jam patroli tahun ini, dicocokkan dengan kenyataan",
-      },
-      {
-        href: "/intelijen",
-        label: "Dokumen Intelijen",
-        icon: "intelligence",
-        permissions: ["intelligence:read"],
-        hint: "Laporan intelijen beserta keandalannya",
       },
       {
         href: "/brief",

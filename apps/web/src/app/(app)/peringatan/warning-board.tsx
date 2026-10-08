@@ -90,15 +90,9 @@ function WarningCard({ warning, selected }: { warning: WarningDetail; selected: 
         </div>
 
         <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 border-t border-base-800 pt-2">
-          <div>
+          <div className="col-span-2">
             <span className="stat-label">Jendela Waktu</span>
             <span className="ml-1 font-mono text-xs text-ink">{warning.time_window ?? "—"}</span>
-          </div>
-          <div className="text-right">
-            <span className="stat-label">Ambang</span>
-            <span className="ml-1 font-mono text-xs text-ink">
-              {warning.threshold_version ?? "tidak ada"}
-            </span>
           </div>
           <div className="col-span-2 text-2xs text-ink-muted">
             {formatWib(warning.window_start)} → {formatWib(warning.window_end)}
@@ -233,15 +227,6 @@ export function WarningBoard({
   canAcknowledge: boolean;
   canResolve: boolean;
 }) {
-  const thresholds = [
-    ...new Set(
-      groups
-        .flatMap((group) => group.rows)
-        .map((warning) => warning.threshold_version)
-        .filter((version): version is string => Boolean(version)),
-    ),
-  ];
-
   // Status dibaca dari baris yang benar-benar tampil, bukan ditulis tetap di layar.
   // Sampai 9 September 2026 kalimat di sini berbunyi "DEMO / PROPOSED" apa adanya,
   // sehingga ia tidak ikut berubah ketika ambangnya ditetapkan — layar dan konfigurasi
@@ -263,11 +248,9 @@ export function WarningBoard({
         status={statuses.length > 0 ? statuses.join(" / ") : "TIDAK DIKENAL"}
         tone={settled ? "accent" : "caution"}
       >
-        Ambang yang memicu peringatan pada layar ini berasal dari konfigurasi versi{" "}
-        <span className="font-mono">
-          {thresholds.length > 0 ? thresholds.join(", ") : "tidak ada"}
-        </span>
-        .{" "}
+        {/* Nama versi ambang (mis. "dummy-v1") tidak lagi ditulis di sini maupun di kartu
+            (8 Oktober 2026): ia penanda ketertelusuran untuk halaman Pengaturan, bukan
+            informasi bagi pembaca peringatan. */}
         {settled
           ? "Ambang tersebut sudah ditetapkan pemilik proyek, sehingga tingkat peringatan di sini berlaku sebagai ketentuan — bukan sebagai bukti bahwa modelnya tepat, yang hanya dapat dinyatakan lewat evaluasi."
           : "Ambang tersebut belum ditetapkan secara resmi, sehingga tingkat peringatan di sini belum boleh dibaca sebagai keputusan final."}

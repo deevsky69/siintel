@@ -191,8 +191,7 @@ function WarningCard({ warning }: { warning: AreaWarning }) {
         </div>
       </div>
       <p className="mt-1.5 font-mono text-2xs text-ink-faint">
-        {warning.code} · dari {warning.prediction_code} · ambang{" "}
-        {warning.threshold_version ?? "tidak tercatat"}
+        {warning.code} · dari {warning.prediction_code}
       </p>
     </li>
   );

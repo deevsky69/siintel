@@ -206,7 +206,7 @@ halaman yang sedang Anda buka yang terbuka sendiri; kelompok lain cukup satu kli
 | **Pemantauan** | Beranda · Informasi Terbaru · Peta · Peringatan Dini | Apa yang sedang terjadi |
 | **Laporan** | Laporan Masyarakat · Laporan Petugas · Panic Button · Input Data | Apa yang masuk |
 | **Analisis** | Analitik · Wilayah Rawan · Pola Gangguan · Prediksi · Penilaian Risiko · Evaluasi | Apa artinya |
-| **Operasi** | Operasi & Penugasan · Rekomendasi & Keputusan · Dokumen Intelijen · Brief Pimpinan | Apa yang dikerjakan |
+| **Operasi** | Operasi & Penugasan · Rekomendasi & Keputusan · Brief Pimpinan | Apa yang dikerjakan |
 | **Sistem** | Manajemen Pengguna · Audit Log · Pengaturan Sistem | Siapa melakukan apa |
 
 Susunan ini ditetapkan pemilik proyek pada 2 September 2026, menggantikan deret enam belas
@@ -230,7 +230,7 @@ angka yang tidak dapat Anda selesaikan hanya menjadi kecemasan tanpa jalan kelua
 
 | Submenu | Isinya |
 |---|---|
-| **Informasi Terbaru** | Tiga kanal berdampingan — kejadian, laporan masyarakat, laporan intelijen. Sengaja **tidak dilebur** jadi satu aliran: keandalan ketiganya berbeda, dan aliran tunggal membuat perbedaan itu hilang |
+| **Informasi Terbaru** | Dua kanal berdampingan — kejadian terbaru (dicatat Polsek/Fungsi lewat Input Data) dan laporan masyarakat. Sengaja **tidak dilebur** jadi satu aliran: keandalan keduanya berbeda, dan aliran tunggal membuat perbedaan itu hilang |
 | **Laporan Petugas** | Kejadian yang dicatat petugas, dengan **pencarian, rentang tanggal, dan penyaring**. Statusnya dapat diubah langsung dari daftar |
 | **Wilayah Rawan** | Peringkat kecamatan; **tiap baris dapat diklik** untuk melihat ancaman, jam rawan, riwayat, peringatan aktif, dan kejadian terbarunya |
 | **Pengaturan Sistem** | Bobot, ambang, dan kelas risiko yang sedang berlaku — **hanya membaca** |
@@ -712,47 +712,12 @@ berwenang, layar menyatakannya terus terang.
 
 ## 13a. IMBAUAN PUBLIK — KETIKA PERINGATAN KELUAR DARI ORGANISASI
 
-Menu **Imbauan Publik**. Inilah lengan terakhir rantai: prediksi → peringatan →
-**imbauan kepada yang berkepentingan**. Dibangun 9 September 2026; sebelumnya peringatan
-dini berhenti di dalam organisasi.
-
-### Siapa yang boleh menerbitkan
-
-**Hanya Pimpinan.** Ditetapkan pemilik proyek 9 September 2026. Mengumumkan peringatan
-kepada masyarakat adalah keputusan komando, bukan tindakan teknis: ia mengubah perilaku
-orang di luar organisasi, tidak dapat ditarik kembali setelah terbaca, dan menanggung
-risiko kepanikan sekaligus risiko diam. Administrator — peran yang menjalankan prediksi —
-justru tidak dapat mengumumkan hasilnya sendiri.
-
-### Menerbitkan
-
-1. Buka **Menunggu Diumumkan**. Isinya peringatan yang masih hidup dan belum punya
-   imbauan aktif.
-2. **Baca dan sunting** kalimat pada kotak isian. Kotak itu sudah terisi **rancangan** yang
-   diturunkan aturan dari kolom peringatannya — bukan keluaran model bahasa, dan bukan isi
-   yang sudah tersimpan. Yang tersimpan adalah yang Anda kirim.
-3. Tekan **Terbitkan Imbauan**.
-
-Imbauan langsung tampil di halaman muka publik, dapat dibaca siapa saja tanpa akun.
-
-### Mencabut
-
-Tekan **Cabut Imbauan**. Ia langsung hilang dari halaman publik. Mencabut lalu menerbitkan
-ulang adalah cara mengganti isi yang keliru — satu peringatan tidak boleh punya dua imbauan
-aktif, karena pembacanya tidak akan tahu mana yang berlaku.
-
-### Yang tidak ikut keluar
-
-Imbauan menyebut wilayah **setingkat kecamatan**, dan **tidak memuat** skor risiko, tingkat
-kepercayaan, kode grid, kelurahan, maupun kode peringatan internal. Ketiganya tidak berarti
-bagi pembaca di luar organisasi, dan justru memberi tahu di mana perhatian sedang terpusat.
-
-> **Tidak ada penyaringan tingkat.** Seluruh peringatan yang masih hidup dapat diumumkan,
-> apa pun tingkatnya — severity minimum belum ditetapkan (sisa U-10). Layar menyatakannya
-> terbuka alih-alih mendiamkannya, sebab layar yang diam membuat pembacanya mengira sudah
-> ada penyaringan.
-
----
+Menu ini **dihapus dari navigasi pada 8 Oktober 2026** atas keputusan pemilik proyek,
+bersama layarnya. Imbauan yang sudah terbit tetap dibaca aplikasi warga (LAPOR PRESISI)
+dan halaman publik, dan API penerbitannya (`public_alert:publish`, hanya Pimpinan) tetap ada —
+tetapi **belum ada layar lain untuk menerbitkan imbauan baru**. Bila penerbitan masih
+diperlukan, tempat yang wajar adalah panel tindak lanjut pada Peringatan Dini; itu menunggu
+keputusan pemilik proyek.
 
 ## 14. REKOMENDASI & KEPUTUSAN — INTI SISTEM
 
@@ -1048,19 +1013,10 @@ lokasi, dan menyertakannya berarti membocorkan laporan luar wilayah.
 
 ## 18. LAPORAN INTELIJEN
 
-Menu **Intelligence**. Daftar laporan intelijen beserta kategori, wilayah, keandalan
-sumber, tingkat keyakinan, urgensi, dampak, dan statusnya.
-
-> **Keandalan dan keyakinan di sini dicatat manusia**, bukan keluaran model — berbeda
-> artinya dari *confidence* pada prediksi. Layar menyatakan perbedaan itu tepat di bawah
-> ketiga angkanya.
-
-Peran **Fungsi** untuk sementara tidak berwenang membaca laporan intelijen. Kewenangan itu
-dicabut karena pembatasannya menurut fungsi tidak dapat ditegakkan pada model data
-sekarang, dan menaikkannya menjadi akses penuh adalah pelebaran kewenangan yang menunggu
-keputusan pemilik proyek. Layar menyatakan hal ini, bukan menampilkan halaman kosong.
-
----
+Menu ini **dihapus dari navigasi pada 8 Oktober 2026** atas keputusan pemilik proyek,
+bersama layarnya. Dokumen intelijen tetap **dimasukkan** lewat **Input Data** (Fungsi)
+dan tetap dihitung dalam penilaian risiko; hanya layar daftarnya yang tidak ada lagi. Ia juga
+tidak lagi tampil di Informasi Terbaru.
 
 ## 19. ADMINISTRASI — PENGGUNA DAN PERAN
 

@@ -20,7 +20,8 @@ import { apiGet } from "./api";
  * dari API dibawa apa adanya ke layar.
  *
  * Berkas ini memanggil `lib/api.ts`, yang membaca cookie sesi, sehingga hanya boleh dipakai
- * dari server. Pembantu tampilan murni ada di `app/(app)/intelijen/display.ts`.
+ * dari server. Layar daftarnya (/intelijen) dihapus 8 Oktober 2026 atas keputusan pemilik
+ * proyek; dokumen tetap masuk lewat formulir Input dan dibaca lewat API.
  */
 
 /** Tahapan penanganan laporan intelijen (docs/02 §22, `status_intelligence`). */

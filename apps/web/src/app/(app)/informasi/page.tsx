@@ -2,23 +2,24 @@ import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { ApiError } from "@/lib/api";
-import { getCitizenReports, getCrimes, getIntelligenceReports, jamKejadian } from "@/lib/reports";
+import { getCitizenReports, getCrimes, jamKejadian } from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
 
 const PER_CHANNEL = 15;
 
 /**
- * Informasi Terbaru — apa yang masuk dari ketiga kanal (TASK 161).
+ * Informasi Terbaru — apa yang masuk dari dua kanal (TASK 161; kanal intelijen dilepas
+ * dari halaman ini atas keputusan pemilik proyek 8 Oktober 2026 — dokumen intelijen tetap
+ * ada di /intelijen dan formulir Input, hanya tidak lagi tampil sebagai "informasi terbaru").
  *
- * Tiga kanal ditampilkan **berdampingan, bukan dilebur** menjadi satu aliran tunggal.
+ * Kanal ditampilkan **berdampingan, bukan dilebur** menjadi satu aliran tunggal.
  * Aliran tunggal terlihat lebih rapi dan memang lebih mudah dibaca sekilas — tetapi ia
  * menyamakan tiga hal yang keandalannya berbeda:
  *
  * | Kanal | Keandalan |
  * |---|---|
- * | Kejadian | dicatat petugas, sudah terverifikasi |
- * | Intelijen | membawa penilaian keandalan sendiri (A–F) |
+ * | Kejadian | dicatat petugas (Polsek/Fungsi lewat formulir Input), sudah terverifikasi |
  * | Masyarakat | sebagian belum diperiksa siapa pun |
  *
  * Dalam satu aliran, ketiganya tampil sebagai baris yang setara, dan pembaca yang
@@ -31,15 +32,14 @@ const PER_CHANNEL = 15;
  * yang sebenarnya baik-baik saja.
  */
 export default async function InformasiPage() {
-  const [crimes, citizen, intel] = await Promise.all([
+  const [crimes, citizen] = await Promise.all([
     load(() => getCrimes({ page_size: PER_CHANNEL })),
     load(() => getCitizenReports({ page_size: PER_CHANNEL })),
-    load(() => getIntelligenceReports({ page_size: PER_CHANNEL })),
   ]);
 
   return (
     <div className="space-y-3">
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
         <Channel
           title="Kejadian Terbaru"
           href="/laporan-petugas"
@@ -74,25 +74,6 @@ export default async function InformasiPage() {
               when={row.reported_at.slice(0, 16).replace("T", " ")}
               where={row.kecamatan ?? "tanpa lokasi"}
               detail={row.status}
-            />
-          ))}
-        </Channel>
-
-        <Channel
-          title="Laporan Intelijen"
-          href="/intelijen"
-          total={intel.total}
-          state={intel.state}
-          note="Membawa penilaian keandalan sendiri."
-        >
-          {intel.rows?.map((row) => (
-            <Row
-              key={row.code}
-              code={row.code}
-              headline={row.category}
-              when={row.report_date}
-              where={row.kecamatan ?? "—"}
-              detail={row.reliability ? `keandalan ${row.reliability}` : null}
             />
           ))}
         </Channel>

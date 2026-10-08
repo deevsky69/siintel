@@ -6,7 +6,8 @@ import { Sidebar } from "@/components/shell/sidebar";
 import { Topbar } from "@/components/shell/topbar";
 import { RISK_LABELS, riskClassOf } from "@/lib/risk";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+const pathname = vi.hoisted(() => ({ value: "/" }));
+vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
 
 /** Seluruh permission yang disebut submenu mana pun. */
 const ALL_PERMISSIONS = [...new Set(NAV_ITEMS.flatMap((item) => item.permissions))];
@@ -28,6 +29,25 @@ describe("shell aplikasi", () => {
     // usePathname dipalsukan ke "/", yang berada di kelompok Pemantauan.
     expect(screen.getByRole("link", { name: /beranda/i })).toBeDefined();
     expect(screen.queryByRole("link", { name: /audit log/i })).toBeNull();
+  });
+
+  it("tidak menutup kelompok yang baru dibuka setelah salah satu submenunya dituju", () => {
+    // 8 Oktober 2026: membuka Laporan dari Beranda lalu mengeklik "Laporan Masyarakat"
+    // justru MENUTUP kelompok Laporan begitu halaman berganti. Pilihan buka/tutup dicatat
+    // untuk halaman tempat ia dibuat; di halaman baru, kelompok aktif terbuka apa adanya.
+    pathname.value = "/";
+    const view = render(<Sidebar permissions={ALL_PERMISSIONS} />);
+    fireEvent.click(screen.getByRole("button", { name: /^laporan$/i }));
+    expect(screen.getByRole("link", { name: /laporan masyarakat/i })).toBeDefined();
+
+    pathname.value = "/masyarakat";
+    view.rerender(<Sidebar permissions={ALL_PERMISSIONS} />);
+
+    expect(screen.getByRole("link", { name: /laporan masyarakat/i })).toBeDefined();
+    expect(
+      screen.getByRole("link", { name: /laporan masyarakat/i }).getAttribute("aria-current"),
+    ).toBe("page");
+    pathname.value = "/";
   });
 
   it("membuka kelompok lain ketika judulnya ditekan", () => {

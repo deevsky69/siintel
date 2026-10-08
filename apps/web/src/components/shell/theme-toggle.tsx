@@ -1,24 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { applyThemeChoice, readThemeChoice, type ThemeChoice } from "@/lib/theme";
+import { applyThemeChoice, readThemeChoice, resolveTheme } from "@/lib/theme";
 
-const ORDER: readonly ThemeChoice[] = ["system", "light", "dark"];
+type Theme = "light" | "dark";
 
-const LABEL: Record<ThemeChoice, string> = {
-  system: "Ikut perangkat",
-  light: "Terang",
-  dark: "Gelap",
-};
+const LABEL: Record<Theme, string> = { light: "Terang", dark: "Gelap" };
 
 /**
- * Pengalih tema: sistem → terang → gelap → sistem.
+ * Pengalih tema: terang ↔ gelap.
  *
- * ## Mengapa tiga keadaan dan bukan satu sakelar
+ * ## Mengapa dua keadaan, bukan tiga
  *
- * Sakelar dua keadaan memaksa pengguna memilih, dan sekali memilih ia terkunci: ponsel yang
- * beralih gelap sendiri saat malam tidak lagi diikuti. Keadaan "ikut perangkat" adalah yang
- * bawaan, dan hanya ditinggalkan bila pengguna benar-benar menghendaki sesuatu yang lain.
+ * Sampai 8 Oktober 2026 tombol ini berputar sistem → terang → gelap, dengan ikon monitor
+ * untuk "ikut perangkat". Pemilik proyek memutuskan: dua ikon saja. Keadaan ketiga membuat
+ * tombol harus ditekan dua kali untuk sampai ke tema yang diinginkan, dan ikon monitornya
+ * tidak dimengerti siapa pun. Setelan perangkat tetap dipakai sebagai tema AWAL sebelum
+ * pengguna pernah memilih (lihat `THEME_BOOTSTRAP`); setelah memilih, pilihannya diingat.
  *
  * ## Mengapa ikonnya baru muncul setelah terpasang
  *
@@ -28,25 +26,15 @@ const LABEL: Record<ThemeChoice, string> = {
  * ruang yang sama tetapi tanpa isi sampai nilainya diketahui.
  */
 export function ThemeToggle() {
-  const [choice, setChoice] = useState<ThemeChoice | null>(null);
+  const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
-    setChoice(readThemeChoice());
+    setTheme(resolveTheme(readThemeChoice()));
   }, []);
 
-  // Saat "ikut perangkat", perubahan setelan sistem harus langsung terasa — pengguna yang
-  // menyalakan mode gelap ponselnya tidak akan memuat ulang halaman ini untuk membuktikannya.
-  useEffect(() => {
-    if (choice !== "system") return;
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const follow = () => applyThemeChoice("system");
-    media.addEventListener("change", follow);
-    return () => media.removeEventListener("change", follow);
-  }, [choice]);
-
   const next = () => {
-    const value = ORDER[(ORDER.indexOf(choice ?? "system") + 1) % ORDER.length];
-    setChoice(value);
+    const value: Theme = (theme ?? "dark") === "dark" ? "light" : "dark";
+    setTheme(value);
     applyThemeChoice(value);
   };
 
@@ -54,17 +42,11 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={next}
-      title={choice ? `Tema: ${LABEL[choice]}. Klik untuk mengganti.` : "Tema"}
-      aria-label={choice ? `Tema ${LABEL[choice]}, ganti tema` : "Ganti tema"}
+      title={theme ? `Tema: ${LABEL[theme]}. Klik untuk mengganti.` : "Tema"}
+      aria-label={theme ? `Tema ${LABEL[theme]}, ganti tema` : "Ganti tema"}
       className="flex h-9 w-9 items-center justify-center rounded border border-base-700 text-ink-muted transition hover:border-accent/40 hover:text-accent"
     >
-      {choice === null ? null : choice === "dark" ? (
-        <MoonIcon />
-      ) : choice === "light" ? (
-        <SunIcon />
-      ) : (
-        <DeviceIcon />
-      )}
+      {theme === null ? null : theme === "dark" ? <MoonIcon /> : <SunIcon />}
     </button>
   );
 }
@@ -93,15 +75,6 @@ function MoonIcon() {
   return (
     <svg {...STROKE} aria-hidden="true">
       <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
-    </svg>
-  );
-}
-
-function DeviceIcon() {
-  return (
-    <svg {...STROKE} aria-hidden="true">
-      <rect x="2" y="4" width="20" height="13" rx="2" />
-      <path d="M8 21h8M12 17v4" />
     </svg>
   );
 }

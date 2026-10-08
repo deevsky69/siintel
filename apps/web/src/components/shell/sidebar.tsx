@@ -35,16 +35,25 @@ export function Sidebar({
   const activeGroup = groupOf(pathname);
 
   /** Kelompok yang dibuka sendiri oleh pengguna, di luar yang sedang aktif. */
-  const [opened, setOpened] = useState<Set<string>>(new Set());
+  // Pilihan buka/tutup yang dibuat pengguna dicatat bersama halaman tempat ia dibuat.
+  // Sebelum 8 Oktober 2026 catatan itu dibaca sebagai "pembalikan" terhadap keadaan
+  // bawaan — sehingga membuka kelompok Laporan dari Beranda lalu mengeklik "Laporan
+  // Masyarakat" justru MENUTUP kelompok itu: setelah berpindah halaman, Laporan menjadi
+  // kelompok aktif dan catatan "dibuka" tadi berubah makna menjadi "ditutup".
+  const [toggled, setToggled] = useState<{ path: string; ids: Set<string> }>({
+    path: pathname,
+    ids: new Set(),
+  });
+  const opened = toggled.path === pathname ? toggled.ids : new Set<string>();
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   const toggle = (id: string) =>
-    setOpened((previous) => {
-      const next = new Set(previous);
+    setToggled((previous) => {
+      const next = new Set(previous.path === pathname ? previous.ids : []);
       if (next.has(id)) next.delete(id);
       else next.add(id);
-      return next;
+      return { path: pathname, ids: next };
     });
 
   return (

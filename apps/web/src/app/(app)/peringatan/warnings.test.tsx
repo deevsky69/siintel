@@ -136,7 +136,9 @@ describe("papan peringatan", () => {
     expect(card.textContent).toMatch(/95/);
     expect(card.textContent).toMatch(/89%/);
     expect(card.textContent).toMatch(/18:00-23:59/);
-    expect(card.textContent).toMatch(/dummy-v1/);
+    // Nama versi ambang tidak lagi dicetak di kartu (8 Oktober 2026): penanda
+    // ketertelusuran itu tempatnya di Pengaturan, bukan di depan pembaca peringatan.
+    expect(card.textContent).not.toMatch(/dummy-v1/);
   });
 
   it("memakai label tingkat peringatan berbahasa Indonesia", () => {
@@ -152,14 +154,13 @@ describe("papan peringatan", () => {
     expect(screen.getByText("tidak ada")).toBeDefined();
   });
 
-  it("menyebut versi ambang beserta statusnya yang sebenarnya", () => {
+  it("menyebut status ambang yang sebenarnya, tanpa nama versinya", () => {
     // Status dibaca dari barisnya, tidak ditulis tetap di layar. Sampai 9 September 2026
     // kalimat ini berbunyi "DEMO / PROPOSED" apa adanya, sehingga ia tidak ikut berubah
     // ketika ambangnya ditetapkan — dan tidak ada satu test pun yang gagal karenanya.
     board();
 
     expect(screen.getByText("FINAL")).toBeDefined();
-    expect(screen.getAllByText("dummy-v1").length).toBeGreaterThan(0);
     expect(screen.getByText(/sudah ditetapkan pemilik proyek/i)).toBeDefined();
     // Ditetapkan BUKAN berarti terbukti tepat (CLAUDE.md §18).
     expect(screen.getByText(/hanya dapat dinyatakan lewat evaluasi/i)).toBeDefined();

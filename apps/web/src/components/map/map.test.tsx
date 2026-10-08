@@ -525,7 +525,8 @@ describe("rincian wilayah", () => {
     render(<DistrictDetail district={kebayoran} detail={areaDetail} horizon="6H" />);
 
     expect(screen.getByText("91")).toBeDefined();
-    expect(screen.getByText(/WRN-0069 · dari PRD-00148 · ambang dummy-v1/)).toBeDefined();
+    expect(screen.getByText(/WRN-0069 · dari PRD-00148/)).toBeDefined();
+    expect(screen.queryByText(/ambang dummy-v1/)).toBeNull();
     expect(screen.getByText(/hanya peringatan berstatus active/i)).toBeDefined();
   });
 

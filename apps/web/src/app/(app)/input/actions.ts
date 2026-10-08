@@ -128,7 +128,6 @@ export async function recordIntelligence(
   }
 
   revalidatePath("/input");
-  revalidatePath("/intelijen");
 
   return {
     error: null,
