@@ -428,12 +428,28 @@ private fun QueueCard(queue: Api.Queue, actions: PetugasActions, modifier: Modif
 // Daftar
 // ---------------------------------------------------------------------------------
 
+/**
+ * Kalimat keadaan kosong yang menyebut CAKUPAN akun: daftar kosong pada akun Fungsi atau
+ * Polsek hampir selalu berarti "bukan untuk Anda", bukan "tidak ada" — dan dua hal itu
+ * terlihat sama bila hanya ditulis "tidak ada data".
+ */
+@Composable
+private fun emptyLabel(state: PetugasState): String {
+    val profile = state.profile
+    return when {
+        profile?.function?.isNotBlank() == true -> stringResource(R.string.list_empty_function, profile.function)
+        profile?.polsek?.isNotBlank() == true -> stringResource(R.string.list_empty_polsek, profile.polsek)
+        else -> stringResource(R.string.list_empty)
+    }
+}
+
 @Composable
 private fun <T> ListPage(
     title: String,
     icon: ImageVector,
     rows: List<T>?,
     basis: String,
+    state: PetugasState,
     actions: PetugasActions,
     row: @Composable (T) -> Unit,
 ) {
@@ -443,8 +459,14 @@ private fun <T> ListPage(
         }
     }
     when {
+        // Gagal memuat: pesannya harus terlihat DI SINI, bukan hanya di halaman Antrean —
+        // tanpa ini daftar tampak "memuat" selamanya.
+        rows == null && state.note != null && !state.busy -> {
+            ErrorBox(stringResource(R.string.list_failed, state.note))
+            SecondaryButton(stringResource(R.string.retry), onClick = actions.onRefresh, fullWidth = false, icon = Icons.Outlined.Refresh, modifier = Modifier.padding(top = 8.dp))
+        }
         rows == null -> Hint(stringResource(R.string.list_loading))
-        rows.isEmpty() -> Panel { Text(stringResource(R.string.list_empty), style = MaterialTheme.typography.bodyMedium) }
+        rows.isEmpty() -> Panel { Text(emptyLabel(state), style = MaterialTheme.typography.bodyMedium) }
         else -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { for (item in rows) row(item) }
     }
     Hint(basis, Modifier.padding(top = 12.dp))
@@ -479,7 +501,7 @@ private fun ListRow(code: String, title: String, subtitle: String, status: Strin
 
 @Composable
 private fun WarningList(state: PetugasState, actions: PetugasActions) =
-    ListPage(stringResource(R.string.tab_warnings), Icons.Outlined.Warning, state.warnings, stringResource(R.string.warning_basis), actions) { w ->
+    ListPage(stringResource(R.string.tab_warnings), Icons.Outlined.Warning, state.warnings, stringResource(R.string.warning_basis), state, actions) { w ->
         ListRow(
             code = w.code,
             title = "${w.severity} · ${w.threatType}",
@@ -491,7 +513,7 @@ private fun WarningList(state: PetugasState, actions: PetugasActions) =
 
 @Composable
 private fun ReportList(state: PetugasState, actions: PetugasActions) =
-    ListPage(stringResource(R.string.tab_reports), Icons.Outlined.Edit, state.reports, stringResource(R.string.report_basis), actions) { r ->
+    ListPage(stringResource(R.string.tab_reports), Icons.Outlined.Edit, state.reports, stringResource(R.string.report_basis), state, actions) { r ->
         ListRow(
             code = r.code,
             title = r.category,
@@ -533,6 +555,7 @@ private fun RecommendationList(state: PetugasState, actions: PetugasActions) =
         Icons.Outlined.ThumbUp,
         state.recommendations?.let(::forDecision),
         stringResource(R.string.recommendation_basis),
+        state,
         actions,
     ) { r ->
         // Satu baris apa/di mana/kapan dengan skor di kiri — urutan baca Pimpinan (7 Oktober
@@ -766,7 +789,12 @@ private fun AccountPage(state: PetugasState, actions: PetugasActions) {
     PageTitle(stringResource(R.string.account_title), Icons.Outlined.AccountCircle)
     Panel {
         Text(profile.name, style = MaterialTheme.typography.titleMedium)
-        Text(profile.role, style = MaterialTheme.typography.bodyMedium, color = PresisiColors.Accent)
+        Text(
+            listOf(profile.role, profile.polsek.takeIf { it.isNotBlank() }, profile.function.takeIf { it.isNotBlank() })
+                .filterNotNull().joinToString(" · "),
+            style = MaterialTheme.typography.bodyMedium,
+            color = PresisiColors.Accent,
+        )
         Text(stringResource(roleLook(profile.role).tagline), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
     }
     SectionLabel(stringResource(R.string.account_permissions), Modifier.padding(top = 16.dp))

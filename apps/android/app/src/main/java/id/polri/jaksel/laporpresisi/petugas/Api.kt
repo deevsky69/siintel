@@ -57,7 +57,14 @@ object Api {
      */
     data class Credentials(val accessToken: String, val refreshToken: String?)
 
-    data class Profile(val name: String, val role: String, val permissions: List<String>)
+    data class Profile(
+        val name: String,
+        val role: String,
+        val permissions: List<String>,
+        /** Cakupan akun dari `/auth/me`: kosong berarti seluruh Polres. */
+        val polsek: String = "",
+        val function: String = "",
+    )
 
     data class QueueItem(val code: String, val headline: String, val detail: String)
 
@@ -302,6 +309,8 @@ object Api {
             name = json.text("full_name").ifBlank { json.getString("username") },
             role = json.text("role"),
             permissions = json.optJSONArray("permissions").toStringList(),
+            polsek = json.text("polsek"),
+            function = json.text("function"),
         )
     }
 

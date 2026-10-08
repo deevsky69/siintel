@@ -167,11 +167,23 @@ class PetugasActivity : ComponentActivity() {
         state = state.copy(busy = true)
         lifecycleScope.launch {
             try {
-                state = when (tab) {
-                    Tab.PERINGATAN -> state.copy(warnings = session.run { Api.warnings(BuildConfig.API_BASE, it) })
-                    Tab.LAPORAN -> state.copy(reports = session.run { Api.reports(BuildConfig.API_BASE, it) })
-                    Tab.REKOMENDASI -> state.copy(recommendations = session.run { Api.recommendations(BuildConfig.API_BASE, it) })
-                    else -> state
+                // Hasil ditunggu DULU, baru `state` disalin: `state.copy(x = suspend())`
+                // mengambil `state` sebelum menunggu dan menimpa perubahan yang terjadi di
+                // sela-selanya (ganti tab, antrean selesai dimuat) dengan keadaan basi.
+                when (tab) {
+                    Tab.PERINGATAN -> {
+                        val rows = session.run { Api.warnings(BuildConfig.API_BASE, it) }
+                        state = state.copy(warnings = rows, note = null)
+                    }
+                    Tab.LAPORAN -> {
+                        val rows = session.run { Api.reports(BuildConfig.API_BASE, it) }
+                        state = state.copy(reports = rows, note = null)
+                    }
+                    Tab.REKOMENDASI -> {
+                        val rows = session.run { Api.recommendations(BuildConfig.API_BASE, it) }
+                        state = state.copy(recommendations = rows, note = null)
+                    }
+                    else -> Unit
                 }
             } catch (failure: Api.Failure) {
                 if (failure.unauthorized) signOut(getString(R.string.err_session)) else state = state.copy(note = failure.readable)

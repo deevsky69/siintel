@@ -144,6 +144,16 @@ class ApiTest {
     }
 
     @Test
+    fun `profil membawa cakupan polsek dan fungsi, kosong bila null`() {
+        val fungsi = Api.parseProfile(
+            """{"username":"demo.fungsi","full_name":"Kanit Contoh","role":"Fungsi","polsek":null,
+               "function":"RESKRIM","permissions":["recommendation:read"],"scopes":{}}""",
+        )
+        assertEquals("RESKRIM", fungsi.function)
+        assertEquals("", fungsi.polsek)
+    }
+
+    @Test
     fun `antrean diurai beserta isinya`() {
         val feed = Api.parseFeed(
             """
