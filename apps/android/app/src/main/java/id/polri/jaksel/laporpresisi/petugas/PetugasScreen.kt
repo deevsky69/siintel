@@ -1,5 +1,6 @@
 package id.polri.jaksel.laporpresisi.petugas
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -500,17 +501,88 @@ private fun ReportList(state: PetugasState, actions: PetugasActions) =
         )
     }
 
+/** Urutan memutuskan: prioritas tinggi dahulu, lalu skor terbesar, lalu yang paling lama menunggu. */
+private val PRIORITY_RANK = mapOf("HIGH" to 0, "MEDIUM" to 1, "LOW" to 2)
+
+private fun forDecision(rows: List<Api.Recommendation>): List<Api.Recommendation> =
+    rows.sortedWith(
+        compareBy<Api.Recommendation> { if (it.status == "PENDING_REVIEW") 0 else 1 }
+            .thenBy { PRIORITY_RANK[it.priority] ?: 3 }
+            .thenByDescending { it.riskScore ?: 0 }
+            .thenBy { it.createdAt },
+    )
+
+private fun priorityLabel(priority: String): String = when (priority) {
+    "HIGH" -> "tinggi"
+    "MEDIUM" -> "sedang"
+    "LOW" -> "rendah"
+    else -> priority.lowercase()
+}
+
+private fun scoreColor(score: Int?): androidx.compose.ui.graphics.Color = when {
+    score == null -> PresisiColors.InkFaint
+    score >= 85 -> PresisiColors.Critical
+    score >= 70 -> PresisiColors.Warning
+    else -> PresisiColors.InkMuted
+}
+
 @Composable
 private fun RecommendationList(state: PetugasState, actions: PetugasActions) =
-    ListPage(stringResource(R.string.tab_recommendations), Icons.Outlined.ThumbUp, state.recommendations, stringResource(R.string.recommendation_basis), actions) { r ->
-        ListRow(
-            code = r.code,
-            title = "Untuk ${r.function} · prioritas ${r.priority}",
-            subtitle = r.text.take(90),
-            status = r.status,
-            onClick = { actions.onOpen(DetailRef(Tab.REKOMENDASI, r.code)) },
-        )
+    ListPage(
+        stringResource(R.string.tab_recommendations),
+        Icons.Outlined.ThumbUp,
+        state.recommendations?.let(::forDecision),
+        stringResource(R.string.recommendation_basis),
+        actions,
+    ) { r ->
+        // Satu baris apa/di mana/kapan dengan skor di kiri — urutan baca Pimpinan (7 Oktober
+        // 2026, sama dengan web). Server lama tanpa field itu jatuh ke fungsi + usulan.
+        Panel(Modifier.clickable { actions.onOpen(DetailRef(Tab.REKOMENDASI, r.code)) }) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (r.riskScore != null) {
+                    Text(
+                        r.riskScore.toString(),
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = scoreColor(r.riskScore),
+                        modifier = Modifier.width(44.dp),
+                    )
+                }
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        r.headline.ifBlank { "Untuk ${r.function}" },
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        "${r.function} · prioritas ${priorityLabel(r.priority)} · ${r.text}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp),
+                    )
+                }
+                Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
+                    StatusTag(r.status)
+                }
+            }
+        }
     }
+
+/** Satu kunci besar: Apa / Di mana / Kapan / Risiko. */
+@Composable
+private fun KeyBox(label: String, value: String, modifier: Modifier = Modifier, color: androidx.compose.ui.graphics.Color = PresisiColors.Ink) {
+    Column(
+        modifier
+            .background(PresisiColors.Base800.copy(alpha = 0.5f), androidx.compose.foundation.shape.RoundedCornerShape(10.dp))
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+    ) {
+        Text(label.uppercase(), style = MaterialTheme.typography.labelSmall)
+        Text(value.ifBlank { "—" }, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = color, maxLines = 2, modifier = Modifier.padding(top = 2.dp))
+    }
+}
 
 // ---------------------------------------------------------------------------------
 // Rincian
@@ -605,14 +677,40 @@ private fun DetailPage(detail: DetailRef, state: PetugasState, actions: PetugasA
                 else -> {
                     Panel {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Untuk ${r.function}", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                            Text(
+                                "Untuk ${r.function} · prioritas ${priorityLabel(r.priority)}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontSize = 14.sp,
+                                modifier = Modifier.weight(1f),
+                            )
                             StatusTag(r.status)
                         }
-                        Field("Rekomendasi", r.text)
-                        Field(stringResource(R.string.label_priority), r.priority)
-                        Field(stringResource(R.string.label_created), shortTime(r.createdAt))
-                        Field("Prediksi", r.predictionCode)
-                        Field("Peringatan", r.warningCode)
+                        // Empat kunci sebelum kalimat: Pimpinan memutuskan dari sini.
+                        val where = listOf(r.kelurahan, r.kecamatan).filter { it.isNotBlank() }.joinToString(", ")
+                        Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            KeyBox("Apa", r.threatType, Modifier.weight(1f))
+                            KeyBox("Di mana", where, Modifier.weight(1f))
+                        }
+                        Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            KeyBox("Kapan", r.timeWindow, Modifier.weight(1f))
+                            KeyBox(
+                                "Risiko",
+                                r.riskScore?.let { "$it / 100" } ?: "",
+                                Modifier.weight(1f),
+                                color = scoreColor(r.riskScore),
+                            )
+                        }
+                        Text("USULAN SISTEM", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 12.dp))
+                        Text(r.text, style = MaterialTheme.typography.bodyLarge, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
+                        // Ketertelusuran, kecil, paling bawah.
+                        Text(
+                            listOf(r.code, "prediksi ${r.predictionCode}", r.warningCode.takeIf { it.isNotBlank() }?.let { "peringatan $it" }, "dibuat ${shortTime(r.createdAt)}")
+                                .filterNotNull().joinToString(" · "),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 10.sp,
+                            color = PresisiColors.InkFaint,
+                            modifier = Modifier.padding(top = 10.dp),
+                        )
                     }
                     if (r.status == "PENDING_REVIEW" && state.allows(Perm.DECIDE)) {
                         DecisionForm(r, state, actions, acting)
@@ -718,6 +816,30 @@ private fun QueuePreview() {
                     ),
                 ),
                 version = "2.4.0",
+            ),
+            NO_ACTIONS,
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF050B18, widthDp = 360, heightDp = 860)
+@Composable
+private fun RecommendationDetailPreview() {
+    PresisiTheme {
+        PetugasScreen(
+            PetugasState(
+                profile = Api.Profile("AKBP Contoh", "Pimpinan", listOf(Perm.RECOMMENDATION_READ, Perm.DECIDE)),
+                tab = Tab.REKOMENDASI,
+                detail = DetailRef(Tab.REKOMENDASI, "REC-0007"),
+                recommendations = listOf(
+                    Api.Recommendation(
+                        "REC-0007", "SAMAPTA", "Tambah patroli pada jam 18.00–24.00 di Tebet Timur.", "HIGH",
+                        "PENDING_REVIEW", "2026-01-03T06:00:00+07:00", "PRD-00981", "WRN-00012",
+                        threatType = "CURANMOR", timeWindow = "18:00-23:59", riskScore = 78,
+                        kecamatan = "Tebet", kelurahan = "Tebet Timur",
+                    ),
+                ),
+                version = "2.5.0",
             ),
             NO_ACTIONS,
         )

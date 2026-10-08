@@ -357,7 +357,17 @@ ponsel adalah **daftar dan tindakan lapangan**, bukan peta/analitik/evaluasi.
 Unit test 45 (3 baru: pengurai daftar, badan keputusan, jalur terima/selesaikan). Belum
 diperiksa di perangkat.
 
-## 11. Yang belum dikerjakan
+## 11. Tab Rekomendasi memakai field baru (8 Oktober 2026, versi 2.5.0)
+
+Mengikuti `GET /recommendations` yang kini membawa `threat_type`, `time_window`,
+`risk_score`, `kecamatan`, `kelurahan`. Daftar: skor di kiri, satu baris apa · di mana ·
+kapan, lalu fungsi · prioritas · potongan usulan; urutannya yang menunggu dahulu, prioritas
+tinggi, skor terbesar. Rincian: empat kotak kunci (Apa, Di mana, Kapan, Risiko) sebelum
+kalimat usulan; kode prediksi/peringatan/waktu dibuat menjadi satu baris kecil di bawah.
+Server lama tanpa field itu: tajuk jatuh ke "Untuk {fungsi}", skor tidak digambar (null,
+bukan 0) — diuji di `ApiTest`. Unit test 45, `assembleRelease` lulus.
+
+## 12. Yang belum dikerjakan
 
 - Belum ada notifikasi dorong; antrean hanya diperbarui saat aplikasi dibuka atau
   "Muat ulang" ditekan.

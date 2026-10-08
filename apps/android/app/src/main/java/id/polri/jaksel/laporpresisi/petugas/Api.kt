@@ -110,7 +110,20 @@ object Api {
         val createdAt: String,
         val predictionCode: String,
         val warningCode: String,
-    )
+        /** Apa, di mana, kapan, seberapa besar — dari prediksi sumbernya (server ≥ 7 Oktober 2026). */
+        val threatType: String = "",
+        val timeWindow: String = "",
+        val riskScore: Int? = null,
+        val kecamatan: String = "",
+        val kelurahan: String = "",
+    ) {
+        /** "CURANMOR · Tebet Timur, Tebet · 18:00-23:59" — kosong pada server lama. */
+        val headline: String
+            get() {
+                val where = listOf(kelurahan, kecamatan).filter { it.isNotBlank() }.joinToString(", ")
+                return listOf(threatType, where, timeWindow).filter { it.isNotBlank() }.joinToString(" · ")
+            }
+    }
 
     /** Badan respons beserta headernya — headernya diperlukan hanya untuk `Set-Cookie`. */
     internal class Reply(val body: String, val headers: Map<String, List<String>>)
@@ -274,6 +287,11 @@ object Api {
                 createdAt = row.text("created_at"),
                 predictionCode = row.text("prediction_code"),
                 warningCode = row.text("warning_code"),
+                threatType = row.text("threat_type"),
+                timeWindow = row.text("time_window"),
+                riskScore = if (row.isNull("risk_score")) null else row.optInt("risk_score"),
+                kecamatan = row.text("kecamatan"),
+                kelurahan = row.text("kelurahan"),
             )
         }
     }

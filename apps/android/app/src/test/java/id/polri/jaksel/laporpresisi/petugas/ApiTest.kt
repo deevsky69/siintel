@@ -264,6 +264,18 @@ class ApiTest {
         )
         assertEquals("Samapta", recommendations[0].function)
         assertEquals("", recommendations[0].warningCode)
+        // Server lama tanpa field apa/di mana/kapan: tajuk kosong, skor null — bukan 0.
+        assertEquals("", recommendations[0].headline)
+        assertNull(recommendations[0].riskScore)
+
+        val enriched = Api.parseRecommendations(
+            """{"data":[{"code":"REC-0008","recommended_function":"Samapta","recommendation_text":"Patroli.",
+               "priority":"HIGH","status":"PENDING_REVIEW","created_at":"2026-01-03T06:00:00+07:00",
+               "prediction_code":"PRD-1","warning_code":null,"threat_type":"CURANMOR","time_window":"18:00-23:59",
+               "risk_score":78,"kecamatan":"Tebet","kelurahan":"Tebet Timur"}],"pagination":{}}""",
+        )
+        assertEquals("CURANMOR · Tebet Timur, Tebet · 18:00-23:59", enriched[0].headline)
+        assertEquals(78, enriched[0].riskScore)
     }
 
     @Test
