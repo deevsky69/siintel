@@ -228,7 +228,9 @@ export function RiskMap({
       </div>
 
       <div className="col-span-12 xl:col-span-5">
-        <Panel title="Potensi Ancaman Wilayah" className="h-full">
+        {/* Panel luar tanpa kepala sendiri: tiap bagian di dalamnya sudah berupa kartu
+            berjudul, dan satu judul lagi di atasnya hanya menambah tumpukan. */}
+        <Panel title="Rincian Wilayah" className="h-full" bodyClassName="bg-base-950/40">
           <DistrictDetail district={district} detail={detail} horizon={data.horizon} />
         </Panel>
       </div>

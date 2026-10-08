@@ -54,9 +54,22 @@ function formatDate(value: string | null): string {
     : parsed.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 }
 
+/**
+ * Judul tiap kartu rincian. Sejak 8 Oktober 2026 tiap bagian (potensi ancaman, jendela
+ * rawan, riwayat, peringatan, prediksi) adalah KARTU terpisah dengan kepala bergaris, bukan
+ * sub-judul kecil yang berdempetan di satu panel — permintaan pemilik proyek: judulnya
+ * tidak kontras dan terlalu mepet.
+ */
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="stat-label mb-2">{children}</h3>;
+  return (
+    <h3 className="panel-title mb-3 border-b border-base-800 pb-2 text-xs text-accent-soft">
+      {children}
+    </h3>
+  );
 }
+
+/** Kelas kartu untuk tiap bagian rincian wilayah. */
+const CARD = "rounded-lg border border-base-800 bg-base-900/70 p-3 shadow-panel";
 
 /**
  * Baris skor dengan batang risiko.
@@ -319,8 +332,8 @@ export function DistrictDetail({
   );
 
   return (
-    <div className="space-y-4" {...REGION}>
-      <header className="flex items-start justify-between gap-3">
+    <div className="space-y-3" {...REGION}>
+      <header className={`${CARD} flex items-start justify-between gap-3`}>
         <div className="min-w-0">
           <h2 className="truncate font-heading text-base font-bold text-ink">
             {detail.kelurahan ? `Kelurahan ${detail.kelurahan}` : detail.kecamatan}
@@ -360,7 +373,7 @@ export function DistrictDetail({
         </div>
       </header>
 
-      <section>
+      <section className={CARD}>
         <SectionTitle>Potensi Ancaman</SectionTitle>
         {detail.threats.length === 0 ? (
           <p className="text-sm text-ink-muted">
@@ -384,7 +397,7 @@ export function DistrictDetail({
         )}
       </section>
 
-      <section>
+      <section className={CARD}>
         <SectionTitle>Jendela Waktu Paling Rawan</SectionTitle>
         {detail.time_windows.length === 0 ? (
           <p className="text-sm text-ink-muted">Tidak ada data jendela waktu untuk wilayah ini.</p>
@@ -408,7 +421,7 @@ export function DistrictDetail({
         )}
       </section>
 
-      <section>
+      <section className={CARD}>
         <SectionTitle>Riwayat Kejadian</SectionTitle>
         {history.total_incidents === 0 ? (
           <p className="text-sm text-ink-muted">
@@ -437,7 +450,7 @@ export function DistrictDetail({
         )}
       </section>
 
-      <section>
+      <section className={CARD}>
         <SectionTitle>Peringatan Aktif</SectionTitle>
         {detail.active_warnings.length === 0 ? (
           <p className="text-sm text-ink-muted">
@@ -453,7 +466,7 @@ export function DistrictDetail({
         <Basis>{detail.active_warnings_basis}</Basis>
       </section>
 
-      <section>
+      <section className={CARD}>
         <SectionTitle>Prediksi {horizonLabel(horizon)}</SectionTitle>
         {district.predictive === null ? (
           <p className="text-sm text-ink-muted">
@@ -464,7 +477,7 @@ export function DistrictDetail({
         )}
       </section>
 
-      <section>
+      <section className={CARD}>
         <SectionTitle>Prediksi Teratas Wilayah Ini</SectionTitle>
         {detail.top_predictions.length === 0 ? (
           <p className="text-sm text-ink-muted">
