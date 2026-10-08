@@ -455,6 +455,28 @@ tidak terjadi.
 > tangan pemilik proyek. Aplikasi Android LAPOR PRESISI (PHASE 17) tetap direncanakan
 > terpisah.
 
+### 2.11c Kanal perpesanan — bot Telegram / WhatsApp (8 Oktober 2026)
+
+Keputusan pemilik proyek: laporan masyarakat juga dapat masuk lewat **bot Telegram** (dan
+**WhatsApp Business Platform** setelah akun bisnis Meta tersedia), dan pengenal percakapan
+**boleh disimpan** untuk mengabari perkembangan laporan. Layanan bot ada di `apps/bot`; ia
+tidak menyentuh basis data dan hanya memanggil endpoint di bawah ini dengan kunci bersama
+`X-Messaging-Key` (= `MESSAGING_API_KEY`). Kunci kosong → 503; kunci salah → 401.
+
+| Method | Path | Kunci | Keterangan |
+|---|---|---|---|
+| POST | `/messaging/reports` | bot | isi sama dengan `POST /public/citizen-reports` + `channel`, `chat_id`; kuota 10/jam **per percakapan**; menyimpan `citizen_report_contacts`; tanpa `claim_token` |
+| POST | `/messaging/attachments` | bot | multipart `berkas` + `channel`, `chat_id` → `handle` |
+| GET | `/messaging/reports?channel&chat_id` | bot | laporan milik percakapan itu (untuk `/status`), tanpa penilaian petugas |
+| GET | `/messaging/updates?channel` | bot | laporan yang `status` ≠ `last_notified_status` |
+| POST | `/messaging/updates/ack` | bot | menandai kabar terkirim; audit `NOTIFY_CITIZEN_REPORTER` |
+
+Tabel `citizen_report_contacts` (migration 0013): `report_id` (unik, FK CASCADE), `channel`
+(TELEGRAM/WHATSAPP), `chat_id`, `last_notified_status`. Pada WhatsApp `chat_id` adalah nomor
+telepon — data pribadi — sehingga **tidak ada endpoint berperan** yang mengembalikannya; test
+`test_officer_screens_never_receive_the_chat_id` menjaganya. Audit `SUBMIT_CITIZEN_REPORT`
+mencatat `channel` tanpa `chat_id`.
+
 ### 2.12 Dashboard & Executive Brief
 
 | Method | Path | Permission |

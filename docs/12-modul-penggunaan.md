@@ -933,6 +933,14 @@ siintel.awansurya.com  →  Lapor Kejadian  →  formulir  →  nomor tiket
 
 Bisa juga lewat **aplikasi Android** — tombol *Lapor Kejadian* pada layar mukanya.
 
+Sejak 8 Oktober 2026 juga lewat **bot Telegram** (dan WhatsApp setelah akun bisnis Meta
+tersedia): warga mengetik `/mulai`, bot bertanya jenis kejadian, kecamatan, lokasi (tombol
+bagikan lokasi atau pilih kelurahan), uraian, dan foto, lalu memberi nomor tiket. Bedanya
+dari web/Android, atas keputusan pemilik proyek: **pengenal percakapan disimpan** supaya bot
+dapat mengabari pelapor ketika statusnya berubah (`/status` menampilkan laporan miliknya).
+Yang tetap tidak disimpan: nama dan nomor yang ditampilkan. Bagi petugas, laporan dari bot
+tampil sama dengan laporan lain; pengenal percakapan tidak pernah tampil di layar mana pun.
+
 Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
 pengiriman adalah **nomor tiket** seperti `RPT-0151` — satu-satunya penanda yang
 dipegangnya, dan ia tidak terikat ke nama siapa pun.

@@ -1,0 +1,86 @@
+"""Penerjemahan bentuk kanal: tombol Telegram, daftar bernomor WhatsApp, pesan masuk."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from lapor_bot import telegram, whatsapp
+from lapor_bot.core import Reply
+
+
+def test_telegram_keyboard_puts_location_first_and_two_choices_per_row() -> None:
+    markup = telegram.keyboard(Reply("x", choices=("A", "B", "C"), request_location=True))
+    assert markup["keyboard"][0] == [{"text": telegram.LOCATION_BUTTON, "request_location": True}]
+    assert markup["keyboard"][1:] == [[{"text": "A"}, {"text": "B"}], [{"text": "C"}]]
+    assert telegram.keyboard(Reply("x")) == {"remove_keyboard": True}
+
+
+def test_telegram_incoming_maps_location_photo_and_text() -> None:
+    def fetch(file_id: str, filename: str, media_type: str) -> tuple[str, bytes, str]:
+        return filename, b"bytes-" + file_id.encode(), media_type
+
+    location = telegram.incoming_from(
+        {"location": {"latitude": -6.2, "longitude": 106.8, "horizontal_accuracy": 9}}, fetch
+    )
+    assert (location.latitude, location.longitude, location.accuracy_m) == (-6.2, 106.8, 9.0)
+
+    photo = telegram.incoming_from(
+        {"photo": [{"file_id": "s", "file_size": 10}, {"file_id": "l", "file_size": 99}]}, fetch
+    )
+    assert photo.attachment is not None and photo.attachment.content == b"bytes-l"
+
+    assert telegram.incoming_from({"text": "/mulai"}, fetch).text == "/mulai"
+
+
+def test_whatsapp_renders_numbered_choices_and_location_request() -> None:
+    reply = Reply("Pilih:", choices=("Tebet", "Cilandak"), request_location=True)
+    messages = whatsapp.outgoing("628123", reply)
+    assert messages[0]["text"]["body"].endswith("1. Tebet\n2. Cilandak\n\nBalas dengan nomornya.")
+    assert messages[1]["interactive"]["type"] == "location_request_message"
+    assert len(whatsapp.outgoing("628123", Reply("halo"))) == 1
+
+
+def test_whatsapp_webhook_parsing_and_incoming_kinds() -> None:
+    body: dict[str, Any] = {
+        "entry": [
+            {
+                "changes": [
+                    {
+                        "value": {
+                            "messages": [
+                                {"from": "628123", "type": "text", "text": {"body": "2"}},
+                                {
+                                    "from": "628123",
+                                    "type": "location",
+                                    "location": {"latitude": -6.2, "longitude": 106.8},
+                                },
+                                {
+                                    "from": "628123",
+                                    "type": "interactive",
+                                    "interactive": {"list_reply": {"id": "1", "title": "Tebet"}},
+                                },
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    found = whatsapp.incoming_messages(body)
+    assert [sender for sender, _ in found] == ["628123"] * 3
+
+    def fetch(media_id: str, filename: str, media_type: str) -> tuple[str, bytes, str]:
+        return filename, b"x", media_type
+
+    text, location, choice = (whatsapp.incoming_from(m, fetch) for _, m in found)
+    assert text.text == "2"
+    assert (location.latitude, location.longitude) == (-6.2, 106.8)
+    assert choice.text == "Tebet"
+
+
+def test_whatsapp_verify_requires_matching_token() -> None:
+    channel = whatsapp.WhatsAppChannel("tok", "123", "rahasia", backend=None)  # type: ignore[arg-type]
+    good = {"hub.mode": ["subscribe"], "hub.verify_token": ["rahasia"], "hub.challenge": ["abc"]}
+    bad = {"hub.mode": ["subscribe"], "hub.verify_token": ["salah"], "hub.challenge": ["abc"]}
+    assert channel.verify(good) == "abc"
+    assert channel.verify(bad) is None

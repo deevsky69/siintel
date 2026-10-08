@@ -101,6 +101,8 @@ services:
       # Direktori lampiran laporan masyarakat. NILAINYA HARUS SAMA dengan titik pasang
       # volume di bawah — kalau berbeda, aplikasi menulis ke lapisan container yang hilang
       # begitu container dibangun ulang, dan tidak ada galat apa pun yang menandainya.
+      # Kunci bersama layanan bot (8 Oktober 2026). Kosong = /messaging/* menjawab 503.
+      MESSAGING_API_KEY: ${MESSAGING_API_KEY:-}
       ATTACHMENT_DIR: /var/lib/predpol/lampiran
     volumes:
       # Foto, rekaman suara, dan video yang dikirim warga.
@@ -152,6 +154,36 @@ services:
     expose:
       - "3000"
     # Rute publik ditambahkan oleh salah satu berkas pelengkap (lihat kepala berkas).
+    networks:
+      - internal
+
+  # Bot kanal perpesanan (Telegram / WhatsApp), 8 Oktober 2026. Hanya bercakap-cakap dan
+  # memanggil API lewat jaringan internal; tidak membuka basis data. Telegram memakai long
+  # polling (tanpa alamat publik); WhatsApp menerima webhook di port 8080 — dirutekan oleh
+  # berkas override (coolify) ke /webhook/whatsapp.
+  bot:
+    build:
+      context: ../..
+      dockerfile: apps/bot/Dockerfile
+    image: prediksi-presisi/bot:${IMAGE_TAG:-latest}
+    container_name: predpol-prod-bot
+    restart: unless-stopped
+    logging: *logging
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_BASE: http://api:8000
+      MESSAGING_API_KEY: ${MESSAGING_API_KEY:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      WHATSAPP_ACCESS_TOKEN: ${WHATSAPP_ACCESS_TOKEN:-}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID:-}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN:-}
+      NOTIFY_INTERVAL_SECONDS: ${NOTIFY_INTERVAL_SECONDS:-30}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      TZ: ${APP_TIMEZONE:-Asia/Jakarta}
+    expose:
+      - "8080"
     networks:
       - internal
 

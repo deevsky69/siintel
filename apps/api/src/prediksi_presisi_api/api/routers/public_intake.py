@@ -515,7 +515,22 @@ def submit_report(
             "Terlalu banyak laporan dikirim dari jaringan ini dalam satu jam terakhir. "
             "Untuk keadaan mendesak, hubungi 110.",
         )
+    _report, response = accept_report(session, payload, channel=CHANNEL_PUBLIC)
+    return response
 
+
+#: Nilai `channel` pada audit SUBMIT_CITIZEN_REPORT. Kanal perpesanan mengirim nama
+#: kanalnya (TELEGRAM / WHATSAPP) lewat `routers/messaging.py`.
+CHANNEL_PUBLIC = "PUBLIC"
+
+
+def accept_report(
+    session: Session, payload: ReportRequest, *, channel: str
+) -> tuple[CitizenReport, dict[str, Any]]:
+    """Memeriksa, menyimpan, dan mengaudit satu laporan — dipakai kanal publik DAN kanal
+    perpesanan (8 Oktober 2026), supaya aturan isian hanya hidup di satu tempat. Pembatas
+    laju bukan bagian dari sini: tiap kanal membatasi menurut pengenalnya sendiri (alamat
+    jaringan untuk web/aplikasi, percakapan untuk bot)."""
     categories = load_report_categories()
     if payload.category not in categories:
         raise ApiError(
@@ -692,7 +707,7 @@ def submit_report(
             "kecamatan": payload.kecamatan,
             "kelurahan": location.kelurahan,
             "area_source": area_source,
-            "channel": "PUBLIC",
+            "channel": channel,
             # Asal koordinat dan jumlah lampiran ikut dicatat: keduanya menentukan berapa
             # banyak data pribadi yang masuk lewat peristiwa ini, dan itu justru yang perlu
             # dapat ditelusuri kemudian. Isi lampirannya sendiri tidak pernah masuk audit.
@@ -703,7 +718,7 @@ def submit_report(
     session.commit()
     session.refresh(report)
 
-    return {
+    response: dict[str, Any] = {
         "ticket": report.code,
         # DITERBITKAN SEKALI, dan tidak dapat diminta ulang: yang tersimpan hanya hash-nya.
         # Pelapor yang kehilangan token ini kehilangan cara memeriksa statusnya sendiri —
@@ -729,3 +744,4 @@ def submit_report(
         ),
         "basis": INTAKE_BASIS,
     }
+    return report, response

@@ -33,6 +33,7 @@ from ..db import Base
 from .base import TimestampMixin, uuid_pk
 
 if TYPE_CHECKING:
+    from .citizen_report_contact import CitizenReportContact
     from .community_feedback import CommunityFeedback
     from .location import Location
 
@@ -118,6 +119,11 @@ class CitizenReport(TimestampMixin, Base):
     feedback: Mapped[list[CommunityFeedback]] = relationship(back_populates="report")
     attachments: Mapped[list[CitizenReportAttachment]] = relationship(
         back_populates="report", cascade="all, delete-orphan"
+    )
+    #: Kontak kanal perpesanan bila laporan masuk lewat bot (8 Oktober 2026); None untuk
+    #: laporan web/aplikasi, yang tetap tanpa identitas. Lihat `citizen_report_contact.py`.
+    contact: Mapped[CitizenReportContact | None] = relationship(
+        back_populates="report", cascade="all, delete-orphan", uselist=False
     )
 
     __table_args__ = (

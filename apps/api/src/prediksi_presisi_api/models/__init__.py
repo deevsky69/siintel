@@ -21,6 +21,7 @@ from .citizen_report import (
     CitizenReport,
     CitizenReportAttachment,
 )
+from .citizen_report_contact import CitizenReportContact
 from .commander_decision import CommanderDecision
 from .community_feedback import CommunityFeedback
 from .crime_incident import CrimeIncident
@@ -46,6 +47,7 @@ __all__ = [
     "AuditLog",
     "CitizenReport",
     "CitizenReportAttachment",
+    "CitizenReportContact",
     "CommanderDecision",
     "CommunityFeedback",
     "CrimeIncident",

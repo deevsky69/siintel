@@ -49,6 +49,15 @@ for jalur in /api/v1/notifications /api/v1/auth/me /api/v1/public-alerts; do
     || tidak "tanpa token, $jalur menjawab $kode — seharusnya 401"
 done
 
+# 3b. Kanal perpesanan (8 Oktober 2026): endpoint bot TIDAK boleh terbuka. Tanpa kunci ia
+#     menjawab 401 (kunci terpasang) atau 503 (kanal belum diaktifkan) — tidak pernah 200.
+kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/api/v1/messaging/updates?channel=TELEGRAM")
+case "$kode" in
+  401) lulus "tanpa kunci, /api/v1/messaging/updates ditolak (kanal aktif)" ;;
+  503) lulus "tanpa kunci, /api/v1/messaging/updates ditolak (kanal belum diaktifkan)" ;;
+  *) tidak "tanpa kunci, /api/v1/messaging/updates menjawab $kode — seharusnya 401/503" ;;
+esac
+
 # 4. SERVER ACTION — inti berkas ini.
 #
 #    Next menolak action bila `Origin` tidak cocok dengan `X-Forwarded-Host` yang

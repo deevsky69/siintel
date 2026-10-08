@@ -650,6 +650,9 @@ Yang wajib diisi:
 | `DEMO_REFERENCE_TIME` | lihat peringatan di bawah |
 | `DISPLAY_DATA_UNTIL` | `2025-12-31` — layar hanya memuat kejadian sampai tanggal ini (keputusan 4 Oktober 2026); kosong = tanpa batas |
 | `ACME_EMAIL` | **hanya untuk JALUR B**; boleh dikosongkan pada JALUR A |
+| `MESSAGING_API_KEY` | kunci bersama API ⇄ bot; dibuat `scripts/pasang-kanal-perpesanan.sh`. Kosong = kanal perpesanan tidak aktif |
+| `TELEGRAM_BOT_TOKEN` | token dari @BotFather; kosong = bot Telegram tidak dijalankan |
+| `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN` | dari Meta Business Suite; kosong = kanal WhatsApp tidak dijalankan |
 
 **Peringatan tentang `DEMO_REFERENCE_TIME`.** Data asli Pusiknas berposisi 29 September 2026
 (kejadian terakhir 28 September). Bila dibiarkan kosong, aplikasi memakai waktu server yang
@@ -870,6 +873,55 @@ Enam akun demo harus muncul, seluruhnya dengan kredensial **`terkunci`**. Itu me
 disengaja — lanjut ke §7.
 
 ---
+
+## 6b. KANAL PERPESANAN — BOT TELEGRAM (DAN WHATSAPP)
+
+Ditambahkan 8 Oktober 2026. Kontainer `predpol-prod-bot` dibangun dari `apps/bot` dan ikut
+dinyalakan `deploy-produksi.sh`; tanpa token ia menyala tetapi diam.
+
+### 6b.1 Telegram
+
+1. Di Telegram, buka **@BotFather** → `/newbot` → beri nama (mis. *LAPOR PRESISI*) dan
+   username (harus berakhiran `bot`). BotFather memberi **token**.
+2. Di server:
+
+```bash
+TELEGRAM_BOT_TOKEN='123456789:AA...' bash scripts/pasang-kanal-perpesanan.sh
+bash scripts/deploy-produksi.sh
+```
+
+   Skrip pertama membuat `MESSAGING_API_KEY` bila belum ada dan menyimpan token ke
+   `.env.production` tanpa mencetaknya. Deploy membangun kontainer bot dan memulai ulang API
+   dengan kunci itu.
+3. Uji: buka bot di Telegram, ketik `/mulai`. Laporan yang terkirim tampil di **Laporan
+   Masyarakat** seperti laporan web, dengan `channel: TELEGRAM` pada audit.
+4. Kabar perkembangan: ketika petugas mengubah status laporan, bot mengirim pesan ke
+   percakapan asal dalam ≤30 detik (`NOTIFY_INTERVAL_SECONDS`).
+
+Telegram memakai *long polling*: bot yang menghubungi Telegram, bukan sebaliknya. Tidak ada
+port atau rute publik yang dibuka.
+
+### 6b.2 WhatsApp (setelah akun bisnis Meta ada)
+
+Syarat di luar kode: akun Meta Business terverifikasi atas nama lembaga, nomor telepon khusus
+yang didaftarkan ke WhatsApp Business Platform, dan metode pembayaran (biaya per percakapan).
+Setelah ada, dari Meta Business Suite → WhatsApp → API Setup ambil **access token** (yang
+permanen, dari system user) dan **phone number id**, lalu:
+
+```bash
+WHATSAPP_ACCESS_TOKEN='...' WHATSAPP_PHONE_NUMBER_ID='...' bash scripts/pasang-kanal-perpesanan.sh
+bash scripts/deploy-produksi.sh
+```
+
+Skrip membuat `WHATSAPP_VERIFY_TOKEN`. Daftarkan webhook di Meta:
+`https://<domain>/webhook/whatsapp` dengan verify token itu, dan langganan field `messages`.
+Rute `/webhook/whatsapp` menuju kontainer bot ditambahkan `docker-compose.coolify.yml`.
+
+### 6b.3 Yang disimpan dari pelapor
+
+Hanya kanal dan pengenal percakapan (`citizen_report_contacts`), untuk mengirim kabar. Pada
+WhatsApp pengenal itu nomor telepon — data pribadi — dan tidak tampil pada layar petugas mana
+pun. Menghapus satu baris tabel itu menghentikan kabar tanpa menyentuh laporannya.
 
 ## 7. MENETAPKAN PASSWORD AKUN DEMO
 

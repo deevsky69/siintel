@@ -57,6 +57,8 @@ EXPECTED_TABLES = {
     "operational_actions",
     "patrol_plan_decisions",
     "panic_events",
+    # 0013 — kanal perpesanan (8 Oktober 2026)
+    "citizen_report_contacts",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat
     "citizen_report_attachments",

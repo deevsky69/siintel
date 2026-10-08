@@ -51,6 +51,10 @@ class Settings(BaseSettings):
 
     app_timezone: str = "Asia/Jakarta"
 
+    # Kunci bersama layanan bot (Telegram/WhatsApp) untuk endpoint /messaging/* (8 Oktober
+    # 2026). Kosong = kanal perpesanan tidak aktif; endpoint menjawab 503.
+    messaging_api_key: str = ""
+
     @property
     def cors_origins(self) -> list[str]:
         """Daftar origin CORS yang diizinkan."""
