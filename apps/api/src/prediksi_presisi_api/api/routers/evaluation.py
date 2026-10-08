@@ -17,9 +17,9 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...models import CrimeIncident, Prediction, PredictionActual
+from ...services import recommendation_outcome, visibility
 from ...services import risk_engine as risk
-from ...services import visibility
-from ..deps import CurrentUser, get_db, require_permission
+from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
 
 router = APIRouter(prefix="/evaluation", tags=["evaluasi"])
 
@@ -203,3 +203,17 @@ def threshold_sweep(
         "status": "PROPOSED",
         "basis": SWEEP_BASIS,
     }
+
+
+@router.get(
+    "/recommendations",
+    summary="Rekomendasi dicocokkan dengan kejadian nyata tahun sasaran",
+)
+def recommendations_vs_actual(
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("evaluation:read"),
+) -> dict[str, Any]:
+    """Permintaan pemilik proyek 8 Oktober 2026: apakah rekomendasi sejalan dengan data
+    nyata 2026. Cakupan Polsek dihormati lewat kelurahan prediksinya."""
+    polsek = jurisdiction_filter(current, "evaluation:read")
+    return recommendation_outcome.evaluate_recommendations(session, polsek)

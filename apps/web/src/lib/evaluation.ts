@@ -93,3 +93,60 @@ export type ThresholdSweep = {
 };
 
 export const getThresholdSweep = () => apiGet<ThresholdSweep>("/evaluation/threshold-sweep");
+
+/** Putusan pencocokan satu rekomendasi dengan kenyataan tahun sasaran (PROPOSED). */
+export type OutcomeVerdict = "SEJALAN" | "SEBAGIAN" | "TIDAK_SEJALAN" | "BELUM_DAPAT_DINILAI";
+
+export const VERDICT_LABELS: Record<OutcomeVerdict, string> = {
+  SEJALAN: "Sejalan",
+  SEBAGIAN: "Sebagian",
+  TIDAK_SEJALAN: "Tidak sejalan",
+  BELUM_DAPAT_DINILAI: "Belum dapat dinilai",
+};
+
+export type RecommendationOutcomeRow = {
+  code: string;
+  status: string;
+  priority: string | null;
+  recommended_function: string;
+  prediction_code: string;
+  threat_type: string;
+  kecamatan: string | null;
+  kelurahan: string | null;
+  time_window: string | null;
+  window_start: string;
+  window_end: string;
+  risk_score: number;
+  target_year: number;
+  /** Ada kejadian pada enam jam yang persis diprediksi. */
+  literal_window_hit: boolean;
+  area_incidents: number;
+  area_timed_incidents: number;
+  area_unknown_time: number;
+  block_incidents: number;
+  block_share_percent: number | null;
+  expected_share_percent: number | null;
+  area_rank: number | null;
+  area_rank_of: number;
+  verdict: OutcomeVerdict;
+};
+
+export type RecommendationOutcome = {
+  target_years: number[];
+  observed_to: string | null;
+  rows: RecommendationOutcomeRow[];
+  summary: {
+    total: number;
+    aligned: number;
+    partial: number;
+    not_aligned: number;
+    unevaluable: number;
+    literal_window_hits: number;
+    aligned_percent: number | null;
+  };
+  status: string;
+  basis: string;
+};
+
+export const getRecommendationOutcome = () =>
+  apiGet<RecommendationOutcome>("/evaluation/recommendations");

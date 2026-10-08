@@ -10,7 +10,10 @@ import {
   MATCH_HINTS,
   MATCH_LABELS,
   MATCH_TYPES,
+  type OutcomeVerdict,
+  type RecommendationOutcome,
   type ThresholdSweep,
+  VERDICT_LABELS,
 } from "@/lib/evaluation";
 
 function MetricCard({
@@ -53,11 +56,14 @@ export function EvaluationView({
   metrics,
   summary,
   sweep = null,
+  outcome,
 }: {
   metrics: EvaluationMetrics;
   summary: EvaluationSummary;
   /** Precision/recall bila ambang terbit dinaikkan — bahan keputusan ambang. */
   sweep?: ThresholdSweep | null;
+  /** Rekomendasi vs kenyataan tahun sasaran; `null` bila tidak termuat, `undefined` bila tidak diminta. */
+  outcome?: RecommendationOutcome | null;
 }) {
   const precisionPercent = formatPercent(metrics.precision);
   const recallPercent = formatPercent(metrics.recall);
@@ -152,6 +158,8 @@ export function EvaluationView({
           </div>
         )}
       </Panel>
+
+      {outcome === undefined ? null : <OutcomePanel outcome={outcome} />}
 
       {sweep && sweep.rows.length > 0 ? <SweepPanel sweep={sweep} /> : null}
       <div className="grid grid-cols-12 gap-3">
@@ -306,6 +314,152 @@ function SweepPanel({ sweep }: { sweep: ThresholdSweep }) {
         ) : null}
       </p>
       <Basis>{sweep.basis}</Basis>
+    </Panel>
+  );
+}
+
+const VERDICT_TONE: Record<OutcomeVerdict, string> = {
+  SEJALAN: "bg-risk-low/15 text-risk-low border-risk-low/40",
+  SEBAGIAN: "bg-risk-moderate/15 text-risk-moderate border-risk-moderate/40",
+  TIDAK_SEJALAN: "bg-risk-critical/15 text-risk-critical border-risk-critical/40",
+  BELUM_DAPAT_DINILAI: "bg-base-800 text-ink-muted border-base-700",
+};
+
+function VerdictTag({ verdict }: { verdict: OutcomeVerdict }) {
+  return (
+    <span
+      className={`inline-block rounded border px-1.5 py-0.5 font-heading text-2xs font-semibold uppercase tracking-wider ${VERDICT_TONE[verdict]}`}
+    >
+      {VERDICT_LABELS[verdict]}
+    </span>
+  );
+}
+
+const formatShare = (value: number | null) =>
+  value === null ? "—" : `${value.toLocaleString("id-ID", { maximumFractionDigits: 1 })}%`;
+
+/**
+ * Rekomendasi vs kenyataan tahun sasaran (permintaan pemilik proyek 8 Oktober 2026).
+ *
+ * Dua pembacaan ditampilkan berdampingan dan tidak dilebur: jendela harfiah (enam jam yang
+ * persis diprediksi — hampir selalu kosong, dan itu disebut) dan pola tahun berjalan (tempat
+ * dan blok jam yang direkomendasikan dibandingkan seluruh kejadian tahun sasaran). Putusan
+ * per baris membawa angkanya sendiri; aturannya PROPOSED.
+ */
+function OutcomePanel({ outcome }: { outcome: RecommendationOutcome | null }) {
+  if (outcome === null) {
+    return (
+      <Panel title="Rekomendasi vs Kenyataan">
+        <EmptyState label="Pencocokan rekomendasi tidak termuat. Angka evaluasi lainnya tetap berlaku." />
+      </Panel>
+    );
+  }
+  const { summary: s } = outcome;
+  const title = `Rekomendasi vs Kenyataan ${outcome.target_years.join(", ")}`.trim();
+  return (
+    <Panel
+      title={title}
+      action={
+        <span className="panel-action">
+          {s.total > 0
+            ? `${s.total} rekomendasi · data sampai ${outcome.observed_to ?? "?"}`
+            : "tidak ada rekomendasi"}
+        </span>
+      }
+    >
+      {s.total === 0 ? (
+        <EmptyState label="Belum ada rekomendasi yang dapat dicocokkan." />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+            <MetricCard
+              label="Sejalan"
+              value={`${s.aligned} dari ${s.total}`}
+              hint={
+                s.aligned_percent === null
+                  ? "Tempat dan jam yang direkomendasikan sama-sama terbukti"
+                  : `${formatShare(s.aligned_percent)} rekomendasi: tempat dan jamnya sama-sama terbukti sepanjang tahun sasaran`
+              }
+              accent
+            />
+            <MetricCard
+              label="Sebagian"
+              value={String(s.partial)}
+              hint="Kelurahannya memang mengalami jenis itu, tetapi tidak menonjol pada blok jam yang direkomendasikan"
+            />
+            <MetricCard
+              label="Tidak sejalan"
+              value={String(s.not_aligned)}
+              hint="Kelurahan itu tidak mengalami jenis itu sama sekali pada tahun sasaran"
+            />
+            <MetricCard
+              label="Jendela harfiah"
+              value={`${s.literal_window_hits} dari ${s.total}`}
+              hint="Ada kejadian pada enam jam yang persis diprediksi. Ukuran paling ketat; hampir selalu kosong karena satu kelurahan hanya mengalami beberapa kejadian setahun"
+            />
+          </div>
+
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-base-800">
+                  <th className="stat-label pb-2">Rekomendasi</th>
+                  <th className="stat-label pb-2">Apa · Di mana · Kapan</th>
+                  <th className="stat-label pb-2 text-right">Kejadian di kelurahan</th>
+                  <th className="stat-label pb-2 text-right">Pada blok jam</th>
+                  <th className="stat-label pb-2 text-right">Peringkat kelurahan</th>
+                  <th className="stat-label pb-2 text-right">Putusan</th>
+                </tr>
+              </thead>
+              <tbody>
+                {outcome.rows.map((row) => (
+                  <tr
+                    key={row.code}
+                    className="border-b border-base-800/60 align-top last:border-0"
+                  >
+                    <td className="py-2 pr-2 font-mono text-ink">{row.code}</td>
+                    <td className="py-2 pr-2 text-ink">
+                      <span className="font-heading font-semibold">{row.threat_type}</span>
+                      {" · "}
+                      {row.kelurahan ?? "—"}
+                      {row.kecamatan ? `, ${row.kecamatan}` : ""}
+                      {" · "}
+                      <span className="font-mono">{row.time_window ?? "—"}</span>
+                    </td>
+                    <td className="py-2 pr-2 text-right font-mono text-ink">
+                      {row.area_incidents}
+                      {row.area_unknown_time > 0 ? (
+                        <span className="text-ink-faint"> ({row.area_unknown_time} tanpa jam)</span>
+                      ) : null}
+                    </td>
+                    <td className="py-2 pr-2 text-right font-mono text-ink">
+                      {`${row.block_incidents} dari ${row.area_timed_incidents}`}
+                      <span className="text-ink-faint">
+                        {` · ${formatShare(row.block_share_percent)} vs ${formatShare(row.expected_share_percent)}`}
+                      </span>
+                    </td>
+                    <td className="py-2 pr-2 text-right font-mono text-ink">
+                      {row.area_rank === null ? "—" : `${row.area_rank} dari ${row.area_rank_of}`}
+                    </td>
+                    <td className="py-2 text-right">
+                      <VerdictTag verdict={row.verdict} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
+            "Pada blok jam" membaca kejadian yang jamnya tercatat: berapa yang jatuh pada blok yang
+            direkomendasikan, dibandingkan porsi jamnya (enam dari dua puluh empat jam = 25%).
+            Peringkat kelurahan dihitung di antara kelurahan yang mengalami jenis itu pada tahun
+            sasaran. Jumlah kecil (tiga–empat kejadian) membuat persentasenya mudah berubah; bacalah
+            bersama angkanya.
+          </p>
+          <Basis>{outcome.basis}</Basis>
+        </>
+      )}
     </Panel>
   );
 }

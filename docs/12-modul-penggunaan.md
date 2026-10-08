@@ -888,6 +888,36 @@ menghapus riwayat, dan **pencocokan dengan kejadian nyata dihitung atas rencana 
 berlaku**, bukan atas usulan mentah. Peran lain melihat keputusan yang berlaku beserta
 pejabatnya, tanpa tombol.
 
+### Rekomendasi vs Kenyataan — apakah rekomendasi sejalan dengan data nyata 2026
+
+Panel di halaman **Evaluasi** (permintaan pemilik proyek 8 Oktober 2026). Setiap
+rekomendasi lahir dari satu prediksi: **jenis**, **kelurahan**, **blok jam enam jam**, disusun
+dari pola sampai 2025. Panel ini mencocokkannya dengan kejadian nyata 2026 yang sudah
+tercatat — data yang sengaja tidak dilihat layar lain.
+
+Dua pembacaan, berdampingan:
+
+| Pembacaan | Artinya | Hasil pada data asli (per 28 Sep 2026) |
+|---|---|---|
+| **Jendela harfiah** | Ada kejadian pada enam jam yang *persis* diprediksi (1–2 Januari 2026) | 0 dari 32 — satu kelurahan hanya mengalami beberapa kejadian setahun, sehingga satu jendela enam jam hampir pasti kosong |
+| **Pola tahun berjalan** | Kelurahan itu memang mengalami jenis itu sepanjang 2026, dan blok jam yang direkomendasikan memuat bagian yang lebih besar daripada porsi jamnya (25%) | 17 **Sejalan**, 15 **Sebagian**, 0 **Tidak sejalan** |
+
+Putusan per baris:
+
+- **Sejalan** — tempat dan jam sama-sama terbukti. Contoh: Curanmor Cipete Utara 00.00–06.00:
+  21 kejadian di kelurahan itu pada 2026 (peringkat 1 dari 58 kelurahan), 6 dari 14 yang
+  jamnya tercatat jatuh pada blok itu (42,9% vs porsi 25%).
+- **Sebagian** — kelurahannya memang mengalami jenis itu, tetapi tidak menonjol pada blok jam
+  yang direkomendasikan.
+- **Tidak sejalan** — kelurahan itu tidak mengalami jenis itu sama sekali.
+
+Setiap baris membawa angkanya: jumlah kejadian di kelurahan (yang tanpa jam disebut
+terpisah), jumlah pada blok jam beserta persentasenya, dan peringkat kelurahan di antara
+kelurahan yang mengalami jenis itu. Jumlah kecil (tiga–empat kejadian) membuat persentase
+mudah berubah; bacalah bersama angkanya. Aturan putusannya **PROPOSED** (U-03): batas
+"lebih besar daripada porsi jamnya" adalah pilihan teknis yang masuk akal, bukan ketentuan
+yang ditetapkan pemilik proyek.
+
 ---
 
 ## 17. LAPORAN MASYARAKAT
