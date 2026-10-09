@@ -69,7 +69,8 @@ def main() -> None:
         )
     else:
         log.warning(
-            "WHATSAPP_* belum lengkap (token, phone id, verify token, app secret) — kanal WhatsApp tidak dijalankan."
+            "WHATSAPP_* belum lengkap (token, phone id, verify token, app secret) — "
+            "kanal WhatsApp tidak dijalankan."
         )
 
     if not threads:
