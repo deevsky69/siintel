@@ -14,7 +14,9 @@ version: proposed-2026-09-01
 permissions:
   dashboard: [read]
   location: [read, write]
-  crime: [read, write, export]
+  # `triage` (9 Oktober 2026): mengubah status penanganan. Terpisah dari `write` (mencatat)
+  # karena pemilik proyek menetapkan hanya Administrator yang mengubah status.
+  crime: [read, write, export, triage]
   intelligence: [read, write]
   patrol: [read, write]
   police_unit: [read, write]
@@ -27,7 +29,7 @@ permissions:
   recommendation: [read, write]
   commander_decision: [read, approve]
   operation: [read, write]
-  citizen_report: [read, write]
+  citizen_report: [read, write, triage]
   community_feedback: [read]
   evaluation: [read, run]
   user: [read, manage]
@@ -216,6 +218,16 @@ roles:
   # mungkin diajukan penguji: siapa yang memutuskan, dan siapa yang memverifikasi.
   Administrator:
     ALL:
+      # KEPUTUSAN PEMILIK PROYEK 9 Oktober 2026 — membalik pemisahan 1 September 2026:
+      # Administrator BOLEH memutuskan rekomendasi (setujui/ubah/tolak) seperti Pimpinan.
+      # Akibat yang disadari: rantai "yang mengusulkan bukan yang memutuskan" kini hanya
+      # ditegakkan oleh jejak audit (setiap keputusan mencatat akunnya), bukan oleh
+      # pemisahan peran. evaluation:run dan public_alert:publish tetap hanya Pimpinan.
+      - commander_decision:approve
+      # KEPUTUSAN PEMILIK PROYEK 9 Oktober 2026: mengubah status laporan masyarakat dan
+      # kejadian (laporan petugas) hanya oleh Administrator. Polsek/Fungsi tetap mencatat.
+      - citizen_report:triage
+      - crime:triage
       - dashboard:read
       - location:read
       - location:write

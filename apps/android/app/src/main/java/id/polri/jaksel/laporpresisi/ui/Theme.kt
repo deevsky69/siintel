@@ -19,13 +19,13 @@ import androidx.compose.ui.unit.sp
  * "terang seadanya" dari Material akan terlihat seperti aplikasi lain.
  */
 object PresisiColors {
-    val Base950 = Color(0xFF050B18)
-    val Base900 = Color(0xFF0A1424)
-    val Base800 = Color(0xFF132339)
-    val Base700 = Color(0xFF1B2F4A)
+    val Base950 = Color(0xFF111A2C)
+    val Base900 = Color(0xFF19253C)
+    val Base800 = Color(0xFF2A3C5A)
+    val Base700 = Color(0xFF384E72)
     val Ink = Color(0xFFE6F0FF)
     val InkMuted = Color(0xFF8EA6C8)
-    val InkFaint = Color(0xFF5B7796)
+    val InkFaint = Color(0xFF7591B3)
     val Accent = Color(0xFF22D3EE)
     val Critical = Color(0xFFEF4444)
     val Ok = Color(0xFF4ADE80)

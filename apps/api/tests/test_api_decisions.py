@@ -248,10 +248,11 @@ def test_unknown_decision_value_is_refused(client: TestClient, session: Session)
     assert response.json()["error"]["code"] == "VALIDATION_ERROR"
 
 
-def test_analyst_cannot_decide_and_the_refusal_is_recorded(
+def test_a_role_without_authority_cannot_decide_and_the_refusal_is_recorded(
     client: TestClient, session: Session
 ) -> None:
-    analyst = _make_user(session, "Administrator")
+    # Sejak 9 Oktober 2026 Administrator boleh memutuskan; yang tidak: Fungsi dan Polsek.
+    analyst = _make_user(session, "Fungsi")
     recommendation = _undecided(session)
 
     response = client.post(

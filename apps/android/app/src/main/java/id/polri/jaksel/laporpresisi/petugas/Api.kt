@@ -74,6 +74,8 @@ object Api {
         val action: String,
         val total: Int,
         val items: List<QueueItem>,
+        /** Ada isi mendesak (darurat; laporan tawuran/begal) — kartu beranda berkedip. */
+        val urgent: Boolean = false,
     )
 
     data class Feed(val role: String, val total: Int, val queues: List<Queue>)
@@ -396,6 +398,7 @@ object Api {
                     title = group.getString("title"),
                     action = group.text("action"),
                     total = group.optInt("total"),
+                    urgent = group.optBoolean("urgent", false) && group.optInt("urgent_total") > 0,
                     items = (0 until items.length()).map {
                         val item = items.getJSONObject(it)
                         QueueItem(item.text("code"), item.text("headline"), item.text("detail"))

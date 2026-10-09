@@ -56,11 +56,13 @@ def _holders(permission: str) -> list[str]:
     return sorted(role for role, grants in _roles().items() if permission in _granted(grants))
 
 
-def test_only_one_role_may_approve_recommendations() -> None:
-    """Inti rantai human-in-the-loop: yang mengusulkan bukan yang memutuskan."""
-    assert _holders(DECIDES) == ["Pimpinan"], (
-        f"`{DECIDES}` dipegang {_holders(DECIDES)}. Bila lebih dari satu peran dapat "
-        f"memutuskan, pertanggungjawaban keputusan operasional menjadi kabur."
+def test_only_the_two_designated_roles_may_approve_recommendations() -> None:
+    """Human-in-the-loop: hanya Pimpinan dan (sejak 9 Oktober 2026) Administrator."""
+    # 9 Oktober 2026 — keputusan pemilik proyek: Administrator ikut memutuskan. Yang dijaga
+    # kini: TIDAK ada peran lain di luar keduanya, dan jejak audit tetap mencatat pemutusnya.
+    assert _holders(DECIDES) == ["Administrator", "Pimpinan"], (
+        f"`{DECIDES}` dipegang {_holders(DECIDES)}; yang ditetapkan pemilik proyek hanya "
+        f"Pimpinan dan Administrator."
     )
 
 
@@ -133,7 +135,7 @@ def test_publishing_to_the_public_is_a_command_decision_not_a_technical_one() ->
     )
 
 
-def test_the_three_permissions_administrator_lacks_are_all_command_decisions() -> None:
+def test_the_permissions_administrator_lacks_are_all_command_decisions() -> None:
     """Yang menjalankan prediksi tidak memutuskan, tidak menilai, dan tidak mengumumkan."""
     config = yaml.safe_load(RBAC_FILE.read_text(encoding="utf-8"))
     catalogue = {
@@ -143,8 +145,5 @@ def test_the_three_permissions_administrator_lacks_are_all_command_decisions() -
     }
     admin = {entry for entries in config["roles"]["Administrator"].values() for entry in entries}
 
-    assert catalogue - admin == {
-        "commander_decision:approve",
-        "evaluation:run",
-        "public_alert:publish",
-    }
+    # Sejak 9 Oktober 2026 tinggal dua (commander_decision:approve diberikan pemilik proyek).
+    assert catalogue - admin == {"evaluation:run", "public_alert:publish"}

@@ -133,7 +133,7 @@ def test_a_leader_is_not_told_about_work_they_cannot_do(
 
     kinds = _kinds(_feed(client, leader))
 
-    assert "CITIZEN_REPORT" not in kinds, "Pimpinan tidak memegang citizen_report:write"
+    assert "CITIZEN_REPORT" not in kinds, "Pimpinan tidak memegang citizen_report:triage"
     assert "WARNING" not in kinds, "Pimpinan tidak memegang warning:acknowledge"
     assert "PREDICTION" not in kinds, "Pimpinan tidak memegang prediction:publish"
 
@@ -150,7 +150,8 @@ def test_a_polsek_officer_is_told_about_the_work_they_do(
     kinds = _kinds(_feed(client, officer))
 
     assert "WARNING" in kinds, "Polsek memegang warning:acknowledge"
-    assert "CITIZEN_REPORT" in kinds, "Polsek memegang citizen_report:write"
+    # 9 Oktober 2026: triase hanya Administrator; Polsek tidak lagi menerima antrean ini.
+    assert "CITIZEN_REPORT" not in kinds, "Polsek tidak memegang citizen_report:triage"
     assert "DECISION" not in kinds, "yang memutuskan rekomendasi bukan Polsek"
 
 
@@ -216,41 +217,27 @@ def test_a_scoped_officer_only_counts_their_own_jurisdiction(
     )
 
 
-def test_reports_without_a_location_stay_out_of_a_scoped_queue(
+def test_the_triage_queue_belongs_to_the_administrator_only(
     client: TestClient, session: Session
 ) -> None:
-    """Laporan tanpa lokasi tidak dapat dipastikan berada di wilayah siapa pun.
-
-    Memasukkannya ke antrean petugas ber-cakupan berarti menugaskan pekerjaan yang belum
-    tentu miliknya.
-    """
-    orphan = session.scalar(
-        select(func.count())
-        .select_from(CitizenReport)
-        .where(CitizenReport.status == "RECEIVED", CitizenReport.location_id.is_(None))
-    )
-    assert orphan, "data dummy tidak memuat laporan tanpa lokasi — test ini sia-sia"
-
+    """9 Oktober 2026: triase hanya Administrator (cakupan seluruh Polres), sehingga laporan
+    tanpa lokasi pun masuk hitungan — tidak ada lagi antrean triase ber-cakupan yang harus
+    dijaga dari laporan yatim. Polsek tidak menerima kelompok ini sama sekali."""
     polsek = session.scalar(
         select(Location.polsek).where(Location.polsek.is_not(None)).order_by(Location.polsek)
     )
     assert polsek is not None
     officer = _make_user(session, "Polsek", polsek=polsek)
+    assert "CITIZEN_REPORT" not in _kinds(_feed(client, officer))
 
-    groups = _feed(client, officer)["groups"]
-    assert isinstance(groups, list)
+    admin = _make_user(session, "Administrator")
+    groups = _feed(client, admin)["groups"]
     reports = next(group for group in groups if group["kind"] == "CITIZEN_REPORT")
-
-    scoped = session.scalar(
-        select(func.count())
-        .select_from(CitizenReport)
-        .join(Location, Location.location_id == CitizenReport.location_id)
-        .where(CitizenReport.status == "RECEIVED", Location.polsek == polsek)
+    received = session.scalar(
+        select(func.count()).select_from(CitizenReport).where(CitizenReport.status == "RECEIVED")
     )
-    assert reports["total"] == int(scoped or 0)
-
-
-# --- Bentuk respons ---------------------------------------------------------------------
+    assert reports["total"] == received
+    assert "urgent" in reports and "urgent_total" in reports
 
 
 def test_empty_queues_are_kept_rather_than_dropped(client: TestClient, session: Session) -> None:

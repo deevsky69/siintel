@@ -592,23 +592,29 @@ def test_unknown_report_status_is_refused_with_the_valid_list(
     assert "FORWARDED" in response.json()["error"]["message"]
 
 
-def test_report_outside_jurisdiction_is_not_found(client: TestClient, session: Session) -> None:
+def test_polsek_can_no_longer_change_a_report_status(client: TestClient, session: Session) -> None:
+    """9 Oktober 2026 — keputusan pemilik proyek: triase hanya Administrator. Polsek ditolak
+    (403) sekalipun laporannya di wilayahnya sendiri, dan penolakannya tercatat."""
     officer = _make_user(session, "Polsek", polsek=TEBET)
-    outside = session.scalar(
+    inside = session.scalar(
         select(CitizenReport)
         .join(Location, Location.location_id == CitizenReport.location_id)
-        .where(Location.polsek != TEBET)
+        .where(Location.polsek == TEBET)
         .limit(1)
     )
-    assert outside is not None
+    assert inside is not None
 
     response = client.post(
-        f"/api/v1/citizen-reports/{outside.code}/status",
+        f"/api/v1/citizen-reports/{inside.code}/status",
         json={"status": "VERIFIED"},
         headers=_auth(client, officer),
     )
 
-    assert response.status_code == 404
+    assert response.status_code == 403
+    denial = session.scalar(
+        select(AuditLog).where(AuditLog.user_id == officer.user_id, AuditLog.result == "DENIED")
+    )
+    assert denial is not None
 
 
 def test_officer_without_permission_cannot_triage(client: TestClient, session: Session) -> None:
@@ -753,17 +759,13 @@ def test_an_unknown_crime_status_is_refused_with_the_valid_list(
     assert "CLOSED" in response.text, "penolakan harus menyebut nilai yang sah"
 
 
-def test_a_crime_outside_the_jurisdiction_is_answered_not_found(
+def test_polsek_can_record_but_not_change_a_crime_status(
     client: TestClient, session: Session
 ) -> None:
-    """404, bukan 403: 403 akan membocorkan keberadaan kejadian di wilayah lain."""
+    """9 Oktober 2026: `crime:write` (mencatat) dan `crime:triage` (mengubah status) dipisah;
+    yang kedua hanya Administrator. Polsek ditolak 403 pada kejadian wilayahnya sendiri."""
     code, polsek = _an_incident(session)
-    other = session.scalar(
-        select(Location.polsek).where(Location.polsek.is_not(None), Location.polsek != polsek)
-    )
-    assert other is not None
-
-    officer = _make_user(session, "Polsek", polsek=other)
+    officer = _make_user(session, "Polsek", polsek=polsek)
 
     response = client.post(
         f"/api/v1/crimes/{code}/status",
@@ -771,7 +773,7 @@ def test_a_crime_outside_the_jurisdiction_is_answered_not_found(
         json={"status": "CLOSED"},
     )
 
-    assert response.status_code == 404, response.text
+    assert response.status_code == 403, response.text
 
 
 def test_changing_a_crime_status_leaves_both_sides_in_the_audit_trail(

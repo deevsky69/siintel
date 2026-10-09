@@ -110,26 +110,26 @@ def _auth(client: TestClient, user: User) -> dict[str, str]:
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
 
-def _sole_approver(session: Session) -> User:
-    """Akun aktif satu-satunya yang memegang `commander_decision:approve`.
+def _leave_as_sole_approver(session: Session, keep: User) -> None:
+    """Menonaktifkan seluruh pemegang `commander_decision:approve` lain supaya `keep`
+    menjadi penyetuju aktif satu-satunya.
 
-    Dicari lewat permission yang benar-benar dipegangnya, bukan lewat nama peran —
-    sama seperti yang dilakukan endpoint. Test ini menuntut memang hanya ada satu:
-    bila kelak ditambah akun Pimpinan kedua, aturan yang diuji tidak lagi berlaku dan
-    test harus disesuaikan, bukan lolos diam-diam.
+    Sampai 9 Oktober 2026 data demo memang hanya punya satu penyetuju (Pimpinan). Sejak
+    Administrator ikut berwenang, keadaan "penyetuju terakhir" harus DIBUAT oleh test —
+    dan karena pemanggil endpoint (Administrator) kini juga penyetuju, aturan itu hanya
+    dapat tersentuh oleh akun yang mengubah dirinya sendiri.
     """
-    approvers = list(
-        session.scalars(
-            select(User)
-            .join(RolePermission, RolePermission.role_id == User.role_id)
-            .join(Permission, Permission.permission_id == RolePermission.permission_id)
-            .where(Permission.resource == APPROVAL_RESOURCE)
-            .where(Permission.action == APPROVAL_ACTION)
-            .where(User.status == "ACTIVE")
-        ).all()
-    )
-    assert len(approvers) == 1, f"data demo diharapkan punya satu penyetuju, ada {len(approvers)}"
-    return approvers[0]
+    others = session.scalars(
+        select(User)
+        .join(RolePermission, RolePermission.role_id == User.role_id)
+        .join(Permission, Permission.permission_id == RolePermission.permission_id)
+        .where(Permission.resource == APPROVAL_RESOURCE)
+        .where(Permission.action == APPROVAL_ACTION)
+        .where(User.status == "ACTIVE", User.user_id != keep.user_id)
+    ).all()
+    for user in others:
+        user.status = "INACTIVE"
+    session.flush()
 
 
 def _audits(session: Session, code: str) -> list[AuditLog]:
@@ -201,7 +201,8 @@ def test_role_list_reports_holders_and_is_not_editable(
     assert "permissions.yaml" in body["source_basis"]
 
     assert roles["Pimpinan"]["can_approve"] is True
-    assert roles["Administrator"]["can_approve"] is False
+    # 9 Oktober 2026 — keputusan pemilik proyek: Administrator ikut memutuskan.
+    assert roles["Administrator"]["can_approve"] is True
     assert roles["Administrator"]["user_count"] >= 4  # tiga akun demo + akun uji
     assert roles["Polsek"]["scopes"]["OWN_JURISDICTION"] > 0
     assert roles["Fungsi"]["scopes"]["OWN_FUNCTION"] > 0
@@ -313,66 +314,65 @@ def test_user_may_still_change_own_jurisdiction(client: TestClient, session: Ses
     assert response.json()["polsek"] == "Polsek Tebet"
 
 
-def test_last_approver_cannot_be_reassigned(client: TestClient, session: Session) -> None:
-    """Tanpa pemegang `commander_decision:approve`, rantai human-in-the-loop mati."""
+def test_reassigning_another_approver_is_allowed_while_the_caller_remains_one(
+    client: TestClient, session: Session
+) -> None:
+    """Sejak Administrator ikut memegang `commander_decision:approve` (9 Oktober 2026),
+    pemanggil endpoint ini selalu penyetuju, sehingga memindahkan penyetuju LAIN tidak
+    pernah menghabiskan pemegangnya. Aturan "penyetuju terakhir" kini hanya dapat
+    tersentuh oleh akun yang menonaktifkan dirinya sendiri (test di bawah)."""
     admin = _make_user(session, "Administrator")
-    approver = _sole_approver(session)
+    _leave_as_sole_approver(session, admin)
+    leader = _make_user(session, "Pimpinan")
 
     response = client.patch(
-        f"/api/v1/users/{approver.code}",
-        json={"role_code": _role(session, "Administrator").code},
+        f"/api/v1/users/{leader.code}",
+        json={"role_code": _role(session, "Fungsi").code, "function": "SAMAPTA"},
         headers=_auth(client, admin),
     )
 
-    assert response.status_code == 409, response.text
-    assert "commander_decision:approve" in response.json()["error"]["message"]
-
-    session.expire(approver)
-    assert approver.role.role_name == "Pimpinan"
+    assert response.status_code == 200, response.text
+    assert response.json()["role"] == "Fungsi"
 
 
-def test_last_approver_cannot_be_deactivated_either(client: TestClient, session: Session) -> None:
-    """Menonaktifkan akunnya menghabiskan pemegangnya sama saja dengan memindahkannya.
+def test_last_approver_cannot_deactivate_themself(client: TestClient, session: Session) -> None:
+    """Tanpa pemegang `commander_decision:approve`, rantai human-in-the-loop mati.
 
-    `api/deps.py` menolak akun non-`ACTIVE`, jadi Pimpinan yang dinonaktifkan tidak
-    dapat menyetujui apa pun. Aturannya diperiksa terhadap keadaan hasil, bukan
-    terhadap satu bidang saja.
+    `api/deps.py` menolak akun non-`ACTIVE`, jadi penyetuju yang dinonaktifkan tidak
+    dapat menyetujui apa pun. Aturannya diperiksa terhadap keadaan hasil.
     """
     admin = _make_user(session, "Administrator")
-    approver = _sole_approver(session)
+    _leave_as_sole_approver(session, admin)
 
     response = client.patch(
-        f"/api/v1/users/{approver.code}",
+        f"/api/v1/users/{admin.code}",
         json={"status": "INACTIVE"},
         headers=_auth(client, admin),
     )
 
     assert response.status_code == 409, response.text
-    session.expire(approver)
-    assert approver.status == "ACTIVE"
+    assert "commander_decision:approve" in response.json()["error"]["message"]
+    session.expire(admin)
+    assert admin.status == "ACTIVE"
 
 
-def test_approver_may_be_reassigned_once_a_replacement_exists(
+def test_approver_may_be_deactivated_once_a_replacement_exists(
     client: TestClient, session: Session
 ) -> None:
-    """Aturannya diperiksa terhadap basis data, bukan terhadap daftar nama tetap.
-
-    Begitu ada penyetuju kedua yang aktif, pemindahan yang tadinya ditolak menjadi sah.
-    Tanpa test ini, aturan di atas sama saja dengan mengunci satu baris tertentu
-    selamanya.
-    """
+    """Aturannya diperiksa terhadap basis data, bukan terhadap daftar nama tetap: begitu
+    ada penyetuju kedua yang aktif, penonaktifan yang tadinya ditolak menjadi sah."""
     admin = _make_user(session, "Administrator")
-    approver = _sole_approver(session)
+    _leave_as_sole_approver(session, admin)
     _make_user(session, "Pimpinan")  # pengganti
 
     response = client.patch(
-        f"/api/v1/users/{approver.code}",
-        json={"role_code": _role(session, "Administrator").code},
+        f"/api/v1/users/{admin.code}",
+        json={"status": "INACTIVE"},
         headers=_auth(client, admin),
     )
 
     assert response.status_code == 200, response.text
-    assert response.json()["role"] == "Administrator"
+    assert response.json()["status"] == "INACTIVE"
 
 
 def test_scoped_role_requires_its_attribute(client: TestClient, session: Session) -> None:

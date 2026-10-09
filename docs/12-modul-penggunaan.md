@@ -922,6 +922,13 @@ yang ditetapkan pemilik proyek.
 
 ## 17. LAPORAN MASYARAKAT
 
+> **9 Oktober 2026.** Mengubah status laporan masyarakat dan kejadian kini **hanya oleh
+> Administrator**; Polsek dan Fungsi tetap mencatat. Laporan berkategori **tawuran** dan
+> **begal (Kejahatan Jalanan)** disorot berkedip pada lonceng dan spanduk atas, seperti
+> darurat. Administrator kini juga dapat **memutuskan rekomendasi** seperti Pimpinan. Pada
+> **Rencana Patroli** tersedia **Unduh perkiraan (.docx)**: perkiraan singkat bulan depan —
+> kelurahan, blok jam, dan rekomendasi per jenis — dari pola bulan yang sama tahun sebelumnya.
+
 ### Bagaimana masyarakat mengirim laporan
 
 Warga **tidak masuk ke aplikasi ini**. Mereka membuka halaman muka dan menekan **Lapor

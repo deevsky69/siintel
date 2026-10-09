@@ -535,7 +535,9 @@ def update_crime_status(
     code: str,
     payload: CrimeStatusRequest,
     session: Session = Depends(get_db),
-    current: CurrentUser = require_permission("crime:write"),
+    # `*:triage`, bukan `*:write` (9 Oktober 2026): mencatat dan mengubah status adalah dua
+    # kewenangan; yang kedua hanya pada Administrator (keputusan pemilik proyek).
+    current: CurrentUser = require_permission("crime:triage"),
 ) -> dict[str, Any]:
     """Memindahkan kejadian sepanjang alur penanganannya, beserta jejaknya.
 
@@ -564,7 +566,7 @@ def update_crime_status(
     ditulis di satu tempat — di sini — dan bukan disebar ke layar.
     """
     new_status = _validated(DOMAIN_CRIME_STATUS, payload.status, "Status kejadian")
-    polsek = jurisdiction_filter(current, "crime:write")
+    polsek = jurisdiction_filter(current, "crime:triage")
 
     query = (
         select(CrimeIncident, Location)
@@ -647,7 +649,7 @@ def update_report_status(
     code: str,
     payload: ReportStatusRequest,
     session: Session = Depends(get_db),
-    current: CurrentUser = require_permission("citizen_report:write"),
+    current: CurrentUser = require_permission("citizen_report:triage"),
 ) -> dict[str, Any]:
     """Mengubah status satu laporan masyarakat, beserta jejaknya.
 
@@ -679,7 +681,7 @@ def update_report_status(
     wilayah. Menebak wilayahnya sama saja dengan mengarang lokasi.
     """
     new_status = _validated(DOMAIN_CITIZEN_STATUS, payload.status, "Status laporan")
-    polsek = jurisdiction_filter(current, "citizen_report:write")
+    polsek = jurisdiction_filter(current, "citizen_report:triage")
 
     query = (
         select(CitizenReport, Location)

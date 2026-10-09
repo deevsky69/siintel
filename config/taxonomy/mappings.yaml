@@ -253,3 +253,10 @@ citizen_report_categories:
   - Keramaian Meresahkan
   - Gangguan Lalu Lintas
   - Kerawanan Lingkungan
+
+# Kategori laporan masyarakat yang DISOROT pada notifikasi (berkedip, paling atas setelah
+# darurat) — keputusan pemilik proyek 9 Oktober 2026: "tawuran dan begal". Begal masuk
+# kategori Kejahatan Jalanan. Satu sumber untuk API, web, dan Android (CLAUDE.md §12).
+citizen_report_urgent_categories:
+  - Tawuran dan Perkelahian Kelompok
+  - Kejahatan Jalanan

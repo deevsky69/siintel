@@ -123,7 +123,8 @@ def proposal(session: Session) -> list[dict[str, object]]:
 def test_only_the_approving_role_may_decide(
     client: TestClient, session: Session, proposal: list[dict[str, object]]
 ) -> None:
-    headers = _auth(client, _user(session, "Administrator"))
+    # Administrator ikut berwenang sejak 9 Oktober 2026; Fungsi tidak.
+    headers = _auth(client, _user(session, "Fungsi"))
     response = client.post(DECISIONS, json={"decision": "APPROVED"}, headers=headers)
     assert response.status_code == 403, response.text
 

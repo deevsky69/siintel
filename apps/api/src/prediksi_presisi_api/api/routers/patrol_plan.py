@@ -18,13 +18,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ...models import PatrolPlanDecision
-from ...services import audit, clock
+from ...services import audit, clock, outlook
 from ...services import patrol_plan as planning
 from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
 from ..errors import ApiError
@@ -233,3 +233,47 @@ def list_patrol_plan_decisions(
         "limit": MAX_HISTORY,
         "decision_basis": planning.DECISION_BASIS,
     }
+
+
+OUTLOOK_FILENAME = "perkiraan-kerawanan-{month}.docx"
+
+
+@router.get(
+    "/outlook",
+    summary="Perkiraan singkat satu bulan ke depan — di mana, jam berapa, rekomendasinya",
+)
+def monthly_outlook(
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("recommendation:read"),
+    month: str | None = Query(
+        None, pattern=r"^\d{4}-\d{2}$", description="Bulan sasaran YYYY-MM; kosong = bulan depan"
+    ),
+    format: str = Query("json", pattern="^(json|docx)$"),
+) -> Any:
+    """Permintaan pemilik proyek 9 Oktober 2026. `format=docx` mengunduh dokumen Word."""
+    polsek = jurisdiction_filter(current, "recommendation:read")
+    if month:
+        year, month_number = int(month[:4]), int(month[5:7])
+        if not 1 <= month_number <= 12:
+            raise ApiError(status.HTTP_400_BAD_REQUEST, "Bulan harus 01-12.")
+    else:
+        year, month_number = outlook.default_target_month()
+    result = outlook.build_outlook(session, year, month_number, polsek)
+    audit.record(
+        session,
+        action="EXPORT_OUTLOOK" if format == "docx" else "VIEW_OUTLOOK",
+        resource_type="patrol_plan",
+        result=audit.RESULT_SUCCESS,
+        user_id=current.user.user_id,
+        resource_id=result["target_month"],
+        detail={"format": format, "scope": polsek},
+    )
+    session.commit()
+    if format == "docx":
+        filename = OUTLOOK_FILENAME.format(month=result["target_month"])
+        return Response(
+            content=outlook.render_docx(result),
+            media_type=("application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    return result

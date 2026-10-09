@@ -377,6 +377,21 @@ Audit: `CREATE_OPERATIONAL_ACTION`, `UPDATE_OPERATIONAL_ACTION`.
 `/evaluation/metrics` mengembalikan precision, recall, false positive, false negative (CLAUDE.md §26) beserta `evaluated_from/to`, `unevaluable_incidents` (kejadian tanpa jam pada periode), `warning_floor`, `threshold_version`, `threat_types` (dari versi bobot aktif), dan **aturan pencocokan yang dipakai** (`basis`). Barisnya ditulis oleh evaluasi mundur `python -m prediksi_presisi_api.cli backtest --dari --sampai` (pekerjaan batch di server, bukan endpoint — `/evaluation/run` tidak dibuat).
 > Selama aturan pencocokan belum ditetapkan (U-03), respons wajib menandai hasil sebagai `PROPOSED` dan tidak boleh disajikan sebagai validasi model final.
 
+### 2.10b Perkiraan singkat bulan depan (9 Oktober 2026)
+
+| Method | Path | Permission |
+|---|---|---|
+| GET | `/patrol-plan/outlook?month=YYYY-MM&format=json\|docx` | `recommendation:read` (cakupan Polsek) |
+
+Kelurahan × blok 3 jam × jenis dari bulan kalender yang sama pada tahun-tahun sebelumnya
+(aturan slot sama dengan rencana patroli), rekomendasi dari `function-rules.yaml`. `format=docx`
+mengunduh dokumen Word; audit `VIEW_OUTLOOK` / `EXPORT_OUTLOOK`. Status PROPOSED.
+
+**Status laporan (9 Oktober 2026).** `POST /citizen-reports/{code}/status` kini menuntut
+`citizen_report:triage` dan `POST /crimes/{code}/status` menuntut `crime:triage` — keduanya hanya
+Administrator. `GET /notifications` membawa `urgent`/`urgent_total` per kelompok dan `urgent` per
+item (darurat; laporan berkategori mendesak).
+
 ### 2.11 Partisipasi Masyarakat
 
 | Method | Path | Permission |

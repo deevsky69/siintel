@@ -86,7 +86,8 @@ object Perm {
     const val WARNING_ACK = "warning:acknowledge"
     const val WARNING_RESOLVE = "warning:resolve"
     const val REPORT_READ = "citizen_report:read"
-    const val REPORT_WRITE = "citizen_report:write"
+    // 9 Oktober 2026: hanya Administrator yang mengubah status (citizen_report:triage).
+    const val REPORT_TRIAGE = "citizen_report:triage"
     const val RECOMMENDATION_READ = "recommendation:read"
     const val DECIDE = "commander_decision:approve"
     const val PANIC_READ = "panic:read"
@@ -431,7 +432,7 @@ private fun HomeBoard(state: PetugasState, actions: PetugasActions) {
                     onClick = if (target != null && queue.total > 0) {
                         { if (first != null && queue.total == 1) actions.onOpen(DetailRef(target, first.code)) else actions.onTab(target) }
                     } else null,
-                    alarm = queue.kind == "PANIC",
+                    alarm = queue.kind == "PANIC" || queue.urgent,
                 )
             }
         }
@@ -804,7 +805,7 @@ private fun DetailPage(detail: DetailRef, state: PetugasState, actions: PetugasA
                     Field("Keterangan tempat", r.locationText)
                     Field(stringResource(R.string.label_reported), shortTime(r.reportedAt))
                     Field(stringResource(R.string.label_attach_count), if (r.attachments > 0) "${r.attachments} berkas (dibuka di web)" else "")
-                    if (r.status == "RECEIVED" && state.allows(Perm.REPORT_WRITE)) {
+                    if (r.status == "RECEIVED" && state.allows(Perm.REPORT_TRIAGE)) {
                         SecondaryButton(
                             text = stringResource(if (acting) R.string.verifying else R.string.verify),
                             onClick = { actions.onVerify(r.code) },
@@ -948,7 +949,7 @@ private val NO_ACTIONS = PetugasActions({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, 
 
 private val PREVIEW_PROFILE = Api.Profile(
     "Bripka Contoh", "Polsek",
-    listOf(Perm.WARNING_READ, Perm.WARNING_ACK, Perm.REPORT_READ, Perm.REPORT_WRITE),
+    listOf(Perm.WARNING_READ, Perm.WARNING_ACK, Perm.REPORT_READ, Perm.REPORT_TRIAGE),
 )
 
 @Preview(showBackground = true, backgroundColor = 0xFF050B18, widthDp = 360, heightDp = 640)

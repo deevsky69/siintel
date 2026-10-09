@@ -58,6 +58,8 @@ export function PatrolPlanView({
         {plan.plan_basis}
       </Basis>
 
+      <OutlookExport />
+
       <Panel
         title={`Rencana Patroli ${plan.target_year}`}
         action={
@@ -339,6 +341,39 @@ function EvaluationPanel({ evaluation }: { evaluation: PlanEvaluation }) {
           </div>
         </details>
       </div>
+    </Panel>
+  );
+}
+
+/**
+ * Ekspor perkiraan singkat satu bulan ke depan (.docx) — permintaan pemilik proyek 9 Oktober
+ * 2026. Unduhan lewat rute `/api/perkiraan`, yang menyeberangkan sesi ke API. Bulan sasaran
+ * bawaan ditentukan API (bulan setelah waktu acuan); pengguna dapat memilih bulan lain.
+ */
+function OutlookExport() {
+  return (
+    <Panel title="Perkiraan Singkat Bulan Depan">
+      <form method="get" action="/api/perkiraan" className="flex flex-wrap items-end gap-3 text-xs">
+        <label className="flex flex-col gap-1">
+          <span className="stat-label">Bulan sasaran</span>
+          <input
+            type="month"
+            name="bulan"
+            className="rounded border border-base-700 bg-base-850 px-2 py-1.5 font-mono text-xs text-ink"
+          />
+        </label>
+        <button
+          type="submit"
+          className="rounded border border-accent/60 bg-accent/10 px-3 py-1.5 font-heading text-xs font-semibold text-accent transition hover:bg-accent/20"
+        >
+          Unduh perkiraan (.docx)
+        </button>
+        <p className="basis-full text-2xs leading-relaxed text-ink-muted">
+          Satu dokumen Word: di kelurahan mana, pada blok jam berapa, dan apa rekomendasinya untuk
+          tiap jenis ancaman — disusun dari kejadian pada bulan yang sama tahun-tahun sebelumnya
+          (bukan model terlatih; PROPOSED). Kosongkan bulan untuk bulan depan.
+        </p>
+      </form>
     </Panel>
   );
 }

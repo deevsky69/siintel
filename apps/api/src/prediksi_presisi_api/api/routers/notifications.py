@@ -59,6 +59,7 @@ from ...models import (
 from ...services import clock
 from ...services import patrol_plan as planning
 from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
+from .public_intake import load_urgent_categories
 
 router = APIRouter(tags=["notifikasi"])
 
@@ -120,6 +121,9 @@ def notifications(
                 "action": "Terima dan tindak lanjuti sekarang",
                 "href": "/panic",
                 "total": int(panic_total or 0),
+                # Selalu disorot bila ada isinya (9 Oktober 2026): layar mengedipkannya.
+                "urgent": int(panic_total or 0) > 0,
+                "urgent_total": int(panic_total or 0),
                 "items": [
                     {
                         "code": event.code,
@@ -251,8 +255,10 @@ def notifications(
         )
 
     # --- Laporan masyarakat yang belum diverifikasi -----------------------------------
-    if _holds(current, "citizen_report:write"):
-        polsek = jurisdiction_filter(current, "citizen_report:write")
+    # Diikat ke `citizen_report:triage` (9 Oktober 2026): yang mengubah status laporan
+    # hanya Administrator, dan antrean ini adalah daftar pekerjaan, bukan umpan berita.
+    if _holds(current, "citizen_report:triage"):
+        polsek = jurisdiction_filter(current, "citizen_report:triage")
         # Laporan tanpa lokasi tidak dapat dibebankan ke wilayah mana pun; pengguna
         # ber-cakupan tidak menerimanya, sebab menampilkannya berarti menebak.
         query = select(CitizenReport).where(CitizenReport.status == "RECEIVED")
@@ -269,9 +275,18 @@ def notifications(
                 Location, Location.location_id == CitizenReport.location_id
             ).where(Location.polsek == polsek)
 
+        # Kategori mendesak (tawuran, begal — 9 Oktober 2026) didahulukan di contoh isi dan
+        # dihitung terpisah supaya layar dapat menyorotnya; daftarnya satu sumber di taksonomi.
+        urgent_categories = load_urgent_categories()
         reports = session.scalars(
-            query.order_by(CitizenReport.reported_at.desc()).limit(SAMPLE_LIMIT)
+            query.order_by(
+                CitizenReport.category.in_(urgent_categories).desc(),
+                CitizenReport.reported_at.desc(),
+            ).limit(SAMPLE_LIMIT)
         ).all()
+        urgent_total = int(
+            session.scalar(counter.where(CitizenReport.category.in_(urgent_categories))) or 0
+        )
         groups.append(
             {
                 "kind": "CITIZEN_REPORT",
@@ -279,11 +294,14 @@ def notifications(
                 "action": "Triase",
                 "href": "/masyarakat?status=RECEIVED",
                 "total": int(session.scalar(counter) or 0),
+                "urgent": urgent_total > 0,
+                "urgent_total": urgent_total,
                 "items": [
                     {
                         "code": report.code,
                         "headline": report.category,
                         "detail": (report.description or "")[:70] or "Tanpa keterangan.",
+                        "urgent": report.category in urgent_categories,
                     }
                     for report in reports
                 ],

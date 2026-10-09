@@ -20,6 +20,7 @@ dependencies = [
   "pillow>=11.0",
   # Menerima unggahan multipart pada kanal laporan masyarakat.
   "python-multipart>=0.0.20",
+  "python-docx>=1.1",
 ]
 
 [dependency-groups]

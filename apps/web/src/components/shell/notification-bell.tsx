@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { NotificationFeed } from "@/lib/notifications";
+import { type NotificationFeed, urgentGroups } from "@/lib/notifications-shape";
 
 /**
  * Lonceng antrean pekerjaan di pojok kanan atas.
@@ -51,6 +51,8 @@ export function NotificationBell({ feed }: { feed: NotificationFeed }) {
   }, [open]);
 
   const waiting = feed.total > 0;
+  // Darurat / tawuran / begal (9 Oktober 2026): lonceng ikut berkedip, bukan hanya merah.
+  const urgent = urgentGroups(feed).length > 0;
 
   return (
     <div ref={box} className="relative">
@@ -62,9 +64,11 @@ export function NotificationBell({ feed }: { feed: NotificationFeed }) {
           waiting ? `${feed.total} pekerjaan menunggu Anda` : "Tidak ada pekerjaan yang menunggu"
         }
         className={`relative flex items-center gap-1.5 rounded border px-2.5 py-1.5 transition-colors ${
-          waiting
-            ? "border-risk-critical/50 bg-risk-critical/10 text-risk-critical hover:bg-risk-critical/20"
-            : "border-base-700 text-ink-muted hover:border-accent/40 hover:text-accent"
+          urgent
+            ? "urgent-blink border-risk-critical text-risk-critical"
+            : waiting
+              ? "border-risk-critical/50 bg-risk-critical/10 text-risk-critical hover:bg-risk-critical/20"
+              : "border-base-700 text-ink-muted hover:border-accent/40 hover:text-accent"
         }`}
       >
         <svg
@@ -119,7 +123,19 @@ export function NotificationBell({ feed }: { feed: NotificationFeed }) {
                     {group.items.length > 0 ? (
                       <ul className="mt-1.5 space-y-1">
                         {group.items.map((item) => (
-                          <li key={item.code} className="text-2xs leading-tight">
+                          <li
+                            key={item.code}
+                            className={`text-2xs leading-tight ${
+                              item.urgent || group.kind === "PANIC"
+                                ? "rounded border border-risk-critical/60 bg-risk-critical/10 px-1.5 py-1"
+                                : ""
+                            }`}
+                          >
+                            {item.urgent || group.kind === "PANIC" ? (
+                              <span className="mr-1 font-heading text-2xs font-bold uppercase text-risk-critical">
+                                {group.kind === "PANIC" ? "Darurat" : "Segera"}
+                              </span>
+                            ) : null}
                             <span className="text-ink-muted">{item.headline}</span>
                             <span className="block text-ink-faint">{item.detail}</span>
                           </li>

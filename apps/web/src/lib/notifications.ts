@@ -8,30 +8,13 @@ import { apiGet } from "./api";
  * dan yang di layar akan menyimpang tanpa ada yang menyadarinya.
  */
 
-export type NotificationItem = {
-  code: string;
-  headline: string;
-  detail: string;
-};
+export type {
+  NotificationFeed,
+  NotificationGroup,
+  NotificationItem,
+} from "./notifications-shape";
+export { urgentGroups } from "./notifications-shape";
 
-export type NotificationGroup = {
-  kind: string;
-  title: string;
-  /** Kata kerja yang menyebut apa yang dikerjakan di sana. */
-  action: string;
-  href: string;
-  total: number;
-  /** Contoh isi, paling banyak tiga. */
-  items: NotificationItem[];
-};
-
-export type NotificationFeed = {
-  reference_time: string;
-  demo_clock: boolean;
-  role: string | null;
-  total: number;
-  groups: NotificationGroup[];
-  basis: string;
-};
+import type { NotificationFeed } from "./notifications-shape";
 
 export const getNotifications = () => apiGet<NotificationFeed>("/notifications");

@@ -3,6 +3,11 @@ package id.polri.jaksel.laporpresisi.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -107,10 +112,17 @@ fun TaskCard(
 ) {
     val live = count > 0
     val tint = if (alarm && live) PresisiColors.Critical else if (live) PresisiColors.Accent else PresisiColors.InkFaint
+    // Kedip untuk darurat dan laporan mendesak (9 Oktober 2026): latar merah bernapas.
+    val pulse = rememberInfiniteTransition(label = "pulse").animateFloat(
+        initialValue = 0.12f,
+        targetValue = 0.38f,
+        animationSpec = infiniteRepeatable(tween(650), RepeatMode.Reverse),
+        label = "pulse-alpha",
+    )
     Row(
         modifier
             .fillMaxWidth()
-            .background(if (alarm && live) PresisiColors.Critical.copy(alpha = 0.12f) else PresisiColors.Base900, BoxShape)
+            .background(if (alarm && live) PresisiColors.Critical.copy(alpha = pulse.value) else PresisiColors.Base900, BoxShape)
             .border(1.dp, if (alarm && live) PresisiColors.Critical.copy(alpha = 0.7f) else PresisiColors.Base700.copy(alpha = 0.55f), BoxShape)
             .let { if (onClick != null) it.clickable(onClick = onClick) else it }
             .padding(16.dp),

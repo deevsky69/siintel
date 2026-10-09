@@ -215,6 +215,12 @@ def load_report_categories() -> list[str]:
     return [str(name) for name in categories]
 
 
+def load_urgent_categories() -> tuple[str, ...]:
+    """Kategori yang disorot pada notifikasi (tawuran, begal) — dari taksonomi, satu sumber."""
+    raw: dict[str, Any] = yaml.safe_load(TAXONOMY_FILE.read_text(encoding="utf-8"))
+    return tuple(str(name) for name in (raw.get("citizen_report_urgent_categories") or []))
+
+
 # ---------------------------------------------------------------------------
 # Model permintaan
 # ---------------------------------------------------------------------------
