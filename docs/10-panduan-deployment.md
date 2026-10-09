@@ -652,6 +652,7 @@ Yang wajib diisi:
 | `ACME_EMAIL` | **hanya untuk JALUR B**; boleh dikosongkan pada JALUR A |
 | `MESSAGING_API_KEY` | kunci bersama API ⇄ bot; dibuat `scripts/pasang-kanal-perpesanan.sh`. Kosong = kanal perpesanan tidak aktif |
 | `TELEGRAM_BOT_TOKEN` | token dari @BotFather; kosong = bot Telegram tidak dijalankan |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`, `TWILIO_WEBHOOK_URL` | WhatsApp lewat Twilio (Sandbox untuk peragaan); diisi `scripts/pasang-kanal-perpesanan.sh` |
 | `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | dari Meta Business Suite (App Secret dari pengaturan aplikasi Meta; dipakai memverifikasi tanda tangan webhook); kosong = kanal WhatsApp tidak dijalankan |
 
 **Peringatan tentang `DEMO_REFERENCE_TIME`.** Data asli Pusiknas berposisi 29 September 2026
@@ -922,6 +923,38 @@ atas nama nomor mana pun.
 Skrip membuat `WHATSAPP_VERIFY_TOKEN`. Daftarkan webhook di Meta:
 `https://<domain>/webhook/whatsapp` dengan verify token itu, dan langganan field `messages`.
 Rute `/webhook/whatsapp` menuju kontainer bot ditambahkan `docker-compose.coolify.yml`.
+
+### 6b.2b WhatsApp lewat Twilio Sandbox — untuk peragaan tanpa akun bisnis Meta
+
+Ditambahkan 9 Oktober 2026 karena onboarding langsung ke Meta memblokir akun baru. Twilio
+adalah penyedia resmi WhatsApp; **Sandbox for WhatsApp**-nya gratis pada akun percobaan dan
+tidak menuntut akun bisnis Meta. Mekanismenya:
+
+```text
+peserta ──"join <dua-kata>"──▶ nomor sandbox Twilio ──POST /webhook/twilio──▶ bot ──REST Twilio──▶ peserta
+```
+
+1. Daftar di https://www.twilio.com/try-twilio (akun percobaan). Di Console salin
+   **Account SID** dan **Auth Token** (halaman muka Console).
+2. Console → **Messaging** → **Try it out** → **Send a WhatsApp message**. Di sana ada nomor
+   sandbox dan kata kunci `join <dua-kata>`; kirim pesan itu dari WhatsApp Anda ke nomor
+   tersebut (peserta lain melakukan hal yang sama — ini syarat sandbox).
+3. Di server:
+
+```bash
+TWILIO_ACCOUNT_SID='AC...' TWILIO_AUTH_TOKEN='...' bash scripts/pasang-kanal-perpesanan.sh
+bash scripts/deploy-produksi.sh
+```
+
+4. Kembali ke Twilio: tab **Sandbox settings**, isi *When a message comes in* dengan
+   `https://<domain>/webhook/twilio`, metode **HTTP POST**, simpan.
+5. Dari WhatsApp kirim `mulai` ke nomor sandbox.
+
+Batas sandbox: nomor milik Twilio; keanggotaan `join` kedaluwarsa 72 jam tanpa pesan;
+tanpa tombol (pilihan dijawab nomor); kabar perkembangan hanya sampai dalam 24 jam sejak
+pesan terakhir pelapor. Setiap POST diverifikasi tanda tangan `X-Twilio-Signature`
+(HMAC-SHA1 dengan Auth Token atas URL `TWILIO_WEBHOOK_URL`); URL itu harus **persis** sama
+dengan yang didaftarkan di Twilio, termasuk tanpa garis miring akhir.
 
 ### 6b.3 Yang disimpan dari pelapor
 

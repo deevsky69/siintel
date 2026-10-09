@@ -25,18 +25,19 @@ import logging
 import re
 import threading
 import time
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 import httpx
 
 from .backend import Backend, BackendError
 from .core import Attachment, Conversation, Incoming, Reply, progress_message
+from .webhook import Response, WebhookServer, run_later
 
 log = logging.getLogger("lapor_bot.whatsapp")
 CHANNEL = "WHATSAPP"
 GRAPH = "https://graph.facebook.com/v21.0"
+WEBHOOK_PATH = "/webhook/whatsapp"
 MAX_FILE_BYTES = 20 * 1024 * 1024
 MEDIA_ID = re.compile(r"^[0-9]+$")
 #: Host tempat Meta menyajikan media; token akses hanya dikirim ke sini.
@@ -184,57 +185,28 @@ class WhatsAppChannel:
             return query.get("hub.challenge", [""])[0]
         return None
 
-    def serve_forever(self, port: int) -> None:
-        channel = self
+    def register(self, server: WebhookServer) -> None:
+        """Mendaftarkan /webhook/whatsapp: GET verifikasi Meta, POST pesan bertanda tangan."""
 
-        class Handler(BaseHTTPRequestHandler):
-            def log_message(self, format: str, *args: Any) -> None:  # noqa: A002
-                log.debug(format, *args)
+        def on_get(query: dict[str, list[str]]) -> Response:
+            challenge = self.verify(query)
+            if challenge is None:
+                return 403, "text/plain", b""
+            return 200, "text/plain", challenge.encode()
 
-            def do_GET(self) -> None:  # noqa: N802
-                parsed = urlparse(self.path)
-                if parsed.path.rstrip("/") != "/webhook/whatsapp":
-                    self.send_response(404)
-                    self.end_headers()
-                    return
-                challenge = channel.verify(parse_qs(parsed.query))
-                if challenge is None:
-                    self.send_response(403)
-                    self.end_headers()
-                    return
-                payload = challenge.encode()
-                self.send_response(200)
-                self.send_header("Content-Type", "text/plain")
-                self.send_header("Content-Length", str(len(payload)))
-                self.end_headers()
-                self.wfile.write(payload)
+        def on_post(raw: bytes, headers: dict[str, str], _path: str) -> Response:
+            # Tanda tangan diperiksa SEBELUM apa pun dibaca dari isinya.
+            if not signature_valid(self._app_secret, raw, headers.get("x-hub-signature-256", "")):
+                return 401, "text/plain", b""
+            try:
+                body = json.loads(raw or b"{}")
+            except ValueError:
+                return 200, "text/plain", b""
+            # Meta menuntut 200 segera; pemrosesan dilakukan setelah jawaban.
+            run_later(lambda: self.handle_webhook(body))
+            return 200, "text/plain", b""
 
-            def do_POST(self) -> None:  # noqa: N802
-                if urlparse(self.path).path.rstrip("/") != "/webhook/whatsapp":
-                    self.send_response(404)
-                    self.end_headers()
-                    return
-                length = int(self.headers.get("Content-Length") or 0)
-                raw = self.rfile.read(length) if length else b"{}"
-                # Tanda tangan diperiksa SEBELUM apa pun dibaca dari isinya.
-                if not signature_valid(
-                    channel._app_secret, raw, self.headers.get("X-Hub-Signature-256", "")
-                ):
-                    self.send_response(401)
-                    self.end_headers()
-                    return
-                # Meta menuntut 200 segera; pemrosesan dilakukan setelah jawaban.
-                self.send_response(200)
-                self.end_headers()
-                try:
-                    body = json.loads(raw or b"{}")
-                except ValueError:
-                    return
-                threading.Thread(target=channel.handle_webhook, args=(body,), daemon=True).start()
-
-        server = ThreadingHTTPServer(("0.0.0.0", port), Handler)  # noqa: S104 — di dalam kontainer
-        log.info("WhatsApp: webhook mendengarkan di port %s", port)
-        server.serve_forever()
+        server.route(WEBHOOK_PATH, get=on_get, post=on_post)
 
     def notify_forever(self) -> None:
         log.info("WhatsApp: memeriksa kabar perkembangan tiap %s detik", self._interval)

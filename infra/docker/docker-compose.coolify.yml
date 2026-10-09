@@ -157,8 +157,9 @@ services:
       traefik.http.routers.predpol-api.middlewares: predpol-security-headers
       traefik.http.services.predpol-api.loadbalancer.server.port: "8000"
 
-  # Webhook WhatsApp (8 Oktober 2026): satu jalur publik ke kontainer bot. Telegram tidak
-  # membutuhkannya. Verifikasi webhook memakai WHATSAPP_VERIFY_TOKEN, bukan terbuka.
+  # Webhook kanal yang didorong pihak luar (8–9 Oktober 2026): /webhook/whatsapp (Meta Cloud
+  # API) dan /webhook/twilio (Twilio). Telegram tidak membutuhkannya. Setiap POST diverifikasi
+  # tanda tangannya oleh bot; jalur ini publik tetapi tidak terbuka.
   bot:
     networks:
       - internal
@@ -167,7 +168,7 @@ services:
       traefik.enable: "true"
       traefik.docker.network: coolify
       traefik.http.routers.predpol-bot.entrypoints: https
-      traefik.http.routers.predpol-bot.rule: PathPrefix(`/webhook/whatsapp`)
+      traefik.http.routers.predpol-bot.rule: PathPrefix(`/webhook/`)
       traefik.http.routers.predpol-bot.priority: "110"
       traefik.http.routers.predpol-bot.tls: "true"
       traefik.http.routers.predpol-bot.service: predpol-bot

@@ -25,7 +25,17 @@ class Settings(BaseSettings):
     #: App secret aplikasi Meta — untuk memverifikasi tanda tangan X-Hub-Signature-256 setiap
     #: webhook. Tanpa ini siapa pun dapat mengirim POST palsu atas nama nomor mana pun.
     whatsapp_app_secret: str = ""
-    #: Port penerima webhook WhatsApp di dalam kontainer.
-    whatsapp_webhook_port: int = 8080
+    #: Twilio (Sandbox for WhatsApp untuk peragaan, atau nomor resmi lewat Twilio).
+    #: Kanal berjalan bila SID, auth token, nomor pengirim, dan URL webhook publik terisi.
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    #: mis. whatsapp:+14155238886 (nomor sandbox) — lihat Twilio Console.
+    twilio_whatsapp_from: str = ""
+    #: URL webhook persis seperti yang didaftarkan di Twilio, dipakai memverifikasi tanda
+    #: tangan: https://<domain>/webhook/twilio
+    twilio_webhook_url: str = ""
+
+    #: Port penerima webhook (WhatsApp Cloud API dan Twilio berbagi satu server).
+    webhook_port: int = 8080
 
     log_level: str = "info"

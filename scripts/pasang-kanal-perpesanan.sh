@@ -14,6 +14,7 @@
 #   TELEGRAM_BOT_TOKEN='123456:ABC...' bash scripts/pasang-kanal-perpesanan.sh
 #   TELEGRAM_BOT_TOKEN='...' WHATSAPP_ACCESS_TOKEN='...' WHATSAPP_PHONE_NUMBER_ID='...' \
 #     bash scripts/pasang-kanal-perpesanan.sh
+#   TWILIO_ACCOUNT_SID='AC...' TWILIO_AUTH_TOKEN='...' bash scripts/pasang-kanal-perpesanan.sh
 #
 # Token Telegram didapat dari @BotFather (perintah /newbot). Nilai WhatsApp dari Meta
 # Business Suite → WhatsApp → API Setup. WHATSAPP_VERIFY_TOKEN dibuat di sini bila kosong;
@@ -69,6 +70,18 @@ if [ -n "${WHATSAPP_ACCESS_TOKEN:-}" ] && [ -n "${WHATSAPP_PHONE_NUMBER_ID:-}" ]
   echo "  verify token: lihat baris WHATSAPP_VERIFY_TOKEN di .env.production"
 else
   echo "  WHATSAPP_ACCESS_TOKEN / WHATSAPP_PHONE_NUMBER_ID / WHATSAPP_APP_SECRET tidak lengkap — dilewati"
+fi
+
+echo "== Twilio (Sandbox for WhatsApp, atau nomor resmi lewat Twilio)"
+if [ -n "${TWILIO_ACCOUNT_SID:-}" ] && [ -n "${TWILIO_AUTH_TOKEN:-}" ]; then
+  set_var TWILIO_ACCOUNT_SID "$TWILIO_ACCOUNT_SID"
+  set_var TWILIO_AUTH_TOKEN "$TWILIO_AUTH_TOKEN"
+  set_var TWILIO_WHATSAPP_FROM "${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}"
+  set_var TWILIO_WEBHOOK_URL "https://$(grep '^DOMAIN=' "$ENV_FILE" | cut -d= -f2)/webhook/twilio"
+  echo "  daftarkan di Twilio Console → Messaging → Try it out → Send a WhatsApp message → Sandbox settings:"
+  echo "  'When a message comes in' = https://$(grep '^DOMAIN=' "$ENV_FILE" | cut -d= -f2)/webhook/twilio  (HTTP POST)"
+else
+  echo "  TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN tidak diberikan — dilewati"
 fi
 
 chmod 600 "$ENV_FILE"

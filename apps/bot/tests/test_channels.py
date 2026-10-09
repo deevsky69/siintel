@@ -104,6 +104,32 @@ def test_whatsapp_media_host_allowlist() -> None:
     assert whatsapp.MEDIA_ID.match("12345") and not whatsapp.MEDIA_ID.match("../x")
 
 
+def test_whatsapp_cloud_webhook_routes_verify_and_signed_posts() -> None:
+    import hashlib
+    import hmac
+
+    from lapor_bot.webhook import WebhookServer
+
+    channel = whatsapp.WhatsAppChannel("tok", "123", "rahasia", "app-secret", backend=None)  # type: ignore[arg-type]
+    server = WebhookServer(0)
+    channel.register(server)
+    assert server.paths == ("/webhook/whatsapp",)
+    get = server._gets["/webhook/whatsapp"]
+    assert (
+        get({"hub.mode": ["subscribe"], "hub.verify_token": ["rahasia"], "hub.challenge": ["c"]})[2]
+        == b"c"
+    )
+    assert (
+        get({"hub.mode": ["subscribe"], "hub.verify_token": ["x"], "hub.challenge": ["c"]})[0]
+        == 403
+    )
+    post = server._posts["/webhook/whatsapp"]
+    raw = b'{"entry": []}'
+    assert post(raw, {}, "/webhook/whatsapp")[0] == 401
+    sig = "sha256=" + hmac.new(b"app-secret", raw, hashlib.sha256).hexdigest()
+    assert post(raw, {"x-hub-signature-256": sig}, "/webhook/whatsapp")[0] == 200
+
+
 def test_whatsapp_verify_requires_matching_token() -> None:
     channel = whatsapp.WhatsAppChannel("tok", "123", "rahasia", "app-secret", backend=None)  # type: ignore[arg-type]
     good = {"hub.mode": ["subscribe"], "hub.verify_token": ["rahasia"], "hub.challenge": ["abc"]}

@@ -35,6 +35,16 @@ muncul/hilang, lampiran, layar petugas tanpa chat_id; seluruh suite API lulus. B
 tanpa jaringan (alur percakapan, keyboard Telegram, render/parse WhatsApp, verifikasi
 webhook); ruff + mypy strict lulus; image Docker terbangun dan menyala.
 
+## Tambahan 9 Oktober 2026 — Twilio Sandbox dan server webhook bersama
+
+Onboarding ke Meta memblokir akun pemilik proyek. Pilihan B pemilik proyek: adapter
+**Twilio** (`twilio.py`) memakai mesin percakapan yang sama; webhook `/webhook/twilio`
+(form-urlencoded, tanda tangan HMAC-SHA1 `X-Twilio-Signature` atas URL publik + parameter),
+balasan lewat REST Twilio, lokasi dari field `Latitude`/`Longitude`, media diunduh dengan
+autentikasi akun dan hanya dari host Twilio. `webhook.py` menjadi satu server untuk kedua
+kanal yang didorong (Cloud API dan Twilio) di port 8080; rute Traefik menjadi `/webhook/`.
+Kabar WHATSAPP dikirim oleh satu pengirim saja (Cloud API didahulukan bila keduanya ada).
+
 ## Belum
 
 - WhatsApp menunggu akun bisnis Meta (gate di docs/01 §19.2).
