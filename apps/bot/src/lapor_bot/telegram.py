@@ -144,6 +144,12 @@ class TelegramChannel:
                 for row in self._backend.updates(CHANNEL):
                     self.send(str(row["chat_id"]), Reply(progress_message(row)))
                     self._backend.ack(CHANNEL, str(row["ticket"]), str(row["status"]))
+            except BackendError as error:
+                # API belum siap (mis. migrasi masih berjalan saat deploy): satu baris
+                # peringatan, bukan jejak tumpukan setiap 30 detik.
+                log.warning(
+                    "Telegram: kabar ditunda, API menjawab %s (%s)", error.status, error.message
+                )
             except Exception:  # noqa: BLE001
                 log.exception("Telegram: pengiriman kabar gagal; mencoba lagi")
             time.sleep(self._interval)

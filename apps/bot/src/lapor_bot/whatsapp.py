@@ -23,7 +23,7 @@ from urllib.parse import parse_qs, urlparse
 
 import httpx
 
-from .backend import Backend
+from .backend import Backend, BackendError
 from .core import Attachment, Conversation, Incoming, Reply, progress_message
 
 log = logging.getLogger("lapor_bot.whatsapp")
@@ -202,6 +202,12 @@ class WhatsAppChannel:
                 for row in self._backend.updates(CHANNEL):
                     self.send(str(row["chat_id"]), Reply(progress_message(row)))
                     self._backend.ack(CHANNEL, str(row["ticket"]), str(row["status"]))
+            except BackendError as error:
+                # API belum siap (mis. migrasi masih berjalan saat deploy): satu baris
+                # peringatan, bukan jejak tumpukan setiap 30 detik.
+                log.warning(
+                    "WhatsApp: kabar ditunda, API menjawab %s (%s)", error.status, error.message
+                )
             except Exception:  # noqa: BLE001
                 log.exception("WhatsApp: pengiriman kabar gagal; mencoba lagi")
             time.sleep(self._interval)

@@ -19,7 +19,9 @@ echo "== kode: $(git rev-parse --short HEAD) $(git log -1 --format=%s | cut -c1-
 echo "== bangun ulang image"
 "${COMPOSE[@]}" build
 echo "== nyalakan ulang"
-"${COMPOSE[@]}" up -d
+# Bot dinyalakan SETELAH migrasi (9 Oktober 2026): ia langsung memanggil /messaging/*,
+# yang menuntut tabel 0013 — menyalakannya lebih dulu hanya menghasilkan galat 500 sia-sia.
+"${COMPOSE[@]}" up -d db api web
 for _ in $(seq 1 60); do
   [ "$(docker inspect -f '{{.State.Health.Status}}' "$API" 2>/dev/null)" = "healthy" ] && break
   sleep 5
@@ -29,6 +31,8 @@ docker inspect -f '{{.State.Health.Status}}' "$API"
 echo "== migration"
 docker exec "$API" alembic upgrade head
 docker exec "$API" alembic current
+echo "== bot kanal perpesanan"
+"${COMPOSE[@]}" up -d bot
 
 echo "== pemeriksaan"
 # Traefik butuh beberapa detik mendaftarkan ulang rute container yang baru dibuat; tanpa
