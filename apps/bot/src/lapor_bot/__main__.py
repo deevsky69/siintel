@@ -45,12 +45,14 @@ def main() -> None:
             settings.whatsapp_access_token,
             settings.whatsapp_phone_number_id,
             settings.whatsapp_verify_token,
+            settings.whatsapp_app_secret,
         )
     ):
         whatsapp = WhatsAppChannel(
             settings.whatsapp_access_token,
             settings.whatsapp_phone_number_id,
             settings.whatsapp_verify_token,
+            settings.whatsapp_app_secret,
             backend,
             settings.notify_interval_seconds,
         )
@@ -66,7 +68,9 @@ def main() -> None:
             threading.Thread(target=whatsapp.notify_forever, name="whatsapp-kabar", daemon=True)
         )
     else:
-        log.warning("WHATSAPP_* belum lengkap — kanal WhatsApp tidak dijalankan.")
+        log.warning(
+            "WHATSAPP_* belum lengkap (token, phone id, verify token, app secret) — kanal WhatsApp tidak dijalankan."
+        )
 
     if not threads:
         log.warning("Tidak ada kanal yang dikonfigurasi; bot menunggu tanpa melakukan apa pun.")

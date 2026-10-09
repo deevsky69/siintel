@@ -652,7 +652,7 @@ Yang wajib diisi:
 | `ACME_EMAIL` | **hanya untuk JALUR B**; boleh dikosongkan pada JALUR A |
 | `MESSAGING_API_KEY` | kunci bersama API ⇄ bot; dibuat `scripts/pasang-kanal-perpesanan.sh`. Kosong = kanal perpesanan tidak aktif |
 | `TELEGRAM_BOT_TOKEN` | token dari @BotFather; kosong = bot Telegram tidak dijalankan |
-| `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN` | dari Meta Business Suite; kosong = kanal WhatsApp tidak dijalankan |
+| `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | dari Meta Business Suite (App Secret dari pengaturan aplikasi Meta; dipakai memverifikasi tanda tangan webhook); kosong = kanal WhatsApp tidak dijalankan |
 
 **Peringatan tentang `DEMO_REFERENCE_TIME`.** Data asli Pusiknas berposisi 29 September 2026
 (kejadian terakhir 28 September). Bila dibiarkan kosong, aplikasi memakai waktu server yang
@@ -909,9 +909,15 @@ Setelah ada, dari Meta Business Suite → WhatsApp → API Setup ambil **access 
 permanen, dari system user) dan **phone number id**, lalu:
 
 ```bash
-WHATSAPP_ACCESS_TOKEN='...' WHATSAPP_PHONE_NUMBER_ID='...' bash scripts/pasang-kanal-perpesanan.sh
+WHATSAPP_ACCESS_TOKEN='...' WHATSAPP_PHONE_NUMBER_ID='...' WHATSAPP_APP_SECRET='...' \
+  bash scripts/pasang-kanal-perpesanan.sh
 bash scripts/deploy-produksi.sh
 ```
+
+App Secret (Meta for Developers → aplikasi → Settings → Basic) wajib: setiap POST webhook
+dicocokkan tanda tangannya (`X-Hub-Signature-256`) sebelum dibaca, dan kanal menolak
+berjalan tanpanya — tanpa itu siapa pun yang tahu alamat webhook dapat mengirim pesan palsu
+atas nama nomor mana pun.
 
 Skrip membuat `WHATSAPP_VERIFY_TOKEN`. Daftarkan webhook di Meta:
 `https://<domain>/webhook/whatsapp` dengan verify token itu, dan langganan field `messages`.

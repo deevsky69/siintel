@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     whatsapp_access_token: str = ""
     whatsapp_phone_number_id: str = ""
     whatsapp_verify_token: str = ""
+    #: App secret aplikasi Meta — untuk memverifikasi tanda tangan X-Hub-Signature-256 setiap
+    #: webhook. Tanpa ini siapa pun dapat mengirim POST palsu atas nama nomor mana pun.
+    whatsapp_app_secret: str = ""
     #: Port penerima webhook WhatsApp di dalam kontainer.
     whatsapp_webhook_port: int = 8080
 

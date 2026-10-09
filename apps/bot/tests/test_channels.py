@@ -78,8 +78,34 @@ def test_whatsapp_webhook_parsing_and_incoming_kinds() -> None:
     assert choice.text == "Tebet"
 
 
+def test_whatsapp_webhook_signature_is_required_and_checked() -> None:
+    import hashlib
+    import hmac
+
+    raw = b'{"entry": []}'
+    good = "sha256=" + hmac.new(b"app-secret", raw, hashlib.sha256).hexdigest()
+    assert whatsapp.signature_valid("app-secret", raw, good) is True
+    assert whatsapp.signature_valid("app-secret", raw + b" ", good) is False
+    assert whatsapp.signature_valid("app-secret", raw, "") is False
+    assert whatsapp.signature_valid("", raw, good) is False
+
+
+def test_whatsapp_channel_refuses_to_start_without_app_secret() -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="WHATSAPP_APP_SECRET"):
+        whatsapp.WhatsAppChannel("tok", "123", "rahasia", "", backend=None)  # type: ignore[arg-type]
+
+
+def test_whatsapp_media_host_allowlist() -> None:
+    assert whatsapp.media_host_allowed("https://lookaside.fbsbx.com/whatsapp_business/x") is True
+    assert whatsapp.media_host_allowed("https://mmg.whatsapp.net/v/x") is True
+    assert whatsapp.media_host_allowed("https://evil.example.com/x") is False
+    assert whatsapp.MEDIA_ID.match("12345") and not whatsapp.MEDIA_ID.match("../x")
+
+
 def test_whatsapp_verify_requires_matching_token() -> None:
-    channel = whatsapp.WhatsAppChannel("tok", "123", "rahasia", backend=None)  # type: ignore[arg-type]
+    channel = whatsapp.WhatsAppChannel("tok", "123", "rahasia", "app-secret", backend=None)  # type: ignore[arg-type]
     good = {"hub.mode": ["subscribe"], "hub.verify_token": ["rahasia"], "hub.challenge": ["abc"]}
     bad = {"hub.mode": ["subscribe"], "hub.verify_token": ["salah"], "hub.challenge": ["abc"]}
     assert channel.verify(good) == "abc"

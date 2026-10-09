@@ -4,8 +4,9 @@
 # Yang dilakukan:
 #   1. Membuat MESSAGING_API_KEY (kunci bersama API ⇄ bot) bila belum ada di .env.production.
 #   2. Menyimpan TELEGRAM_BOT_TOKEN dari variabel lingkungan ke .env.production.
-#   3. (Opsional) Menyimpan WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID,
-#      WHATSAPP_VERIFY_TOKEN bila ketiganya diberikan.
+#   3. (Opsional) Menyimpan WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, dan
+#      WHATSAPP_APP_SECRET (App Secret aplikasi Meta, untuk memverifikasi tanda tangan
+#      webhook) bila ketiganya diberikan; WHATSAPP_VERIFY_TOKEN dibuat otomatis.
 #   4. Memberi tahu langkah berikutnya (deploy).
 #
 # Tidak satu pun nilai rahasia dicetak ke layar. Pakai:
@@ -55,9 +56,10 @@ else
 fi
 
 echo "== WhatsApp"
-if [ -n "${WHATSAPP_ACCESS_TOKEN:-}" ] && [ -n "${WHATSAPP_PHONE_NUMBER_ID:-}" ]; then
+if [ -n "${WHATSAPP_ACCESS_TOKEN:-}" ] && [ -n "${WHATSAPP_PHONE_NUMBER_ID:-}" ] && [ -n "${WHATSAPP_APP_SECRET:-}" ]; then
   set_var WHATSAPP_ACCESS_TOKEN "$WHATSAPP_ACCESS_TOKEN"
   set_var WHATSAPP_PHONE_NUMBER_ID "$WHATSAPP_PHONE_NUMBER_ID"
+  set_var WHATSAPP_APP_SECRET "$WHATSAPP_APP_SECRET"
   if grep -q "^WHATSAPP_VERIFY_TOKEN=.\+" "$ENV_FILE"; then
     echo "  WHATSAPP_VERIFY_TOKEN sudah ada, dipertahankan"
   else
@@ -66,7 +68,7 @@ if [ -n "${WHATSAPP_ACCESS_TOKEN:-}" ] && [ -n "${WHATSAPP_PHONE_NUMBER_ID:-}" ]
   echo "  daftarkan webhook di Meta: https://$(grep '^DOMAIN=' "$ENV_FILE" | cut -d= -f2)/webhook/whatsapp"
   echo "  verify token: lihat baris WHATSAPP_VERIFY_TOKEN di .env.production"
 else
-  echo "  WHATSAPP_ACCESS_TOKEN / WHATSAPP_PHONE_NUMBER_ID tidak diberikan — dilewati"
+  echo "  WHATSAPP_ACCESS_TOKEN / WHATSAPP_PHONE_NUMBER_ID / WHATSAPP_APP_SECRET tidak lengkap — dilewati"
 fi
 
 chmod 600 "$ENV_FILE"

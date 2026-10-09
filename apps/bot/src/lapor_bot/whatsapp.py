@@ -5,6 +5,11 @@ alamat publik (`/webhook/whatsapp`, dirutekan Traefik ke kontainer bot) dan tiga
 Meta: access token, phone number id, dan verify token pilihan sendiri. Tanpa ketiganya
 kanal ini tidak dijalankan.
 
+Setiap POST webhook diverifikasi lewat tanda tangan `X-Hub-Signature-256` (HMAC-SHA256
+dengan app secret aplikasi Meta) SEBELUM dibaca: tanpa itu siapa pun yang tahu alamatnya
+dapat mengirim pesan palsu atas nama nomor mana pun — membuat laporan dan menerima kabarnya.
+Kanal menolak berjalan tanpa app secret.
+
 Pilihan ditampilkan sebagai daftar bernomor dalam teks, bukan "interactive list": daftar
 interaktif dibatasi 10 baris dengan judul 24 huruf, dan nama jenis kejadian kita lebih
 panjang dari itu. Tombol lokasi memakai `location_request_message`, yang membuka dialog
@@ -13,8 +18,11 @@ lokasi perangkat seperti di Telegram.
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import logging
+import re
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -30,6 +38,22 @@ log = logging.getLogger("lapor_bot.whatsapp")
 CHANNEL = "WHATSAPP"
 GRAPH = "https://graph.facebook.com/v21.0"
 MAX_FILE_BYTES = 20 * 1024 * 1024
+MEDIA_ID = re.compile(r"^[0-9]+$")
+#: Host tempat Meta menyajikan media; token akses hanya dikirim ke sini.
+MEDIA_HOSTS = (".fbsbx.com", ".whatsapp.net", ".facebook.com", "graph.facebook.com")
+
+
+def signature_valid(app_secret: str, raw: bytes, header: str) -> bool:
+    """Memeriksa `X-Hub-Signature-256: sha256=<hex>` dengan perbandingan waktu-tetap."""
+    if not app_secret or not header.startswith("sha256="):
+        return False
+    expected = hmac.new(app_secret.encode(), raw, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(header[len("sha256=") :], expected)
+
+
+def media_host_allowed(url: str) -> bool:
+    host = (urlparse(url).hostname or "").lower()
+    return any(host == h.lstrip(".") or host.endswith(h) for h in MEDIA_HOSTS)
 
 
 def render(reply: Reply) -> str:
@@ -99,9 +123,13 @@ class WhatsAppChannel:
         access_token: str,
         phone_number_id: str,
         verify_token: str,
+        app_secret: str,
         backend: Backend,
         notify_interval: int = 30,
     ) -> None:
+        if not app_secret:
+            raise ValueError("WHATSAPP_APP_SECRET kosong: webhook tidak dapat diverifikasi.")
+        self._app_secret = app_secret
         self._graph = httpx.Client(
             base_url=GRAPH, headers={"Authorization": f"Bearer {access_token}"}, timeout=40.0
         )
@@ -119,10 +147,16 @@ class WhatsAppChannel:
                 raise RuntimeError(f"WhatsApp kirim: {response.status_code} {response.text[:200]}")
 
     def fetch(self, media_id: str, filename: str, media_type: str) -> tuple[str, bytes, str]:
+        if not MEDIA_ID.match(media_id):
+            raise RuntimeError("Pengenal media tidak sah.")
         info = self._graph.get(f"/{media_id}").json()
         if int(info.get("file_size") or 0) > MAX_FILE_BYTES:
             raise RuntimeError("Berkas terlalu besar.")
-        content = self._graph.get(str(info["url"])).content
+        url = str(info["url"])
+        # Token akses hanya boleh dikirim ke host Meta; URL dari jawaban API tetap diperiksa.
+        if not media_host_allowed(url):
+            raise RuntimeError("Alamat media di luar host Meta.")
+        content = self._graph.get(url).content
         return filename, content, media_type or str(info.get("mime_type") or "")
 
     def _conversation(self, chat_id: str) -> Conversation:
@@ -182,6 +216,13 @@ class WhatsAppChannel:
                     return
                 length = int(self.headers.get("Content-Length") or 0)
                 raw = self.rfile.read(length) if length else b"{}"
+                # Tanda tangan diperiksa SEBELUM apa pun dibaca dari isinya.
+                if not signature_valid(
+                    channel._app_secret, raw, self.headers.get("X-Hub-Signature-256", "")
+                ):
+                    self.send_response(401)
+                    self.end_headers()
+                    return
                 # Meta menuntut 200 segera; pemrosesan dilakukan setelah jawaban.
                 self.send_response(200)
                 self.end_headers()
