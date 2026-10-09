@@ -19,6 +19,10 @@ def main() -> None:
     logging.basicConfig(
         level=settings.log_level.upper(), format="%(asctime)s %(levelname)s %(name)s: %(message)s"
     )
+    # httpx mencatat URL penuh setiap permintaan pada tingkat INFO — dan URL Bot API
+    # memuat token bot. Log kontainer bukan tempat rahasia; cukup peringatan ke atas.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
     if not settings.messaging_api_key:
         log.error("MESSAGING_API_KEY kosong — bot tidak dapat berbicara dengan API. Berhenti.")
         raise SystemExit(2)
