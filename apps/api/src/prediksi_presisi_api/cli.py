@@ -114,7 +114,7 @@ def run_backtest(start: date, end: date, horizon: str, dry_run: bool) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="predpol", description="Administrasi PREDIKSI PRESISI")
+    parser = argparse.ArgumentParser(prog="predpol", description="Administrasi KRESNA SIGAP")
     sub = parser.add_subparsers(dest="command", required=True)
 
     password = sub.add_parser("set-password", help="Menetapkan password seorang pengguna")

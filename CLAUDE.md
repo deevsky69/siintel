@@ -1,4 +1,4 @@
-# CLAUDE.md — PREDIKSI PRESISI
+# CLAUDE.md — KRESNA SIGAP
 ## Autonomous Technical Lead + Senior Developer Operating Rules
 
 > **Versi:** Final Baseline  
@@ -9,7 +9,9 @@
 
 # 0. IDENTITAS PROYEK
 
-Nama: **PREDIKSI PRESISI**
+Nama: **KRESNA SIGAP** — Sistem Inteligensi Geospasial dan Analitik Prediktif
+
+(Sebelum 13 Oktober 2026 bernama PREDIKSI PRESISI; nama paket, repositori, dan pengenal internal tidak diubah.)
 
 Tema:
 

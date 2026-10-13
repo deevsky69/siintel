@@ -136,7 +136,7 @@ export function BriefDocument({ brief }: { brief: DailyBrief }) {
 
       <div className="border-b-2 border-ink/20 pb-5">
         <p className="font-heading text-2xs font-semibold uppercase tracking-[0.22em] text-accent">
-          Executive Brief — Prediksi Presisi
+          Executive Brief — Kresna Sigap
         </p>
         <h1 className="mt-2 font-heading text-2xl font-bold leading-tight text-ink md:text-3xl">
           Ringkasan Situasi Kamtibmas

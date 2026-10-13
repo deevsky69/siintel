@@ -31,7 +31,8 @@ from datetime import date, timedelta
 from typing import Any
 
 from docx import Document
-from docx.shared import Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Cm, Pt
 from sqlalchemy.orm import Session
 
 from ..api.analysis import HOUR_BLOCK_STARTS, hour_block_label
@@ -203,59 +204,141 @@ def build_outlook(
 # ---------------------------------------------------------------------------
 
 
+def _set_cell(cell: Any, text: str, *, bold: bool = False, align: str | None = None) -> None:
+    cell.text = ""
+    paragraph = cell.paragraphs[0]
+    run = paragraph.add_run(text)
+    run.bold = bold
+    run.font.size = Pt(10)
+    if align == "center":
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+
 def render_docx(outlook: dict[str, Any]) -> bytes:
-    """Dokumen Word ringkas: judul, dasar, tabel per jenis, catatan human-in-the-loop."""
+    """Dokumen Word bergaya naskah dinas: kop satuan, judul, bagian bernomor romawi, tabel
+    bergaris, penutup. Times New Roman 12, margin 2,5 cm. Susunannya mengikuti contoh
+    "perkiraan singkat" dari pemilik proyek (13 Oktober 2026); isinya tetap dari data."""
     document = Document()
-    style = document.styles["Normal"]
-    style.font.name = "Calibri"
-    style.font.size = Pt(11)
+    for section in document.sections:
+        section.top_margin = section.bottom_margin = Cm(2.5)
+        section.left_margin = section.right_margin = Cm(2.5)
+    normal = document.styles["Normal"]
+    normal.font.name = "Times New Roman"
+    normal.font.size = Pt(12)
+    normal.paragraph_format.space_after = Pt(6)
 
-    document.add_heading(f"Perkiraan Singkat Kerawanan — {outlook['target_label']}", level=1)
-    scope = outlook.get("scope") or "Polres Metro Jakarta Selatan"
-    document.add_paragraph(
-        f"Lingkup: {scope}. Disusun {clock.reference_now().astimezone(clock.JAKARTA):%d %B %Y} "
-        f"oleh PREDIKSI PRESISI. Status: {outlook['status']} — usulan kepada Pimpinan, "
-        "bukan perintah."
+    def para(
+        text: str = "",
+        *,
+        bold: bool = False,
+        center: bool = False,
+        size: int = 12,
+        space_after: int = 6,
+    ) -> Any:
+        paragraph = document.add_paragraph()
+        run = paragraph.add_run(text)
+        run.bold = bold
+        run.font.size = Pt(size)
+        if center:
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        paragraph.paragraph_format.space_after = Pt(space_after)
+        return paragraph
+
+    # Kop
+    scope = outlook.get("scope")
+    para("KEPOLISIAN NEGARA REPUBLIK INDONESIA", bold=True, center=True, space_after=0)
+    para("DAERAH METRO JAYA", bold=True, center=True, space_after=0)
+    para(
+        f"RESOR METRO JAKARTA SELATAN{(' — SEKTOR ' + scope.upper()) if scope else ''}",
+        bold=True,
+        center=True,
+        space_after=12,
     )
-    basis = ", ".join(outlook["basis_labels"]) or "tidak ada bulan dasar yang tersedia"
-    document.add_paragraph(f"Dasar: pola kejadian pada {basis}. {outlook['basis']}")
+    para("PERKIRAAN SINGKAT KERAWANAN KAMTIBMAS", bold=True, center=True, space_after=0)
+    para(f"BULAN {outlook['target_label'].upper()}", bold=True, center=True, space_after=14)
 
-    for threat in outlook["threats"]:
-        document.add_heading(threat["threat_type"], level=2)
+    now = clock.reference_now().astimezone(clock.JAKARTA)
+    basis = ", ".join(outlook["basis_labels"]) or "tidak ada bulan dasar yang tersedia"
+
+    # I. Pendahuluan
+    para("I.  PENDAHULUAN", bold=True, space_after=4)
+    para(
+        f"Perkiraan ini disusun sistem KRESNA SIGAP (Sistem Inteligensi Geospasial dan Analitik "
+        f"Prediktif) pada {now:%d %B %Y} sebagai bahan pertimbangan Pimpinan dalam menetapkan "
+        f"sasaran dan waktu kegiatan kepolisian bulan {outlook['target_label']}. Perkiraan "
+        f"disusun dari pola kejadian pada bulan yang sama tahun-tahun sebelumnya ({basis}) "
+        "dengan satuan analisis kelurahan, blok waktu tiga jam, dan jenis kejahatan."
+    )
+    para(
+        "Status: " + outlook["status"] + ". Dokumen ini USULAN, bukan perintah; penetapan "
+        "kegiatan tetap merupakan keputusan Pimpinan dan tercatat pada jejak audit."
+    )
+
+    # II. Perkiraan per jenis
+    para("II.  PERKIRAAN KERAWANAN PER JENIS KEJAHATAN", bold=True, space_after=4)
+    for index, threat in enumerate(outlook["threats"], start=1):
         peak = threat["peak_block"] or "tidak dapat ditentukan"
-        document.add_paragraph(
+        para(f"{index}.  {threat['threat_type']}", bold=True, space_after=2)
+        para(
             f"Pada bulan dasar tercatat {threat['basis_incidents']} kejadian "
-            f"({threat['basis_with_hour']} dengan jam). Blok jam paling rawan: {peak}. "
-            f"Fungsi yang diusulkan: {threat['function']} — {threat['action']}."
+            f"({threat['basis_with_hour']} dengan jam tercatat). Blok waktu paling rawan: "
+            f"{peak}. Fungsi yang diusulkan: {threat['function']}."
         )
         if not threat["slots"]:
-            document.add_paragraph(
-                "Tidak ada kelurahan x blok jam yang memenuhi batas minimum kejadian; "
-                "polanya tersebar. Patroli mengikuti pola jam di atas."
+            para(
+                "Tidak ada kelurahan dan blok waktu yang memenuhi batas minimum kejadian; "
+                "polanya tersebar. Kegiatan mengikuti blok waktu paling rawan di atas."
             )
             continue
         table = document.add_table(rows=1, cols=5)
-        table.style = "Light Grid Accent 1"
-        header = table.rows[0].cells
-        for cell, text in zip(
-            header, ("No", "Kelurahan (Kecamatan)", "Jam", "Kejadian", "Rekomendasi"), strict=True
-        ):
-            cell.text = text
+        table.style = "Table Grid"
+        widths = (Cm(1.0), Cm(5.2), Cm(2.8), Cm(2.2), Cm(5.3))
+        header = ("NO", "KELURAHAN (KECAMATAN)", "WAKTU", "KEJADIAN", "REKOMENDASI")
+        for cell, text, width in zip(table.rows[0].cells, header, widths, strict=True):
+            _set_cell(cell, text, bold=True, align="center")
+            cell.width = width
         for slot in threat["slots"]:
             row = table.add_row().cells
-            row[0].text = str(slot["rank"])
-            row[1].text = f"{slot['kelurahan']} ({slot['kecamatan']})"
-            row[2].text = slot["block_label"]
-            row[3].text = f"{slot['incidents']} ({slot['share_percent']}%)"
-            row[4].text = slot["recommendation"]
+            values = (
+                str(slot["rank"]),
+                f"{slot['kelurahan']} ({slot['kecamatan']})",
+                slot["block_label"],
+                f"{slot['incidents']} ({slot['share_percent']}%)",
+                f"{threat['action']} oleh {slot['function']}.",
+            )
+            for cell, text, width in zip(row, values, widths, strict=True):
+                _set_cell(
+                    cell, text, align="center" if text == values[0] or text == values[3] else None
+                )
+                cell.width = width
+        para("", space_after=6)
 
-    document.add_heading("Catatan", level=2)
-    document.add_paragraph(
-        "Angka pada dokumen ini dihitung dari kejadian yang tercatat pada bulan yang sama "
-        "tahun-tahun sebelumnya, bukan dari model terlatih, dan belum dievaluasi terhadap "
-        "bulan sasaran. Keputusan penempatan patroli tetap pada Pimpinan (human-in-the-loop); "
-        "setiap keputusan tercatat pada jejak audit."
+    # III. Rekomendasi umum
+    para("III.  REKOMENDASI", bold=True, space_after=4)
+    for index, threat in enumerate(outlook["threats"], start=1):
+        top = threat["slots"][:3]
+        where = (
+            ", ".join(f"{s['kelurahan']} ({s['block_label']})" for s in top)
+            if top
+            else "mengikuti blok waktu paling rawan"
+        )
+        para(
+            f"{index}.  {threat['threat_type']}: {threat['action']} oleh {threat['function']}, "
+            f"diprioritaskan pada {where}."
+        )
+
+    # IV. Penutup
+    para("IV.  PENUTUP", bold=True, space_after=4)
+    para(
+        "Angka pada dokumen ini dihitung dari kejadian yang tercatat, bukan dari model "
+        "terlatih, dan belum dievaluasi terhadap bulan sasaran. Demikian perkiraan singkat ini "
+        "disampaikan sebagai bahan pertimbangan Pimpinan."
     )
+    para("", space_after=18)
+    para(f"Jakarta, {now:%d %B %Y}", space_after=0)
+    para("Disusun oleh sistem KRESNA SIGAP", space_after=0)
+    para("Diperiksa dan ditetapkan oleh: ______________________", space_after=0)
+
     buffer = io.BytesIO()
     document.save(buffer)
     return buffer.getvalue()

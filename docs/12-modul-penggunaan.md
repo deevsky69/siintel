@@ -1,4 +1,4 @@
-# MODUL TATA CARA PENGGUNAAN — PREDIKSI PRESISI
+# MODUL TATA CARA PENGGUNAAN — KRESNA SIGAP
 
 Sistem Deteksi Dini Kerawanan Kamtibmas berbasis *Predictive Policing*
 Polres Metro Jakarta Selatan
@@ -31,7 +31,7 @@ Polres Metro Jakarta Selatan
 
 ## 2. GAGASAN POKOK: SISTEM INI TIDAK MEMUTUSKAN
 
-Yang membedakan PREDIKSI PRESISI dari sekadar dasbor statistik adalah **rantai
+Yang membedakan KRESNA SIGAP dari sekadar dasbor statistik adalah **rantai
 tertutup** berikut, dan yang membedakannya dari sistem otomatis adalah mata rantai
 keempat:
 

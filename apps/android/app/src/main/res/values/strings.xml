@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PRESISI</string>
-    <string name="subtitle">Polres Metro Jakarta Selatan</string>
+    <string name="app_name">KRESNA SIGAP</string>
+    <string name="subtitle">Sistem Inteligensi Geospasial dan Analitik Prediktif · Polres Metro Jakarta Selatan</string>
 
     <string name="emergency_title">Sedang darurat? Hubungi 110.</string>
     <string name="emergency_body">Aplikasi ini untuk laporan yang tidak memerlukan penanganan seketika. Laporan di sini bukan pengganti laporan polisi resmi.</string>

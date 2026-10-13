@@ -34,7 +34,7 @@ from .taxonomy import load_taxonomy
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="seeding", description="Memuat data dummy PREDIKSI PRESISI"
+        prog="seeding", description="Memuat data dummy KRESNA SIGAP"
     )
     parser.add_argument(
         "command",

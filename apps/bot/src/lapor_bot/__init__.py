@@ -1,1 +1,1 @@
-"""Bot kanal perpesanan LAPOR PRESISI."""
+"""Bot kanal perpesanan KRESNA SIGAP."""

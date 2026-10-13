@@ -1,4 +1,6 @@
-# PREDIKSI PRESISI
+# KRESNA SIGAP
+
+> **Nama produk** (keputusan pemilik proyek 13 Oktober 2026): **KRESNA SIGAP — Sistem Inteligensi Geospasial dan Analitik Prediktif**. Sebelumnya PREDIKSI PRESISI; nama paket, repositori, dan pengenal internal tidak diubah.
 ## MASTER TECHNICAL SPECIFICATION v1.0
 ### Predictive Policing & Spatial Intelligence System
 
@@ -747,6 +749,7 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 | Threshold early warning & batas kelas risiko (U-01) | 9 September 2026 | `config/risk/warning-thresholds.yaml` versi `dummy-v1` |
 | Tombol darurat warga: penerima | 8 Oktober 2026 | Tombol di aplikasi warga memberi tahu Administrator (seluruh Polres), Polsek (wilayahnya), Pimpinan (baca); Polsek/Administrator yang menerima dan menutup. Migrasi 0012, permission `panic:read`/`panic:acknowledge` |
 | Navigasi web dirampingkan | 8 Oktober 2026 | Menu dan layar **Imbauan Publik** (/imbauan) dan **Dokumen Intelijen** (/intelijen) dihapus; Informasi Terbaru tinggal dua kanal (kejadian, laporan masyarakat); label versi ambang tidak dicetak di kartu peringatan/peta; pengalih tema dua keadaan. API `public_alert:publish` dan intake intelijen tetap ada — **belum ada layar penerbitan imbauan baru** (lihat gate terbuka) |
+| Nama produk: KRESNA SIGAP | 13 Oktober 2026 | Sistem Inteligensi Geospasial dan Analitik Prediktif. Diganti pada web (judul, kop, halaman masuk/muka), Android (nama aplikasi), bot, judul API, dokumen Word, modul; pengenal internal tetap. Dokumen Word perkiraan singkat disusun ulang bergaya naskah dinas (kop, bagian romawi, tabel bergaris) |
 | Administrator ikut memutuskan rekomendasi | 9 Oktober 2026 | `commander_decision:approve` diberikan kepada Administrator (migrasi 0014), membalik pemisahan 1 September 2026. Pertanggungjawaban kini bertumpu pada jejak audit per keputusan, bukan pemisahan peran. `evaluation:run` dan `public_alert:publish` tetap hanya Pimpinan |
 | Mengubah status laporan hanya Administrator | 9 Oktober 2026 | Permission baru `citizen_report:triage` dan `crime:triage` (0014), hanya Administrator. Polsek/Fungsi tetap mencatat (`*:write`) tetapi tidak mengubah status; antrean "laporan belum diverifikasi" dan tombol triase mengikuti permission baru |
 | Sorotan notifikasi mendesak | 9 Oktober 2026 | Darurat selalu berkedip; laporan masyarakat berkategori **Tawuran dan Perkelahian Kelompok** dan **Kejahatan Jalanan** (begal) disorot — daftar kategori satu sumber di `config/taxonomy/mappings.yaml` (`citizen_report_urgent_categories`). Fungsi tidak memegang `panic:read`/`citizen_report:triage` sehingga tidak menerima keduanya |

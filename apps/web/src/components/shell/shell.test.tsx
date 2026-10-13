@@ -145,7 +145,7 @@ describe("shell aplikasi", () => {
   it("menampilkan identitas sistem dan satuan wilayah", () => {
     render(<Topbar name="demo.pimpinan" roleName="Pimpinan" />);
 
-    expect(screen.getByText("PREDIKSI PRESISI")).toBeDefined();
+    expect(screen.getByText("KRESNA SIGAP")).toBeDefined();
     expect(screen.getByText(/polres metro jakarta selatan/i)).toBeDefined();
   });
 

@@ -14,7 +14,7 @@ const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "PREDIKSI PRESISI — Polres Metro Jakarta Selatan",
+  title: "KRESNA SIGAP — Polres Metro Jakarta Selatan",
   description:
     "Sistem pendukung keputusan Kamtibmas berbasis predictive policing dan spatial intelligence.",
 };
