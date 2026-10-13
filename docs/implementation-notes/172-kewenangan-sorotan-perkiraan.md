@@ -18,3 +18,14 @@
    `plan-rules.yaml`, rekomendasi `function-rules.yaml`. PROPOSED, bukan model terlatih.
 
 Uji: suite API penuh, test web, test unit Android, `next build`, `assembleRelease` (2.8.0).
+
+## Tambahan 13 Oktober 2026 — bentuk Kirkat dan nama produk
+
+Pemilik proyek mengunggah `CONTOH FORMAT PERKIRAAN SINGKAT.docx` (Perkiraan Intelijen
+Singkat Baintelkam). Yang diambil darinya: A4, Arial 12, margin kiri 2,5 cm dan 2 cm lainnya,
+kop satuan + baris nomor naskah, judul "PERKIRAAN INTELIJEN SINGKAT / TENTANG / …", bagian
+PENDAHULUAN – KEADAAN SASARAN (Subyek, Situasi Khusus, Data Sasaran) – ANALISA (Kemampuan
+Sasaran, Kemampuan Penanggulangan) – KESIMPULAN (Kondisi Sasaran, Kemampuan Satuan) – SARAN,
+penomoran bertingkat dengan indentasi gantung, teks rata kiri-kanan, blok tanda tangan, kaki
+halaman klasifikasi (`CLASSIFICATION = "RAHASIA"`, satu konstanta). Yang ditambahkan: tabel
+bergaris pada Data Sasaran. Nama produk menjadi **KRESNA SIGAP** (lihat docs/01 §19.2).
