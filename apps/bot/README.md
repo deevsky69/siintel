@@ -1,4 +1,4 @@
-# KRESNA SIGAP — bot kanal perpesanan
+# SIGAP — bot kanal perpesanan
 
 Laporan masyarakat lewat **Telegram** (dan **WhatsApp** setelah akun WhatsApp Business
 Platform tersedia). Bot ini hanya bercakap-cakap; seluruh aturan isian, kuota, audit, dan

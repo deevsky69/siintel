@@ -15,8 +15,8 @@ android {
         targetSdk = 34
         // 2.0.0: dua APK menjadi satu. 2.1.0: kelurahan pada laporan. 2.2.0: seluruh
         // tampilan dipindahkan ke Jetpack Compose. 2.3.0: lambang, ikon, lokasi tangguh.
-        versionCode = 11
-        versionName = "2.9.0"
+        versionCode = 12
+        versionName = "2.9.1"
 
         // Alamat API dibaca dari sini, bukan ditanam di kode: alamat produksi kelak
         // berbeda, dan pengujian lokal memakai alamat lain lagi

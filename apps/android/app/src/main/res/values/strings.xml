@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KRESNA SIGAP</string>
+    <string name="app_name">SIGAP</string>
     <string name="subtitle">Sistem Inteligensi Geospasial dan Analitik Prediktif · Polres Metro Jakarta Selatan</string>
 
     <string name="emergency_title">Sedang darurat? Hubungi 110.</string>

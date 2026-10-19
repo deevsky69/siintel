@@ -22,7 +22,7 @@ def test_openapi_document_is_available_outside_production() -> None:
     response = client.get("/openapi.json")
 
     assert response.status_code == 200
-    assert response.json()["info"]["title"] == "KRESNA SIGAP API"
+    assert response.json()["info"]["title"] == "SIGAP API"
 
 
 def test_health_endpoint_is_registered() -> None:

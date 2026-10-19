@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getReportOptions } from "./actions";
 import { ReportForm } from "./report-form";
 
-export const metadata = { title: "Lapor Kejadian — KRESNA SIGAP" };
+export const metadata = { title: "Lapor Kejadian — SIGAP" };
 
 // Pilihan isian diambil dari API saat halaman dibuka, bukan saat build: daftar kecamatan
 // berasal dari master lokasi, dan API tidak dapat dihubungi ketika image sedang dibangun.

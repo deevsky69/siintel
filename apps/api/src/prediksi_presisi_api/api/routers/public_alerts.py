@@ -143,7 +143,7 @@ def suggested_message(warning: EarlyWarning, area_text: str) -> str:
         f"Imbauan kewaspadaan terhadap {warning.threat_type} di wilayah {area_text}{jam}. "
         "Tingkatkan kewaspadaan, pastikan rumah dan kendaraan dalam keadaan terkunci, "
         "serta laporkan hal mencurigakan kepada Polsek setempat atau melalui kanal "
-        "KRESNA SIGAP."
+        "SIGAP."
     )
 
 

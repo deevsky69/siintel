@@ -28,4 +28,4 @@ PENDAHULUAN – KEADAAN SASARAN (Subyek, Situasi Khusus, Data Sasaran) – ANALI
 Sasaran, Kemampuan Penanggulangan) – KESIMPULAN (Kondisi Sasaran, Kemampuan Satuan) – SARAN,
 penomoran bertingkat dengan indentasi gantung, teks rata kiri-kanan, blok tanda tangan, kaki
 halaman klasifikasi (`CLASSIFICATION = "RAHASIA"`, satu konstanta). Yang ditambahkan: tabel
-bergaris pada Data Sasaran. Nama produk menjadi **KRESNA SIGAP** (lihat docs/01 §19.2).
+bergaris pada Data Sasaran. Nama produk menjadi **SIGAP** (lihat docs/01 §19.2).

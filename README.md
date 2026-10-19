@@ -1,6 +1,6 @@
-# KRESNA SIGAP
+# SIGAP
 
-*Sistem Inteligensi Geospasial dan Analitik Prediktif* — sebelumnya PREDIKSI PRESISI (nama diganti 13 Oktober 2026).
+*Sistem Inteligensi Geospasial dan Analitik Prediktif* — sebelumnya PREDIKSI PRESISI (nama diganti 13 Oktober 2026, ditetapkan SIGAP 19 Oktober 2026).
 
 Repository: `siintel`
 

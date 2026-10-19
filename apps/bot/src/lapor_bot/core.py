@@ -37,7 +37,7 @@ COMMAND_HELP = ("/bantuan", "bantuan", "/help", "help")
 MIN_DESCRIPTION = 10
 
 INTRO = (
-    "Selamat datang di KRESNA SIGAP, kanal laporan masyarakat Polres Metro Jakarta Selatan.\n\n"
+    "Selamat datang di SIGAP, kanal laporan masyarakat Polres Metro Jakarta Selatan.\n\n"
     "Laporan ini TANPA nama. Yang disimpan dari percakapan ini hanya pengenalnya, "
     "agar Anda menerima kabar perkembangan laporan Anda di sini.\n\n"
     "Untuk keadaan darurat yang mengancam jiwa, hubungi 110."

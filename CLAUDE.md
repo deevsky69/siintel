@@ -1,17 +1,17 @@
-# CLAUDE.md — KRESNA SIGAP
+# CLAUDE.md — SIGAP
 ## Autonomous Technical Lead + Senior Developer Operating Rules
 
 > **Versi:** Final Baseline  
 > **Status:** Instruksi utama AI coding assistant  
-> **Tujuan:** Membuat Claude mampu menjalankan proyek PREDIKSI PRESISI secara mandiri, tetapi tetap meminta persetujuan pengguna untuk keputusan bisnis, requirement, kebijakan, dan perubahan arsitektur material.
+> **Tujuan:** Membuat Claude mampu menjalankan proyek SIGAP secara mandiri, tetapi tetap meminta persetujuan pengguna untuk keputusan bisnis, requirement, kebijakan, dan perubahan arsitektur material.
 
 ---
 
 # 0. IDENTITAS PROYEK
 
-Nama: **KRESNA SIGAP** — Sistem Inteligensi Geospasial dan Analitik Prediktif
+Nama: **SIGAP** — Sistem Inteligensi Geospasial dan Analitik Prediktif
 
-(Sebelum 13 Oktober 2026 bernama PREDIKSI PRESISI; nama paket, repositori, dan pengenal internal tidak diubah.)
+(Sebelum 13 Oktober 2026 bernama PREDIKSI PRESISI, sempat KRESNA SIGAP, ditetapkan **SIGAP** 19 Oktober 2026; nama paket, repositori, dan pengenal internal tidak diubah.)
 
 Tema:
 
@@ -1268,7 +1268,7 @@ PHASE 13 Commander Approval
 PHASE 14 Operation Center
 PHASE 15 Evaluation
 PHASE 16 Security / Hardening
-PHASE 17 Android / LAPOR PRESISI
+PHASE 17 Android / SIGAP (kanal warga)
 ```
 
 ---
@@ -1377,7 +1377,7 @@ business / policy / requirement decisions
 
 Tujuan akhirnya bukan sekadar membuat website yang terlihat bagus.
 
-Tujuan akhirnya adalah membuat sistem PREDIKSI PRESISI yang:
+Tujuan akhirnya adalah membuat sistem SIGAP yang:
 
 ```text
 Consistent

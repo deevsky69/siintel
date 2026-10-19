@@ -322,7 +322,7 @@ def render_docx(outlook: dict[str, Any]) -> bytes:
         "2.",
         "Perkiraan Intelijen Singkat ini disampaikan kepada Pimpinan sebagai masukan untuk "
         "dijadikan bahan pertimbangan dalam menentukan sasaran, waktu, dan bentuk kegiatan "
-        f"kepolisian pada bulan {target}. Perkiraan disusun oleh sistem KRESNA SIGAP (Sistem "
+        f"kepolisian pada bulan {target}. Perkiraan disusun oleh sistem SIGAP (Sistem "
         "Inteligensi Geospasial dan Analitik Prediktif) dari data kejadian yang tercatat, "
         f"dengan status {outlook['status']}: usulan, bukan perintah.",
     )

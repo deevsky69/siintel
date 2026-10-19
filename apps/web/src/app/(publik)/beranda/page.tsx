@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ImbauanBerlaku } from "./imbauan-berlaku";
 
-export const metadata = { title: "KRESNA SIGAP" };
+export const metadata = { title: "SIGAP" };
 
 /**
  * Halaman muka untuk pengunjung yang belum masuk.
@@ -30,11 +30,11 @@ export default function BerandaPublik() {
 
       <div className="relative z-10 w-full max-w-lg text-center">
         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-xl border border-accent/30 bg-accent/10 font-heading text-xl font-bold text-accent shadow-glow">
-          KS
+          S
         </div>
 
         <h1 className="font-heading text-3xl font-bold tracking-wide text-ink sm:text-4xl">
-          KRESNA SIGAP
+          SIGAP
         </h1>
         <p className="mt-2 text-xs uppercase tracking-[0.14em] text-accent-soft">
           Sistem Inteligensi Geospasial dan Analitik Prediktif

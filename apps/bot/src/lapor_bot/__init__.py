@@ -1,1 +1,1 @@
-"""Bot kanal perpesanan KRESNA SIGAP."""
+"""Bot kanal perpesanan SIGAP."""

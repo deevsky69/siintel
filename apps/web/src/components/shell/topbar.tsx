@@ -59,11 +59,11 @@ export function Topbar({
 
       <div className="flex shrink-0 items-center gap-2.5">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-accent/30 bg-accent/10 font-heading text-sm font-bold text-accent sm:h-10 sm:w-10">
-          KS
+          S
         </div>
         <div className="leading-tight">
           <div className="whitespace-nowrap font-heading text-sm font-bold tracking-wide text-ink sm:text-base">
-            KRESNA SIGAP
+            SIGAP
           </div>
           <div className="hidden whitespace-nowrap text-2xs uppercase tracking-[0.12em] text-ink-muted xl:block">
             Sistem Inteligensi Geospasial dan Analitik Prediktif

@@ -59,7 +59,7 @@ def create_app() -> FastAPI:
     )
 
     app = FastAPI(
-        title="KRESNA SIGAP API",
+        title="SIGAP API",
         version=__version__,
         description=(
             "Sistem pendukung keputusan Kamtibmas. "
