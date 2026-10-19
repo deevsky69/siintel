@@ -226,6 +226,21 @@ memakai sebagian sumber daya server ini.
 > **Mendeteksinya:** `pnpm prod:periksa` — pemeriksaan ini dibuat justru karena kegagalan
 > tersebut senyap selama entah berapa lama.
 
+> ### ⚠ SERTIFIKAT DI NGINX DEPAN TERTUKAR — 19 Oktober 2026
+>
+> Setelah deploy `31193ec`, pemeriksaan gagal pada langkah pertama padahal API sehat:
+> nginx di `202.56.161.114` **tetap meneruskan** `siintel.awansurya.com` ke server ini
+> (dengan `-k` menjawab 200, migrasi 0014), tetapi **menyajikan sertifikat
+> `prediksi.awansurya.com`** untuk nama `siintel.awansurya.com`. Peramban menolak, Android
+> dan bot pun gagal. Tidak ada yang dapat diperbaiki dari server ini.
+>
+> **Perbaikan pada mesin nginx:** pastikan blok `server { server_name siintel.awansurya.com; }`
+> memuat `ssl_certificate`/`ssl_certificate_key` miliknya sendiri (Let's Encrypt
+> `siintel.awansurya.com`, bukan `prediksi.awansurya.com`), lalu `nginx -t && systemctl
+> reload nginx`. Penyebab yang lazim: blok `siintel` kehilangan dua baris itu saat domain
+> `prediksi` ditambahkan, sehingga nginx memakai sertifikat *default server*.
+> `scripts/periksa-produksi.sh` kini menyebut keadaan ini secara eksplisit.
+
 > ### ⚠ IP PUBLIK BERUBAH — 7 September 2026
 >
 > IP publik server berganti dari `111.68.123.134` menjadi `202.56.161.114`, dan bersamaan

@@ -28,9 +28,19 @@ tidak() { printf '  \033[31mGAGAL\033[0m %s\n' "$1"; gagal=$((gagal + 1)); }
 echo "Memeriksa $BASE"
 echo
 
-# 1. API hidup.
+# 1. API hidup. Bila gagal, bedakan dua sebab yang gejalanya sama (19 Oktober 2026):
+#    sertifikat yang disajikan proxy depan tidak cocok dengan nama domain (aplikasi sehat,
+#    nginx di mesin lain menyajikan sertifikat domain lain), atau memang tidak terjangkau.
 if [ "$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/api/v1/health")" = "200" ]; then
   lulus "API menjawab"
+elif [ "$(curl -sk -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/api/v1/health")" = "200" ]; then
+  host="${BASE#https://}"; host="${host%%/*}"
+  cn=$(echo | openssl s_client -connect "$host:443" -servername "$host" 2>/dev/null \
+       | openssl x509 -noout -subject 2>/dev/null | sed 's/^subject=//')
+  tidak "API hidup, tetapi SERTIFIKAT yang disajikan untuk $host tidak cocok: $cn"
+  echo "        Aplikasi di server ini sehat. Yang harus diperbaiki adalah sertifikat pada proxy"
+  echo "        depan (nginx di mesin lain): blok server $host harus memakai sertifikatnya sendiri."
+  exit 1
 else
   tidak "API tidak menjawab — sisanya tidak dapat diperiksa"
   exit 1
