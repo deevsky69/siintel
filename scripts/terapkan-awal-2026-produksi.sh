@@ -24,7 +24,7 @@ YAKIN=0
 
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
-BASE="${BASE:-https://siintel.awansurya.com}"
+BASE="${BASE:-https://prediksi.awansurya.com}"
 ENV_FILE="$ROOT/.env.production"
 COMPOSE=(docker compose --env-file "$ENV_FILE" -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml)
 API=predpol-prod-api

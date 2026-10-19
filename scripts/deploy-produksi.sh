@@ -11,7 +11,7 @@ cd "$(dirname "$0")/.."
 ENV_FILE="$(pwd)/.env.production"
 COMPOSE=(docker compose --env-file "$ENV_FILE" -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml)
 API=predpol-prod-api
-BASE="${BASE:-https://siintel.awansurya.com}"
+BASE="${BASE:-https://prediksi.awansurya.com}"
 
 [ -f "$ENV_FILE" ] || { echo ".env.production tidak ada"; exit 1; }
 echo "== kode: $(git rev-parse --short HEAD) $(git log -1 --format=%s | cut -c1-70)"

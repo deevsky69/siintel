@@ -19,7 +19,7 @@
 # Pakai:  bash scripts/periksa-produksi.sh [https://alamat-demo]
 set -uo pipefail
 
-BASE="${1:-https://siintel.awansurya.com}"
+BASE="${1:-https://prediksi.awansurya.com}"
 gagal=0
 
 lulus() { printf '  \033[32mOK\033[0m   %s\n' "$1"; }

@@ -162,7 +162,7 @@ Commit kecil dan sering; sebelum meminta Claude melanjutkan, pastikan perubahan 
 di-push. `PublicApi.kt`, `petugas/Api.kt`, dan logika pengiriman mengikuti kontrak backend —
 perubahan di sana sebaiknya dikoordinasikan lewat server.
 
-Alamat API bawaannya `https://siintel.awansurya.com`, dan dapat diganti tanpa menyunting
+Alamat API bawaannya `https://prediksi.awansurya.com`, dan dapat diganti tanpa menyunting
 kode:
 
 ```bash
@@ -197,7 +197,7 @@ keystore itu di repository** (CLAUDE.md §28).
 Backend dibuka ke publik lewat **awalan path**, bukan subdomain:
 
 ```text
-https://siintel.awansurya.com/api/v1/...
+https://prediksi.awansurya.com/api/v1/...
 ```
 
 Subdomain (`api.<domain>`) lebih rapi tetapi menuntut satu A record baru di panel DomaiNesia

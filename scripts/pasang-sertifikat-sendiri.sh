@@ -27,7 +27,7 @@
 #
 set -euo pipefail
 
-DOMAIN="${DOMAIN:-siintel.awansurya.com}"
+DOMAIN="${DOMAIN:-prediksi.awansurya.com}"
 OUT="${OUT:-$HOME/siintel-cert}"
 PROXY="coolify-proxy"
 DAYS=3650

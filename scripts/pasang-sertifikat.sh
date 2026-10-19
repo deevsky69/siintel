@@ -15,11 +15,11 @@
 #
 # PRASYARAT
 #
-#   Record TXT `_acme-challenge.siintel.awansurya.com` sudah dipasang di panel DNS
+#   Record TXT `_acme-challenge.prediksi.awansurya.com` sudah dipasang di panel DNS
 #   (DomaiNesia) dan sudah menyebar. Nilainya diberikan oleh perintah `--issue`.
 #   Periksa lebih dulu:
 #
-#       dig +short TXT _acme-challenge.siintel.awansurya.com @8.8.8.8
+#       dig +short TXT _acme-challenge.prediksi.awansurya.com @8.8.8.8
 #
 # YANG DIUBAH DI LUAR REPOSITORY
 #
@@ -40,7 +40,7 @@
 #
 set -euo pipefail
 
-DOMAIN="${DOMAIN:-siintel.awansurya.com}"
+DOMAIN="${DOMAIN:-prediksi.awansurya.com}"
 ACME="$HOME/.acme.sh/acme.sh"
 PROXY_CONTAINER="coolify-proxy"
 
@@ -78,7 +78,7 @@ docker "exec -i $PROXY_CONTAINER sh -c 'cat > /traefik/certs/siintel.key && chmo
 # Sertifikat dipasang sebagai `certificates`, BUKAN `defaultCertificate`: mengganti
 # sertifikat bawaan akan ikut mengubah perilaku seluruh aplikasi lain di proxy ini.
 docker "exec -i $PROXY_CONTAINER sh -c 'cat > /traefik/dynamic/siintel.yml'" <<'YML'
-# Sertifikat PREDIKSI PRESISI (siintel.awansurya.com), diterbitkan lewat DNS-01.
+# Sertifikat PREDIKSI PRESISI (prediksi.awansurya.com), diterbitkan lewat DNS-01.
 # Ditambahkan di luar Coolify; tidak mengubah resolver ACME miliknya.
 tls:
   certificates:

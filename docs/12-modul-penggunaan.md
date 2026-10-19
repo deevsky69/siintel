@@ -935,7 +935,7 @@ Warga **tidak masuk ke aplikasi ini**. Mereka membuka halaman muka dan menekan *
 Kejadian**:
 
 ```text
-siintel.awansurya.com  →  Lapor Kejadian  →  formulir  →  nomor tiket
+prediksi.awansurya.com  →  Lapor Kejadian  →  formulir  →  nomor tiket
 ```
 
 Bisa juga lewat **aplikasi Android** — tombol *Lapor Kejadian* pada layar mukanya.

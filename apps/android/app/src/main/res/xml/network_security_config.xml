@@ -5,7 +5,7 @@
   JANGKAR CA SATUAN SUDAH DIHAPUS — 9 September 2026.
 
     Berkas ini sebelumnya menambahkan CA milik satuan sebagai jangkar kepercayaan untuk
-    `siintel.awansurya.com`, karena server demo memakai sertifikat swatandatangan. Sejak
+    `prediksi.awansurya.com`, karena server demo memakai sertifikat swatandatangan. Sejak
     7 September 2026 domain itu dilayani sertifikat Let's Encrypt yang sah, sehingga
     jangkar tambahan tidak lagi diperlukan — dan membawanya terus berarti memperluas
     permukaan kepercayaan tanpa alasan: siapa pun yang memegang kunci CA satuan dapat
