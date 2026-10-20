@@ -193,7 +193,7 @@ memakai sebagian sumber daya server ini.
 >
 > ```text
 > `x-forwarded-host` header with value `10.3.3.87` does not match `origin` header
-> with value `prediksi.awansurya.com` from a forwarded Server Actions request.
+> with value `sigap.awansurya.com` from a forwarded Server Actions request.
 > ```
 >
 > Next membandingkan keduanya sebagai penangkal CSRF pada Server Action. nginx meneruskan
@@ -226,7 +226,7 @@ memakai sebagian sumber daya server ini.
 > **Mendeteksinya:** `pnpm prod:periksa` — pemeriksaan ini dibuat justru karena kegagalan
 > tersebut senyap selama entah berapa lama.
 
-> ### ✅ DOMAIN BERGANTI KE `prediksi.awansurya.com` — 19 Oktober 2026
+> ### ✅ DOMAIN BERGANTI KE `sigap.awansurya.com` — 20 Oktober 2026 (sehari sebelumnya sempat `prediksi.awansurya.com`)
 >
 > Keputusan pemilik proyek. Seluruh rujukan domain (compose, skrip, Android, web, modul)
 > diganti; `DOMAIN` pada `.env.production` disesuaikan; nginx depan sudah menyajikan
@@ -235,14 +235,14 @@ memakai sebagian sumber daya server ini.
 > ### ⚠ SERTIFIKAT DI NGINX DEPAN TERTUKAR — 19 Oktober 2026 (selesai: domain diganti)
 >
 > Setelah deploy `31193ec`, pemeriksaan gagal pada langkah pertama padahal API sehat:
-> nginx di `202.56.161.114` **tetap meneruskan** `prediksi.awansurya.com` ke server ini
+> nginx di `202.56.161.114` **tetap meneruskan** `sigap.awansurya.com` ke server ini
 > (dengan `-k` menjawab 200, migrasi 0014), tetapi **menyajikan sertifikat
-> `prediksi.awansurya.com`** untuk nama `prediksi.awansurya.com`. Peramban menolak, Android
+> `sigap.awansurya.com`** untuk nama `sigap.awansurya.com`. Peramban menolak, Android
 > dan bot pun gagal. Tidak ada yang dapat diperbaiki dari server ini.
 >
-> **Perbaikan pada mesin nginx:** pastikan blok `server { server_name prediksi.awansurya.com; }`
+> **Perbaikan pada mesin nginx:** pastikan blok `server { server_name sigap.awansurya.com; }`
 > memuat `ssl_certificate`/`ssl_certificate_key` miliknya sendiri (Let's Encrypt
-> `prediksi.awansurya.com`, bukan `prediksi.awansurya.com`), lalu `nginx -t && systemctl
+> `sigap.awansurya.com`, bukan `sigap.awansurya.com`), lalu `nginx -t && systemctl
 > reload nginx`. Penyebab yang lazim: blok `siintel` kehilangan dua baris itu saat domain
 > `prediksi` ditambahkan, sehingga nginx memakai sertifikat *default server*.
 > `scripts/periksa-produksi.sh` kini menyebut keadaan ini secara eksplisit.
@@ -278,7 +278,7 @@ memakai sebagian sumber daya server ini.
 |---|---|
 | Alamat IP publik | `111.68.123.134` |
 | Alamat mesin di jaringan lokal | `10.3.3.87` (privat, di belakang NAT) |
-| Domain | `prediksi.awansurya.com` → A record → `111.68.123.134` ✅ |
+| Domain | `sigap.awansurya.com` → A record → `111.68.123.134` ✅ |
 | `111.68.123.134:8999` | → SSH (port 22) |
 | `111.68.123.134:8997` | → port **80** server ✅ terbukti tembus dari internet |
 | `111.68.123.134:8998` | → port **443** server ✅ terbukti tembus dari internet |
@@ -297,10 +297,10 @@ sertifikatnya yang belum tepercaya — kesalahan itu mustahil muncul bila port t
 ### 3.1 Alamat demo yang berlaku sekarang
 
 ```
-https://prediksi.awansurya.com:8998
+https://sigap.awansurya.com:8998
 ```
 
-`http://prediksi.awansurya.com:8997` ikut bekerja dan mengalihkan ke alamat di atas.
+`http://sigap.awansurya.com:8997` ikut bekerja dan mengalihkan ke alamat di atas.
 Pengalihan itu **wajib menyebut nomor port** (`PUBLIC_HTTPS_PORT=8998` di
 `.env.production`); tanpa itu Traefik mengalihkan ke port 443 yang tidak diteruskan,
 dan situs tampak mati padahal hidup.
@@ -356,7 +356,7 @@ dan perpanjangannya manual tiap 90 hari.
 **1. Minta nilai TXT** (di server):
 
 ```bash
-~/.acme.sh/acme.sh --issue --dns -d prediksi.awansurya.com \
+~/.acme.sh/acme.sh --issue --dns -d sigap.awansurya.com \
   --server letsencrypt --yes-I-know-dns-manual-mode-enough-go-ahead-please
 ```
 
@@ -372,12 +372,12 @@ Keluarannya menyebut nama dan nilai record.
 | TTL | terendah yang tersedia |
 
 > Kolom "Nama" diisi **tanpa** `.awansurya.com` — panel menambahkannya sendiri.
-> Nama lengkap yang harus terbentuk: `_acme-challenge.prediksi.awansurya.com`.
+> Nama lengkap yang harus terbentuk: `_acme-challenge.sigap.awansurya.com`.
 
 **3. Tunggu penyebaran, lalu periksa:**
 
 ```bash
-dig +short TXT _acme-challenge.prediksi.awansurya.com @8.8.8.8
+dig +short TXT _acme-challenge.sigap.awansurya.com @8.8.8.8
 ```
 
 Biasanya beberapa menit. Jangan lanjut sebelum nilainya muncul — verifikasi yang
@@ -395,7 +395,7 @@ menunjukkan penerbit sertifikat yang benar-benar disajikan. Resolver ACME milik
 Coolify tidak disentuh, dan tidak ada berkas Coolify yang diubah — hanya tiga berkas
 baru yang ditambahkan, dan menghapusnya mengembalikan keadaan semula.
 
-Setelah itu `https://prediksi.awansurya.com:8998` terbuka tanpa peringatan.
+Setelah itu `https://sigap.awansurya.com:8998` terbuka tanpa peringatan.
 
 ---
 
@@ -408,7 +408,7 @@ keamanan. Cloudflare Tunnel menghapus keduanya sekaligus.
 `cloudflared` membuka sambungan **keluar** ke jaringan Cloudflare, lalu lalu lintas
 masuk mengalir balik lewat sambungan itu. Tidak ada port masuk yang dibutuhkan sama
 sekali — pemetaan 8997/8998 menjadi tidak relevan, dan alamatnya menjadi
-`https://prediksi.awansurya.com` tanpa nomor port.
+`https://sigap.awansurya.com` tanpa nomor port.
 
 > **Ini menggantikan pekerjaan DNS-01 pada §3.2.** Sertifikat disediakan Cloudflare di
 > tepi jaringan, jadi `scripts/pasang-sertifikat.sh` tidak perlu dijalankan dan record
@@ -526,7 +526,7 @@ Masih di halaman tunnel, buka tab **Public Hostname** → **Add a public hostnam
 | Type | `HTTP` |
 | URL | `coolify-proxy:80` |
 
-Cloudflare akan membuat sendiri record DNS untuk `prediksi.awansurya.com`. Bila sudah ada
+Cloudflare akan membuat sendiri record DNS untuk `sigap.awansurya.com`. Bila sudah ada
 record A lama yang menunjuk `111.68.123.134`, **hapus** — record itu tidak lagi dipakai.
 
 > Tujuannya `coolify-proxy:80`, bukan `web:3000`, supaya lalu lintas tetap melewati
@@ -558,7 +558,7 @@ berpindah ke Cloudflare:
 **8. Buka dan pastikan**
 
 ```
-https://prediksi.awansurya.com
+https://sigap.awansurya.com
 ```
 
 Tanpa nomor port, tanpa peringatan sertifikat.

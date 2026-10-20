@@ -12,7 +12,7 @@
 #   Cloudflare Tunnel menghilangkan keduanya sekaligus. `cloudflared` membuka
 #   sambungan **keluar** menuju jaringan Cloudflare, lalu lalu lintas masuk mengalir
 #   balik lewat sambungan itu. Tidak ada port masuk yang dibutuhkan, dan alamatnya
-#   menjadi `https://prediksi.awansurya.com` — bersih, tanpa nomor port.
+#   menjadi `https://sigap.awansurya.com` — bersih, tanpa nomor port.
 #
 #   Sertifikat ditangani Cloudflare di tepi jaringan. Karena itu berkas ini
 #   MENGGANTIKAN pekerjaan DNS-01 pada `scripts/pasang-sertifikat.sh`; keduanya

@@ -15,8 +15,8 @@ android {
         targetSdk = 34
         // 2.0.0: dua APK menjadi satu. 2.1.0: kelurahan pada laporan. 2.2.0: seluruh
         // tampilan dipindahkan ke Jetpack Compose. 2.3.0: lambang, ikon, lokasi tangguh.
-        versionCode = 13
-        versionName = "2.9.2"
+        versionCode = 14
+        versionName = "2.9.3"
 
         // Alamat API dibaca dari sini, bukan ditanam di kode: alamat produksi kelak
         // berbeda, dan pengujian lokal memakai alamat lain lagi
@@ -27,7 +27,7 @@ android {
         // router, dan penerusan itu sudah tidak aktif. Demo kini dilayani pada 443 lewat
         // nama domainnya. Alamat bawaan yang mati adalah kegagalan paling mahal pada
         // sebuah APK — ia baru ketahuan setelah dipasang di ponsel orang.
-        buildConfigField("String", "API_BASE", "\"${project.findProperty("apiBase") ?: "https://prediksi.awansurya.com"}\"")
+        buildConfigField("String", "API_BASE", "\"${project.findProperty("apiBase") ?: "https://sigap.awansurya.com"}\"")
     }
 
     buildFeatures {

@@ -6,7 +6,7 @@ import type { NextConfig } from "next";
  * MENGAPA INI ADA. Next memeriksa `Origin` terhadap `X-Forwarded-Host` sebagai penangkal
  * CSRF pada Server Action. Di depan demo ini berdiri nginx pada mesin lain yang
  * meneruskan `X-Forwarded-Host` berisi ALAMAT IP internal (`10.3.3.87`), sedangkan
- * peramban mengirim `Origin: https://prediksi.awansurya.com`. Keduanya tidak cocok, dan
+ * peramban mengirim `Origin: https://sigap.awansurya.com`. Keduanya tidak cocok, dan
  * Next membatalkan SETIAP Server Action dengan "Invalid Server Actions request".
  *
  * Akibatnya seluruh rantai human-in-the-loop mati di peramban demo — menyetujui
@@ -22,7 +22,7 @@ import type { NextConfig } from "next";
  * Nilainya dibaca saat BUILD, bukan saat jalan: `output: "standalone"` membekukan config
  * ke dalam image. Karena itu ia diteruskan sebagai build arg, bukan environment runtime.
  */
-const allowedOrigins = (process.env.APP_ALLOWED_ORIGINS ?? "prediksi.awansurya.com")
+const allowedOrigins = (process.env.APP_ALLOWED_ORIGINS ?? "sigap.awansurya.com")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);

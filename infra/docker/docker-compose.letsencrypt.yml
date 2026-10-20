@@ -23,7 +23,7 @@
 #
 #   3. Tunggu sekitar satu menit, lalu periksa:
 #
-#        openssl s_client -connect 127.0.0.1:443 -servername prediksi.awansurya.com \
+#        openssl s_client -connect 127.0.0.1:443 -servername sigap.awansurya.com \
 #          </dev/null 2>/dev/null | openssl x509 -noout -issuer -dates
 #
 #      Penerbit harus berbunyi Let's Encrypt, bukan "TRAEFIK DEFAULT CERT".

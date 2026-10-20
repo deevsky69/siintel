@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Menerapkan data asli Pusiknas ke PRODUKSI (prediksi.awansurya.com) — Fase 5.
+# Menerapkan data asli Pusiknas ke PRODUKSI (sigap.awansurya.com) — Fase 5.
 #
 # Dijalankan DI SERVER oleh orang yang memegang persetujuan pemilik proyek 30 September
 # 2026 ("ganti seluruh data menjadi data asli; hapus ketujuh tabel sintetis"). Skrip ini
@@ -45,7 +45,7 @@ done
 
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
-BASE="${BASE:-https://prediksi.awansurya.com}"
+BASE="${BASE:-https://sigap.awansurya.com}"
 ENV_FILE="$ROOT/.env.production"
 COMPOSE=(docker compose --env-file "$ENV_FILE" -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml)
 API=predpol-prod-api

@@ -7,7 +7,7 @@
 # Pakai: bash scripts/status-produksi.sh [https://alamat]
 
 set -euo pipefail
-BASE="${1:-https://prediksi.awansurya.com}"
+BASE="${1:-https://sigap.awansurya.com}"
 PASSFILE="$HOME/siintel-demo-passwords.txt"
 ADMIN_PASS="$(awk '$1=="demo.admin"{print $2}' "$PASSFILE")"
 [ -n "$ADMIN_PASS" ] || { echo "kata sandi demo.admin tidak ditemukan di $PASSFILE"; exit 1; }

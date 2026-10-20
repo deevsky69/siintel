@@ -9,7 +9,7 @@
 # Kata sandi demo.admin dibaca dari ~/siintel-demo-passwords.txt (baris: demo.admin<spasi>sandi).
 
 set -uo pipefail
-BASE="${1:-https://prediksi.awansurya.com}"
+BASE="${1:-https://sigap.awansurya.com}"
 PASSFILE="$HOME/siintel-demo-passwords.txt"
 
 [ -r "$PASSFILE" ] || { echo "GAGAL: $PASSFILE tidak dapat dibaca."; exit 1; }

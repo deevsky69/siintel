@@ -21,7 +21,7 @@
     </domain-config>
 
     <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">prediksi.awansurya.com</domain>
+        <domain includeSubdomains="true">sigap.awansurya.com</domain>
         <trust-anchors>
             <certificates src="@raw/siintel_ca" />
             <certificates src="system" />
