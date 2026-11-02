@@ -126,6 +126,21 @@ class TwilioChannel:
             data={"From": self._from, "To": f"whatsapp:{phone}", "Body": outgoing(reply)},
         )
         if response.status_code >= 400:
+            code = ""
+            try:
+                code = str(response.json().get("code", ""))
+            except ValueError:
+                pass
+            if code in ("21654", "63016"):
+                # Jendela 24 jam WhatsApp belum terbuka: Twilio hanya mengizinkan balasan
+                # bebas setelah PELAPOR mengirim pesan lebih dulu dari WhatsApp-nya. Uji
+                # yang disuntikkan ke webhook tanpa pesan WhatsApp sungguhan selalu gagal
+                # di sini — itu bukan kesalahan bot.
+                raise RuntimeError(
+                    "Twilio menolak balasan bebas (kode "
+                    f"{code}): belum ada pesan WhatsApp sungguhan dari {phone} dalam 24 jam "
+                    "terakhir, atau nomor pengirim menuntut template."
+                )
             raise RuntimeError(f"Twilio kirim: {response.status_code} {response.text[:200]}")
 
     def fetch(self, url: str, filename: str, media_type: str) -> tuple[str, bytes, str]:
