@@ -13,9 +13,10 @@ tujuan pengiriman buletin, bukan informasi untuk warga.
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, Depends, Path, Query, status
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -91,6 +92,19 @@ class BabinRequest(BaseModel):
         default=None, max_length=20, description="Internasional tanpa +"
     )
     is_dummy: bool = False
+
+    @field_validator("whatsapp_group_link")
+    @classmethod
+    def _only_whatsapp_invite_links(cls, value: str | None) -> str | None:
+        """Tautan ini dirender sebagai href di halaman publik: hanya undangan grup WhatsApp
+        resmi (https://chat.whatsapp.com/…) yang diterima — bukan skema lain (tinjauan
+        keamanan 2 November 2026)."""
+        if value is None or not value.strip():
+            return None
+        parsed = urlparse(value.strip())
+        if parsed.scheme != "https" or (parsed.hostname or "").lower() != "chat.whatsapp.com":
+            raise ValueError("Tautan grup harus berbentuk https://chat.whatsapp.com/…")
+        return value.strip()
 
 
 @router.put("/babin/{kelurahan}", summary="Membuat atau mengubah kontak Babin satu kelurahan")

@@ -148,7 +148,8 @@ export default async function PetaWarga({
                   >
                     {babin.phone_display}
                   </a>
-                  {babin.whatsapp_group_link ? (
+                  {babin.whatsapp_group_link &&
+                  /^https:\/\/chat\.whatsapp\.com\//.test(babin.whatsapp_group_link) ? (
                     <a
                       href={babin.whatsapp_group_link}
                       className="ml-3 text-sm text-accent-soft"

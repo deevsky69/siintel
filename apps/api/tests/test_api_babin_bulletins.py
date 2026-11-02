@@ -124,6 +124,28 @@ def test_public_contact_shows_service_number_but_never_delivery_targets(
     )
 
 
+def test_group_link_accepts_only_official_whatsapp_invites(
+    client: TestClient, session: Session
+) -> None:
+    """Tautan grup dirender sebagai href di halaman publik: skema lain ditolak di API."""
+    area = _kelurahan(session)
+    admin = _login(client, session, "Administrator")
+    base = {"name": "Bripka Uji", "phone_display": "021-7654321"}
+    bad = client.put(
+        f"/api/v1/babin/{area.kelurahan}",
+        json={**base, "whatsapp_group_link": "javascript:alert(1)"},
+        headers=admin,
+    )
+    assert bad.status_code == 400
+    good = client.put(
+        f"/api/v1/babin/{area.kelurahan}",
+        json={**base, "whatsapp_group_link": "https://chat.whatsapp.com/AbCdEf"},
+        headers=admin,
+    )
+    assert good.status_code == 200
+    assert good.json()["whatsapp_group_link"] == "https://chat.whatsapp.com/AbCdEf"
+
+
 def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_by_bot(
     client: TestClient, session: Session
 ) -> None:

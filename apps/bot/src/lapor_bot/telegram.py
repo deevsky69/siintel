@@ -173,14 +173,18 @@ def deliver_bulletins(
                 telegram.send(str(chat_id), Reply(text))
                 delivery["telegram"] = "ok"
             except Exception as error:  # noqa: BLE001
-                delivery["telegram"] = f"gagal: {str(error)[:120]}"
+                # Hanya JENIS galatnya yang disimpan: teks httpx dapat memuat URL Bot API
+                # beserta tokennya, dan `delivery` tersimpan di basis data.
+                log.warning("Buletin Telegram gagal: %s", type(error).__name__)
+                delivery["telegram"] = f"gagal: {type(error).__name__}"
         number = row.get("whatsapp_number")
         if whatsapp_send is not None and number:
             try:
                 whatsapp_send(str(number), Reply(text))
                 delivery["whatsapp"] = "ok"
             except Exception as error:  # noqa: BLE001
-                delivery["whatsapp"] = f"gagal: {str(error)[:120]}"
+                log.warning("Buletin WhatsApp gagal: %s", type(error).__name__)
+                delivery["whatsapp"] = f"gagal: {type(error).__name__}"
         if not delivery:
             delivery["catatan"] = (
                 "tidak ada tujuan: isi chat id grup Telegram atau nomor WhatsApp Babin"
