@@ -100,6 +100,6 @@ EXPOSE 3000
 # `/masuk` adalah satu-satunya halaman yang boleh diakses tanpa sesi (src/middleware.ts),
 # jadi halaman inilah penanda "server web hidup" yang benar.
 HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=6 \
-  CMD node -e "fetch('http://127.0.0.1:3000/masuk').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:3000/ops/masuk').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 CMD ["node", "apps/web/server.js"]
