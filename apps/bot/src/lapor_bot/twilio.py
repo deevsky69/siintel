@@ -38,7 +38,7 @@ import httpx
 
 from .backend import Backend, BackendError
 from .core import Attachment, Conversation, Incoming, Reply, progress_message
-from .webhook import Response, WebhookServer, run_later
+from .webhook import Response, WebhookServer
 from .whatsapp import render
 
 log = logging.getLogger("lapor_bot.twilio")
@@ -49,6 +49,10 @@ MAX_FILE_BYTES = 16 * 1024 * 1024
 LOCATION_HINT = (
     "\n\nUntuk membagikan lokasi: tekan ikon lampiran (klip) di WhatsApp, pilih Lokasi, lalu kirim."
 )
+
+
+class TemplateRequired(RuntimeError):
+    """Twilio menolak pesan bebas (21654/63016); balasan hanya dapat lewat respons webhook."""
 
 
 def signature(auth_token: str, url: str, params: dict[str, str]) -> str:
@@ -132,14 +136,11 @@ class TwilioChannel:
             except ValueError:
                 pass
             if code in ("21654", "63016"):
-                # Jendela 24 jam WhatsApp belum terbuka: Twilio hanya mengizinkan balasan
-                # bebas setelah PELAPOR mengirim pesan lebih dulu dari WhatsApp-nya. Uji
-                # yang disuntikkan ke webhook tanpa pesan WhatsApp sungguhan selalu gagal
-                # di sini — itu bukan kesalahan bot.
-                raise RuntimeError(
-                    "Twilio menolak balasan bebas (kode "
-                    f"{code}): belum ada pesan WhatsApp sungguhan dari {phone} dalam 24 jam "
-                    "terakhir, atau nomor pengirim menuntut template."
+                # Twilio menolak teks bebas: jendela 24 jam belum terbuka (63016) atau nomor
+                # pengirim trial hanya boleh mengirim template bawaan Twilio (21654).
+                raise TemplateRequired(
+                    f"Twilio menolak balasan bebas ke {phone} (kode {code}): jendela 24 jam "
+                    "belum terbuka, atau nomor pengirim trial hanya boleh mengirim template."
                 )
             raise RuntimeError(f"Twilio kirim: {response.status_code} {response.text[:200]}")
 
@@ -157,15 +158,26 @@ class TwilioChannel:
                 self._conversations[phone] = Conversation(self._backend, CHANNEL, phone)
             return self._conversations[phone]
 
-    def handle(self, params: dict[str, str]) -> None:
+    def handle(self, params: dict[str, str]) -> str | None:
+        """Memproses satu pesan masuk. Mengembalikan teks balasan yang GAGAL dikirim lewat
+        REST karena nomor pengirim menuntut template (akun trial), supaya webhook dapat
+        menjawabnya langsung di respons HTTP; None bila sudah terkirim atau tidak ada."""
         phone = phone_of(params.get("From", ""))
         if not phone:
-            return
+            return None
         try:
             reply = self._conversation(phone).handle(incoming_from(params, self.fetch))
-            self.send(phone, reply)
         except Exception:  # noqa: BLE001
             log.exception("Twilio: gagal menangani pesan dari satu percakapan")
+            return None
+        try:
+            self.send(phone, reply)
+        except TemplateRequired as error:
+            log.warning("Twilio: %s — balasan dikembalikan lewat respons webhook", error)
+            return outgoing(reply)
+        except Exception:  # noqa: BLE001
+            log.exception("Twilio: balasan gagal dikirim")
+        return None
 
     def register(self, server: WebhookServer) -> None:
         def on_post(raw: bytes, headers: dict[str, str], _path: str) -> Response:
@@ -174,8 +186,13 @@ class TwilioChannel:
                 self._token, self._public_url, params, headers.get("x-twilio-signature", "")
             ):
                 return 401, "text/plain", b""
-            run_later(lambda: self.handle(params))
-            # TwiML kosong: balasan dikirim lewat REST API, bukan di sini.
+            # Diproses langsung (bukan run_later) supaya balasan dapat ikut di respons bila
+            # REST menolak (akun trial). Twilio menunggu sampai 15 detik; percakapan kita
+            # hanya memanggil API lokal dan, untuk foto, mengunduh media dari Twilio.
+            text = self.handle(params)
+            if text is not None:
+                return 200, "text/plain; charset=utf-8", text.encode("utf-8")
+            # TwiML kosong: balasan sudah dikirim lewat REST API.
             return 200, "text/xml", b"<Response></Response>"
 
         def on_get(_query: dict[str, list[str]]) -> Response:

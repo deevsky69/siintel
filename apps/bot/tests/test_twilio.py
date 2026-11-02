@@ -75,3 +75,23 @@ def test_channel_requires_all_four_settings() -> None:
 
     with pytest.raises(ValueError):
         twilio.TwilioChannel("AC1", "", "+1", "https://x", backend=None)  # type: ignore[arg-type]
+
+
+def test_trial_sender_reply_is_returned_in_webhook_response(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    """Akun trial Twilio menolak teks bebas lewat REST (21654): balasan ikut di respons."""
+    channel = twilio.TwilioChannel(
+        "AC1", "token", "+1737", "https://x.id/webhook/twilio", backend=None
+    )  # type: ignore[arg-type]
+
+    def refuse(phone: str, reply: Reply) -> None:
+        raise twilio.TemplateRequired("trial")
+
+    monkeypatch.setattr(channel, "send", refuse)
+    server = WebhookServer(0)
+    channel.register(server)
+    handler = server._posts["/webhook/twilio"]
+    raw = urlencode({"From": "whatsapp:+628", "Body": "/bantuan", "NumMedia": "0"}).encode()
+    good = twilio.signature("token", "https://x.id/webhook/twilio", twilio.form(raw))
+    status, content_type, body = handler(raw, {"x-twilio-signature": good}, "/webhook/twilio")
+    assert status == 200 and content_type.startswith("text/plain")
+    assert "/mulai" in body.decode()
