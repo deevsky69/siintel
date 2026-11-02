@@ -33,7 +33,7 @@ export function MapPanel({ data }: { data: MapData }) {
       className="h-full"
       bodyClassName="flex flex-col gap-3"
       action={
-        <Link href="/peta" className="panel-action">
+        <Link href="/ops/peta" className="panel-action">
           Buka peta
         </Link>
       }

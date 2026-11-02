@@ -220,3 +220,87 @@
     box-shadow: 0 0 0 2px rgb(var(--risk-critical) / 0.6);
   }
 }
+
+/* ------------------------------------------------------------------------------------------
+   SIGAP WARGA — tema sisi masyarakat (2 November 2026).
+
+   Dasbor warga memakai rupa yang SENGAJA berbeda dari sisi kepolisian (/ops): terang,
+   hangat, lapang, tanpa huruf teknis. Token yang sama (surface/text/accent/risk) didefinisikan
+   ulang di dalam pembungkus `.warga`, sehingga komponen Tailwind bekerja apa adanya, tetapi
+   tidak terpengaruh pengalih tema gelap/terang milik /ops (`.dark .warga` ikut ditimpa).
+   ------------------------------------------------------------------------------------------ */
+.warga,
+.dark .warga {
+  color-scheme: light;
+
+  --surface-app: 247 245 240; /* gading hangat */
+  --surface-panel: 255 255 255;
+  --surface-inset: 241 238 231;
+  --line: 226 222 212;
+  --line-strong: 203 198 186;
+  --line-stronger: 170 165 152;
+
+  --text: 22 32 56; /* biru malam, 14:1 di atas panel */
+  --text-muted: 84 96 122; /* 6,1:1 */
+  --text-faint: 118 128 150; /* 4,6:1 */
+
+  --accent: 24 58 112; /* biru tua Polri */
+  --accent-soft: 41 88 168;
+  --accent-deep: 16 40 80;
+
+  /* tingkat kerawanan kasar: rendah / sedang / tinggi — tiga warna saja */
+  --risk-low: 18 120 86;
+  --risk-moderate: 196 110 10;
+  --risk-high: 184 30 52;
+  --risk-critical: 184 30 52;
+
+  --warga-amber: 243 178 10; /* sentuhan kuning Polri untuk aksen kecil */
+  --glow-a: rgba(24, 58, 112, 0.06);
+  --glow-b: rgba(243, 178, 10, 0.08);
+  --shadow-panel: 0 1px 2px rgba(22, 32, 56, 0.06), 0 12px 32px -16px rgba(22, 32, 56, 0.18);
+  --shadow-glow: 0 0 0 0 transparent;
+
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+.warga .font-heading {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+.warga .warga-card {
+  background: rgb(var(--surface-panel));
+  border: 1px solid rgb(var(--line));
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-panel);
+}
+.warga .warga-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.8rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+.warga .warga-btn:active {
+  transform: scale(0.98);
+}
+.warga .warga-btn-primary {
+  background: rgb(var(--accent));
+  color: white;
+}
+.warga .warga-btn-primary:hover {
+  background: rgb(var(--accent-deep));
+}
+.warga .warga-btn-danger {
+  background: rgb(var(--risk-high));
+  color: white;
+}
+.warga .warga-btn-ghost {
+  background: rgb(var(--surface-panel));
+  color: rgb(var(--accent));
+  border: 1px solid rgb(var(--line-strong));
+}

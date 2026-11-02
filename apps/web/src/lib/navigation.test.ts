@@ -3,8 +3,8 @@ import { DEFAULT_PATH, safeNextPath } from "@/lib/navigation";
 
 describe("tujuan pengalihan setelah masuk", () => {
   it("menerima lintasan relatif dalam aplikasi", () => {
-    expect(safeNextPath("/peta")).toBe("/peta");
-    expect(safeNextPath("/evaluasi?tahun=2025")).toBe("/evaluasi?tahun=2025");
+    expect(safeNextPath("/ops/peta")).toBe("/ops/peta");
+    expect(safeNextPath("/ops/evaluasi?tahun=2025")).toBe("/ops/evaluasi?tahun=2025");
   });
 
   it("menolak origin lain", () => {

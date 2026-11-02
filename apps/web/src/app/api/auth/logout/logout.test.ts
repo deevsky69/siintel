@@ -15,7 +15,7 @@ describe("keluar dari sesi", () => {
     const response = await POST();
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("/masuk");
+    expect(response.headers.get("location")).toBe("/ops/masuk");
   });
 
   it("memakai 303 supaya peramban mengubah POST menjadi GET", async () => {

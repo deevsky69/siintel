@@ -18,24 +18,24 @@ import { ACCESS_COOKIE } from "@/lib/session";
  * membuat "halaman muka" punya dua nama.
  */
 
-/** Halaman yang dilayani tanpa akun. Kanal laporan masyarakat ada di sini (docs/14 §3). */
-const PUBLIC_PATHS = ["/masuk", "/beranda", "/lapor"];
+/**
+ * Sejak 2 November 2026 (SIGAP WARGA): seluruh jalur di luar `/ops` adalah halaman warga
+ * tanpa akun; `/ops/...` adalah aplikasi kepolisian yang menuntut sesi, kecuali `/ops/masuk`.
+ */
+const OPS_PREFIX = "/ops";
+const OPS_PUBLIC = ["/ops/masuk"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const signedIn = Boolean(request.cookies.get(ACCESS_COOKIE));
-
-  if (PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+  if (pathname !== OPS_PREFIX && !pathname.startsWith(`${OPS_PREFIX}/`)) {
     return NextResponse.next();
   }
-
-  if (signedIn) return NextResponse.next();
-
-  if (pathname === "/") {
-    return NextResponse.rewrite(new URL("/beranda", request.url));
+  if (OPS_PUBLIC.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+    return NextResponse.next();
   }
+  if (request.cookies.get(ACCESS_COOKIE)) return NextResponse.next();
 
-  const target = new URL("/masuk", request.url);
+  const target = new URL("/ops/masuk", request.url);
   target.searchParams.set("lanjut", pathname);
   return NextResponse.redirect(target);
 }

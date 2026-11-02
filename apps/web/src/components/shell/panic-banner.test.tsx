@@ -14,7 +14,7 @@ const feed: NotificationFeed = {
       kind: "PANIC",
       title: "Permintaan bantuan darurat",
       action: "Terima",
-      href: "/panic",
+      href: "/ops/panic",
       total: 1,
       items: [{ code: "PNC-0001", headline: "Tebet Timur, Tebet", detail: "ditekan 10:05 WIB" }],
     },
@@ -25,7 +25,7 @@ describe("spanduk darurat", () => {
   it("tampil selama ada permintaan yang belum diterima, menautkan ke antrean", () => {
     render(<PanicBanner feed={feed} />);
     const banner = screen.getByRole("alert");
-    expect(banner.getAttribute("href")).toBe("/panic");
+    expect(banner.getAttribute("href")).toBe("/ops/panic");
     expect(screen.getByText(/1 permintaan bantuan belum diterima/)).toBeDefined();
     expect(screen.getByText(/Tebet Timur, Tebet/)).toBeDefined();
   });

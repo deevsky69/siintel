@@ -59,6 +59,8 @@ EXPECTED_TABLES = {
     "panic_events",
     # 0013 — kanal perpesanan (8 Oktober 2026)
     "citizen_report_contacts",
+    # 0015 — Survey Rasa Aman (2 November 2026)
+    "area_reviews",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat
     "citizen_report_attachments",

@@ -47,6 +47,7 @@ from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session
 
 from ...models import (
+    AreaReview,
     CitizenReport,
     CommanderDecision,
     EarlyWarning,
@@ -119,7 +120,7 @@ def notifications(
                 "kind": "PANIC",
                 "title": "Permintaan bantuan darurat",
                 "action": "Terima dan tindak lanjuti sekarang",
-                "href": "/panic",
+                "href": "/ops/panic",
                 "total": int(panic_total or 0),
                 # Selalu disorot bila ada isinya (9 Oktober 2026): layar mengedipkannya.
                 "urgent": int(panic_total or 0) > 0,
@@ -168,7 +169,7 @@ def notifications(
                 "kind": "WARNING",
                 "title": "Peringatan belum diterima",
                 "action": "Terima atau selesaikan",
-                "href": "/peringatan",
+                "href": "/ops/peringatan",
                 "total": int(total or 0),
                 "items": [
                     {
@@ -197,7 +198,7 @@ def notifications(
                         "kind": "PATROL_PLAN",
                         "title": f"Rencana patroli {plan.target_year} belum diputus",
                         "action": "Setujui, setujui sebagian, atau tolak",
-                        "href": "/rencana-patroli",
+                        "href": "/ops/rencana-patroli",
                         "total": 1,
                         "items": [
                             {
@@ -241,7 +242,7 @@ def notifications(
                 "kind": "DECISION",
                 "title": "Menunggu keputusan Anda",
                 "action": "Setujui, modifikasi, atau tolak",
-                "href": "/rekomendasi",
+                "href": "/ops/rekomendasi",
                 "total": int(total or 0),
                 "items": [
                     {
@@ -292,7 +293,7 @@ def notifications(
                 "kind": "CITIZEN_REPORT",
                 "title": "Laporan warga belum diverifikasi",
                 "action": "Triase",
-                "href": "/masyarakat?status=RECEIVED",
+                "href": "/ops/masyarakat?status=RECEIVED",
                 "total": int(session.scalar(counter) or 0),
                 "urgent": urgent_total > 0,
                 "urgent_total": urgent_total,
@@ -304,6 +305,35 @@ def notifications(
                         "urgent": report.category in urgent_categories,
                     }
                     for report in reports
+                ],
+            }
+        )
+
+    # --- Survey Rasa Aman: ulasan menunggu moderasi (2 November 2026) ------------------
+    if _holds(current, "review:moderate"):
+        pending_reviews = session.scalars(
+            select(AreaReview)
+            .where(AreaReview.status == "PENDING")
+            .order_by(AreaReview.submitted_at.asc())
+            .limit(SAMPLE_LIMIT)
+        ).all()
+        pending_reviews_total = session.scalar(
+            select(func.count()).select_from(AreaReview).where(AreaReview.status == "PENDING")
+        )
+        groups.append(
+            {
+                "kind": "REVIEW",
+                "title": "Ulasan warga menunggu moderasi",
+                "action": "Tayangkan atau tolak",
+                "href": "/ops/survey",
+                "total": int(pending_reviews_total or 0),
+                "items": [
+                    {
+                        "code": review.code,
+                        "headline": f"{review.location.kelurahan} · {review.rating}/5",
+                        "detail": (review.comment or "")[:70] or "Tanpa komentar.",
+                    }
+                    for review in pending_reviews
                 ],
             }
         )
@@ -334,7 +364,7 @@ def notifications(
                 "kind": "PREDICTION",
                 "title": "Prediksi belum dipublikasikan",
                 "action": "Tinjau lalu publikasikan",
-                "href": "/prediksi",
+                "href": "/ops/prediksi",
                 "total": int(total or 0),
                 "items": [
                     {
@@ -378,7 +408,7 @@ def notifications(
                 "kind": "OPERATION",
                 "title": "Keputusan belum ditindaklanjuti",
                 "action": "Catat tindakan operasional",
-                "href": "/operasi",
+                "href": "/ops/operasi",
                 "total": int(total or 0),
                 "items": [
                     {

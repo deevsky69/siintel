@@ -27,7 +27,7 @@ import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/session";
 export async function POST(): Promise<NextResponse> {
   const response = new NextResponse(null, {
     status: 303,
-    headers: { Location: "/masuk" },
+    headers: { Location: "/ops/masuk" },
   });
   response.cookies.delete(ACCESS_COOKIE);
   response.cookies.delete(REFRESH_COOKIE);

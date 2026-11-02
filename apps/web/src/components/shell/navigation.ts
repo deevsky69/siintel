@@ -62,14 +62,14 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     icon: "dashboard",
     items: [
       {
-        href: "/",
+        href: "/ops",
         label: "Beranda",
         icon: "dashboard",
         permissions: ["dashboard:read"],
         hint: "Ringkasan keadaan hari ini",
       },
       {
-        href: "/informasi",
+        href: "/ops/informasi",
         label: "Informasi Terbaru",
         icon: "feed",
         // Dua kanal (kejadian dan laporan masyarakat); cukup salah satunya untuk bermakna.
@@ -77,14 +77,14 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         hint: "Kejadian terbaru dan laporan masyarakat",
       },
       {
-        href: "/peta",
+        href: "/ops/peta",
         label: "Peta",
         icon: "map",
         permissions: ["map:read"],
         hint: "Historis, risiko berjalan, dan prediktif",
       },
       {
-        href: "/peringatan",
+        href: "/ops/peringatan",
         label: "Peringatan Dini",
         icon: "warning",
         permissions: ["warning:read"],
@@ -98,28 +98,35 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     icon: "community",
     items: [
       {
-        href: "/masyarakat",
+        href: "/ops/masyarakat",
         label: "Laporan Masyarakat",
         icon: "community",
         permissions: ["citizen_report:read"],
         hint: "Laporan yang masuk lewat kanal publik",
       },
       {
-        href: "/laporan-petugas",
+        href: "/ops/laporan-petugas",
         label: "Laporan Petugas",
         icon: "entry",
         permissions: ["crime:read"],
         hint: "Kejadian yang dicatat petugas",
       },
       {
-        href: "/panic",
+        href: "/ops/survey",
+        label: "Survey Rasa Aman",
+        icon: "community",
+        permissions: ["review:moderate"],
+        hint: "Ulasan warga per kelurahan yang menunggu moderasi",
+      },
+      {
+        href: "/ops/panic",
         label: "Panic Button",
         icon: "panic",
         permissions: ["panic:read"],
         hint: "Permintaan bantuan darurat",
       },
       {
-        href: "/input",
+        href: "/ops/input",
         label: "Input Data",
         icon: "write",
         permissions: ["crime:write", "intelligence:write", "citizen_report:write"],
@@ -133,42 +140,42 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     icon: "analytics",
     items: [
       {
-        href: "/analitik",
+        href: "/ops/analitik",
         label: "Analitik",
         icon: "analytics",
         permissions: ["analytics:read"],
         hint: "Tren bulanan, pola waktu, perbandingan wilayah",
       },
       {
-        href: "/wilayah",
+        href: "/ops/wilayah",
         label: "Wilayah Rawan",
         icon: "area",
         permissions: ["risk_score:read"],
         hint: "Peringkat wilayah beserta rincian datanya",
       },
       {
-        href: "/pola",
+        href: "/ops/pola",
         label: "Pola Gangguan",
         icon: "pattern",
         permissions: ["analytics:read"],
         hint: "Crime Pattern DNA per jenis gangguan",
       },
       {
-        href: "/prediksi",
+        href: "/ops/prediksi",
         label: "Prediksi",
         icon: "prediction",
         permissions: ["prediction:read"],
         hint: "Prediksi per horizon beserta faktor dominannya",
       },
       {
-        href: "/skoring",
+        href: "/ops/skoring",
         label: "Penilaian Risiko",
         icon: "scoring",
         permissions: ["risk_score:read"],
         hint: "Skor risiko beserta bobot yang menghasilkannya",
       },
       {
-        href: "/evaluasi",
+        href: "/ops/evaluasi",
         label: "Evaluasi",
         icon: "evaluation",
         permissions: ["evaluation:read"],
@@ -182,28 +189,28 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     icon: "operation",
     items: [
       {
-        href: "/operasi",
+        href: "/ops/operasi",
         label: "Operasi & Penugasan",
         icon: "operation",
         permissions: ["operation:read"],
         hint: "Tindakan yang dijalankan dan hasilnya",
       },
       {
-        href: "/rekomendasi",
+        href: "/ops/rekomendasi",
         label: "Rekomendasi & Keputusan",
         icon: "recommendation",
         permissions: ["recommendation:read"],
         hint: "Usulan tindakan dan keputusan komandan",
       },
       {
-        href: "/rencana-patroli",
+        href: "/ops/rencana-patroli",
         label: "Rencana Patroli",
         icon: "recommendation",
         permissions: ["recommendation:read"],
         hint: "Usulan kelurahan dan blok jam patroli tahun ini, dicocokkan dengan kenyataan",
       },
       {
-        href: "/brief",
+        href: "/ops/brief",
         label: "Brief Pimpinan",
         icon: "brief",
         permissions: ["dashboard:read"],
@@ -217,21 +224,21 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     icon: "admin",
     items: [
       {
-        href: "/admin",
+        href: "/ops/admin",
         label: "Manajemen Pengguna",
         icon: "admin",
         permissions: ["user:read", "user:manage", "role:manage"],
         hint: "Akun, peran, dan kewenangannya",
       },
       {
-        href: "/audit",
+        href: "/ops/audit",
         label: "Audit Log",
         icon: "audit",
         permissions: ["audit:read"],
         hint: "Jejak siapa melakukan apa",
       },
       {
-        href: "/pengaturan",
+        href: "/ops/pengaturan",
         label: "Pengaturan Sistem",
         icon: "settings",
         permissions: ["config:read", "config:manage"],
@@ -276,7 +283,7 @@ export function visibleNavItems(held: readonly string[]): NavItem[] {
 export function groupOf(pathname: string): string | null {
   for (const group of NAV_GROUPS) {
     for (const item of group.items) {
-      const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+      const active = item.href === "/ops" ? pathname === "/ops" : pathname.startsWith(item.href);
       if (active) return group.id;
     }
   }

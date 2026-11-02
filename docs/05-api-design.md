@@ -470,6 +470,20 @@ tidak terjadi.
 > tangan pemilik proyek. Aplikasi Android LAPOR PRESISI (PHASE 17) tetap direncanakan
 > terpisah.
 
+### 2.11d SIGAP WARGA — ringkasan wilayah publik dan Survey Rasa Aman (2 November 2026)
+
+| Method | Path | Permission | Keterangan |
+|---|---|---|---|
+| GET | `/public/areas/summary` | — | per kelurahan: jumlah 3C 12 bulan terakhir, per jenis, per bulan, tingkat RENDAH/SEDANG/TINGGI (tertil, PROPOSED), rata-rata ulasan tayang; agregat per kecamatan. Tanpa prediksi/skor/titik |
+| POST | `/public/reviews` | — | ulasan anonim (kecamatan, kelurahan, rating 1–5, komentar ≤300); kuota 3/jam per alamat; masuk PENDING; audit `SUBMIT_AREA_REVIEW` |
+| GET | `/public/reviews?kelurahan=` | — | ulasan PUBLISHED + rata-rata + jumlah |
+| GET | `/reviews?status=` | `review:moderate` | antrean moderasi |
+| POST | `/reviews/{code}/moderate` | `review:moderate` | `PUBLISH` / `REJECT` + catatan; audit `MODERATE_AREA_REVIEW` |
+
+Tabel `area_reviews` (migration 0015). `GET /notifications` memuat kelompok `REVIEW` bagi
+pemegang `review:moderate`. Tautan `href` pada `/notifications` kini berawalan `/ops`
+karena sisi kepolisian web pindah ke bawah jalur itu.
+
 ### 2.11c Kanal perpesanan — bot Telegram / WhatsApp (8 Oktober 2026)
 
 Keputusan pemilik proyek: laporan masyarakat juga dapat masuk lewat **bot Telegram** (dan

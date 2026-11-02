@@ -18,19 +18,16 @@ export default async function LaporPage() {
   const options = await getReportOptions();
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-lg p-6">
-      <div className="mb-6 text-center">
-        <Link href="/" className="inline-block">
-          <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg border border-accent/30 bg-accent/10 font-heading text-base font-bold text-accent">
-            PP
-          </span>
-        </Link>
-        <h1 className="font-heading text-xl font-bold tracking-wide text-ink">Lapor Kejadian</h1>
-        <p className="mt-1 text-xs uppercase tracking-[0.14em] text-ink-muted">
-          Polres Metro Jakarta Selatan
+    <div className="mx-auto w-full max-w-lg">
+      <div className="mb-5">
+        <p className="text-xs font-semibold uppercase tracking-wider text-accent-soft">
+          SIGAP WARGA
+        </p>
+        <h1 className="mt-1 text-2xl font-bold text-ink">Lapor Kejadian</h1>
+        <p className="mt-1 text-sm text-ink-muted">
+          Tanpa akun, tanpa identitas. Anda menerima nomor tiket.
         </p>
       </div>
-
       {/* Ditempatkan SEBELUM formulir, bukan sesudahnya. Orang yang sedang menghadapi
           keadaan darurat tidak akan membaca catatan kaki di bawah tombol kirim. */}
       <p className="mb-5 rounded border border-risk-critical/40 bg-risk-critical/10 px-3 py-2.5 text-xs leading-relaxed text-ink">
@@ -48,11 +45,11 @@ export default async function LaporPage() {
         </p>
         <p>{options.intake_basis}</p>
         <p>
-          <Link href="/masuk" className="underline hover:text-ink-muted">
+          <Link href="/ops/masuk" className="underline hover:text-ink-muted">
             Masuk sebagai petugas
           </Link>
         </p>
       </div>
-    </main>
+    </div>
   );
 }

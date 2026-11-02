@@ -16,6 +16,17 @@ Polres Metro Jakarta Selatan
 
 ---
 
+## 0. DUA WAJAH SATU DOMAIN — SIGAP WARGA DAN SIGAP (2 November 2026)
+
+| Alamat | Untuk siapa | Isi |
+|---|---|---|
+| `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP WARGA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
+| `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
+
+Yang sengaja **tidak** ada di sisi warga: skor, prediksi, titik kejadian, peringkat halus.
+Tingkat RENDAH/SEDANG/TINGGI adalah pembagian tertil jumlah kejadian historis (PROPOSED).
+Moderasi Survey Rasa Aman ada di menu **Laporan → Survey Rasa Aman** (Administrator).
+
 ## 1. UNTUK SIAPA MODUL INI
 
 | Pembaca | Bagian yang paling relevan |
@@ -935,7 +946,7 @@ Warga **tidak masuk ke aplikasi ini**. Mereka membuka halaman muka dan menekan *
 Kejadian**:
 
 ```text
-sigap.awansurya.com  →  Lapor Kejadian  →  formulir  →  nomor tiket
+sigap.awansurya.com  →  Lapor  →  formulir  →  nomor tiket
 ```
 
 Bisa juga lewat **aplikasi Android** — tombol *Lapor Kejadian* pada layar mukanya.

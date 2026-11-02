@@ -28,7 +28,7 @@ const SRC = join(process.cwd(), "src");
  * Untuk setiap berkas `"use client"`, hanya komponen yang **diekspor** yang diperiksa —
  * dan hanya itu yang perlu. Komponen internal di dalam berkas yang sama tidak dapat
  * diimpor siapa pun, sehingga batas server/klien tidak pernah dilewati saat memanggilnya;
- * `FilterRow` pada `/prediksi` adalah contohnya.
+ * `FilterRow` pada `/ops/prediksi` adalah contohnya.
  *
  * ## Server action adalah pengecualian yang sah, dan dikenali dari tipenya
  *

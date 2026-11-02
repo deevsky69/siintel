@@ -50,7 +50,7 @@ export function TopReportAreas({ top }: { top: LeadershipBoard["top_report_areas
                   <td className="py-1.5 font-mono text-2xs text-ink-faint">{index + 1}</td>
                   <td className="py-1.5">
                     <Link
-                      href={`/peta?wilayah=${encodeURIComponent(area.kecamatan)}&layer=historical`}
+                      href={`/ops/peta?wilayah=${encodeURIComponent(area.kecamatan)}&layer=historical`}
                       className="text-ink hover:text-accent"
                     >
                       {area.kecamatan}

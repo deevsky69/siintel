@@ -360,7 +360,7 @@ describe("peta risiko", () => {
     const areas = screen.getAllByRole("link", { name: /—/ });
     expect(areas).toHaveLength(shapesAt("kecamatan").length);
     expect(screen.getByRole("link", { name: /^Tebet —/ }).getAttribute("href")).toBe(
-      "/peta?wilayah=Tebet&tingkat=kelurahan",
+      "/ops/peta?wilayah=Tebet&tingkat=kelurahan",
     );
   });
 
@@ -460,10 +460,10 @@ describe("peta risiko", () => {
     render(<RiskMap {...mapProps} />);
 
     expect(screen.getByRole("link", { name: "Prediktif" }).getAttribute("href")).toBe(
-      "/peta?wilayah=Kebayoran+Baru&layer=predictive",
+      "/ops/peta?wilayah=Kebayoran+Baru&layer=predictive",
     );
     expect(screen.getByRole("link", { name: "Risiko Berjalan" }).getAttribute("href")).toBe(
-      "/peta?wilayah=Kebayoran+Baru",
+      "/ops/peta?wilayah=Kebayoran+Baru",
     );
   });
 
@@ -478,7 +478,7 @@ describe("peta risiko", () => {
     ).toBeDefined();
     expect(
       screen.getByRole("link", { name: "Tebet — tidak ada prediksi" }).getAttribute("href"),
-    ).toBe("/peta?wilayah=Tebet&tingkat=kelurahan&layer=predictive");
+    ).toBe("/ops/peta?wilayah=Tebet&tingkat=kelurahan&layer=predictive");
     expect(screen.getByText(/tanpa kelas risiko resmi/i)).toBeDefined();
   });
 
@@ -804,10 +804,10 @@ describe("layer historis", () => {
 
     const jendela = screen.getByRole("navigation", { name: "Jendela waktu historis" });
     expect(within(jendela).getByRole("link", { name: "Seluruh data" }).getAttribute("href")).toBe(
-      "/peta?wilayah=Kebayoran+Baru&layer=historical&bulan=36",
+      "/ops/peta?wilayah=Kebayoran+Baru&layer=historical&bulan=36",
     );
     expect(within(jendela).getByRole("link", { name: "12 bulan" }).getAttribute("href")).toBe(
-      "/peta?wilayah=Kebayoran+Baru&layer=historical",
+      "/ops/peta?wilayah=Kebayoran+Baru&layer=historical",
     );
   });
 });

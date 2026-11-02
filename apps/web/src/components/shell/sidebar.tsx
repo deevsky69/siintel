@@ -46,7 +46,8 @@ export function Sidebar({
   });
   const opened = toggled.path === pathname ? toggled.ids : new Set<string>();
 
-  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const isActive = (href: string) =>
+    href === "/ops" ? pathname === "/ops" : pathname.startsWith(href);
 
   const toggle = (id: string) =>
     setToggled((previous) => {
@@ -63,7 +64,7 @@ export function Sidebar({
     >
       {groups.map((group) => {
         const open = group.id === activeGroup ? !opened.has(group.id) : opened.has(group.id);
-        const badge = group.items.some((item) => item.href === "/rekomendasi")
+        const badge = group.items.some((item) => item.href === "/ops/rekomendasi")
           ? pendingDecisions
           : 0;
 
@@ -108,7 +109,7 @@ export function Sidebar({
                     <SubmenuLink
                       item={item}
                       active={isActive(item.href)}
-                      badge={item.href === "/rekomendasi" ? pendingDecisions : 0}
+                      badge={item.href === "/ops/rekomendasi" ? pendingDecisions : 0}
                     />
                   </li>
                 ))}

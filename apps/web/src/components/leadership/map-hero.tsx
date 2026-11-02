@@ -77,7 +77,7 @@ export function MapHero({
           title="Peta Kerawanan"
           bodyClassName="flex flex-col gap-3"
           action={
-            <Link href="/peta" className="panel-action">
+            <Link href="/ops/peta" className="panel-action">
               Peta lengkap
             </Link>
           }
@@ -282,7 +282,7 @@ function AreaSummary({
 
       <div className="mt-auto flex flex-wrap gap-2 pt-3">
         <Link
-          href={`/wilayah/${encodeURIComponent(kecamatan)}`}
+          href={`/ops/wilayah/${encodeURIComponent(kecamatan)}`}
           className="rounded border border-accent/40 bg-accent/10 px-2.5 py-1 text-2xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20"
         >
           Rincian lengkap

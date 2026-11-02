@@ -38,6 +38,8 @@ permissions:
   config: [read, manage]
   # Tombol darurat warga — keputusan pemilik proyek 8 Oktober 2026 (migrasi 0012).
   panic: [read, acknowledge]
+  # Survey Rasa Aman (2 November 2026): memutuskan ulasan warga tayang atau tidak.
+  review: [moderate]
 
 roles:
   Pimpinan:
@@ -228,6 +230,9 @@ roles:
       # kejadian (laporan petugas) hanya oleh Administrator. Polsek/Fungsi tetap mencatat.
       - citizen_report:triage
       - crime:triage
+      # Moderator Survey Rasa Aman (2 November 2026). Binmas lewat peran Fungsi menunggu
+      # keputusan RBAC tersendiri; sementara Administrator.
+      - review:moderate
       - dashboard:read
       - location:read
       - location:write

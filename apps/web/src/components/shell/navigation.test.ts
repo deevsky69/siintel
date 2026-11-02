@@ -65,7 +65,13 @@ describe("susunan menu", () => {
     // menunjukkan bahwa ramalannya pernah diuji terhadap kenyataan (CLAUDE.md §9).
     const routes = NAV_ITEMS.map((item) => item.href);
 
-    for (const href of ["/prediksi", "/evaluasi", "/rekomendasi", "/peringatan", "/skoring"]) {
+    for (const href of [
+      "/ops/prediksi",
+      "/ops/evaluasi",
+      "/ops/rekomendasi",
+      "/ops/peringatan",
+      "/ops/skoring",
+    ]) {
       expect(routes, `${href} hilang dari menu`).toContain(href);
     }
   });
@@ -75,11 +81,11 @@ describe("penyaringan menu menurut kewenangan", () => {
   it("menyembunyikan Input Data dari peran tanpa satu pun izin tulis", () => {
     const readerOnly = ["dashboard:read", "crime:read", "citizen_report:read"];
 
-    expect(visibleNavItems(readerOnly).map((item) => item.href)).not.toContain("/input");
+    expect(visibleNavItems(readerOnly).map((item) => item.href)).not.toContain("/ops/input");
   });
 
   it("menampilkan Input Data begitu satu izin tulis dipegang", () => {
-    expect(visibleNavItems(["crime:write"]).map((item) => item.href)).toContain("/input");
+    expect(visibleNavItems(["crime:write"]).map((item) => item.href)).toContain("/ops/input");
   });
 
   it("membuang kelompok yang tidak menyisakan satu pun submenu", () => {
@@ -87,7 +93,7 @@ describe("penyaringan menu menurut kewenangan", () => {
     const groups = visibleNavGroups(["dashboard:read"]);
 
     expect(groups.map((group) => group.id)).toEqual(["pemantauan", "operasi"]);
-    expect(groups[0].items.map((item) => item.href)).toEqual(["/"]);
+    expect(groups[0].items.map((item) => item.href)).toEqual(["/ops"]);
   });
 
   it("menjawab menu kosong untuk kewenangan kosong", () => {
@@ -99,34 +105,34 @@ describe("penyaringan menu menurut kewenangan", () => {
     // Pimpinan tidak memegang satu pun izin tulis maupun pengelolaan pengguna.
     const routes = visibleNavItems(PIMPINAN).map((item) => item.href);
 
-    expect(routes).not.toContain("/admin");
-    expect(routes).not.toContain("/input");
-    expect(routes).toContain("/audit");
-    expect(routes).toContain("/pengaturan");
+    expect(routes).not.toContain("/ops/admin");
+    expect(routes).not.toContain("/ops/input");
+    expect(routes).toContain("/ops/audit");
+    expect(routes).toContain("/ops/pengaturan");
   });
 });
 
 describe("kelompok yang sedang aktif", () => {
   it("mengenali kelompok dari rutenya", () => {
-    expect(groupOf("/")).toBe("pemantauan");
-    expect(groupOf("/peta")).toBe("pemantauan");
-    expect(groupOf("/masyarakat")).toBe("laporan");
-    expect(groupOf("/analitik")).toBe("analisis");
-    expect(groupOf("/operasi")).toBe("operasi");
-    expect(groupOf("/audit")).toBe("sistem");
+    expect(groupOf("/ops")).toBe("pemantauan");
+    expect(groupOf("/ops/peta")).toBe("pemantauan");
+    expect(groupOf("/ops/masyarakat")).toBe("laporan");
+    expect(groupOf("/ops/analitik")).toBe("analisis");
+    expect(groupOf("/ops/operasi")).toBe("operasi");
+    expect(groupOf("/ops/audit")).toBe("sistem");
   });
 
   it("mengenali rute turunan sebagai bagian submenunya", () => {
-    // `/wilayah/Tebet` harus tetap membuka kelompok Analisis.
-    expect(groupOf("/wilayah/Tebet")).toBe("analisis");
-    expect(groupOf("/peta?wilayah=Tebet")).toBe("pemantauan");
+    // `/ops/wilayah/Tebet` harus tetap membuka kelompok Analisis.
+    expect(groupOf("/ops/wilayah/Tebet")).toBe("analisis");
+    expect(groupOf("/ops/peta?wilayah=Tebet")).toBe("pemantauan");
   });
 
   it("mencocokkan Beranda persis, bukan sebagai awalan", () => {
     // `/` adalah awalan dari setiap rute; dicocokkan sebagai awalan, seluruh halaman akan
     // menandai Beranda sebagai halaman yang sedang dibuka.
-    expect(groupOf("/audit")).not.toBe(groupOf("/") === "sistem" ? "sistem" : "x");
-    expect(groupOf("/audit")).toBe("sistem");
+    expect(groupOf("/ops/audit")).not.toBe(groupOf("/ops") === "sistem" ? "sistem" : "x");
+    expect(groupOf("/ops/audit")).toBe("sistem");
   });
 
   it("menjawab null untuk rute di luar menu", () => {

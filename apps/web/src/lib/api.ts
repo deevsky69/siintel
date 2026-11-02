@@ -71,7 +71,7 @@ async function request<T>(path: string, accessToken: string, payload: Payload): 
 
 async function call<T>(path: string, payload: Payload): Promise<T> {
   const session = await readSession();
-  if (!session) redirect("/masuk");
+  if (!session) redirect("/ops/masuk");
 
   try {
     return await request<T>(path, session.accessToken, payload);
@@ -80,7 +80,7 @@ async function call<T>(path: string, payload: Payload): Promise<T> {
     if (!expired || !session.refreshToken) throw error;
 
     const renewed = await refreshAccessToken(session.refreshToken);
-    if (!renewed) redirect("/masuk");
+    if (!renewed) redirect("/ops/masuk");
     return await request<T>(path, renewed, payload);
   }
 }

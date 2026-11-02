@@ -68,13 +68,22 @@ case "$kode" in
   *) tidak "tanpa kunci, /api/v1/messaging/updates menjawab $kode — seharusnya 401/503" ;;
 esac
 
+# 3c. Dua wajah satu domain (2 November 2026): akar = SIGAP WARGA (terbuka), /ops = kepolisian
+#     (dialihkan ke halaman masuk bila tanpa sesi). Ringkasan wilayah publik harus terbuka.
+kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/")
+[ "$kode" = "200" ] && lulus "beranda SIGAP WARGA terbuka" || tidak "beranda warga menjawab $kode"
+kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/ops")
+case "$kode" in 302|307|308) lulus "tanpa sesi, /ops dialihkan ke halaman masuk" ;; *) tidak "/ops tanpa sesi menjawab $kode — seharusnya dialihkan" ;; esac
+kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/api/v1/public/areas/summary")
+[ "$kode" = "200" ] && lulus "ringkasan wilayah publik /api/v1/public/areas/summary" || tidak "ringkasan wilayah publik menjawab $kode"
+
 # 4. SERVER ACTION — inti berkas ini.
 #
 #    Next menolak action bila `Origin` tidak cocok dengan `X-Forwarded-Host` yang
 #    diteruskan proxy. Yang diperiksa di sini bukan berhasilnya sebuah aksi (itu menuntut
 #    akun), melainkan bahwa permintaannya tidak ditolak MENTAH-MENTAH sebelum sampai ke
 #    kode aplikasi. Action yang ditolak menjawab 500; yang sampai menjawab 303/200/4xx.
-kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 -X POST "$BASE/masuk" \
+kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 -X POST "$BASE/ops/masuk" \
   -H "Origin: $BASE" \
   -H "Content-Type: multipart/form-data; boundary=x" \
   -H "Next-Action: 00000000000000000000000000000000000000" \

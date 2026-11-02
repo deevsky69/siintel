@@ -181,7 +181,7 @@ export function PriorityAreasCard({ areas }: { areas: AreaStatusRow[] }) {
             <li key={area.kecamatan} className="flex items-center gap-2.5">
               <span className="font-mono text-2xs text-ink-faint">{index + 1}</span>
               <Link
-                href={`/peta?wilayah=${encodeURIComponent(area.kecamatan)}`}
+                href={`/ops/peta?wilayah=${encodeURIComponent(area.kecamatan)}`}
                 className="flex-1 text-xs text-ink hover:text-accent"
               >
                 {area.kecamatan}

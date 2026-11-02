@@ -71,7 +71,7 @@ export function Highlights({ board }: { board: LeadershipBoard }) {
         title="Laporan Masuk"
         value={String(reports.total)}
         note={`24 jam terakhir — ${reports.crime_incidents} kejadian, ${reports.intelligence_reports} intelijen, ${reports.citizen_reports} dari warga.`}
-        href="/informasi"
+        href="/ops/informasi"
         linkLabel="Lihat semuanya"
       />
 
@@ -83,7 +83,7 @@ export function Highlights({ board }: { board: LeadershipBoard }) {
         note={`Kecamatan berstatus ${dominant.label} pada penilaian ${board.area_status.assessment_date ?? "terakhir"}. Pemetaan status ${
           board.area_status.mapping_status === "FINAL" ? "sudah ditetapkan" : "belum disetujui"
         }.`}
-        href="/wilayah"
+        href="/ops/wilayah"
         linkLabel="Peringkat wilayah"
       />
 
@@ -96,7 +96,7 @@ export function Highlights({ board }: { board: LeadershipBoard }) {
             ? "Tidak ada yang menunggu tindakan siapa pun."
             : `${warnings} peringatan belum diterima, ${decisions} menunggu keputusan Anda.`
         }
-        href="/rekomendasi"
+        href="/ops/rekomendasi"
         linkLabel="Keputusan menunggu"
       />
 
@@ -109,7 +109,7 @@ export function Highlights({ board }: { board: LeadershipBoard }) {
             ? `${top.kecamatan} — sel tertinggi, rata-rata wilayahnya ${top.average_risk_score}.`
             : "Belum ada penilaian risiko untuk kewenangan Anda."
         }
-        href={top ? `/wilayah/${encodeURIComponent(top.kecamatan)}` : "/wilayah"}
+        href={top ? `/ops/wilayah/${encodeURIComponent(top.kecamatan)}` : "/ops/wilayah"}
         linkLabel="Rincian wilayah"
       />
     </div>
@@ -142,7 +142,7 @@ export function Notables({ board }: { board: LeadershipBoard }) {
             ? `${rising.threat_type} — ${rising.incidents} kejadian pekan ini, sebelumnya ${rising.previous_incidents}.`
             : "Tidak ada jenis gangguan yang naik dibanding pekan lalu."
         }
-        href="/analitik"
+        href="/ops/analitik"
         linkLabel="Tren lengkap"
       />
 
@@ -154,7 +154,7 @@ export function Notables({ board }: { board: LeadershipBoard }) {
             ? `${busiest.kecamatan} — ${board.top_report_areas.days} hari terakhir. Volume laporan, bukan kerawanan.`
             : "Tidak ada laporan pada jendela ini."
         }
-        href="/wilayah"
+        href="/ops/wilayah"
         linkLabel="Peringkat volume"
       />
 
@@ -166,7 +166,7 @@ export function Notables({ board }: { board: LeadershipBoard }) {
             ? `${action.action}. Diturunkan aturan dari angka di layar ini, bukan keluaran model.`
             : "Tidak ada yang dapat diturunkan dari data pada jendela ini."
         }
-        href="/rekomendasi"
+        href="/ops/rekomendasi"
         linkLabel="Seluruh rekomendasi"
       />
     </div>

@@ -49,3 +49,19 @@ dari aplikasi tinggal dipindahkan awalannya. Yang harus dijaga: cookie sesi diba
 
 Dasbor warga memakai tema sendiri, terang sebagai bawaan; arah visual ditentukan pemilik
 proyek dari refero.design. Komponen sisi polisi tidak dipakai ulang di sisi warga.
+
+## Tahap 1 — SELESAI 2 November 2026
+
+- API: `routers/public_areas.py` (`GET /public/areas/summary`), `routers/reviews.py`
+  (kirim/baca ulasan publik; antrean dan moderasi `review:moderate`), tabel `area_reviews`
+  (0015), kelompok `REVIEW` di `/notifications`; tautan antrean berawalan `/ops`.
+- Web: sisi kepolisian dipindah ke `app/ops/(app)` + `app/ops/masuk`; middleware: akar
+  terbuka, `/ops` menuntut sesi; `safeNextPath` hanya menerima jalur `/ops`. Sisi warga:
+  `app/(publik)/layout.tsx` (tema `.warga` terang-hangat, navigasi atas/bawah),
+  beranda `/` (peta kecamatan + imbauan + sorotan survey + wilayah tinggi), `/peta`
+  (kecamatan → kelurahan, panel angka), `/survey` (nilai, ulasan tayang, formulir anonim),
+  `/lapor` disesuaikan. Moderasi di `/ops/survey`.
+- Tema: arah B (peta di depan) dengan rupa A (gading hangat, biru tua, aksen kuning),
+  Inter untuk semua teks; tidak memakai komponen/huruf teknis sisi /ops.
+- Pemeriksaan produksi: beranda warga 200, `/ops` dialihkan, ringkasan publik 200,
+  Server Action diuji pada `/ops/masuk`.

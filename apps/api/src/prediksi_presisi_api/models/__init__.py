@@ -13,6 +13,7 @@ Modul ini diimpor oleh `database/migrations/env.py` supaya seluruh tabel
 terdaftar pada `Base.metadata` saat Alembic membandingkan schema.
 """
 
+from .area_review import AreaReview
 from .audit_log import AuditLog
 from .citizen_report import (
     ATTACHMENT_KINDS,
@@ -44,6 +45,7 @@ __all__ = [
     "ATTACHMENT_KINDS",
     "COORDINATE_SOURCE_CENTROID",
     "COORDINATE_SOURCE_GPS",
+    "AreaReview",
     "AuditLog",
     "CitizenReport",
     "CitizenReportAttachment",

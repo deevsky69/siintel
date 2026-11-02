@@ -23,7 +23,7 @@ const feed: NotificationFeed = {
       kind: "DECISION",
       title: "Menunggu keputusan Anda",
       action: "Setujui, modifikasi, atau tolak",
-      href: "/rekomendasi",
+      href: "/ops/rekomendasi",
       total: 20,
       items: [
         { code: "REC-0009", headline: "Untuk SAMAPTA", detail: "Tebet · Tingkatkan patroli" },
@@ -33,7 +33,7 @@ const feed: NotificationFeed = {
       kind: "WARNING",
       title: "Peringatan belum diterima",
       action: "Terima atau selesaikan",
-      href: "/peringatan",
+      href: "/ops/peringatan",
       total: 0,
       items: [],
     },
@@ -71,7 +71,7 @@ describe("lonceng antrean pekerjaan", () => {
     fireEvent.click(screen.getByRole("button", { name: /pekerjaan menunggu/ }));
 
     expect(screen.getByRole("link", { name: /Menunggu keputusan Anda/ }).getAttribute("href")).toBe(
-      "/rekomendasi",
+      "/ops/rekomendasi",
     );
   });
 

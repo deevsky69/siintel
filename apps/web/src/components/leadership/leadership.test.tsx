@@ -88,7 +88,7 @@ describe("kartu perlu perhatian", () => {
     render(<AttentionCard items={board.needs_attention.items} />);
 
     expect(screen.getByRole("link", { name: /Peringatan CRITICAL/ }).getAttribute("href")).toBe(
-      "/peringatan?kode=WRN-0001",
+      "/ops/peringatan?kode=WRN-0001",
     );
   });
 
@@ -178,7 +178,7 @@ describe("rekomendasi kebijakan", () => {
     const link = screen.getByRole("link", {
       name: /Tambah patroli pukul 20.00 s.d. 23.00 WIB di Pasar Minggu/,
     });
-    expect(link.getAttribute("href")).toBe("/wilayah/Pasar%20Minggu");
+    expect(link.getAttribute("href")).toBe("/ops/wilayah/Pasar%20Minggu");
   });
 
   it("membiarkan panel kosong alih-alih mengisinya dengan saran umum", () => {

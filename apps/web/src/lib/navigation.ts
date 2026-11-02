@@ -13,7 +13,7 @@
  * - `/\situs-lain`        — sebagian peramban memperlakukannya seperti `//`
  * - `javascript:…`        — bukan lintasan sama sekali
  */
-export const DEFAULT_PATH = "/";
+export const DEFAULT_PATH = "/ops";
 
 export function safeNextPath(candidate: string | null | undefined): string {
   if (!candidate) return DEFAULT_PATH;
@@ -21,6 +21,8 @@ export function safeNextPath(candidate: string | null | undefined): string {
   const path = candidate.trim();
   if (!path.startsWith("/")) return DEFAULT_PATH;
   if (path.startsWith("//") || path.startsWith("/\\")) return DEFAULT_PATH;
+  // Hanya jalur aplikasi kepolisian yang layak dituju setelah masuk (2 November 2026).
+  if (path !== "/ops" && !path.startsWith("/ops/")) return DEFAULT_PATH;
 
   return path;
 }

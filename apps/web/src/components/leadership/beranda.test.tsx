@@ -5,7 +5,7 @@ import type { MapDistrict } from "@/lib/map-data";
 import { board } from "./fixtures";
 import { Highlights, Notables } from "./highlights";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/ops" }));
 
 /**
  * Yang diuji di sini adalah **kepadatan informasi**, bukan tata letak.

@@ -117,7 +117,7 @@ export function mapHref(
     params.set("bulan", String(months));
   }
   const query = params.toString();
-  return query === "" ? "/peta" : `/peta?${query}`;
+  return query === "" ? "/ops/peta" : `/ops/peta?${query}`;
 }
 
 /** Warna tunggal layer prediktif: aksen sian, bukan salah satu warna kelas risiko. */

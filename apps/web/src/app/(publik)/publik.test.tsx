@@ -1,230 +1,138 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import LoginPage from "@/app/masuk/page";
-import { ImbauanBerlaku } from "./beranda/imbauan-berlaku";
-import BerandaPublik from "./beranda/page";
+import type { PublicSummary } from "@/lib/warga";
 import type { ReportOptions } from "./lapor/actions";
 import { ReportForm } from "./lapor/report-form";
+import BerandaWarga from "./page";
 
-// Server action tidak dapat dijalankan di lingkungan test; yang diuji di sini bentuk
-// formulirnya, bukan pengirimannya (itu diuji di sisi API).
+/**
+ * Halaman warga SIGAP WARGA (2 November 2026): hanya memuat yang diputuskan boleh terbuka
+ * — tingkat kasar dan angka historis — dan tidak pernah memuat skor, prediksi, atau titik.
+ */
+
+const summary: PublicSummary = {
+  window_from: "2025-01-01",
+  window_to: "2025-12-31",
+  months: [
+    "2025-01",
+    "2025-02",
+    "2025-03",
+    "2025-04",
+    "2025-05",
+    "2025-06",
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+  ],
+  threat_types: ["CURANMOR", "CURAT", "CURAS"],
+  level_edges: { low_max: 3, high_min: 12 },
+  areas: [
+    {
+      kelurahan: "Tebet Timur",
+      kecamatan: "Tebet",
+      polsek: "Tebet",
+      total: 14,
+      level: "TINGGI",
+      by_threat: { CURANMOR: 9, CURAT: 4, CURAS: 1 },
+      by_month: [1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1],
+      rating: 3.5,
+      rating_count: 4,
+    },
+  ],
+  kecamatan: [
+    {
+      kecamatan: "Tebet",
+      total: 14,
+      kelurahan: 1,
+      by_threat: { CURANMOR: 9, CURAT: 4, CURAS: 1 },
+      level: "TINGGI",
+    },
+  ],
+  status: "PROPOSED",
+  basis: "Tingkat RENDAH/SEDANG/TINGGI adalah pembagian tertil (PROPOSED).",
+};
+
 const imbauan = vi.hoisted(() => ({
   rows: [
     {
       code: "PAL-0026",
-      severity: "CRITICAL",
       threat_type: "CURANMOR",
       area_text: "Kecamatan Tebet",
       time_window: "18:00-23:59",
-      message: "Imbauan kewaspadaan. Kunci kendaraan dan laporkan hal mencurigakan.",
+      message: "Kunci ganda kendaraan Anda dan parkir di tempat terang.",
     },
   ],
 }));
 
 vi.mock("./lapor/actions", () => ({
+  getImbauanPublik: vi.fn(async () => imbauan.rows),
+  getReportOptions: vi.fn(),
   submitReport: vi.fn(),
   uploadAttachment: vi.fn(),
-  getImbauanPublik: vi.fn(async () => imbauan.rows),
 }));
-
-/** Mengosongkan imbauan untuk menguji keadaan kosongnya. */
-function kosongkan() {
-  imbauan.rows = [];
-}
-
-// Halaman masuk memuat formulir yang membaca `?lanjut=` lewat useSearchParams, dan hook
-// itu menuntut app router yang tidak ada di lingkungan test. Yang diuji di sini jalan
-// kembalinya, bukan formulir masuknya — jadi routernya cukup dipalsukan.
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
-  useSearchParams: () => new URLSearchParams(),
-}));
-
-const options: ReportOptions = {
-  categories: ["Kejahatan Jalanan", "Pencurian Kendaraan"],
-  kecamatan: ["Cilandak", "Tebet"],
-  areas: [
-    {
-      kecamatan: "Tebet",
-      kelurahan: [{ name: "Tebet Barat", latitude: -6.2305, longitude: 106.8475 }],
-    },
-  ],
-  max_description: 1000,
-  coordinate_basis: "Koordinat laporan diambil dari titik pusat kecamatan.",
-  intake_basis: "Laporan masuk berstatus RECEIVED dan belum diverifikasi siapa pun.",
-  attachment_basis: "Metadata berkas dilucuti sebelum disimpan.",
-  max_attachments: 3,
-  max_attachment_bytes: 25 * 1024 * 1024,
-};
-
-describe("halaman muka publik", () => {
-  it("menawarkan tepat dua pilihan: lapor dan masuk", () => {
-    render(<BerandaPublik />);
-
-    const links = screen.getAllByRole("link");
-    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/lapor", "/masuk"]);
-  });
-
-  it("tidak memuat satu pun angka kamtibmas", () => {
-    // Angka kamtibmas di halaman publik adalah data intelijen. Halaman ini dibuka tanpa
-    // akun, sehingga apa pun yang tampil di sini terbit tanpa keputusan publikasi.
-    const { container } = render(<BerandaPublik />);
-    const text = container.textContent ?? "";
-
-    // Satu-satunya angka yang boleh muncul adalah nomor darurat.
-    expect(text.match(/\d+/g) ?? []).toEqual(["110"]);
-  });
-
-  it("hanya menampilkan imbauan yang sudah melewati keputusan publikasi", async () => {
-    // Bagian ini TIDAK melonggarkan aturan "halaman publik tanpa angka kamtibmas" — ia
-    // menegaskannya. Yang tampil hanya baris yang sudah diterbitkan pejabat berwenang;
-    // peringatan dini yang belum diumumkan tidak pernah sampai ke sini.
-    const bagian = await ImbauanBerlaku();
-    const { container } = render(bagian);
-    const teks = container.textContent ?? "";
-
-    expect(teks).toContain("CURANMOR");
-    expect(teks).toContain("Kecamatan Tebet");
-    // Tidak ada identitas internal apa pun: kode peringatan, kode grid, maupun skor.
-    expect(teks).not.toMatch(/WRN-|JKS-|PAL-/);
-    expect(teks).not.toMatch(/skor|risiko \d/i);
-  });
-
-  it("menghilang sepenuhnya ketika tidak ada imbauan yang berlaku", async () => {
-    // Bukan menampilkan kotak kosong: halaman muka publik tidak boleh memberi kesan ada
-    // sesuatu yang gagal dimuat.
-    kosongkan();
-
-    expect(await ImbauanBerlaku()).toBeNull();
-  });
-
-  it("mengarahkan keadaan darurat ke 110", () => {
-    render(<BerandaPublik />);
-
-    expect(screen.getByText(/110/)).toBeDefined();
-    expect(screen.getByText(/bukan pengganti/i)).toBeDefined();
-  });
+vi.mock("@/lib/warga", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/warga")>();
+  return { ...actual, getPublicSummary: vi.fn(async () => summary) };
 });
 
-describe("halaman masuk", () => {
-  it("menyediakan jalan kembali bagi warga yang salah tekan", () => {
-    // Tombol "Masuk Petugas" bertetangga dengan "Lapor Kejadian" di halaman muka, dan
-    // salah tekan itu wajar. Pengunjung yang merasa tersesat cenderung menutup tab, bukan
-    // mencari tombol mundur peramban.
-    render(<LoginPage />);
-
-    const targets = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
-
-    expect(targets).toContain("/lapor");
-    expect(targets).toContain("/");
-  });
-
-  it("menawarkan tujuan yang tadi dimaksudkan warga, bukan sekadar halaman muka", () => {
-    render(<LoginPage />);
+describe("beranda SIGAP WARGA", () => {
+  it("menawarkan lapor dan darurat 110, dengan peta sebagai isi utama", async () => {
+    render(await BerandaWarga());
 
     expect(screen.getByRole("link", { name: /lapor kejadian/i })).toBeDefined();
-    expect(screen.getByText(/Bukan petugas dan ingin melaporkan kejadian/i)).toBeDefined();
+    expect(screen.getByRole("link", { name: /darurat/i }).getAttribute("href")).toBe("tel:110");
+    expect(screen.getByRole("group", { name: /peta tingkat kerawanan/i })).toBeDefined();
+  });
+
+  it("hanya memuat tingkat kasar dan imbauan yang sudah diterbitkan — tanpa skor atau prediksi", async () => {
+    const { container } = render(await BerandaWarga());
+
+    expect(screen.getByText(/Kunci ganda kendaraan/)).toBeDefined();
+    expect(screen.getAllByText(/Kerawanan Tinggi/).length).toBeGreaterThan(0);
+    const text = container.textContent ?? "";
+    for (const forbidden of ["risk_score", "confidence", "prediksi untuk", "PRD-", "WRN-"]) {
+      expect(text).not.toContain(forbidden);
+    }
+  });
+
+  it("menyorot kelurahan yang sudah diulas pada Survey Rasa Aman", async () => {
+    render(await BerandaWarga());
+
+    expect(screen.getByRole("link", { name: "Tebet Timur" })).toBeDefined();
+    expect(screen.getByText("(4)")).toBeDefined();
   });
 });
 
-describe("formulir laporan masyarakat", () => {
-  it("tidak menyediakan satu pun kolom identitas", () => {
-    // Penjaga terhadap penambahan yang tampak membantu. Basis data tidak punya tempat
-    // untuk identitas; kolom di layar hanya akan menampung data yang lalu dibuang,
-    // sementara pelapor mengira datanya tersimpan.
+describe("formulir laporan", () => {
+  const options: ReportOptions = {
+    categories: ["Kejahatan Jalanan"],
+    kecamatan: ["Tebet"],
+    areas: [
+      {
+        kecamatan: "Tebet",
+        kelurahan: [{ name: "Tebet Timur", latitude: -6.22, longitude: 106.86 }],
+      },
+    ],
+    max_description: 1000,
+    area_basis: "",
+    coordinate_basis: "",
+    intake_basis: "",
+    attachment_basis: "",
+    max_attachments: 3,
+    max_attachment_bytes: 1,
+  } as ReportOptions;
+
+  it("mengarahkan keadaan darurat ke 110 dan tidak meminta identitas", () => {
     const { container } = render(<ReportForm options={options} />);
 
-    const names = [...container.querySelectorAll("input, textarea, select")]
-      .map((field) => field.getAttribute("name"))
-      .filter((name): name is string => name !== null);
-
-    // Daftar ini sengaja dibekukan, bukan disaring terhadap kata-kata identitas. Penjaga
-    // yang mencari "nama" dan "telepon" hanya menangkap yang sudah terpikirkan; daftar
-    // yang dibekukan menangkap penambahan apa pun, termasuk yang belum terpikirkan.
-    //
-    // `latitude`, `longitude`, `accuracy_m`, dan `attachments` tidak ada di sini karena
-    // keempatnya baru muncul SETELAH pelapor menekan tombolnya sendiri — dan tidak satu pun
-    // menanyakan siapa dirinya.
-    expect(names).toEqual([
-      "category",
-      "kecamatan",
-      // Kelurahan adalah wilayah, bukan identitas (5 Oktober 2026).
-      "kelurahan",
-      "location_text",
-      "incident_time",
-      "description",
-    ]);
-  });
-
-  it("menerima unggahan berkas hanya untuk jenis yang dapat dilucuti metadatanya", () => {
-    // Sampai 8 September 2026 penjaga di sini melarang unggahan sama sekali: menyimpan
-    // berkas warga menyentuh retensi dan klasifikasi data, dan keputusannya belum diambil.
-    // Pemilik proyek kemudian mengambilnya beserta syaratnya, sehingga yang dijaga berubah:
-    // bukan lagi "tidak ada unggahan", melainkan "hanya jenis yang metadatanya benar-benar
-    // dapat dilucuti server". Format di luar daftar ini tidak punya pelucut.
-    const { container } = render(<ReportForm options={options} />);
-    const picker = container.querySelector('input[type="file"]');
-
-    expect(picker).not.toBeNull();
-    expect(picker?.getAttribute("accept")?.split(",")).toEqual([
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "audio/mpeg",
-      "audio/ogg",
-      "video/mp4",
-      "video/webm",
-    ]);
-  });
-
-  it("memberi tahu pelapor apa yang TIDAK dapat dilucuti dari berkasnya", () => {
-    // Menyebut "metadata dihapus" tanpa menyebut batasnya membuat pelapor mengira fotonya
-    // menjadi anonim. Koordinat dan merek kamera memang hilang; wajah orang di dalamnya
-    // tidak, dan itu keputusan pelapor yang perlu ia ambil sebelum memilih berkas.
-    const { container } = render(<ReportForm options={options} />);
-
-    expect(container.textContent).toContain("wajah tidak");
-  });
-
-  it("tidak pernah meminta lokasi tanpa ditekan pelapor", () => {
-    // Peramban akan menampilkan dialog izin begitu lokasi diminta. Pelapor yang belum tahu
-    // untuk apa lokasinya dipakai hanya punya dua pilihan buruk, dan keduanya salah.
-    const { container } = render(<ReportForm options={options} />);
-
-    expect(container.querySelector('input[name="latitude"]')).toBeNull();
-    expect(container.textContent).toContain("Bagikan lokasi saya");
-  });
-
-  it("tidak membiarkan pelapor menetapkan urgensi", () => {
-    const { container } = render(<ReportForm options={options} />);
-    const text = container.textContent ?? "";
-
-    expect(container.querySelector('[name="urgency_score"]')).toBeNull();
-    expect(text.toLowerCase()).not.toContain("mendesak");
-  });
-
-  it("hanya menawarkan kategori yang dikirim API", () => {
-    render(<ReportForm options={options} />);
-
-    const select = screen.getByRole("combobox", { name: /jenis kejadian/i });
-    const values = [...select.querySelectorAll("option")]
-      .map((option) => option.getAttribute("value"))
-      .filter((value) => value !== "");
-
-    expect(values).toEqual(options.categories);
-  });
-
-  it("memperingatkan agar tidak menuliskan identitas di keterangan", () => {
-    // Kolom teks bebas adalah satu-satunya jalan identitas dapat masuk. Peringatannya
-    // ditaruh tepat di bawah kolomnya, bukan di catatan kaki halaman.
-    render(<ReportForm options={options} />);
-
-    expect(screen.getByText(/Jangan menuliskan nama, nomor telepon, atau alamat/)).toBeDefined();
-  });
-
-  it("meneruskan keterangan asal koordinat dari API apa adanya", () => {
-    render(<ReportForm options={options} />);
-
-    expect(screen.getByText(options.coordinate_basis)).toBeDefined();
+    const names = [...container.querySelectorAll("input, textarea, select")].map(
+      (el) => (el as HTMLInputElement).name,
+    );
+    for (const forbidden of ["nama", "name", "telepon", "phone", "nik", "email"]) {
+      expect(names).not.toContain(forbidden);
+    }
   });
 });

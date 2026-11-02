@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import type { StatusState } from "@/app/(app)/laporan-petugas/actions";
+import type { StatusState } from "@/app/ops/(app)/laporan-petugas/actions";
 
 /**
  * Pengubah status satu baris, langsung di tempat barisnya terlihat.
