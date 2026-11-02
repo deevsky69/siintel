@@ -61,6 +61,7 @@ def test_webhook_rejects_unsigned_posts_and_registers_route() -> None:
     server = WebhookServer(0)
     channel.register(server)
     assert server.paths == ("/webhook/twilio",)
+    assert server._gets["/webhook/twilio"]({})[0] == 200
     handler = server._posts["/webhook/twilio"]
     raw = urlencode({"From": "whatsapp:+628", "Body": "halo"}).encode()
     assert handler(raw, {}, "/webhook/twilio")[0] == 401

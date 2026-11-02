@@ -163,7 +163,16 @@ class TwilioChannel:
             # TwiML kosong: balasan dikirim lewat REST API, bukan di sini.
             return 200, "text/xml", b"<Response></Response>"
 
-        server.route(WEBHOOK_PATH, post=on_post)
+        def on_get(_query: dict[str, list[str]]) -> Response:
+            # Dibuka di peramban (GET) hanya untuk memastikan alamatnya hidup; Twilio
+            # sendiri mengirim POST bertanda tangan ke sini.
+            return (
+                200,
+                "text/plain; charset=utf-8",
+                b"Webhook SIGAP (Twilio) aktif. Twilio mengirim POST ke alamat ini.",
+            )
+
+        server.route(WEBHOOK_PATH, get=on_get, post=on_post)
 
     def notify_forever(self) -> None:
         log.info("Twilio: memeriksa kabar perkembangan tiap %s detik", self._interval)
