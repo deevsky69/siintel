@@ -130,20 +130,6 @@ def seed_case_files_dummy() -> int:
     return 0
 
 
-def seed_case_files_dummy() -> int:
-    """Berkas perkara dummy (2 November 2026). Idempoten; mencetak LP + PIN untuk dicoba."""
-    from .seeding.case_files_dummy import seed_dummy_case_files
-
-    with get_session_factory()() as session, session.begin():
-        made = seed_dummy_case_files(session)
-    print(f"{len(made)} berkas perkara dummy tersedia (yang sudah ada dilewati).")
-    print("Contoh untuk dicoba di SIGAP WARGA (nomor LP + PIN):")
-    for row in made[:6]:
-        extra = f", plat {row.plate}" if row.plate else ""
-        print(f"  {row.lp_number}  PIN {row.pin}  [{row.crime_type}, {row.stage}{extra}]")
-    return 0
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="predpol", description="Administrasi SIGAP")
     sub = parser.add_subparsers(dest="command", required=True)

@@ -42,10 +42,12 @@ def session() -> Iterator[Session]:
 def client(session: Session) -> Iterator[TestClient]:
     app.dependency_overrides[get_db] = lambda: session
     public_cases.limiter.reset()
+    public_cases.pin_failures.reset()
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
     public_cases.limiter.reset()
+    public_cases.pin_failures.reset()
 
 
 def _login(
@@ -226,3 +228,25 @@ def test_officers_manage_case_files_within_their_jurisdiction(
         client.get("/api/v1/case-files", headers=_login(client, session, "Pimpinan")).status_code
         == 200
     )
+
+
+def test_pin_guessing_is_locked_per_lp_regardless_of_address(
+    client: TestClient, session: Session
+) -> None:
+    """Pembatas per alamat dapat dilewati dengan memalsukan header; kunci per nomor LP tidak."""
+    made = seed_dummy_case_files(session, reference=date(2026, 1, 1))
+    sample = made[1]
+    wrong = "0000" if sample.pin != "0000" else "0001"
+    for index in range(5):
+        response = client.get(
+            "/api/v1/public/cases/track",
+            params={"lp": sample.lp_number, "pin": wrong},
+            headers={"X-Forwarded-For": f"203.0.113.{index}"},  # alamat berganti-ganti
+        )
+        assert response.status_code == 404
+    locked = client.get(
+        "/api/v1/public/cases/track",
+        params={"lp": sample.lp_number, "pin": sample.pin},  # bahkan PIN yang benar
+        headers={"X-Forwarded-For": "203.0.113.99"},
+    )
+    assert locked.status_code == 429

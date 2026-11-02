@@ -226,6 +226,19 @@ memakai sebagian sumber daya server ini.
 > **Mendeteksinya:** `pnpm prod:periksa` — pemeriksaan ini dibuat justru karena kegagalan
 > tersebut senyap selama entah berapa lama.
 
+> ### ⚠ NGINX DEPAN: TIMPA `X-Forwarded-For`, JANGAN TAMBAH — 2 November 2026
+>
+> Pembatas laju kanal publik (laporan, ulasan, lacak LP, cek kendaraan) menghitung per
+> alamat dari entri PERTAMA `X-Forwarded-For`. Bila nginx depan memakai
+> `$proxy_add_x_forwarded_for`, pengirim dapat mengarang entri pertama dan melewati
+> pembatas. Pasang pada blok `server` sigap:
+>
+> ```nginx
+> proxy_set_header X-Forwarded-For $remote_addr;
+> ```
+>
+> Tebakan PIN pada lacak laporan tetap terkunci per nomor LP (5 kali/jam) apa pun alamatnya.
+
 > ### ✅ DOMAIN BERGANTI KE `sigap.awansurya.com` — 20 Oktober 2026 (sehari sebelumnya sempat `prediksi.awansurya.com`)
 >
 > Keputusan pemilik proyek. Seluruh rujukan domain (compose, skrip, Android, web, modul)

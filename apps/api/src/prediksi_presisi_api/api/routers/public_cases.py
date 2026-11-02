@@ -30,6 +30,10 @@ from .public_intake import _client_key, _RateLimiter
 router = APIRouter(prefix="/public", tags=["kanal publik"])
 
 limiter = _RateLimiter(10, 3600)
+#: PIN salah per NOMOR LP: lima kali per jam, apa pun alamatnya. Pembatas per alamat saja
+#: dapat dilewati dengan memalsukan header; yang ini mengunci sasarannya, sehingga menebak
+#: 10.000 kombinasi PIN memakan ribuan jam.
+pin_failures = _RateLimiter(5, 3600)
 MONTHS_ID = (
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember",
@@ -68,9 +72,16 @@ def track_case(
     session: Session = Depends(get_db),
 ) -> dict[str, Any]:
     _rate_limited(request)
-    case = session.scalar(select(CaseFile).where(CaseFile.lp_number == lp.strip().upper()))
+    lp_key = lp.strip().upper()
+    if pin_failures.exhausted(lp_key):
+        raise ApiError(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            "Terlalu banyak percobaan PIN untuk nomor LP ini. Coba lagi satu jam lagi.",
+        )
+    case = session.scalar(select(CaseFile).where(CaseFile.lp_number == lp_key))
     stored = case.reporter_pin_hash if case is not None else "-"
     if case is None or not secrets.compare_digest(stored, hash_pin(lp, pin)):
+        pin_failures.allow(lp_key)  # hanya kegagalan yang dihitung
         audit.record(
             session,
             action="TRACK_CASE",

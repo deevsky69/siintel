@@ -180,6 +180,13 @@ class _RateLimiter:
                 del self._hits[stale]
             return True
 
+    def exhausted(self, key: str, now: float | None = None) -> bool:
+        """Benar bila kuota kunci itu sudah habis — tanpa menambah hitungan."""
+        moment = time.monotonic() if now is None else now
+        with self._lock:
+            recent = [hit for hit in self._hits.get(key, []) if moment - hit < self._window]
+            return len(recent) >= self._limit
+
     def reset(self) -> None:
         with self._lock:
             self._hits.clear()
@@ -194,6 +201,14 @@ def _client_key(request: Request) -> str:
     Aplikasi berjalan di belakang Traefik, sehingga `request.client.host` selalu berisi
     alamat proxy dan pembatas laju akan memperlakukan seluruh dunia sebagai satu pengirim.
     """
+    # Entri PERTAMA dipakai karena rantai proxy kita (nginx depan → Traefik → web → API)
+    # menambahkan alamat di ujung kanan, sehingga entri kanan adalah alamat proxy, bukan
+    # klien. Kelemahannya diketahui (tinjauan keamanan 2 November 2026): entri pertama dapat
+    # dikarang pengirim, jadi pembatas per alamat hanya menahan banjir yang jujur. Supaya
+    # entri pertama tepercaya, nginx depan harus MENIMPA header ini, bukan menambah:
+    #     proxy_set_header X-Forwarded-For $remote_addr;
+    # Perlindungan yang tidak bergantung pada alamat ada di tempat yang membutuhkannya:
+    # kunci PIN per nomor LP pada `public_cases.py`.
     forwarded = request.headers.get("x-forwarded-for", "")
     if forwarded:
         return forwarded.split(",")[0].strip()
