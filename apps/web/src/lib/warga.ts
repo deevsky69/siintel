@@ -177,3 +177,19 @@ export type VehicleCheck = {
 };
 
 export const CASE_STAGES = ["DITERIMA", "LIDIK", "SIDIK", "P21", "SP3", "SELESAI"] as const;
+
+export type BabinContact = {
+  kelurahan: string;
+  kecamatan: string;
+  polsek: string;
+  rank: string | null;
+  name: string;
+  phone_display: string;
+  whatsapp_group_link: string | null;
+  is_dummy: boolean;
+};
+
+export const getBabinContact = (kelurahan: string) =>
+  publicGet<{ data: BabinContact | null; basis: string }>(
+    `/public/babin?kelurahan=${encodeURIComponent(kelurahan)}`,
+  );

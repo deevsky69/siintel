@@ -27,6 +27,13 @@ Yang sengaja **tidak** ada di sisi warga: skor, prediksi, titik kejadian, pering
 Tingkat RENDAH/SEDANG/TINGGI adalah pembagian tertil jumlah kejadian historis (PROPOSED).
 Moderasi Survey Rasa Aman ada di menu **Laporan → Survey Rasa Aman** (Administrator).
 
+**Babinkamtibmas dan buletin kelurahan (tahap 3).** Kontak Babin per kelurahan (nomor dinas)
+tampil di panel kelurahan pada peta warga dan lewat perintah bot `/babin`; dikelola Administrator
+di **Laporan → Babinkamtibmas** (dummy berlabel dulu). **Buletin mingguan** disusun sistem dari
+minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetujui Pimpinan**, lalu
+bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
+`/dasbor` menautkan ke SIGAP WARGA.
+
 **Lacak laporan dan cek kendaraan (tahap 2).** Di `/lacak` warga memasukkan **nomor LP + PIN**
 (PIN diberikan petugas saat melapor) untuk melihat tahap perkaranya, dan di tab **Cek
 kendaraan** memasukkan plat atau nomor rangka untuk tahu apakah kendaraan tercatat dalam

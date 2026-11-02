@@ -77,3 +77,15 @@ proyek dari refero.design. Komponen sisi polisi tidak dipakai ulang di sisi warg
 - Web warga: `/lacak` (tab Lacak laporan / Cek kendaraan), tautan di beranda dan navigasi.
 - Web petugas: `/ops/perkara` (saring, pindah tahap, catat perkara baru).
 - Test: `test_api_case_files.py` (5), web 412; label DUMMY tampil di sisi warga dan petugas.
+
+## Tahap 3 — SELESAI 2 November 2026
+
+- API: `babinkamtibmas` + `bulletins` (0017), `routers/babin.py` (publik: nomor dinas saja;
+  kelola: Administrator), `routers/bulletins.py` (susun DRAFT per kelurahan dari
+  `services/bulletin.py`; setujui = Pimpinan `bulletin:approve`; bot: pending/sent),
+  seeder `seed-babin-dummy` (ikut `scripts/isi-perkara-dummy-produksi.sh`).
+- Bot: `/babin` (kecamatan → kelurahan → kontak), `/dasbor` (tautan SIGAP WARGA), thread
+  buletin: APPROVED → grup Telegram (chat id) dan/atau WhatsApp Babin → `sent` per kanal.
+- Web: `/ops/babin` (kontak + tujuan buletin), `/ops/buletin` (susun, setujui, status kirim);
+  warga: kontak Babin di panel kelurahan `/peta`.
+- Keputusan tercatat: grup WhatsApp tidak terjangkau API resmi → Telegram + WA perorangan.

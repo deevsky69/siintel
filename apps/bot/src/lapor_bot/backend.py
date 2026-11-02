@@ -46,6 +46,9 @@ class Backend(Protocol):
     def reports_of(self, channel: str, chat_id: str) -> list[dict[str, Any]]: ...
     def updates(self, channel: str) -> list[dict[str, Any]]: ...
     def ack(self, channel: str, ticket: str, status: str) -> None: ...
+    def babin(self, kelurahan: str) -> dict[str, Any] | None: ...
+    def pending_bulletins(self) -> list[dict[str, Any]]: ...
+    def bulletin_sent(self, bulletin_id: str, delivery: dict[str, str]) -> None: ...
 
 
 def _message(response: httpx.Response) -> str:
@@ -130,5 +133,23 @@ class ApiBackend:
     def ack(self, channel: str, ticket: str, status: str) -> None:
         response = self._client.post(
             "/messaging/updates/ack", json={"channel": channel, "ticket": ticket, "status": status}
+        )
+        self._raise(response)
+
+    def babin(self, kelurahan: str) -> dict[str, Any] | None:
+        response = self._client.get("/public/babin", params={"kelurahan": kelurahan})
+        self._raise(response)
+        data: dict[str, Any] | None = response.json().get("data")
+        return data
+
+    def pending_bulletins(self) -> list[dict[str, Any]]:
+        response = self._client.get("/messaging/bulletins/pending")
+        self._raise(response)
+        rows: list[dict[str, Any]] = response.json()["data"]
+        return rows
+
+    def bulletin_sent(self, bulletin_id: str, delivery: dict[str, str]) -> None:
+        response = self._client.post(
+            f"/messaging/bulletins/{bulletin_id}/sent", json={"delivery": delivery}
         )
         self._raise(response)

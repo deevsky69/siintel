@@ -5,10 +5,12 @@ from __future__ import annotations
 import logging
 import threading
 import time
+from collections.abc import Callable
 
 from .backend import ApiBackend
 from .config import Settings
-from .telegram import TelegramChannel
+from .core import Reply
+from .telegram import TelegramChannel, bulletins_forever
 from .twilio import TwilioChannel
 from .webhook import WebhookServer
 from .whatsapp import WhatsAppChannel
@@ -31,6 +33,8 @@ def main() -> None:
     backend = ApiBackend(settings.api_base, settings.messaging_api_key)
     threads: list[threading.Thread] = []
 
+    telegram: TelegramChannel | None = None
+    whatsapp_send: Callable[[str, Reply], None] | None = None
     if settings.telegram_bot_token:
         telegram = TelegramChannel(
             settings.telegram_bot_token, backend, settings.notify_interval_seconds
@@ -61,6 +65,7 @@ def main() -> None:
             settings.notify_interval_seconds,
         )
         whatsapp.register(webhook)
+        whatsapp_send = whatsapp.send
         threads.append(
             threading.Thread(target=whatsapp.notify_forever, name="whatsapp-kabar", daemon=True)
         )
@@ -87,6 +92,8 @@ def main() -> None:
             settings.notify_interval_seconds,
         )
         twilio.register(webhook)
+        if whatsapp_send is None:
+            whatsapp_send = twilio.send
         if not any(t.name == "whatsapp-kabar" for t in threads):
             # Kabar WHATSAPP dikirim oleh satu pengirim saja; Cloud API didahulukan bila ada.
             threads.append(
@@ -94,6 +101,21 @@ def main() -> None:
             )
     else:
         log.warning("TWILIO_* belum lengkap — kanal Twilio tidak dijalankan.")
+
+    if telegram is not None or whatsapp_send is not None:
+        threads.append(
+            threading.Thread(
+                target=bulletins_forever,
+                kwargs={
+                    "backend": backend,
+                    "telegram": telegram,
+                    "whatsapp_send": whatsapp_send,
+                    "interval": max(60, settings.notify_interval_seconds * 4),
+                },
+                name="buletin",
+                daemon=True,
+            )
+        )
 
     if webhook.paths:
         threads.append(threading.Thread(target=webhook.serve_forever, name="webhook", daemon=True))

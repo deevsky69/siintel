@@ -6,3 +6,5 @@
 #   bash scripts/isi-perkara-dummy-produksi.sh
 set -euo pipefail
 docker exec predpol-prod-api python -m prediksi_presisi_api.cli seed-case-files-dummy
+echo "== kontak Babinkamtibmas dummy"
+docker exec predpol-prod-api python -m prediksi_presisi_api.cli seed-babin-dummy

@@ -77,6 +77,8 @@ if [ -n "${TWILIO_ACCOUNT_SID:-}" ] && [ -n "${TWILIO_AUTH_TOKEN:-}" ]; then
   set_var TWILIO_ACCOUNT_SID "$TWILIO_ACCOUNT_SID"
   set_var TWILIO_AUTH_TOKEN "$TWILIO_AUTH_TOKEN"
   set_var TWILIO_WHATSAPP_FROM "${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}"
+  echo "  periksa: nomor sandbox di Console Anda bisa berbeda dari bawaan (mis. whatsapp:+17372508034);"
+  echo "  bila begitu, jalankan lagi dengan TWILIO_WHATSAPP_FROM=whatsapp:+<nomor sandbox Anda>"
   set_var TWILIO_WEBHOOK_URL "https://$(grep '^DOMAIN=' "$ENV_FILE" | cut -d= -f2)/webhook/twilio"
   echo "  daftarkan di Twilio Console → Messaging → Try it out → Send a WhatsApp message → Sandbox settings:"
   echo "  'When a message comes in' = https://$(grep '^DOMAIN=' "$ENV_FILE" | cut -d= -f2)/webhook/twilio  (HTTP POST)"

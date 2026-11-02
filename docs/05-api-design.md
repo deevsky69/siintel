@@ -498,6 +498,25 @@ Tabel `case_files` dan `case_file_stages` (migration 0016). Data dummy berlabel:
 `predpol seed-case-files-dummy` / `scripts/isi-perkara-dummy-produksi.sh` (deterministik,
 idempoten, mencetak LP + PIN contoh).
 
+### 2.11f Babinkamtibmas dan buletin kelurahan (tahap 3, 2 November 2026)
+
+| Method | Path | Permission | Keterangan |
+|---|---|---|---|
+| GET | `/public/babin?kelurahan=` | — | nama, pangkat, **nomor dinas**, tautan grup; tanpa nomor WhatsApp Babin/chat id |
+| GET | `/babin` | `babin:read` | daftar lengkap |
+| PUT | `/babin/{kelurahan}` | `babin:manage` (Administrator) | buat/ubah; audit `CREATE_BABIN`/`UPDATE_BABIN` |
+| GET | `/bulletins?week=&status=` | `bulletin:read` | daftar + `suggested_week` |
+| POST | `/bulletins/generate {week?}` | `bulletin:manage` (Administrator) | DRAFT seluruh kelurahan dari minggu Senin–Minggu itu; draf disegarkan, yang disetujui tidak disentuh |
+| POST | `/bulletins/{id}/approve` | `bulletin:approve` (**Pimpinan**) | penerbitan ke masyarakat — human-in-the-loop |
+| GET | `/messaging/bulletins/pending` | kunci bot | APPROVED belum terkirim + `telegram_chat_id`/`whatsapp_number` |
+| POST | `/messaging/bulletins/{id}/sent` | kunci bot | hasil per kanal; SENT bila ada yang `ok`; audit `SEND_BULLETIN` |
+
+Tabel `babinkamtibmas`, `bulletins` (0017). Isi buletin: kejadian 3C minggu itu di kelurahan,
+imbauan ACTIVE kecamatan, rekomendasi yang disetujui/diubah Pimpinan, ajakan dari
+function-rules — aturan, bukan model bahasa (`services/bulletin.py`). Bot mengirim ke grup
+Telegram kelurahan dan/atau WhatsApp Babin (API resmi tidak menjangkau grup WhatsApp); menu
+bot `/babin` dan `/dasbor`.
+
 ### 2.11c Kanal perpesanan — bot Telegram / WhatsApp (8 Oktober 2026)
 
 Keputusan pemilik proyek: laporan masyarakat juga dapat masuk lewat **bot Telegram** (dan

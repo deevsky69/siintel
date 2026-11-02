@@ -33,6 +33,9 @@ COMMAND_START = ("/start", "/mulai", "mulai", "lapor", "/lapor")
 COMMAND_STATUS = ("/status", "status")
 COMMAND_CANCEL = ("/batal", "batal")
 COMMAND_HELP = ("/bantuan", "bantuan", "/help", "help")
+COMMAND_BABIN = ("/babin", "babin", "babinkamtibmas")
+COMMAND_DASHBOARD = ("/dasbor", "dasbor", "/web", "web")
+DASHBOARD_URL = "https://sigap.awansurya.com"
 
 MIN_DESCRIPTION = 10
 
@@ -46,6 +49,8 @@ HELP = (
     "Perintah:\n"
     "/mulai — membuat laporan baru\n"
     "/status — melihat status laporan Anda\n"
+    "/babin — kontak Babinkamtibmas kelurahan Anda\n"
+    "/dasbor — peta kerawanan, lacak laporan, dan survey di SIGAP WARGA\n"
     "/batal — membatalkan laporan yang sedang diisi\n\n"
     "Keadaan darurat: hubungi 110."
 )
@@ -59,6 +64,8 @@ class Step(Enum):
     DESCRIPTION = "description"
     PHOTO = "photo"
     CONFIRM = "confirm"
+    BABIN_KECAMATAN = "babin_kecamatan"
+    BABIN_KELURAHAN = "babin_kelurahan"
 
 
 @dataclass(frozen=True)
@@ -172,6 +179,20 @@ class Conversation:
                 return self._status()
             if lowered in COMMAND_HELP:
                 return Reply(HELP)
+            if lowered in COMMAND_DASHBOARD:
+                return Reply(
+                    "SIGAP WARGA — peta kerawanan wilayah, lacak laporan, cek kendaraan, dan "
+                    f"Survey Rasa Aman:\n{DASHBOARD_URL}"
+                )
+            if lowered in COMMAND_BABIN:
+                self._reset()
+                self.step = Step.BABIN_KECAMATAN
+                return Reply(
+                    "Kontak Babinkamtibmas. Pilih kecamatan Anda:",
+                    choices=tuple(self._opts().kecamatan),
+                )
+            if self.step in (Step.BABIN_KECAMATAN, Step.BABIN_KELURAHAN):
+                return self._babin_step(text)
             if lowered in COMMAND_START or self.step is Step.IDLE:
                 return self._start()
             return self._advance(incoming, text)
@@ -186,6 +207,39 @@ class Conversation:
     def _reset(self) -> None:
         self.step = Step.IDLE
         self.draft = Draft()
+
+    def _babin_step(self, text: str) -> Reply:
+        """Dua langkah: kecamatan → kelurahan → kontak. Nomor yang tampil nomor dinas."""
+        if self.step is Step.BABIN_KECAMATAN:
+            choice = pick(tuple(self._opts().kecamatan), text)
+            if choice is None:
+                return Reply("Pilih kecamatan dari daftar.", choices=tuple(self._opts().kecamatan))
+            self.draft.kecamatan = choice
+            self.step = Step.BABIN_KELURAHAN
+            names = tuple(k.name for k in self._opts().areas.get(choice, []))
+            return Reply("Pilih kelurahan:", choices=names)
+        names = tuple(k.name for k in self._opts().areas.get(self.draft.kecamatan or "", []))
+        choice = pick(names, text)
+        if choice is None:
+            return Reply("Pilih kelurahan dari daftar.", choices=names)
+        contact = self._backend.babin(choice)
+        self._reset()
+        if not contact:
+            return Reply(
+                f"Kontak Babinkamtibmas Kelurahan {choice} belum tercatat. "
+                "Hubungi Polsek setempat atau 110 untuk keadaan darurat."
+            )
+        rank = f"{contact['rank']} " if contact.get("rank") else ""
+        label = " (data peragaan)" if contact.get("is_dummy") else ""
+        lines = [
+            f"Babinkamtibmas Kelurahan {contact['kelurahan']}{label}:",
+            f"{rank}{contact['name']}",
+            f"Nomor dinas: {contact['phone_display']}",
+        ]
+        if contact.get("whatsapp_group_link"):
+            lines.append(f"Grup warga: {contact['whatsapp_group_link']}")
+        lines.append("Keadaan darurat: hubungi 110.")
+        return Reply("\n".join(lines))
 
     def _start(self) -> Reply:
         self._reset()
@@ -357,3 +411,8 @@ def progress_message(row: dict[str, Any]) -> str:
         f"Kabar laporan {row['ticket']}: kini {row['status_label']}.\n"
         "Ketik /status untuk melihat seluruh laporan Anda."
     )
+
+
+def bulletin_message(row: dict[str, Any]) -> str:
+    """Teks buletin apa adanya dari API (sudah disetujui Pimpinan)."""
+    return str(row["content"])

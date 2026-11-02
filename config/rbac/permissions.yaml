@@ -42,6 +42,9 @@ permissions:
   review: [moderate]
   # Berkas perkara 3C (2 November 2026): lacak laporan dan cek kendaraan untuk warga.
   case_file: [read, write]
+  # Tahap 3 (2 November 2026): kontak Babinkamtibmas dan buletin mingguan kelurahan.
+  babin: [read, manage]
+  bulletin: [read, manage, approve]
 
 roles:
   Pimpinan:
@@ -67,6 +70,11 @@ roles:
       - evaluation:read
       - panic:read
       - case_file:read
+      - babin:read
+      - bulletin:read
+      # Buletin kelurahan adalah penerbitan kepada masyarakat — disetujui Pimpinan,
+      # seperti imbauan (2 November 2026).
+      - bulletin:approve
       # DIPINDAHKAN dari Administrator, 1 September 2026 — keputusan pemilik proyek.
       #
       # Yang bergantung pada alat ukur adalah yang memerintahkan pengukurannya.
@@ -163,6 +171,9 @@ roles:
   # kewenangan atas nama "koreksi". Dikembalikan.
   Polsek:
     ALL:
+      # Kontak Babin dan buletin kelurahan boleh dibaca lintas wilayah (bukan data sensitif).
+      - babin:read
+      - bulletin:read
       - location:read
     OWN_JURISDICTION:
       - public_alert:read
@@ -242,6 +253,10 @@ roles:
       # Berkas perkara (2 November 2026): Administrator mengelola seluruh Polres.
       - case_file:read
       - case_file:write
+      - babin:read
+      - babin:manage
+      - bulletin:read
+      - bulletin:manage
       - dashboard:read
       - location:read
       - location:write

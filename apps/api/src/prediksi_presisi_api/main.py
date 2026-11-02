@@ -23,7 +23,9 @@ from .api.routers import (
     attachments,
     audit,
     auth,
+    babin,
     brief,
+    bulletins,
     case_files,
     catalog,
     community,
@@ -114,6 +116,8 @@ def create_app() -> FastAPI:
     api.include_router(reviews.router)
     api.include_router(public_cases.router)
     api.include_router(case_files.router)
+    api.include_router(babin.router)
+    api.include_router(bulletins.router)
     api.include_router(analytics.router)
     api.include_router(scoring.router)
     api.include_router(prediction_center.router)

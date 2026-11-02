@@ -13,6 +13,7 @@ from lapor_bot.core import (
     Attachment,
     Conversation,
     Incoming,
+    Reply,
     Step,
     nearest_kelurahan,
     pick,
@@ -25,6 +26,9 @@ class FakeBackend:
         self.submitted: list[dict[str, Any]] = []
         self.staged: list[str] = []
         self.quota_hit = False
+        self.contact: dict[str, Any] | None = None
+        self.bulletins: list[dict[str, Any]] = []
+        self.acked_bulletins: dict[str, dict[str, str]] = {}
 
     def options(self) -> Options:
         return Options(
@@ -68,6 +72,15 @@ class FakeBackend:
 
     def ack(self, channel: str, ticket: str, status: str) -> None:
         return None
+
+    def babin(self, kelurahan: str) -> dict[str, Any] | None:
+        return self.contact
+
+    def pending_bulletins(self) -> list[dict[str, Any]]:
+        return list(self.bulletins)
+
+    def bulletin_sent(self, bulletin_id: str, delivery: dict[str, str]) -> None:
+        self.acked_bulletins[bulletin_id] = delivery
 
 
 def talk() -> tuple[Conversation, FakeBackend]:
@@ -174,3 +187,61 @@ def test_quota_error_is_relayed_as_plain_words() -> None:
 def test_progress_message_names_ticket_and_status() -> None:
     text = progress_message({"ticket": "RPT-0901", "status_label": "Diteruskan"})
     assert "RPT-0901" in text and "Diteruskan" in text
+
+
+def test_babin_command_walks_kecamatan_then_kelurahan_and_hides_delivery_targets() -> None:
+    backend = FakeBackend()
+    backend.contact = {
+        "kelurahan": "Tebet Timur",
+        "kecamatan": "Tebet",
+        "polsek": "Tebet",
+        "rank": "Bripka",
+        "name": "Agus Santoso (dummy)",
+        "phone_display": "0812-1111-2222",
+        "whatsapp_group_link": None,
+        "is_dummy": True,
+    }
+    chat = Conversation(backend, "TELEGRAM", "7")
+    first = chat.handle(Incoming(text="/babin"))
+    assert first.choices == ("Tebet", "Cilandak")
+    second = chat.handle(Incoming(text="1"))
+    assert second.choices == ("Tebet Timur", "Manggarai")
+    final = chat.handle(Incoming(text="1"))
+    assert "Bripka Agus Santoso (dummy)" in final.text and "0812-1111-2222" in final.text
+    assert "data peragaan" in final.text and "6281" not in final.text
+    assert chat.step is Step.IDLE
+
+
+def test_dashboard_command_links_to_sigap_warga() -> None:
+    chat, _ = talk()
+    assert "sigap.awansurya.com" in chat.handle(Incoming(text="/dasbor")).text
+
+
+def test_bulletins_are_delivered_to_group_and_babin_then_acknowledged() -> None:
+    from lapor_bot.telegram import deliver_bulletins
+
+    backend = FakeBackend()
+    backend.bulletins = [
+        {
+            "id": "b1",
+            "content": "BULETIN A",
+            "telegram_chat_id": "-100",
+            "whatsapp_number": "628100",
+        },
+        {"id": "b2", "content": "BULETIN B", "telegram_chat_id": None, "whatsapp_number": None},
+    ]
+    sent_tg: list[tuple[str, str]] = []
+    sent_wa: list[tuple[str, str]] = []
+
+    class Tg:
+        def send(self, chat_id: str, reply: Reply) -> None:
+            sent_tg.append((chat_id, reply.text))
+
+    def wa(number: str, reply: Reply) -> None:
+        sent_wa.append((number, reply.text))
+
+    delivered = deliver_bulletins(backend, telegram=Tg(), whatsapp_send=wa)  # type: ignore[arg-type]
+    assert delivered == 1
+    assert sent_tg == [("-100", "BULETIN A")] and sent_wa == [("628100", "BULETIN A")]
+    assert backend.acked_bulletins["b1"] == {"telegram": "ok", "whatsapp": "ok"}
+    assert "catatan" in backend.acked_bulletins["b2"]

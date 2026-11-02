@@ -119,6 +119,20 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         hint: "Tahap perkara 3C yang dilacak warga; kendaraan untuk cek kendaraan",
       },
       {
+        href: "/ops/babin",
+        label: "Babinkamtibmas",
+        icon: "community",
+        permissions: ["babin:read"],
+        hint: "Kontak Babin per kelurahan yang tampil ke warga",
+      },
+      {
+        href: "/ops/buletin",
+        label: "Buletin Kelurahan",
+        icon: "brief",
+        permissions: ["bulletin:read"],
+        hint: "Buletin mingguan: disusun sistem, disetujui Pimpinan, dikirim bot",
+      },
+      {
         href: "/ops/survey",
         label: "Survey Rasa Aman",
         icon: "community",

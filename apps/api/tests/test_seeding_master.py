@@ -58,7 +58,7 @@ def test_master_seed_loads_expected_volumes(session: Session) -> None:
     # Empat peran sejak Command Center dan Analyst dilebur ke Administrator
     # (keputusan pemilik proyek, 1 September 2026).
     assert counts["roles"] == 4
-    assert counts["permissions"] == 50  # + panic, triage x2, review:moderate, case_file x2
+    assert counts["permissions"] == 55  # + panic, triage, review, case_file, babin x2, bulletin x3
     # Enam akun tetap: dua di antaranya kini berperan Administrator. Akunnya tidak
     # dihapus karena masih dirujuk keputusan dan tindakan operasional yang tercatat.
     assert counts["users"] == 6

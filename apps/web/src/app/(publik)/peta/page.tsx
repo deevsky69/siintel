@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LevelBadge, MonthBars, Stars } from "@/components/warga/bits";
 import { type MapAreaDatum, PublicMap } from "@/components/warga/public-map";
-import { getPublicSummary, longMonth, threatLabel } from "@/lib/warga";
+import { getBabinContact, getPublicSummary, longMonth, threatLabel } from "@/lib/warga";
 
 export const metadata = { title: "Peta Wilayah — SIGAP WARGA" };
 export const dynamic = "force-dynamic";
@@ -37,6 +37,11 @@ export default async function PetaWarga({
     (row) => row.kelurahan === one("kelurahan") && (!kecamatan || row.kecamatan === kecamatan),
   );
   const kecRow = summary.kecamatan.find((row) => row.kecamatan === kecamatan) ?? null;
+  const babin = area
+    ? await getBabinContact(area.kelurahan)
+        .then((r) => r.data)
+        .catch(() => null)
+    : null;
 
   const data = new Map<string, MapAreaDatum>(
     kecamatan
@@ -128,6 +133,33 @@ export default async function PetaWarga({
               <div className="mt-4">
                 <MonthBars months={summary.months} values={area.by_month} />
               </div>
+              {babin ? (
+                <div className="mt-4 rounded-2xl bg-base-850 px-4 py-3">
+                  <p className="text-xs text-ink-muted">
+                    Babinkamtibmas kelurahan{babin.is_dummy ? " · data peragaan" : ""}
+                  </p>
+                  <p className="mt-0.5 text-sm font-semibold text-ink">
+                    {babin.rank ? `${babin.rank} ` : ""}
+                    {babin.name}
+                  </p>
+                  <a
+                    href={`tel:${babin.phone_display.replace(/[^0-9+]/g, "")}`}
+                    className="text-sm font-semibold text-accent-soft"
+                  >
+                    {babin.phone_display}
+                  </a>
+                  {babin.whatsapp_group_link ? (
+                    <a
+                      href={babin.whatsapp_group_link}
+                      className="ml-3 text-sm text-accent-soft"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Grup warga
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
               <Link
                 href={`/survey?kelurahan=${encodeURIComponent(area.kelurahan)}`}
                 className="warga-btn warga-btn-ghost mt-4 w-full"

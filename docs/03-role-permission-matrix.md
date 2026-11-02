@@ -124,8 +124,10 @@ permission atas resource tersebut.
 | panic | read(ALL) | — | read, acknowledge(OWN_JURISDICTION) | read, acknowledge(ALL) |
 | review | — | — | — | moderate(ALL) |
 | case_file | read(ALL) | — | read, write(OWN_JURISDICTION) | read, write(ALL) |
+| babin | read(ALL) | — | read(ALL) | read, manage(ALL) |
+| bulletin | read, approve(ALL) | — | read(ALL) | read, manage(ALL) |
 
-Jumlah permission per peran: Pimpinan 25, Fungsi 17, Polsek 26, Administrator 48.
+Jumlah permission per peran: Pimpinan 28, Fungsi 17, Polsek 28, Administrator 52.
 
 <!-- matriks:selesai -->
 

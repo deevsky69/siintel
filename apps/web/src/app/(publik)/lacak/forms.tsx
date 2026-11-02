@@ -173,9 +173,9 @@ export function VehicleForm() {
             {state.data.found ? "Tercatat dalam laporan kehilangan" : "Tidak ada catatan"}
           </p>
           <p className="mt-1 text-sm text-ink">{state.data.advice}</p>
-          {state.data.records.map((row, index) => (
+          {state.data.records.map((row) => (
             <p
-              key={`${row.reported_month}-${index}`}
+              key={`${row.crime_type}-${row.kecamatan}-${row.reported_month}`}
               className="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink-muted"
             >
               {threatLabel(row.crime_type)} · {row.kecamatan} · {row.reported_month}

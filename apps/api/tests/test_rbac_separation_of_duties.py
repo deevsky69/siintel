@@ -145,5 +145,6 @@ def test_the_permissions_administrator_lacks_are_all_command_decisions() -> None
     }
     admin = {entry for entries in config["roles"]["Administrator"].values() for entry in entries}
 
-    # Sejak 9 Oktober 2026 tinggal dua (commander_decision:approve diberikan pemilik proyek).
-    assert catalogue - admin == {"evaluation:run", "public_alert:publish"}
+    # Sejak 9 Oktober 2026 commander_decision:approve diberikan pemilik proyek; sejak
+    # 2 November 2026 bulletin:approve (penerbitan buletin ke masyarakat) hanya Pimpinan.
+    assert catalogue - admin == {"evaluation:run", "public_alert:publish", "bulletin:approve"}

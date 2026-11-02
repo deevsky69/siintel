@@ -130,6 +130,16 @@ def seed_case_files_dummy() -> int:
     return 0
 
 
+def seed_babin_dummy() -> int:
+    """Kontak Babin dummy (tahap 3). Idempoten; baris yang sudah ada tidak disentuh."""
+    from .seeding.babin_dummy import seed_dummy_babin
+
+    with get_session_factory()() as session, session.begin():
+        added = seed_dummy_babin(session)
+    print(f"{added} kontak Babinkamtibmas dummy ditambahkan (yang sudah ada dilewati).")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="predpol", description="Administrasi SIGAP")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -155,7 +165,10 @@ def main(argv: list[str] | None = None) -> int:
         help="Menanam berkas perkara DUMMY berlabel untuk peragaan lacak laporan / cek kendaraan",
     )
 
+    sub.add_parser("seed-babin-dummy", help="Menanam kontak Babinkamtibmas DUMMY per kelurahan")
     arguments = parser.parse_args(argv)
+    if arguments.command == "seed-babin-dummy":
+        return seed_babin_dummy()
     if arguments.command == "seed-case-files-dummy":
         return seed_case_files_dummy()
 

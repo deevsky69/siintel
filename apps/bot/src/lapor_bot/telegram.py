@@ -15,7 +15,7 @@ from typing import Any
 import httpx
 
 from .backend import Backend, BackendError
-from .core import Attachment, Conversation, Incoming, Reply, progress_message
+from .core import Attachment, Conversation, Incoming, Reply, bulletin_message, progress_message
 
 log = logging.getLogger("lapor_bot.telegram")
 CHANNEL = "TELEGRAM"
@@ -153,3 +153,52 @@ class TelegramChannel:
             except Exception:  # noqa: BLE001
                 log.exception("Telegram: pengiriman kabar gagal; mencoba lagi")
             time.sleep(self._interval)
+
+
+def deliver_bulletins(
+    backend: Backend,
+    *,
+    telegram: TelegramChannel | None,
+    whatsapp_send: Any = None,
+) -> int:
+    """Mengirim buletin APPROVED ke grup Telegram kelurahan dan/atau nomor WhatsApp Babin,
+    lalu melaporkan hasil tiap kanal ke API. Dipanggil berkala oleh satu thread saja."""
+    sent = 0
+    for row in backend.pending_bulletins():
+        delivery: dict[str, str] = {}
+        text = bulletin_message(row)
+        chat_id = row.get("telegram_chat_id")
+        if telegram is not None and chat_id:
+            try:
+                telegram.send(str(chat_id), Reply(text))
+                delivery["telegram"] = "ok"
+            except Exception as error:  # noqa: BLE001
+                delivery["telegram"] = f"gagal: {str(error)[:120]}"
+        number = row.get("whatsapp_number")
+        if whatsapp_send is not None and number:
+            try:
+                whatsapp_send(str(number), Reply(text))
+                delivery["whatsapp"] = "ok"
+            except Exception as error:  # noqa: BLE001
+                delivery["whatsapp"] = f"gagal: {str(error)[:120]}"
+        if not delivery:
+            delivery["catatan"] = (
+                "tidak ada tujuan: isi chat id grup Telegram atau nomor WhatsApp Babin"
+            )
+        backend.bulletin_sent(str(row["id"]), delivery)
+        sent += 1 if "ok" in delivery.values() else 0
+    return sent
+
+
+def bulletins_forever(
+    backend: Backend, *, telegram: TelegramChannel | None, whatsapp_send: Any, interval: int
+) -> None:
+    log.info("Buletin: memeriksa yang disetujui tiap %s detik", interval)
+    while True:
+        try:
+            deliver_bulletins(backend, telegram=telegram, whatsapp_send=whatsapp_send)
+        except BackendError as error:
+            log.warning("Buletin: ditunda, API menjawab %s (%s)", error.status, error.message)
+        except Exception:  # noqa: BLE001
+            log.exception("Buletin: pengiriman gagal; mencoba lagi")
+        time.sleep(interval)
