@@ -61,6 +61,9 @@ EXPECTED_TABLES = {
     "citizen_report_contacts",
     # 0015 — Survey Rasa Aman (2 November 2026)
     "area_reviews",
+    # 0016 — berkas perkara (2 November 2026)
+    "case_files",
+    "case_file_stages",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat
     "citizen_report_attachments",

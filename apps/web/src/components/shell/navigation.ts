@@ -112,6 +112,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         hint: "Kejadian yang dicatat petugas",
       },
       {
+        href: "/ops/perkara",
+        label: "Berkas Perkara",
+        icon: "feed",
+        permissions: ["case_file:read"],
+        hint: "Tahap perkara 3C yang dilacak warga; kendaraan untuk cek kendaraan",
+      },
+      {
         href: "/ops/survey",
         label: "Survey Rasa Aman",
         icon: "community",

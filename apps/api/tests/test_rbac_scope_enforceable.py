@@ -65,6 +65,7 @@ JURISDICTION_PATH: dict[str, tuple[str, str]] = {
     "citizen_report": ("citizen_reports", "location_id"),
     # Tombol darurat (8 Oktober 2026): kelurahan terdekat dari titik peranti.
     "panic": ("panic_events", "location_id"),
+    "case_file": ("case_files", "location_id"),
     "location": ("locations", "polsek"),
     # Kolom wilayahnya sendiri, bukan lewat `locations`.
     "police_unit": ("police_units", "jurisdiction"),

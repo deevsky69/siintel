@@ -27,6 +27,14 @@ Yang sengaja **tidak** ada di sisi warga: skor, prediksi, titik kejadian, pering
 Tingkat RENDAH/SEDANG/TINGGI adalah pembagian tertil jumlah kejadian historis (PROPOSED).
 Moderasi Survey Rasa Aman ada di menu **Laporan → Survey Rasa Aman** (Administrator).
 
+**Lacak laporan dan cek kendaraan (tahap 2).** Di `/lacak` warga memasukkan **nomor LP + PIN**
+(PIN diberikan petugas saat melapor) untuk melihat tahap perkaranya, dan di tab **Cek
+kendaraan** memasukkan plat atau nomor rangka untuk tahu apakah kendaraan tercatat dalam
+laporan kehilangan — jawabannya hanya tercatat/tidak. Petugas mencatat dan memperbarui tahap
+di menu **Laporan → Berkas Perkara** (Administrator seluruh Polres; Polsek wilayahnya). Data
+awal adalah **DUMMY berlabel** (`scripts/isi-perkara-dummy-produksi.sh`); baris dummy
+menampilkan PIN-nya di layar petugas supaya dapat dicoba, perkara nyata tidak.
+
 ## 1. UNTUK SIAPA MODUL INI
 
 | Pembaca | Bagian yang paling relevan |

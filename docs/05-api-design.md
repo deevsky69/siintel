@@ -484,6 +484,20 @@ Tabel `area_reviews` (migration 0015). `GET /notifications` memuat kelompok `REV
 pemegang `review:moderate`. Tautan `href` pada `/notifications` kini berawalan `/ops`
 karena sisi kepolisian web pindah ke bawah jalur itu.
 
+### 2.11e Berkas perkara — lacak laporan dan cek kendaraan (tahap 2, 2 November 2026)
+
+| Method | Path | Permission | Keterangan |
+|---|---|---|---|
+| GET | `/public/cases/track?lp=&pin=` | — | tahap + riwayat perkara milik pelapor; LP tidak ada / PIN salah dijawab 404 yang sama; 10/jam per alamat; audit `TRACK_CASE` tanpa PIN |
+| GET | `/public/vehicles/check?plat=\|rangka=` | — | hanya tercatat/tidak, jenis, bulan laporan, kecamatan, `recovered`, `is_dummy`; tanpa nama/LP; audit `CHECK_VEHICLE` tanpa plat |
+| GET | `/case-files?stage=&q=` | `case_file:read` (Polsek: wilayahnya) | daftar; `dummy_pin` hanya untuk baris DUMMY |
+| POST | `/case-files` | `case_file:write` | mencatat perkara; `reporter_pin` dijawab **sekali**, yang tersimpan hash-nya |
+| POST | `/case-files/{lp:path}/stage` | `case_file:write` | memindahkan tahap (DITERIMA, LIDIK, SIDIK, P21, SP3, SELESAI — istilah SP2HP, urutan tidak dipaksa; PROPOSED) + catatan; audit `UPDATE_CASE_STAGE` |
+
+Tabel `case_files` dan `case_file_stages` (migration 0016). Data dummy berlabel:
+`predpol seed-case-files-dummy` / `scripts/isi-perkara-dummy-produksi.sh` (deterministik,
+idempoten, mencetak LP + PIN contoh).
+
 ### 2.11c Kanal perpesanan — bot Telegram / WhatsApp (8 Oktober 2026)
 
 Keputusan pemilik proyek: laporan masyarakat juga dapat masuk lewat **bot Telegram** (dan

@@ -12,6 +12,7 @@ const NAV = [
   { href: "/", label: "Beranda", icon: "⌂" },
   { href: "/peta", label: "Peta", icon: "◎" },
   { href: "/survey", label: "Survey", icon: "★" },
+  { href: "/lacak", label: "Lacak", icon: "⌕" },
   { href: "/lapor", label: "Lapor", icon: "✎" },
 ] as const;
 
@@ -58,7 +59,7 @@ export default function WargaLayout({ children }: { children: React.ReactNode })
 
       <nav
         aria-label="Navigasi bawah"
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-base-800 bg-base-900/95 backdrop-blur sm:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-base-800 bg-base-900/95 backdrop-blur sm:hidden"
       >
         {NAV.map((item) => (
           <Link

@@ -40,6 +40,8 @@ permissions:
   panic: [read, acknowledge]
   # Survey Rasa Aman (2 November 2026): memutuskan ulasan warga tayang atau tidak.
   review: [moderate]
+  # Berkas perkara 3C (2 November 2026): lacak laporan dan cek kendaraan untuk warga.
+  case_file: [read, write]
 
 roles:
   Pimpinan:
@@ -64,6 +66,7 @@ roles:
       - community_feedback:read
       - evaluation:read
       - panic:read
+      - case_file:read
       # DIPINDAHKAN dari Administrator, 1 September 2026 — keputusan pemilik proyek.
       #
       # Yang bergantung pada alat ukur adalah yang memerintahkan pengukurannya.
@@ -185,6 +188,9 @@ roles:
       - evaluation:read
       - panic:read
       - panic:acknowledge
+      # Berkas perkara wilayahnya (2 November 2026).
+      - case_file:read
+      - case_file:write
 
   # BELUM DIPUTUSKAN — `audit:read` dicabut sementara dari peran Polsek.
   #
@@ -233,6 +239,9 @@ roles:
       # Moderator Survey Rasa Aman (2 November 2026). Binmas lewat peran Fungsi menunggu
       # keputusan RBAC tersendiri; sementara Administrator.
       - review:moderate
+      # Berkas perkara (2 November 2026): Administrator mengelola seluruh Polres.
+      - case_file:read
+      - case_file:write
       - dashboard:read
       - location:read
       - location:write

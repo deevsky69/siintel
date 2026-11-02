@@ -134,3 +134,46 @@ export function highlightAreas(summary: PublicSummary, limit = 3): AreaSummary[]
     .sort((a, b) => b.rating_count - a.rating_count || (b.rating ?? 0) - (a.rating ?? 0))
     .slice(0, limit);
 }
+
+// ---------------------------------------------------------------------------------------
+// Berkas perkara (tahap 2, 2 November 2026): lacak laporan dan cek kendaraan.
+// ---------------------------------------------------------------------------------------
+
+export type CaseHistory = {
+  stage: string;
+  stage_label: string;
+  changed_at: string;
+  note: string | null;
+};
+
+export type CaseTrack = {
+  lp_number: string;
+  crime_type: string;
+  kelurahan: string | null;
+  kecamatan: string;
+  polsek: string;
+  reported_on: string;
+  stage: string;
+  stage_label: string;
+  stage_updated_at: string;
+  summary: string | null;
+  vehicle: { plate: string | null; description: string | null; recovered: boolean } | null;
+  history: CaseHistory[];
+  is_dummy: boolean;
+  basis: string;
+};
+
+export type VehicleCheck = {
+  found: boolean;
+  records: {
+    crime_type: string;
+    reported_month: string;
+    kecamatan: string;
+    recovered: boolean;
+    is_dummy: boolean;
+  }[];
+  advice: string;
+  basis: string;
+};
+
+export const CASE_STAGES = ["DITERIMA", "LIDIK", "SIDIK", "P21", "SP3", "SELESAI"] as const;

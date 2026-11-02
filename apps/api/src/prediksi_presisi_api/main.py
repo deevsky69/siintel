@@ -24,6 +24,7 @@ from .api.routers import (
     audit,
     auth,
     brief,
+    case_files,
     catalog,
     community,
     dashboard,
@@ -43,6 +44,7 @@ from .api.routers import (
     prediction_center,
     public_alerts,
     public_areas,
+    public_cases,
     public_intake,
     reviews,
     scoring,
@@ -110,6 +112,8 @@ def create_app() -> FastAPI:
     api.include_router(messaging.router)
     api.include_router(public_areas.router)
     api.include_router(reviews.router)
+    api.include_router(public_cases.router)
+    api.include_router(case_files.router)
     api.include_router(analytics.router)
     api.include_router(scoring.router)
     api.include_router(prediction_center.router)

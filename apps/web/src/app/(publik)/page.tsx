@@ -49,6 +49,14 @@ export default async function BerandaWarga() {
                 Darurat · 110
               </a>
             </div>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              <Link href="/lacak" className="font-semibold text-accent-soft">
+                Lacak laporan →
+              </Link>
+              <Link href="/lacak?tab=kendaraan" className="font-semibold text-accent-soft">
+                Cek kendaraan bekas →
+              </Link>
+            </div>
           </div>
           <div className="bg-base-850 p-3 md:col-span-3 md:p-5">
             {summary ? (

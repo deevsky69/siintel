@@ -38,6 +38,7 @@ export function Stars({ value, size = "text-base" }: { value: number | null; siz
   const rounded = Math.round(value ?? 0);
   return (
     <span
+      role="img"
       className={`inline-flex ${size} leading-none`}
       aria-label={value === null ? "belum ada nilai" : `${value} dari 5`}
     >

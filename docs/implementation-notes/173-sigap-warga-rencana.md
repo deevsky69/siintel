@@ -65,3 +65,15 @@ proyek dari refero.design. Komponen sisi polisi tidak dipakai ulang di sisi warg
   Inter untuk semua teks; tidak memakai komponen/huruf teknis sisi /ops.
 - Pemeriksaan produksi: beranda warga 200, `/ops` dialihkan, ringkasan publik 200,
   Server Action diuji pada `/ops/masuk`.
+
+## Tahap 2 — SELESAI 2 November 2026
+
+- API: `models/case_file.py` (`case_files`, `case_file_stages`, 0016; PIN di-hash bersama
+  nomor LP; `is_dummy` + `dummy_pin`), `routers/public_cases.py` (lacak LP+PIN jawaban
+  seragam 404; cek kendaraan tercatat/tidak), `routers/case_files.py` (daftar, catat dengan
+  PIN sekali tampil, pindah tahap; cakupan Polsek), permission `case_file:read/write`
+  (Pimpinan baca; Polsek wilayah; Administrator semua), `seeding/case_files_dummy.py` +
+  perintah `predpol seed-case-files-dummy` + `scripts/isi-perkara-dummy-produksi.sh`.
+- Web warga: `/lacak` (tab Lacak laporan / Cek kendaraan), tautan di beranda dan navigasi.
+- Web petugas: `/ops/perkara` (saring, pindah tahap, catat perkara baru).
+- Test: `test_api_case_files.py` (5), web 412; label DUMMY tampil di sisi warga dan petugas.
