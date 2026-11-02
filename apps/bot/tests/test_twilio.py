@@ -84,7 +84,7 @@ def test_trial_sender_reply_is_returned_in_webhook_response(monkeypatch) -> None
     )  # type: ignore[arg-type]
 
     def refuse(phone: str, reply: Reply) -> None:
-        raise twilio.TemplateRequired("trial")
+        raise twilio.TemplateRequiredError("trial")
 
     monkeypatch.setattr(channel, "send", refuse)
     server = WebhookServer(0)

@@ -51,7 +51,7 @@ LOCATION_HINT = (
 )
 
 
-class TemplateRequired(RuntimeError):
+class TemplateRequiredError(RuntimeError):
     """Twilio menolak pesan bebas (21654/63016); balasan hanya dapat lewat respons webhook."""
 
 
@@ -138,7 +138,7 @@ class TwilioChannel:
             if code in ("21654", "63016"):
                 # Twilio menolak teks bebas: jendela 24 jam belum terbuka (63016) atau nomor
                 # pengirim trial hanya boleh mengirim template bawaan Twilio (21654).
-                raise TemplateRequired(
+                raise TemplateRequiredError(
                     f"Twilio menolak balasan bebas ke {phone} (kode {code}): jendela 24 jam "
                     "belum terbuka, atau nomor pengirim trial hanya boleh mengirim template."
                 )
@@ -172,7 +172,7 @@ class TwilioChannel:
             return None
         try:
             self.send(phone, reply)
-        except TemplateRequired as error:
+        except TemplateRequiredError as error:
             log.warning("Twilio: %s — balasan dikembalikan lewat respons webhook", error)
             return outgoing(reply)
         except Exception:  # noqa: BLE001
