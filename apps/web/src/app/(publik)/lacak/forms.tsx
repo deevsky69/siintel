@@ -13,7 +13,7 @@ function DummyTag() {
 }
 
 const inputClass =
-  "w-full rounded-2xl border border-base-800 bg-base-900 px-4 py-3 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none";
+  "w-full rounded-sm border border-base-800 bg-base-900 px-4 py-3 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none";
 
 export function TrackForm() {
   const [state, action, pending] = useActionState<TrackState, FormData>(trackCase, {
@@ -67,7 +67,7 @@ export function TrackForm() {
 function TrackResult({ data }: { data: CaseTrack }) {
   const stageIndex = CASE_STAGES.indexOf(data.stage as (typeof CASE_STAGES)[number]);
   return (
-    <section className="rounded-2xl bg-base-850 p-4" aria-live="polite">
+    <section className="rounded-sm bg-base-850 p-4" aria-live="polite">
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-mono text-xs text-ink-muted">{data.lp_number}</span>
         {data.is_dummy ? <DummyTag /> : null}
@@ -109,7 +109,7 @@ function TrackResult({ data }: { data: CaseTrack }) {
         </p>
       ) : null}
       {data.vehicle ? (
-        <p className="mt-3 rounded-xl bg-base-900 px-3 py-2 text-sm text-ink">
+        <p className="mt-3 rounded-sm bg-base-900 px-3 py-2 text-sm text-ink">
           Kendaraan: <span className="font-mono">{data.vehicle.plate}</span>
           {data.vehicle.description ? ` · ${data.vehicle.description}` : ""}
           {data.vehicle.recovered ? (
@@ -164,7 +164,7 @@ export function VehicleForm() {
       </form>
       {state.status === "done" ? (
         <section
-          className={`rounded-2xl p-4 ${state.data.found ? "bg-risk-high/10" : "bg-risk-low/10"}`}
+          className={`rounded-sm p-4 ${state.data.found ? "bg-risk-high/10" : "bg-risk-low/10"}`}
           aria-live="polite"
         >
           <p

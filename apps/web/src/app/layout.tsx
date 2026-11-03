@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Chakra_Petch, Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { Barlow_Condensed, Chakra_Petch, Inter, JetBrains_Mono } from "next/font/google";
 import { THEME_BOOTSTRAP, THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
@@ -11,11 +11,11 @@ const heading = Chakra_Petch({
   variable: "--font-heading",
 });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
-// Wajah huruf sisi warga: Plus Jakarta Sans — dirancang di Jakarta (Tokotype), dipakai
-// untuk judul SIGAP WARGA supaya sisi masyarakat punya suara sendiri.
-const display = Plus_Jakarta_Sans({
+// Wajah huruf judul sisi warga: Barlow Condensed — condensed tebal kapital, suara papan
+// pengumuman yang tegas (rupa gelap 3 November 2026); badan tetap Inter.
+const display = Barlow_Condensed({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["600", "700"],
   variable: "--font-display",
 });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });

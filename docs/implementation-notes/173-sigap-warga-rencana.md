@@ -138,3 +138,67 @@ refero.design, dan "elemen yang ada transisinya".
   tampil sama seperti keputusan 2 November (tingkat kasar, imbauan terbit, survey).
 - Test: `map-canvas.test.tsx` (chip meredupkan dan melepas, kartu kecil saat fokus, keadaan
   tanpa ringkasan); `publik.test.tsx` tetap; 417 test web lulus; `next build` berhasil.
+
+## Warna, grid, dan menu bar — rupa papan pengumuman (3 November 2026, malam)
+
+Permintaan pemilik proyek: rombak warna web, grid-gridnya, dan menu bar "jangan terlalu
+seperti AI", dengan referensi Refero.
+
+- **Referensi** (Refero styles/screens): *Art In DUMBO* (panduan galeri lingkungan: kanvas
+  putih, teks tinta, satu aksen fungsional, sudut 2px, flat, blok daftar), *Incident*
+  (garis 1px, sudut tajam, panel peringatan merah pucat), *IKEA Newsroom* (kepala halaman dua
+  baris: strip utilitas lalu logo + tautan teks; grid kartu bergaris dengan panah berlingkar).
+  Ditolak: gradien, bayangan lembut, pil navigasi, tombol berwarna di dalam nav, gading
+  hangat + biru tua + kuning (rupa 2–3 November pagi).
+- **Warna** (`globals.css`, blok `.warga`): kanvas putih, tinta `#141414`, kabut hangat
+  `#F3F1EC` untuk sel sekunder, garis `#DCD7CD` / `#A0988A` / tinta. Tiga keluarga warna saja:
+  tinta (teks, tombol utama, bingkai), **coklat Polri** `#6B4F2A` (strip lembaga, eyebrow,
+  cincin), **sinyal** `#D63A1C` (Darurat, imbauan, tingkat tinggi). Tingkat rendah/sedang
+  tetap hijau/kuning-tua; emas hanya untuk bintang ulasan. Tidak ada gradien dan bayangan.
+- **Menu bar** (`(publik)/layout.tsx`, `components/warga/nav.tsx`): strip tipis coklat Polri
+  berisi nama satuan, "Polri bersama masyarakat", tautan Darurat 110 dan Masuk petugas; lalu
+  masthead putih bergaris bawah tinta: lambang 36 px + wordmark **SIGAP WARGA berkotak**,
+  tautan teks polos di kanan dengan garis bawah 3 px yang "tumbuh" dari kiri saat disentuh dan
+  tetap pada halaman aktif. Ponsel: tab bawah bergaris atas, garis tinta di tab aktif.
+- **Grid** (`.warga-grid` / `.warga-cell`): sel-sel berbagi garis 1 px (gap 1 px di atas latar
+  garis), tanpa radius, tanpa bayangan; setiap bagian diawali `.warga-rubric` (garis atas
+  tinta + judul kapital kecil). Jalan pintas menjadi empat sel dengan panah berlingkar yang
+  terisi tinta dan bergeser saat disentuh; Survey dan wilayah tinggi menjadi dua sel; daftar
+  memakai garis antar-baris. Kanvas peta: kertas kabut bergaris buku besar 24 px, panel putih
+  bersekat garis tinta (bukan kartu mengambang), tag saring persegi, keterangan warna persegi.
+- Halaman warga lain ikut berubah lewat token dan kelas bersama (`warga-card`, `warga-btn`);
+  `rounded-2xl/xl` di `/peta`, `/lacak`, `/survey` diganti `rounded-sm`; `LevelBadge` persegi.
+- Transisi tetap: panel meluncur, tag/poligon, kartu kecil, imbauan bergiliran, reveal, rute,
+  orbit cincin; ditambah garis bawah nav dan panah sel. Semua mati pada reduced-motion.
+- Verifikasi: 417 test web, `tsc`, `biome`, `next build` bersih. Tangkapan layar tetap tidak
+  bisa dibuat di mesin ini.
+
+## Rupa gelap-tegas (3 November 2026, malam — menggantikan rupa putih-tinta di atas)
+
+Permintaan pemilik proyek: "rombak total agar lebih tegas, mungkin agak gelap, jangan terlalu
+terang", referensi Refero.
+
+- **Referensi**: *Felt* (konsol GIS gelap: kanvas gelap, panel bertingkat nada, teks
+  putih-gading, satu aksen hangat untuk tindakan utama, garis tipis, radius kecil) sebagai
+  fondasi; *Eat Real Food / realfood.gov* meminjamkan judul condensed tebal kapital berjarak
+  rapat dan strip lembaga tipis; *Axiom* meminjamkan lapisan nada alih-alih bayangan. Grid
+  bergaris dan menu bar dua baris dari rupa sebelumnya dipertahankan. Ditolak: hitam pekat,
+  glow neon, gradien, pil, kartu radius 16 px, aksen biru.
+- **Warna** (`globals.css`, blok `.warga`): kanvas arang hangat `#1C1B18` (bukan hitam),
+  panel `#262521`, sel sekunder `#302E29`, garis `#3D3A33` / `#5C584E` / gading `#EDE9DF`;
+  teks gading `#F0ECE2`. Tiga keluarga: gading, **emas Polri** `#E6AD3A` (tombol Lapor,
+  eyebrow, garis nav aktif, wordmark, cincin, fokus), **sinyal** `#EC4B3C` (Darurat, imbauan,
+  tingkat tinggi). Tangga peta: hijau `#3DA371` → jingga `#D97A24` → merah `#EC4B3C`, garis
+  antar-wilayah berwarna kanvas (bentuk tampak "diukir"), kelegapan poligon 0,7 (redup 0,15).
+  Teks di atas tombol berwarna gelap, bukan putih, supaya kontras ≥ 5:1.
+- **Tipografi**: judul, wordmark, tautan nav, rubrik, dan tombol memakai **Barlow Condensed**
+  600/700 kapital (`--font-display`, menggantikan Plus Jakarta Sans di `app/layout.tsx`);
+  badan tetap Inter dengan jarak huruf 0,01em. Judul panel 2 rem, judul sel 1,5 rem.
+- **Komponen**: strip atas lebih gelap dari kanvas; masthead semi-transparan dengan blur;
+  tag saring terisi warnanya dengan teks gelap saat ditekan; kartu imbauan merah gelap
+  tembus 12 % bergaris sinyal; panah sel terisi emas saat disentuh; label peta berlatar
+  kanvas. `color-scheme: dark` supaya kontrol bawaan ikut gelap.
+- `PublicMap`: garis dan label tidak lagi putih mati — ikut token (`.warga-poly` + kelas
+  `is-selected`), sehingga komponen yang sama tetap benar bila tema diganti lagi.
+- Verifikasi: 417 test web (nilai kelegapan di `map-canvas.test.tsx` disesuaikan), `tsc`,
+  `biome`, `next build` bersih. Tangkapan layar tetap tidak bisa dibuat di mesin ini.

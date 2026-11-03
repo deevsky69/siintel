@@ -3,56 +3,86 @@ import { PolriEmblem } from "@/components/warga/brand";
 import { WargaBottomNav, WargaTopNav } from "@/components/warga/nav";
 
 /**
- * SIGAP WARGA — kerangka halaman masyarakat (2 November 2026; rupa baru 3 November 2026).
+ * SIGAP WARGA — kerangka halaman masyarakat (2 November 2026; rupa papan pengumuman
+ * 3 November 2026).
  *
- * Satu pembungkus `.warga` mengganti seluruh token warna menjadi tema terang yang hangat,
- * sehingga sisi masyarakat tidak pernah tampak seperti sisi kepolisian (/ops) dan tidak
- * terpengaruh pengalih gelap/terang di sana. Navigasi: lima tujuan — Beranda, Peta,
- * Survey, Lacak, Lapor — di atas pada layar lebar, di bawah pada ponsel. Lambang Polri di
- * kepala halaman; perpindahan rute dianimasikan oleh template.tsx.
+ * Satu pembungkus `.warga` mengganti seluruh token warna menjadi tema gelap-hangat dengan
+ * garis-garis 1px, sehingga sisi masyarakat tidak pernah tampak seperti sisi kepolisian
+ * (/ops) dan tidak terpengaruh pengalih gelap/terang di sana.
+ *
+ * Kepala halaman dua baris, meniru situs lembaga dan ruang berita: strip tipis gelap
+ * berisi nama satuan dan tautan darurat, lalu masthead berisi lambang, wordmark
+ * berkotak emas, dan tautan teks condensed bergaris bawah emas bila aktif. Tidak ada pil,
+ * tidak ada tombol berwarna di dalam navigasi. Di ponsel navigasi turun ke bawah.
  */
 export default function WargaLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="warga min-h-screen bg-base-950 text-ink">
-      <header className="sticky top-0 z-30 border-b border-base-800 bg-base-900/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5">
-          <Link href="/" className="flex items-center gap-2.5">
-            <PolriEmblem size={40} className="h-10 w-10" />
-            <span className="leading-tight">
-              <span className="font-display block text-[15px] font-extrabold tracking-tight text-ink">
-                SIGAP WARGA
-              </span>
-              <span className="block text-[11px] text-ink-muted">Polres Metro Jakarta Selatan</span>
-            </span>
-          </Link>
-          <nav aria-label="Navigasi warga" className="ml-auto hidden items-center gap-1 sm:flex">
-            <WargaTopNav />
-            <a href="tel:110" className="warga-btn warga-btn-danger ml-2 !px-4 !py-1.5 !text-sm">
+      <div className="warga-strip">
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4">
+          <span className="truncate">
+            Polres Metro Jakarta Selatan <span className="warga-strip-sep">·</span> Polri bersama
+            masyarakat
+          </span>
+          <span className="ml-auto flex shrink-0 items-center gap-4">
+            <a href="tel:110" className="warga-strip-link">
               Darurat 110
             </a>
+            <Link href="/ops/masuk" className="warga-strip-link hidden sm:inline">
+              Masuk petugas
+            </Link>
+          </span>
+        </div>
+      </div>
+
+      <header className="warga-masthead sticky top-0 z-30">
+        <div className="mx-auto flex max-w-6xl items-stretch gap-5 px-4">
+          <Link href="/" className="flex items-center gap-3 py-2.5">
+            <PolriEmblem size={36} className="h-9 w-9" />
+            <span className="warga-wordmark">SIGAP WARGA</span>
+          </Link>
+          <nav aria-label="Navigasi warga" className="ml-auto hidden items-stretch sm:flex">
+            <WargaTopNav />
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-5 sm:pb-10">{children}</main>
+      <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-5 sm:pb-12">{children}</main>
 
-      <footer className="hidden border-t border-base-800 py-8 sm:block">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 text-xs text-ink-faint">
-          <PolriEmblem size={32} className="h-8 w-8 opacity-80" />
-          <p className="leading-relaxed">
-            <span className="font-semibold text-ink-muted">Polri bersama masyarakat.</span> SIGAP
-            WARGA · Sistem Inteligensi Geospasial dan Analitik Prediktif · Polres Metro Jakarta
-            Selatan
-          </p>
-          <Link href="/ops/masuk" className="ml-auto underline hover:text-ink-muted">
-            Masuk petugas
-          </Link>
+      <footer className="warga-footer hidden sm:block">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 text-xs sm:grid-cols-[auto_1fr_auto]">
+          <PolriEmblem size={40} className="h-10 w-10" />
+          <div className="leading-relaxed text-ink-muted">
+            <p className="font-semibold text-ink">SIGAP WARGA</p>
+            <p>
+              Sistem Inteligensi Geospasial dan Analitik Prediktif · Polres Metro Jakarta Selatan.
+              Angka di situs ini adalah ringkasan historis per wilayah, bukan ramalan untuk
+              perorangan.
+            </p>
+          </div>
+          <ul className="space-y-1 text-ink-muted sm:text-right">
+            <li>
+              <a href="tel:110" className="warga-link">
+                Darurat 110
+              </a>
+            </li>
+            <li>
+              <Link href="/lapor" className="warga-link">
+                Lapor kejadian
+              </Link>
+            </li>
+            <li>
+              <Link href="/ops/masuk" className="warga-link">
+                Masuk petugas
+              </Link>
+            </li>
+          </ul>
         </div>
       </footer>
 
       <nav
         aria-label="Navigasi bawah"
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-base-800 bg-base-900/95 backdrop-blur sm:hidden"
+        className="warga-tabbar fixed inset-x-0 bottom-0 z-30 sm:hidden"
       >
         <WargaBottomNav />
       </nav>
