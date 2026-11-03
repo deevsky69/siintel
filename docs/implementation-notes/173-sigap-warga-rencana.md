@@ -108,3 +108,33 @@ Permintaan pemilik proyek: "transisi yang mantap" dan "logo Polri bersama masyar
   next/font); badan tetap Inter. Hero satu-satunya bidang biru malam di sisi warga, tombol
   utama kuning Polri.
 - Tidak ada perubahan API, data, maupun teks yang diuji; 414 test web tetap lulus.
+
+## Beranda dirombak — kanvas peta (3 November 2026, sore)
+
+Permintaan pemilik proyek: "rombak total" beranda dengan referensi dasbor keamanan publik dari
+refero.design, dan "elemen yang ada transisinya".
+
+- **Referensi** (Refero, MCP `refero`): Nextdoor *Alerts* — peta memenuhi bidang sebagai meja
+  kerja, panel putih mengambang berisi chip saring dan kartu peringatan, keterangan di sudut
+  peta (`refero.design/pages/685c5750-10a0-4c5f-9a84-a3a42ca4e414`); Google Maps *nearby
+  fires* (iOS) — peta di atas, lembar informasi naik dari bawah, untuk tata letak ponsel; kartu
+  peringatan cuaca Apple — satu garis tingkat, judul singkat, isi di bawahnya.
+- **Susunan baru** (`components/warga/map-canvas.tsx`, `(publik)/page.tsx`): kanvas kertas
+  bertitik (`.warga-canvas`) memuat peta kecamatan di kanan dan panel `.warga-float` di kiri
+  (ponsel: peta di atas, panel menjadi lembar dengan pegangan). Panel: lambang dengan cincin
+  warga (varian terang), judul, rentang bulan, **chip saring** Semua/Tinggi/Sedang/Rendah
+  dengan jumlah kecamatan, imbauan berlaku (maks. 3), tombol Lapor dan 110. Di bawahnya empat
+  ubin jalan pintas (Lacak, Cek kendaraan, Survey, Peta kelurahan), lalu Survey Rasa Aman dan
+  wilayah tinggi. Hero biru malam dihapus; sisi warga kini seluruhnya terang.
+- **Transisi**: panel meluncur masuk (dari kiri di layar lebar, naik dari bawah di ponsel);
+  chip yang ditekan berwarna penuh dan **meredupkan poligon tingkat lain** (`emphasis` pada
+  `PublicMap`, transisi `fill-opacity`); wilayah yang disentuh/difokus memunculkan kartu
+  kecil nama + tingkat + jumlah (`tip` pada `PublicMap`, prop boolean — komponen klien tidak
+  boleh menerima fungsi); kartu imbauan naik bergiliran setelah panel tiba; ubin terangkat
+  dan panahnya bergeser; baris wilayah bergeser saat disentuh. Yang lama tetap: transisi
+  rute, reveal saat gulir, poligon menggambar diri, orbit cincin. Semua mati pada
+  `prefers-reduced-motion`.
+- **Lebar** sisi warga 5xl → 6xl supaya kanvas lapang. Tidak ada perubahan API/data; isi yang
+  tampil sama seperti keputusan 2 November (tingkat kasar, imbauan terbit, survey).
+- Test: `map-canvas.test.tsx` (chip meredupkan dan melepas, kartu kecil saat fokus, keadaan
+  tanpa ringkasan); `publik.test.tsx` tetap; 417 test web lulus; `next build` berhasil.

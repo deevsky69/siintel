@@ -15,7 +15,7 @@ export default function WargaLayout({ children }: { children: React.ReactNode })
   return (
     <div className="warga min-h-screen bg-base-950 text-ink">
       <header className="sticky top-0 z-30 border-b border-base-800 bg-base-900/90 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-2.5">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2.5">
           <Link href="/" className="flex items-center gap-2.5">
             <PolriEmblem size={40} className="h-10 w-10" />
             <span className="leading-tight">
@@ -34,10 +34,10 @@ export default function WargaLayout({ children }: { children: React.ReactNode })
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl px-4 pb-24 pt-5 sm:pb-10">{children}</main>
+      <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-5 sm:pb-10">{children}</main>
 
       <footer className="hidden border-t border-base-800 py-8 sm:block">
-        <div className="mx-auto flex max-w-5xl items-center gap-4 px-4 text-xs text-ink-faint">
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 text-xs text-ink-faint">
           <PolriEmblem size={32} className="h-8 w-8 opacity-80" />
           <p className="leading-relaxed">
             <span className="font-semibold text-ink-muted">Polri bersama masyarakat.</span> SIGAP
