@@ -391,6 +391,14 @@
   border-top: 1px solid rgb(var(--line-strong));
   background: rgb(var(--surface-panel));
 }
+/* `.warga .warga-tabbar` lebih spesifik daripada `sm:hidden` milik Tailwind, sehingga tab
+   bawah ikut tampil di desktop (laporan pemilik proyek 3 November 2026). Media query ini
+   menutupnya pada lebar yang sama dengan `sm`. */
+@media (min-width: 640px) {
+  .warga .warga-tabbar {
+    display: none;
+  }
+}
 .warga .warga-tab {
   position: relative;
   display: flex;
