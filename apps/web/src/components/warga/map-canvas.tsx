@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { type AreaLevel, LEVEL_LABEL, longMonth, type PublicSummary } from "@/lib/warga";
-import { BersamaRing } from "./brand";
+import { PolriEmblem } from "./brand";
 import { type MapAreaDatum, PublicMap } from "./public-map";
 
 export type ImbauanRow = {
@@ -21,7 +21,7 @@ const LEVELS: AreaLevel[] = ["TINGGI", "SEDANG", "RENDAH"];
  *
  * Polanya mengikuti dasbor peringatan lingkungan (peta penuh + panel berisi chip saring dan
  * kartu peringatan; di ponsel, peta di atas dan panel di bawahnya). Rupa papan pengumuman:
- * kanvas kertas bergaris halus, panel putih berbingkai tinta 1px, tag saring persegi, kartu
+ * kanvas kertas bergaris halus, panel berbingkai 1px dengan lambang Tribrata polos, tag saring persegi, kartu
  * imbauan berlatar merah pucat dengan garis sinyal di kiri. Yang berpindah tangan ke
  * komponen klien ini hanya keadaan tampilan: tag yang dipilih meredupkan wilayah lain, dan
  * wilayah yang disentuh memunculkan kartu kecil. Datanya datang dari Server Component.
@@ -89,7 +89,7 @@ export function MapCanvas({
 
       <div className="warga-float">
         <div className="flex items-center gap-3">
-          <BersamaRing size={60} light />
+          <PolriEmblem size={56} className="h-14 w-14 shrink-0" />
           <div className="min-w-0">
             <p className="warga-eyebrow">Keadaan wilayah</p>
             <h1 className="mt-1 text-[2rem] font-bold text-ink">Lihat keadaan wilayahmu</h1>
