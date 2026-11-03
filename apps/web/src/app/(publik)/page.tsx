@@ -1,114 +1,70 @@
 import Link from "next/link";
 import { LevelBadge, Stars } from "@/components/warga/bits";
-import { BersamaRing } from "@/components/warga/brand";
-import { type MapAreaDatum, PublicMap } from "@/components/warga/public-map";
+import { MapCanvas } from "@/components/warga/map-canvas";
 import { Reveal } from "@/components/warga/reveal";
-import { getPublicSummary, highlightAreas, longMonth, type PublicSummary } from "@/lib/warga";
+import { getPublicSummary, highlightAreas, longMonth } from "@/lib/warga";
 import { getImbauanPublik } from "./lapor/actions";
 
 export const metadata = { title: "SIGAP WARGA — Polres Metro Jakarta Selatan" };
 export const dynamic = "force-dynamic";
 
 /**
- * Beranda SIGAP WARGA (2 November 2026) — peta di depan, isi lain di bawahnya.
+ * Beranda SIGAP WARGA (2 November 2026; dirombak 3 November 2026).
  *
- * Yang tampil: imbauan yang sudah diterbitkan, tingkat kerawanan kasar per kecamatan, dan
- * sorotan Survey Rasa Aman. Tidak ada skor, prediksi, maupun titik kejadian: keputusan
- * pemilik proyek, "sederhana saja untuk masyarakat".
+ * Susunan: kanvas peta dengan panel keadaan wilayah di atasnya (MapCanvas), empat jalan
+ * pintas, lalu Survey Rasa Aman dan wilayah berkerawanan tinggi. Yang tampil: imbauan yang
+ * sudah diterbitkan, tingkat kerawanan kasar per kecamatan, dan sorotan survey. Tidak ada
+ * skor, prediksi, maupun titik kejadian: keputusan pemilik proyek, "sederhana saja untuk
+ * masyarakat".
  */
 export default async function BerandaWarga() {
   const [summary, imbauan] = await Promise.all([
     getPublicSummary().catch(() => null),
     getImbauanPublik().catch(() => []),
   ]);
-  const data = new Map<string, MapAreaDatum>(
-    (summary?.kecamatan ?? []).map((row) => [
-      row.kecamatan,
-      { level: row.level, total: row.total },
-    ]),
-  );
+  const highlights = summary ? highlightAreas(summary) : [];
+  const highAreas = summary
+    ? summary.areas
+        .filter((area) => area.level === "TINGGI")
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 6)
+    : [];
 
   return (
-    <div className="space-y-5">
-      <section className="warga-hero rounded-[1.25rem] shadow-panel">
-        <div className="grid gap-0 md:grid-cols-5">
-          <div className="p-5 md:col-span-2 md:p-7">
-            <div className="flex items-center gap-4">
-              <BersamaRing size={120} />
-              <div>
-                <p className="warga-hero-eyebrow">Polres Metro Jakarta Selatan</p>
-                <p className="font-display mt-1 text-lg font-extrabold leading-tight text-white">
-                  Polri bersama masyarakat
-                </p>
-              </div>
-            </div>
-            <h1 className="mt-5 text-[1.75rem] font-extrabold leading-[1.1] text-white sm:text-[2.1rem]">
-              Lihat keadaan wilayahmu, lapor, dan beri ulasan.
-            </h1>
-            <p className="mt-3 text-sm leading-relaxed text-white/75">
-              Warna peta menunjukkan tingkat kerawanan kasar dua belas bulan terakhir. Ketuk wilayah
-              untuk melihat angkanya.
-            </p>
-            <div className="mt-5 flex flex-col gap-2 sm:flex-row md:flex-col">
-              <Link href="/lapor" className="warga-btn warga-btn-amber">
-                Lapor kejadian
-              </Link>
-              <a href="tel:110" className="warga-btn warga-btn-danger">
-                Darurat · 110
-              </a>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              <Link href="/lacak" className="font-semibold text-white/85 hover:text-white">
-                Lacak laporan →
-              </Link>
-              <Link
-                href="/lacak?tab=kendaraan"
-                className="font-semibold text-white/85 hover:text-white"
-              >
-                Cek kendaraan bekas →
-              </Link>
-            </div>
-          </div>
-          <div className="m-2 rounded-2xl bg-white p-3 md:col-span-3 md:m-3 md:p-5">
-            {summary ? (
-              <PublicMap level="kecamatan" data={data} hrefPrefix="/peta?kecamatan=" />
-            ) : (
-              <p className="p-6 text-center text-sm text-ink-muted">Peta belum dapat dimuat.</p>
-            )}
-            <Legend summary={summary} />
-          </div>
-        </div>
-      </section>
+    <div className="space-y-6">
+      <MapCanvas summary={summary} imbauan={imbauan} />
 
       <Reveal>
-        <section className="grid gap-4 md:grid-cols-2">
-          <div className="warga-card p-5">
-            <div className="flex items-baseline justify-between">
-              <h2 className="text-base font-bold text-ink">Imbauan berlaku</h2>
-              <span className="text-xs text-ink-faint">dari Polres</span>
-            </div>
-            {imbauan.length === 0 ? (
-              <p className="mt-3 text-sm text-ink-muted">
-                Tidak ada imbauan khusus saat ini. Tetap waspada dan kunci kendaraan Anda.
-              </p>
-            ) : (
-              <ul className="mt-3 space-y-2.5">
-                {imbauan.slice(0, 3).map((row) => (
-                  <li key={row.code} className="rounded-2xl bg-base-850 px-4 py-3">
-                    <div className="flex flex-wrap items-baseline gap-x-2 text-xs">
-                      <span className="font-semibold text-risk-high">{row.threat_type}</span>
-                      <span className="text-ink-muted">{row.area_text}</span>
-                      {row.time_window ? (
-                        <span className="text-ink-faint">{row.time_window} WIB</span>
-                      ) : null}
-                    </div>
-                    <p className="mt-1 text-sm leading-relaxed text-ink">{row.message}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+        <nav aria-label="Jalan pintas" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Shortcut
+            href="/lacak"
+            title="Lacak laporan"
+            text="Nomor LP dan PIN pelapor"
+            icon="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zm5 11.5L20 20"
+          />
+          <Shortcut
+            href="/lacak?tab=kendaraan"
+            title="Cek kendaraan bekas"
+            text="Plat atau nomor rangka tercatat?"
+            icon="M5 16V9l2-4h10l2 4v7M5 16h14M5 16v2m14-2v2M8 12h.01M16 12h.01"
+          />
+          <Shortcut
+            href="/survey"
+            title="Survey Rasa Aman"
+            text="Nilai kelurahanmu, anonim"
+            icon="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"
+          />
+          <Shortcut
+            href="/peta"
+            title="Peta kelurahan"
+            text="Angka per bulan dan kontak Babin"
+            icon="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5zm0 0v13m6-10.5v13"
+          />
+        </nav>
+      </Reveal>
 
+      <Reveal delay={60}>
+        <section className="grid gap-4 md:grid-cols-2">
           <div className="warga-card p-5">
             <div className="flex items-baseline justify-between">
               <h2 className="text-base font-bold text-ink">Survey Rasa Aman</h2>
@@ -119,9 +75,9 @@ export default async function BerandaWarga() {
             <p className="mt-1 text-xs text-ink-muted">
               Ulasan warga per kelurahan, anonim, seperti ulasan tempat di peta.
             </p>
-            {summary && highlightAreas(summary).length > 0 ? (
+            {highlights.length > 0 ? (
               <ul className="mt-3 divide-y divide-base-800">
-                {highlightAreas(summary).map((area) => (
+                {highlights.map((area) => (
                   <li key={area.kelurahan} className="flex items-center gap-3 py-2.5">
                     <div className="min-w-0 flex-1">
                       <Link
@@ -145,64 +101,89 @@ export default async function BerandaWarga() {
               </p>
             )}
           </div>
+
+          <div className="warga-card p-5">
+            <h2 className="text-base font-bold text-ink">Wilayah dengan kerawanan tinggi</h2>
+            {summary ? (
+              <>
+                <p className="mt-1 text-xs text-ink-muted">
+                  {longMonth(summary.window_from)} – {longMonth(summary.window_to)} · pencurian
+                  kendaraan, pencurian dengan pemberatan, dan dengan kekerasan.
+                </p>
+                {highAreas.length > 0 ? (
+                  <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {highAreas.map((area) => (
+                      <li key={area.kelurahan}>
+                        <Link
+                          href={`/peta?kecamatan=${encodeURIComponent(area.kecamatan)}&kelurahan=${encodeURIComponent(area.kelurahan)}`}
+                          className="warga-row"
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-semibold text-ink">
+                              {area.kelurahan}
+                            </span>
+                            <span className="text-xs text-ink-faint">{area.kecamatan}</span>
+                          </span>
+                          <LevelBadge level={area.level} />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-3 text-sm text-ink-muted">
+                    Tidak ada kelurahan bertingkat tinggi pada rentang ini.
+                  </p>
+                )}
+                <p className="mt-3 text-[11px] leading-relaxed text-ink-faint">{summary.basis}</p>
+              </>
+            ) : (
+              <p className="mt-3 text-sm text-ink-muted">
+                Ringkasan wilayah belum dapat dimuat. Coba lagi beberapa saat.
+              </p>
+            )}
+          </div>
         </section>
       </Reveal>
-
-      {summary ? (
-        <Reveal delay={60}>
-          <section className="warga-card p-5">
-            <h2 className="text-base font-bold text-ink">Wilayah dengan kerawanan tinggi</h2>
-            <p className="mt-1 text-xs text-ink-muted">
-              {longMonth(summary.window_from)} – {longMonth(summary.window_to)} · tiga jenis
-              kejahatan: pencurian kendaraan, pencurian dengan pemberatan, dan dengan kekerasan.
-            </p>
-            <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {summary.areas
-                .filter((area) => area.level === "TINGGI")
-                .sort((a, b) => b.total - a.total)
-                .slice(0, 6)
-                .map((area) => (
-                  <li key={area.kelurahan}>
-                    <Link
-                      href={`/peta?kecamatan=${encodeURIComponent(area.kecamatan)}&kelurahan=${encodeURIComponent(area.kelurahan)}`}
-                      className="flex items-center justify-between rounded-2xl bg-base-850 px-4 py-3 transition hover:bg-base-800"
-                    >
-                      <span>
-                        <span className="block text-sm font-semibold text-ink">
-                          {area.kelurahan}
-                        </span>
-                        <span className="text-xs text-ink-faint">{area.kecamatan}</span>
-                      </span>
-                      <LevelBadge level={area.level} />
-                    </Link>
-                  </li>
-                ))}
-            </ul>
-            <p className="mt-3 text-[11px] leading-relaxed text-ink-faint">{summary.basis}</p>
-          </section>
-        </Reveal>
-      ) : null}
     </div>
   );
 }
 
-function Legend({ summary }: { summary: PublicSummary | null }) {
+/** Jalan pintas: ikon, judul, satu baris penjelas; panah bergeser saat disentuh. */
+function Shortcut({
+  href,
+  title,
+  text,
+  icon,
+}: {
+  href: string;
+  title: string;
+  text: string;
+  icon: string;
+}) {
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-xs text-ink-muted">
-      <span className="inline-flex items-center gap-1.5">
-        <i className="h-2.5 w-2.5 rounded-full bg-risk-low" /> Rendah
+    <Link href={href} className="warga-tile">
+      <span className="warga-tile-icon" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d={icon} />
+        </svg>
       </span>
-      <span className="inline-flex items-center gap-1.5">
-        <i className="h-2.5 w-2.5 rounded-full bg-risk-moderate" /> Sedang
+      <span className="min-w-0">
+        <span className="block text-sm font-bold text-ink">{title}</span>
+        <span className="block text-xs text-ink-muted">{text}</span>
       </span>
-      <span className="inline-flex items-center gap-1.5">
-        <i className="h-2.5 w-2.5 rounded-full bg-risk-high" /> Tinggi
+      <span className="warga-tile-arrow" aria-hidden="true">
+        →
       </span>
-      {summary ? (
-        <span className="ml-auto text-ink-faint">
-          {longMonth(summary.window_from)} – {longMonth(summary.window_to)}
-        </span>
-      ) : null}
-    </div>
+    </Link>
   );
 }

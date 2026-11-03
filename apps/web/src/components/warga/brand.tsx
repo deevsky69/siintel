@@ -21,12 +21,12 @@ export function PolriEmblem({ size = 36, className = "" }: { size?: number; clas
 /**
  * "Polri bersama masyarakat", dibuat terlihat: lambang di tengah, dua lingkaran warga
  * mengelilinginya perlahan. Sekadar hiasan bagi pembaca layar (aria-hidden), lambangnya
- * sendiri tetap bergambar.
+ * sendiri tetap bergambar. `light` untuk latar terang (titik dan lingkaran biru malam).
  */
-export function BersamaRing({ size = 168 }: { size?: number }) {
+export function BersamaRing({ size = 168, light = false }: { size?: number; light?: boolean }) {
   const dots = [0, 60, 120, 180, 240, 300];
   return (
-    <div className="warga-ring" style={{ height: size, width: size }}>
+    <div className={`warga-ring${light ? " is-light" : ""}`} style={{ height: size, width: size }}>
       <div className="warga-ring-orbit" aria-hidden="true">
         {dots.map((deg, index) => (
           <span
