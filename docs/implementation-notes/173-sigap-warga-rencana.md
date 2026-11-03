@@ -138,3 +138,37 @@ refero.design, dan "elemen yang ada transisinya".
   tampil sama seperti keputusan 2 November (tingkat kasar, imbauan terbit, survey).
 - Test: `map-canvas.test.tsx` (chip meredupkan dan melepas, kartu kecil saat fokus, keadaan
   tanpa ringkasan); `publik.test.tsx` tetap; 417 test web lulus; `next build` berhasil.
+
+## Warna, grid, dan menu bar — rupa papan pengumuman (3 November 2026, malam)
+
+Permintaan pemilik proyek: rombak warna web, grid-gridnya, dan menu bar "jangan terlalu
+seperti AI", dengan referensi Refero.
+
+- **Referensi** (Refero styles/screens): *Art In DUMBO* (panduan galeri lingkungan: kanvas
+  putih, teks tinta, satu aksen fungsional, sudut 2px, flat, blok daftar), *Incident*
+  (garis 1px, sudut tajam, panel peringatan merah pucat), *IKEA Newsroom* (kepala halaman dua
+  baris: strip utilitas lalu logo + tautan teks; grid kartu bergaris dengan panah berlingkar).
+  Ditolak: gradien, bayangan lembut, pil navigasi, tombol berwarna di dalam nav, gading
+  hangat + biru tua + kuning (rupa 2–3 November pagi).
+- **Warna** (`globals.css`, blok `.warga`): kanvas putih, tinta `#141414`, kabut hangat
+  `#F3F1EC` untuk sel sekunder, garis `#DCD7CD` / `#A0988A` / tinta. Tiga keluarga warna saja:
+  tinta (teks, tombol utama, bingkai), **coklat Polri** `#6B4F2A` (strip lembaga, eyebrow,
+  cincin), **sinyal** `#D63A1C` (Darurat, imbauan, tingkat tinggi). Tingkat rendah/sedang
+  tetap hijau/kuning-tua; emas hanya untuk bintang ulasan. Tidak ada gradien dan bayangan.
+- **Menu bar** (`(publik)/layout.tsx`, `components/warga/nav.tsx`): strip tipis coklat Polri
+  berisi nama satuan, "Polri bersama masyarakat", tautan Darurat 110 dan Masuk petugas; lalu
+  masthead putih bergaris bawah tinta: lambang 36 px + wordmark **SIGAP WARGA berkotak**,
+  tautan teks polos di kanan dengan garis bawah 3 px yang "tumbuh" dari kiri saat disentuh dan
+  tetap pada halaman aktif. Ponsel: tab bawah bergaris atas, garis tinta di tab aktif.
+- **Grid** (`.warga-grid` / `.warga-cell`): sel-sel berbagi garis 1 px (gap 1 px di atas latar
+  garis), tanpa radius, tanpa bayangan; setiap bagian diawali `.warga-rubric` (garis atas
+  tinta + judul kapital kecil). Jalan pintas menjadi empat sel dengan panah berlingkar yang
+  terisi tinta dan bergeser saat disentuh; Survey dan wilayah tinggi menjadi dua sel; daftar
+  memakai garis antar-baris. Kanvas peta: kertas kabut bergaris buku besar 24 px, panel putih
+  bersekat garis tinta (bukan kartu mengambang), tag saring persegi, keterangan warna persegi.
+- Halaman warga lain ikut berubah lewat token dan kelas bersama (`warga-card`, `warga-btn`);
+  `rounded-2xl/xl` di `/peta`, `/lacak`, `/survey` diganti `rounded-sm`; `LevelBadge` persegi.
+- Transisi tetap: panel meluncur, tag/poligon, kartu kecil, imbauan bergiliran, reveal, rute,
+  orbit cincin; ditambah garis bawah nav dan panah sel. Semua mati pada reduced-motion.
+- Verifikasi: 417 test web, `tsc`, `biome`, `next build` bersih. Tangkapan layar tetap tidak
+  bisa dibuat di mesin ini.

@@ -222,43 +222,52 @@
 }
 
 /* ------------------------------------------------------------------------------------------
-   SIGAP WARGA — tema sisi masyarakat (2 November 2026).
+   SIGAP WARGA — tema sisi masyarakat (2 November 2026; rupa papan pengumuman 3 November).
 
-   Dasbor warga memakai rupa yang SENGAJA berbeda dari sisi kepolisian (/ops): terang,
-   hangat, lapang, tanpa huruf teknis. Token yang sama (surface/text/accent/risk) didefinisikan
-   ulang di dalam pembungkus `.warga`, sehingga komponen Tailwind bekerja apa adanya, tetapi
-   tidak terpengaruh pengalih tema gelap/terang milik /ops (`.dark .warga` ikut ditimpa).
+   Dasbor warga memakai rupa yang SENGAJA berbeda dari sisi kepolisian (/ops): kanvas putih,
+   teks hitam tinta, garis-garis 1px yang membentuk sel seperti papan pengumuman atau koran
+   lokal. Referensi (refero.design): Art In DUMBO (panduan galeri: putih, tinta, satu aksen,
+   sudut 2px, flat), Incident (garis 1px, panel peringatan merah pucat), IKEA Newsroom (kepala
+   halaman dua baris, tautan teks, grid kartu bergaris dengan panah berlingkar).
+
+   Warna hanya tiga keluarga: tinta, coklat Polri (lembaga — strip, garis aktif, eyebrow),
+   dan sinyal merah-jingga (darurat, imbauan, tingkat tinggi). Tidak ada gradien, bayangan,
+   atau pil. Token yang sama (surface/text/accent/risk) didefinisikan ulang di dalam
+   pembungkus `.warga`, sehingga komponen Tailwind bekerja apa adanya, tetapi tidak
+   terpengaruh pengalih tema gelap/terang milik /ops (`.dark .warga` ikut ditimpa).
    ------------------------------------------------------------------------------------------ */
 .warga,
 .dark .warga {
   color-scheme: light;
 
-  --surface-app: 247 245 240; /* gading hangat */
+  --surface-app: 255 255 255; /* kanvas putih */
   --surface-panel: 255 255 255;
-  --surface-inset: 241 238 231;
-  --line: 226 222 212;
-  --line-strong: 203 198 186;
-  --line-stronger: 170 165 152;
+  --surface-inset: 243 241 236; /* kabut hangat: sel sekunder, latar tag */
+  --line: 220 215 205; /* garis 1px */
+  --line-strong: 160 152 138;
+  --line-stronger: 20 20 20; /* bingkai tinta */
 
-  --text: 22 32 56; /* biru malam, 14:1 di atas panel */
-  --text-muted: 84 96 122; /* 6,1:1 */
-  --text-faint: 118 128 150; /* 4,6:1 */
+  --text: 20 20 20; /* tinta */
+  --text-muted: 82 78 70; /* 7,5:1 */
+  --text-faint: 118 112 100; /* 4,7:1 */
 
-  --accent: 24 58 112; /* biru tua Polri */
-  --accent-soft: 41 88 168;
-  --accent-deep: 16 40 80;
+  --accent: 20 20 20; /* tindakan utama: tinta, bukan biru */
+  --accent-soft: 107 79 42; /* coklat Polri: lembaga */
+  --accent-deep: 76 55 28;
 
-  /* tingkat kerawanan kasar: rendah / sedang / tinggi — tiga warna saja */
-  --risk-low: 18 120 86;
-  --risk-moderate: 196 110 10;
-  --risk-high: 184 30 52;
-  --risk-critical: 184 30 52;
+  /* tingkat kerawanan kasar: rendah / sedang / tinggi — tinggi memakai warna sinyal */
+  --risk-low: 47 122 87;
+  --risk-moderate: 196 122 20;
+  --risk-high: 214 58 28;
+  --risk-critical: 214 58 28;
 
-  --warga-amber: 243 178 10; /* sentuhan kuning Polri untuk aksen kecil */
-  --glow-a: rgba(24, 58, 112, 0.06);
-  --glow-b: rgba(243, 178, 10, 0.08);
-  --shadow-panel: 0 1px 2px rgba(22, 32, 56, 0.06), 0 12px 32px -16px rgba(22, 32, 56, 0.18);
-  --shadow-glow: 0 0 0 0 transparent;
+  --warga-polri: 107 79 42;
+  --warga-signal: 214 58 28;
+  --warga-amber: 212 160 23; /* emas: bintang ulasan saja */
+  --glow-a: transparent;
+  --glow-b: transparent;
+  --shadow-panel: none;
+  --shadow-glow: none;
 
   font-family: var(--font-sans), system-ui, sans-serif;
 }
@@ -266,62 +275,290 @@
   font-family: var(--font-sans), system-ui, sans-serif;
   letter-spacing: -0.01em;
 }
+.warga h1,
+.warga h2,
+.warga .font-display {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.015em;
+}
+
+/* --- kepala halaman: strip lembaga + masthead -------------------------------------------- */
+.warga .warga-strip {
+  background: rgb(var(--warga-polri));
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.45rem 0;
+}
+.warga .warga-strip-sep {
+  opacity: 0.5;
+  margin: 0 0.15rem;
+}
+.warga .warga-strip-link {
+  color: white;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(255, 255, 255, 0.4);
+  transition: text-decoration-color 0.2s ease;
+}
+.warga .warga-strip-link:hover {
+  text-decoration-color: white;
+}
+.warga .warga-masthead {
+  background: rgb(var(--surface-panel));
+  border-bottom: 1px solid rgb(var(--line-stronger));
+}
+.warga .warga-wordmark {
+  display: inline-block;
+  border: 1.5px solid rgb(var(--line-stronger));
+  border-radius: 2px;
+  padding: 0.3rem 0.5rem;
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: rgb(var(--text));
+}
+.warga .warga-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgb(var(--text-muted));
+  transition: color 0.2s ease;
+}
+.warga .warga-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  bottom: -1px;
+  height: 3px;
+  background: rgb(var(--line-stronger));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.warga .warga-nav-link:hover {
+  color: rgb(var(--text));
+}
+.warga .warga-nav-link:hover::after {
+  transform: scaleX(1);
+  background: rgb(var(--line-strong));
+}
+.warga .warga-nav-link[aria-current="page"] {
+  color: rgb(var(--text));
+  font-weight: 600;
+}
+.warga .warga-nav-link[aria-current="page"]::after {
+  transform: scaleX(1);
+  background: rgb(var(--line-stronger));
+}
+.warga .warga-footer {
+  border-top: 1px solid rgb(var(--line-stronger));
+  margin-top: 2rem;
+}
+.warga .warga-link {
+  color: rgb(var(--text));
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgb(var(--line-strong));
+  transition: text-decoration-color 0.2s ease;
+}
+.warga .warga-link:hover {
+  text-decoration-color: rgb(var(--text));
+}
+
+/* --- navigasi bawah (ponsel) -------------------------------------------------------------- */
+.warga .warga-tabbar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-top: 1px solid rgb(var(--line-stronger));
+  background: rgb(var(--surface-panel));
+}
+.warga .warga-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgb(var(--text-faint));
+  transition: color 0.2s ease;
+}
+.warga .warga-tab[aria-current="page"] {
+  color: rgb(var(--text));
+}
+.warga .warga-tab[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgb(var(--line-stronger));
+}
+
+/* --- grid bergaris: sel-sel berbagi garis 1px ------------------------------------------- */
+.warga .warga-rubric {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-top: 1px solid rgb(var(--line-stronger));
+  padding-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--text));
+}
+.warga .warga-grid {
+  display: grid;
+  gap: 1px;
+  border: 1px solid rgb(var(--line-strong));
+  background: rgb(var(--line));
+  border-radius: 2px;
+}
+.warga .warga-cell {
+  background: rgb(var(--surface-panel));
+  padding: 1.1rem 1.15rem 1.25rem;
+  min-width: 0;
+}
+.warga .warga-cell-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+}
 .warga .warga-card {
   background: rgb(var(--surface-panel));
-  border: 1px solid rgb(var(--line));
-  border-radius: 1.25rem;
-  box-shadow: var(--shadow-panel);
+  border: 1px solid rgb(var(--line-strong));
+  border-radius: 2px;
 }
+.warga .warga-list {
+  border-top: 1px solid rgb(var(--line));
+}
+.warga .warga-list > li {
+  border-bottom: 1px solid rgb(var(--line));
+}
+.warga .warga-empty {
+  border: 1px dashed rgb(var(--line-strong));
+  border-radius: 2px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.85rem;
+  color: rgb(var(--text-muted));
+}
+
+/* sel jalan pintas: panah berlingkar terisi tinta saat disentuh */
+.warga .warga-tile {
+  position: relative;
+  display: block;
+  padding-bottom: 3.4rem;
+  transition: background-color 0.25s ease;
+}
+.warga .warga-tile:hover,
+.warga .warga-tile:focus-visible {
+  background: rgb(var(--surface-inset));
+}
+.warga .warga-tile-arrow {
+  position: absolute;
+  left: 1.15rem;
+  bottom: 1.1rem;
+  display: grid;
+  place-items: center;
+  height: 2rem;
+  width: 2rem;
+  border: 1.5px solid rgb(var(--line-stronger));
+  border-radius: 999px;
+  color: rgb(var(--text));
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.warga .warga-tile:hover .warga-tile-arrow,
+.warga .warga-tile:focus-visible .warga-tile-arrow {
+  background: rgb(var(--line-stronger));
+  color: white;
+  transform: translateX(4px);
+}
+
+/* baris wilayah di dalam daftar */
+.warga .warga-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.25rem;
+  transition:
+    background-color 0.2s ease,
+    padding-left 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.warga .warga-row:hover {
+  background: rgb(var(--surface-inset));
+  padding-left: 0.6rem;
+}
+
+/* --- tombol: persegi, flat ---------------------------------------------------------------- */
 .warga .warga-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  padding: 0.8rem 1.25rem;
+  border-radius: 2px;
+  padding: 0.75rem 1.1rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  border: 1.5px solid transparent;
   transition:
-    background-color 0.15s ease,
-    transform 0.15s ease;
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 .warga .warga-btn:active {
-  transform: scale(0.98);
+  transform: translateY(1px);
 }
 .warga .warga-btn-primary {
-  background: rgb(var(--accent));
+  background: rgb(var(--line-stronger));
+  border-color: rgb(var(--line-stronger));
   color: white;
 }
 .warga .warga-btn-primary:hover {
   background: rgb(var(--accent-deep));
+  border-color: rgb(var(--accent-deep));
 }
 .warga .warga-btn-danger {
-  background: rgb(var(--risk-high));
+  background: rgb(var(--warga-signal));
+  border-color: rgb(var(--warga-signal));
   color: white;
+}
+.warga .warga-btn-danger:hover {
+  background: rgb(184 44 18);
+  border-color: rgb(184 44 18);
 }
 .warga .warga-btn-ghost {
   background: rgb(var(--surface-panel));
-  color: rgb(var(--accent));
-  border: 1px solid rgb(var(--line-strong));
+  color: rgb(var(--text));
+  border-color: rgb(var(--line-stronger));
+}
+.warga .warga-btn-ghost:hover {
+  background: rgb(var(--surface-inset));
+}
+.warga .warga-btn-amber {
+  background: rgb(var(--line-stronger));
+  border-color: rgb(var(--line-stronger));
+  color: white;
 }
 
-/* ------------------------------------------------------------------------------------------
-   SIGAP WARGA — rupa dan gerak (3 November 2026)
-
-   Judul memakai Plus Jakarta Sans. Gerak umum ada di empat tempat dan semuanya punya
-   alasan: (1) isi halaman naik perlahan saat berpindah rute (template.tsx), (2) bagian di
-   bawah lipatan muncul saat digulir (Reveal), (3) poligon peta "digambar" berurutan saat
-   dimuat, (4) lingkaran warga mengelilingi lambang Polri — "Polri bersama masyarakat" yang
-   dibuat terlihat. Gerak khusus beranda ada di blok "kanvas" di bawah. Semua dimatikan bila
-   pengguna meminta gerak dikurangi.
-   ------------------------------------------------------------------------------------------ */
-.warga h1,
-.warga h2,
-.warga .font-display {
-  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
-  letter-spacing: -0.02em;
-}
-
+/* --- gerak umum --------------------------------------------------------------------------- */
 @keyframes warga-rise {
   from {
     opacity: 0;
@@ -388,13 +625,13 @@
   animation: none;
 }
 
-/* (3) peta: poligon mengembang satu per satu, lalu terangkat saat disentuh */
+/* (3) peta: poligon mengembang satu per satu, lalu terang saat disentuh */
 .warga .warga-poly {
   transform-box: fill-box;
   transform-origin: center;
   animation: warga-poly 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   transition:
-    fill-opacity 0.2s ease,
+    fill-opacity 0.35s ease,
     filter 0.2s ease;
 }
 .warga a:hover > .warga-poly,
@@ -418,7 +655,7 @@
 .warga .warga-ring-orbit.is-inner {
   inset: 14%;
   border-style: solid;
-  border-color: rgba(243, 178, 10, 0.35);
+  border-color: rgba(212, 160, 23, 0.35);
   animation: warga-orbit-back 32s linear infinite;
 }
 .warga .warga-ring-dot {
@@ -428,87 +665,70 @@
   height: 10px;
   width: 10px;
   border-radius: 999px;
-  background: rgb(247 245 240);
-  box-shadow: 0 0 0 3px rgba(247, 245, 240, 0.18);
+  background: rgb(255 255 255);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
 }
 .warga .warga-ring-dot.is-amber {
   background: rgb(var(--warga-amber));
-  box-shadow: 0 0 0 3px rgba(243, 178, 10, 0.22);
+  box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.22);
 }
 .warga .warga-ring-emblem {
   position: relative;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.94);
   padding: 10%;
-  box-shadow:
-    0 0 0 6px rgba(255, 255, 255, 0.08),
-    0 24px 48px -20px rgba(0, 0, 0, 0.5);
 }
 .warga .warga-ring.is-light .warga-ring-orbit {
-  border-color: rgba(24, 58, 112, 0.25);
+  border-color: rgba(20, 20, 20, 0.35);
 }
 .warga .warga-ring.is-light .warga-ring-orbit.is-inner {
-  border-color: rgba(243, 178, 10, 0.55);
+  border-color: rgba(107, 79, 42, 0.6);
 }
 .warga .warga-ring.is-light .warga-ring-dot {
-  background: rgb(var(--accent));
-  box-shadow: 0 0 0 3px rgba(24, 58, 112, 0.14);
+  background: rgb(var(--line-stronger));
+  box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.08);
 }
 .warga .warga-ring.is-light .warga-ring-dot.is-amber {
-  background: rgb(var(--warga-amber));
-  box-shadow: 0 0 0 3px rgba(243, 178, 10, 0.25);
+  background: rgb(var(--warga-polri));
+  box-shadow: 0 0 0 3px rgba(107, 79, 42, 0.18);
 }
 .warga .warga-ring.is-light .warga-ring-emblem {
-  box-shadow:
-    0 0 0 4px rgba(24, 58, 112, 0.06),
-    0 12px 24px -12px rgba(22, 32, 56, 0.35);
+  background: white;
 }
 
 /* ------------------------------------------------------------------------------------------
-   Beranda — kanvas peta dengan panel di atasnya (3 November 2026)
+   Beranda — kanvas peta dengan panel di sisinya (3 November 2026)
 
-   Mengikuti pola dasbor peringatan lingkungan: peta memenuhi bidang seperti meja kerja,
-   panel putih "mengambang" di kirinya (chip saring, imbauan, dua tombol). Di ponsel peta di
-   atas dan panel menjadi lembar yang naik dari bawah. Gerak: panel meluncur masuk, chip dan
-   poligon bertransisi saat disaring, kartu kecil muncul di wilayah yang disentuh, kartu
-   imbauan naik bergiliran, panah ubin bergeser saat disentuh.
+   Peta memenuhi bidang seperti meja kerja: kertas kabut dengan garis halus (buku besar),
+   panel putih berbingkai tinta di kirinya (tag saring, imbauan, dua tombol). Di ponsel peta
+   di atas dan panel di bawahnya. Gerak: panel meluncur masuk, tag dan poligon bertransisi
+   saat disaring, kartu kecil muncul di wilayah yang disentuh, kartu imbauan naik bergiliran,
+   panah sel bergeser saat disentuh.
    ------------------------------------------------------------------------------------------ */
 .warga .warga-canvas {
   position: relative;
   display: grid;
   overflow: hidden;
-  border: 1px solid rgb(var(--line));
-  border-radius: 1.75rem;
-  box-shadow: var(--shadow-panel);
+  border: 1px solid rgb(var(--line-stronger));
+  border-radius: 2px;
   background:
-    radial-gradient(70% 60% at 85% 15%, rgba(243, 178, 10, 0.1), transparent 70%),
-    radial-gradient(rgba(22, 32, 56, 0.11) 1px, transparent 1.3px) 0 0 / 18px 18px,
-    rgb(243 241 234);
+    linear-gradient(rgba(20, 20, 20, 0.06) 1px, transparent 1px) 0 0 / 100% 24px,
+    linear-gradient(90deg, rgba(20, 20, 20, 0.06) 1px, transparent 1px) 0 0 / 24px 100%,
+    rgb(var(--surface-inset));
 }
 .warga .warga-canvas-map {
   position: relative;
-  padding: 1rem 0.75rem 2.75rem;
+  padding: 1rem 0.75rem 0.75rem;
 }
 .warga .warga-float {
   position: relative;
   z-index: 2;
-  margin: -1.75rem 0.5rem 0.5rem;
-  border: 1px solid rgb(var(--line));
-  border-radius: 1.5rem;
-  background: rgba(255, 255, 255, 0.96);
-  padding: 0.75rem 1.1rem 1.1rem;
-  box-shadow:
-    0 1px 2px rgba(22, 32, 56, 0.06),
-    0 24px 48px -20px rgba(22, 32, 56, 0.35);
+  margin: 0;
+  border-top: 1px solid rgb(var(--line-stronger));
+  background: rgb(var(--surface-panel));
+  padding: 1rem 1.1rem 1.1rem;
   animation: warga-sheet 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   animation-delay: 120ms;
-}
-.warga .warga-sheet-handle {
-  margin: 0 auto 0.75rem;
-  height: 4px;
-  width: 40px;
-  border-radius: 999px;
-  background: rgb(var(--line-strong));
 }
 @media (min-width: 640px) {
   .warga .warga-canvas {
@@ -521,26 +741,27 @@
     align-content: center;
     padding: 1.25rem 1.25rem 3rem;
   }
+  .warga .warga-float {
+    order: 1;
+    align-self: stretch;
+    border-top: 0;
+    border-right: 1px solid rgb(var(--line-stronger));
+    padding: 1.35rem 1.35rem 1.5rem;
+    animation-name: warga-float;
+  }
   .warga .warga-legend {
     position: absolute;
     left: auto;
-    right: 0.9rem;
+    right: 1rem;
     bottom: 0.9rem;
     margin: 0;
     transform: none;
-  }
-  .warga .warga-float {
-    order: 1;
-    align-self: center;
-    margin: 1.25rem 0 1.25rem 1.25rem;
-    padding: 1.25rem 1.35rem 1.35rem;
-    animation-name: warga-float;
   }
 }
 @keyframes warga-sheet {
   from {
     opacity: 0;
-    transform: translateY(32px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
@@ -550,7 +771,7 @@
 @keyframes warga-float {
   from {
     opacity: 0;
-    transform: translateX(-24px);
+    transform: translateX(-20px);
   }
   to {
     opacity: 1;
@@ -558,41 +779,45 @@
   }
 }
 .warga .warga-eyebrow {
-  color: rgb(var(--accent-soft));
-  font-size: 0.68rem;
+  color: rgb(var(--warga-polri));
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-/* keterangan warna: pil putih — di bawah peta pada ponsel (lembar menutupi sudut bawah),
-   di sudut kanan bawah peta pada layar lebar */
+/* keterangan warna: baris teks dengan kotak kecil — di bawah peta pada ponsel, di sudut
+   kanan bawah peta pada layar lebar */
 .warga .warga-legend {
   display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
   margin: 0.5rem auto 0;
   width: fit-content;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  gap: 0.8rem;
-  border: 1px solid rgb(var(--line));
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  padding: 0.35rem 0.8rem;
+  border: 1px solid rgb(var(--line-strong));
+  border-radius: 2px;
+  background: rgb(var(--surface-panel));
+  padding: 0.35rem 0.7rem;
   font-size: 0.72rem;
   font-weight: 600;
   color: rgb(var(--text-muted));
-  box-shadow: 0 6px 16px -10px rgba(22, 32, 56, 0.4);
 }
 .warga .warga-legend li {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 .warga .warga-legend i {
   height: 0.6rem;
   width: 0.6rem;
-  border-radius: 999px;
+  border-radius: 1px;
+}
+.warga .warga-legend-note {
+  font-weight: 500;
+  color: rgb(var(--text-faint));
 }
 
 /* kartu kecil di wilayah yang disentuh/difokus */
@@ -601,12 +826,11 @@
   z-index: 3;
   min-width: 150px;
   pointer-events: none;
-  transform: translate(-50%, calc(-100% - 18px));
-  border: 1px solid rgb(var(--line));
-  border-radius: 0.9rem;
+  transform: translate(-50%, calc(-100% - 16px));
+  border: 1px solid rgb(var(--line-stronger));
+  border-radius: 2px;
   background: white;
-  padding: 0.55rem 0.7rem;
-  box-shadow: 0 16px 32px -16px rgba(22, 32, 56, 0.45);
+  padding: 0.5rem 0.65rem;
   animation: warga-tip 0.22s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .warga .warga-tip::after {
@@ -617,39 +841,38 @@
   height: 10px;
   width: 10px;
   transform: translateX(-50%) rotate(45deg);
-  border-right: 1px solid rgb(var(--line));
-  border-bottom: 1px solid rgb(var(--line));
+  border-right: 1px solid rgb(var(--line-stronger));
+  border-bottom: 1px solid rgb(var(--line-stronger));
   background: white;
 }
 @keyframes warga-tip {
   from {
     opacity: 0;
-    transform: translate(-50%, calc(-100% - 8px)) scale(0.96);
+    transform: translate(-50%, calc(-100% - 8px));
   }
   to {
     opacity: 1;
-    transform: translate(-50%, calc(-100% - 18px));
+    transform: translate(-50%, calc(-100% - 16px));
   }
 }
 
-/* chip saring tingkat: satu yang ditekan berwarna penuh */
+/* tag saring tingkat: persegi, yang ditekan terisi warnanya */
 .warga .warga-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  border: 1px solid rgb(var(--line-strong));
-  border-radius: 999px;
+  border: 1px solid rgb(var(--line-stronger));
+  border-radius: 2px;
   background: white;
-  padding: 0.3rem 0.7rem 0.3rem 0.6rem;
+  padding: 0.3rem 0.6rem 0.3rem 0.55rem;
   font-size: 0.78rem;
   font-weight: 600;
-  color: rgb(var(--text-muted));
-  --chip: var(--accent);
+  color: rgb(var(--text));
+  --chip: var(--line-stronger);
   transition:
     background-color 0.25s ease,
     color 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+    border-color 0.25s ease;
 }
 .warga .warga-chip.is-tinggi {
   --chip: var(--risk-high);
@@ -663,20 +886,18 @@
 .warga .warga-chip i {
   height: 0.5rem;
   width: 0.5rem;
-  border-radius: 999px;
+  border-radius: 1px;
   background: rgb(var(--chip));
   transition: background-color 0.25s ease;
 }
 .warga .warga-chip b {
-  font-weight: 700;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: rgb(var(--text-faint));
   transition: color 0.25s ease;
 }
 .warga .warga-chip:hover {
-  border-color: rgb(var(--chip));
-  color: rgb(var(--text));
-  transform: translateY(-1px);
+  background: rgb(var(--surface-inset));
 }
 .warga .warga-chip[aria-pressed="true"] {
   border-color: rgb(var(--chip));
@@ -690,172 +911,23 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* kartu imbauan: garis merah di kiri, naik bergiliran setelah panelnya tiba */
+/* kartu imbauan: panel merah pucat dengan garis sinyal di kiri, naik bergiliran */
 .warga .warga-alert {
   position: relative;
-  border-radius: 1rem;
-  background: rgb(var(--surface-inset));
-  padding: 0.7rem 0.9rem 0.7rem 1.1rem;
+  border-radius: 2px;
+  border-left: 3px solid rgb(var(--warga-signal));
+  background: rgb(253 236 231);
+  padding: 0.65rem 0.85rem 0.7rem;
   animation: warga-rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
-.warga .warga-alert::before {
-  content: "";
-  position: absolute;
-  left: 0.45rem;
-  top: 0.8rem;
-  bottom: 0.8rem;
-  width: 3px;
-  border-radius: 999px;
-  background: rgb(var(--risk-high));
-}
-.warga .warga-alert-empty {
-  border: 1px dashed rgb(var(--line-strong));
-  border-radius: 1rem;
-  padding: 0.7rem 0.9rem;
-  font-size: 0.85rem;
-  color: rgb(var(--text-muted));
-}
 
-/* ubin jalan pintas: panah bergeser dan ubin terangkat saat disentuh */
-.warga .warga-tile {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  border: 1px solid rgb(var(--line));
-  border-radius: 1.25rem;
-  background: rgb(var(--surface-panel));
-  padding: 0.9rem 1rem;
-  box-shadow: var(--shadow-panel);
-  transition:
-    transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
-    box-shadow 0.25s ease,
-    border-color 0.25s ease;
-}
-.warga .warga-tile-icon {
-  display: grid;
-  flex: none;
-  height: 2.6rem;
-  width: 2.6rem;
-  place-items: center;
-  border-radius: 0.9rem;
-  background: rgb(var(--accent) / 0.08);
-  color: rgb(var(--accent));
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
-}
-.warga .warga-tile-arrow {
-  margin-left: auto;
-  color: rgb(var(--text-faint));
-  transition:
-    transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
-    color 0.25s ease;
-}
-.warga .warga-tile:hover,
-.warga .warga-tile:focus-visible {
-  border-color: rgb(var(--accent) / 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 18px 32px -18px rgba(22, 32, 56, 0.35);
-}
-.warga .warga-tile:hover .warga-tile-icon {
-  background: rgb(var(--warga-amber));
-  color: rgb(16 40 80);
-}
-.warga .warga-tile:hover .warga-tile-arrow {
-  transform: translateX(4px);
-  color: rgb(var(--accent));
-}
-
-/* baris wilayah di dalam kartu */
-.warga .warga-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  border-radius: 1rem;
-  background: rgb(var(--surface-inset));
-  padding: 0.7rem 0.9rem;
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.warga .warga-row:hover {
-  background: rgb(var(--line));
-  transform: translateX(2px);
-}
-
-.warga .warga-btn-amber {
-  background: rgb(var(--warga-amber));
-  color: rgb(16 40 80);
-}
-.warga .warga-btn-amber:hover {
-  background: rgb(255 196 40);
-}
-.warga .warga-btn {
-  transition:
-    background-color 0.15s ease,
-    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
-    box-shadow 0.2s ease;
-}
-.warga .warga-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px -14px rgba(22, 32, 56, 0.6);
-}
-.warga .warga-btn:active {
-  transform: scale(0.98);
-  box-shadow: none;
-}
-
-/* navigasi: pil aktif */
-.warga .warga-nav-link {
-  border-radius: 999px;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: rgb(var(--text-muted));
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
-}
-.warga .warga-nav-link:hover {
-  background: rgb(var(--surface-inset));
-  color: rgb(var(--text));
-}
-.warga .warga-nav-link[aria-current="page"] {
-  background: rgb(var(--accent));
-  color: white;
-}
-.warga .warga-tab {
-  position: relative;
-  color: rgb(var(--text-faint));
-  transition: color 0.2s ease;
-}
-.warga .warga-tab[aria-current="page"] {
-  color: rgb(var(--accent));
-}
-.warga .warga-tab[aria-current="page"]::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  height: 3px;
-  width: 28px;
-  transform: translateX(-50%);
-  border-radius: 0 0 999px 999px;
-  background: rgb(var(--warga-amber));
-}
-
-.warga .warga-card {
-  transition:
-    transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
-    box-shadow 0.25s ease;
-}
+/* --- fokus & gerak dikurangi ------------------------------------------------------------- */
 .warga a:focus-visible,
 .warga button:focus-visible,
 .warga input:focus-visible,
 .warga select:focus-visible,
 .warga textarea:focus-visible {
-  outline: 3px solid rgb(var(--warga-amber));
+  outline: 2px solid rgb(var(--line-stronger));
   outline-offset: 2px;
 }
 
@@ -868,19 +940,21 @@
   .warga .warga-alert {
     animation: none;
   }
-  .warga .warga-tile:hover,
-  .warga .warga-chip:hover,
-  .warga .warga-row:hover,
-  .warga .warga-tile:hover .warga-tile-arrow {
-    transform: none;
-  }
   .warga .warga-reveal {
     opacity: 1;
     transform: none;
     transition: none;
     animation: none;
   }
-  .warga .warga-btn:hover {
+  .warga .warga-tile:hover .warga-tile-arrow,
+  .warga .warga-nav-link::after {
+    transition: none;
     transform: none;
+  }
+  .warga .warga-nav-link[aria-current="page"]::after {
+    transform: scaleX(1);
+  }
+  .warga .warga-row:hover {
+    padding-left: 0.25rem;
   }
 }

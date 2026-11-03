@@ -106,11 +106,11 @@ export default async function PetaWarga({
                 <LevelBadge level={area.level} size="lg" />
               </div>
               <dl className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-base-850 px-4 py-3">
+                <div className="rounded-sm bg-base-850 px-4 py-3">
                   <dt className="text-xs text-ink-muted">Kejadian 12 bulan</dt>
                   <dd className="text-2xl font-bold tabular-nums text-ink">{area.total}</dd>
                 </div>
-                <div className="rounded-2xl bg-base-850 px-4 py-3">
+                <div className="rounded-sm bg-base-850 px-4 py-3">
                   <dt className="text-xs text-ink-muted">Rasa aman warga</dt>
                   <dd className="flex items-center gap-1.5">
                     <Stars value={area.rating} size="text-sm" />
@@ -134,7 +134,7 @@ export default async function PetaWarga({
                 <MonthBars months={summary.months} values={area.by_month} />
               </div>
               {babin ? (
-                <div className="mt-4 rounded-2xl bg-base-850 px-4 py-3">
+                <div className="mt-4 rounded-sm bg-base-850 px-4 py-3">
                   <p className="text-xs text-ink-muted">
                     Babinkamtibmas kelurahan{babin.is_dummy ? " · data peragaan" : ""}
                   </p>

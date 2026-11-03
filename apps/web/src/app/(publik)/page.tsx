@@ -11,11 +11,12 @@ export const dynamic = "force-dynamic";
 /**
  * Beranda SIGAP WARGA (2 November 2026; dirombak 3 November 2026).
  *
- * Susunan: kanvas peta dengan panel keadaan wilayah di atasnya (MapCanvas), empat jalan
- * pintas, lalu Survey Rasa Aman dan wilayah berkerawanan tinggi. Yang tampil: imbauan yang
- * sudah diterbitkan, tingkat kerawanan kasar per kecamatan, dan sorotan survey. Tidak ada
- * skor, prediksi, maupun titik kejadian: keputusan pemilik proyek, "sederhana saja untuk
- * masyarakat".
+ * Susunan papan pengumuman: kanvas peta dengan panel keadaan wilayah (MapCanvas), lalu
+ * grid bergaris berisi empat jalan pintas, lalu grid dua sel: Survey Rasa Aman dan wilayah
+ * berkerawanan tinggi. Setiap bagian diawali kepala bergaris, seperti rubrik di koran.
+ * Yang tampil: imbauan yang sudah diterbitkan, tingkat kerawanan kasar per kecamatan, dan
+ * sorotan survey. Tidak ada skor, prediksi, maupun titik kejadian: keputusan pemilik
+ * proyek, "sederhana saja untuk masyarakat".
  */
 export default async function BerandaWarga() {
   const [summary, imbauan] = await Promise.all([
@@ -31,58 +32,61 @@ export default async function BerandaWarga() {
     : [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <MapCanvas summary={summary} imbauan={imbauan} />
 
       <Reveal>
-        <nav aria-label="Jalan pintas" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Shortcut
-            href="/lacak"
-            title="Lacak laporan"
-            text="Nomor LP dan PIN pelapor"
-            icon="M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zm5 11.5L20 20"
-          />
-          <Shortcut
-            href="/lacak?tab=kendaraan"
-            title="Cek kendaraan bekas"
-            text="Plat atau nomor rangka tercatat?"
-            icon="M5 16V9l2-4h10l2 4v7M5 16h14M5 16v2m14-2v2M8 12h.01M16 12h.01"
-          />
-          <Shortcut
-            href="/survey"
-            title="Survey Rasa Aman"
-            text="Nilai kelurahanmu, anonim"
-            icon="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"
-          />
-          <Shortcut
-            href="/peta"
-            title="Peta kelurahan"
-            text="Angka per bulan dan kontak Babin"
-            icon="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5zm0 0v13m6-10.5v13"
-          />
-        </nav>
+        <section aria-labelledby="pintas">
+          <h2 id="pintas" className="warga-rubric">
+            Layanan
+          </h2>
+          <nav aria-label="Jalan pintas" className="warga-grid sm:grid-cols-2 lg:grid-cols-4">
+            <Shortcut
+              href="/lacak"
+              title="Lacak laporan"
+              text="Masukkan nomor LP dan PIN pelapor untuk melihat tahap penanganan."
+            />
+            <Shortcut
+              href="/lacak?tab=kendaraan"
+              title="Cek kendaraan bekas"
+              text="Plat atau nomor rangka: tercatat dalam laporan atau tidak."
+            />
+            <Shortcut
+              href="/survey"
+              title="Survey Rasa Aman"
+              text="Nilai kelurahanmu 1–5 dan tulis ulasan, tanpa nama."
+            />
+            <Shortcut
+              href="/peta"
+              title="Peta kelurahan"
+              text="Angka per bulan, tiga jenis kejahatan, dan kontak Babinkamtibmas."
+            />
+          </nav>
+        </section>
       </Reveal>
 
       <Reveal delay={60}>
-        <section className="grid gap-4 md:grid-cols-2">
-          <div className="warga-card p-5">
-            <div className="flex items-baseline justify-between">
-              <h2 className="text-base font-bold text-ink">Survey Rasa Aman</h2>
-              <Link href="/survey" className="text-xs font-semibold text-accent-soft">
-                Beri ulasan →
+        <div className="warga-grid md:grid-cols-2">
+          <section className="warga-cell" aria-labelledby="survey">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 id="survey" className="warga-cell-title">
+                Survey Rasa Aman
+              </h2>
+              <Link href="/survey" className="warga-link text-xs">
+                Beri ulasan
               </Link>
             </div>
             <p className="mt-1 text-xs text-ink-muted">
-              Ulasan warga per kelurahan, anonim, seperti ulasan tempat di peta.
+              Ulasan warga per kelurahan, anonim, tayang setelah dimoderasi.
             </p>
             {highlights.length > 0 ? (
-              <ul className="mt-3 divide-y divide-base-800">
+              <ul className="warga-list mt-4">
                 {highlights.map((area) => (
                   <li key={area.kelurahan} className="flex items-center gap-3 py-2.5">
                     <div className="min-w-0 flex-1">
                       <Link
                         href={`/survey?kelurahan=${encodeURIComponent(area.kelurahan)}`}
-                        className="block truncate text-sm font-semibold text-ink"
+                        className="warga-link block truncate text-sm font-semibold"
                       >
                         {area.kelurahan}
                       </Link>
@@ -96,14 +100,16 @@ export default async function BerandaWarga() {
                 ))}
               </ul>
             ) : (
-              <p className="mt-3 text-sm text-ink-muted">
+              <p className="warga-empty mt-4">
                 Belum ada ulasan yang tayang. Jadilah yang pertama menilai kelurahan Anda.
               </p>
             )}
-          </div>
+          </section>
 
-          <div className="warga-card p-5">
-            <h2 className="text-base font-bold text-ink">Wilayah dengan kerawanan tinggi</h2>
+          <section className="warga-cell" aria-labelledby="tinggi">
+            <h2 id="tinggi" className="warga-cell-title">
+              Wilayah dengan kerawanan tinggi
+            </h2>
             {summary ? (
               <>
                 <p className="mt-1 text-xs text-ink-muted">
@@ -111,7 +117,7 @@ export default async function BerandaWarga() {
                   kendaraan, pencurian dengan pemberatan, dan dengan kekerasan.
                 </p>
                 {highAreas.length > 0 ? (
-                  <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <ul className="warga-list mt-4">
                     {highAreas.map((area) => (
                       <li key={area.kelurahan}>
                         <Link
@@ -130,59 +136,42 @@ export default async function BerandaWarga() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-sm text-ink-muted">
+                  <p className="warga-empty mt-4">
                     Tidak ada kelurahan bertingkat tinggi pada rentang ini.
                   </p>
                 )}
-                <p className="mt-3 text-[11px] leading-relaxed text-ink-faint">{summary.basis}</p>
+                <p className="mt-4 text-[11px] leading-relaxed text-ink-faint">{summary.basis}</p>
               </>
             ) : (
-              <p className="mt-3 text-sm text-ink-muted">
+              <p className="warga-empty mt-4">
                 Ringkasan wilayah belum dapat dimuat. Coba lagi beberapa saat.
               </p>
             )}
-          </div>
-        </section>
+          </section>
+        </div>
       </Reveal>
     </div>
   );
 }
 
-/** Jalan pintas: ikon, judul, satu baris penjelas; panah bergeser saat disentuh. */
-function Shortcut({
-  href,
-  title,
-  text,
-  icon,
-}: {
-  href: string;
-  title: string;
-  text: string;
-  icon: string;
-}) {
+/** Sel jalan pintas: judul, satu kalimat penjelas, panah berlingkar yang terisi saat disentuh. */
+function Shortcut({ href, title, text }: { href: string; title: string; text: string }) {
   return (
-    <Link href={href} className="warga-tile">
-      <span className="warga-tile-icon" aria-hidden="true">
+    <Link href={href} className="warga-cell warga-tile">
+      <span className="block text-base font-semibold leading-snug text-ink">{title}</span>
+      <span className="mt-1.5 block text-sm leading-relaxed text-ink-muted">{text}</span>
+      <span className="warga-tile-arrow" aria-hidden="true">
         <svg
           viewBox="0 0 24 24"
-          width="22"
-          height="22"
+          width="16"
+          height="16"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          strokeWidth="2"
           aria-hidden="true"
         >
-          <path d={icon} />
+          <path d="M5 12h14m-6-6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-      </span>
-      <span className="min-w-0">
-        <span className="block text-sm font-bold text-ink">{title}</span>
-        <span className="block text-xs text-ink-muted">{text}</span>
-      </span>
-      <span className="warga-tile-arrow" aria-hidden="true">
-        →
       </span>
     </Link>
   );

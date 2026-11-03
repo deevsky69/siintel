@@ -17,13 +17,14 @@ export type ImbauanRow = {
 const LEVELS: AreaLevel[] = ["TINGGI", "SEDANG", "RENDAH"];
 
 /**
- * Kanvas beranda SIGAP WARGA (3 November 2026) — peta sebagai meja kerja, panel di atasnya.
+ * Kanvas beranda SIGAP WARGA (3 November 2026) — peta sebagai meja kerja, panel di sisinya.
  *
- * Polanya mengikuti dasbor peringatan lingkungan (peta penuh + panel mengambang berisi
- * chip saring dan kartu peringatan; di ponsel, peta di atas dan lembar informasi naik dari
- * bawah). Yang berpindah tangan ke komponen klien ini hanya keadaan tampilan: chip tingkat
- * yang dipilih meredupkan wilayah lain, dan wilayah yang disentuh memunculkan kartu kecil.
- * Datanya tetap datang dari Server Component (`page.tsx`).
+ * Polanya mengikuti dasbor peringatan lingkungan (peta penuh + panel berisi chip saring dan
+ * kartu peringatan; di ponsel, peta di atas dan panel di bawahnya). Rupa papan pengumuman:
+ * kanvas kertas bergaris halus, panel putih berbingkai tinta 1px, tag saring persegi, kartu
+ * imbauan berlatar merah pucat dengan garis sinyal di kiri. Yang berpindah tangan ke
+ * komponen klien ini hanya keadaan tampilan: tag yang dipilih meredupkan wilayah lain, dan
+ * wilayah yang disentuh memunculkan kartu kecil. Datanya datang dari Server Component.
  */
 export function MapCanvas({
   summary,
@@ -79,31 +80,26 @@ export function MapCanvas({
             <li>
               <i className="bg-risk-high" /> Tinggi
             </li>
+            <li className="warga-legend-note">
+              {longMonth(summary.window_from)} – {longMonth(summary.window_to)}
+            </li>
           </ul>
         ) : null}
       </div>
 
       <div className="warga-float">
-        <div className="warga-sheet-handle sm:hidden" aria-hidden="true" />
         <div className="flex items-center gap-3">
-          <BersamaRing size={64} light />
+          <BersamaRing size={60} light />
           <div className="min-w-0">
-            <p className="warga-eyebrow">Polres Metro Jakarta Selatan</p>
-            <h1 className="mt-0.5 text-[1.35rem] font-extrabold leading-tight text-ink">
+            <p className="warga-eyebrow">Keadaan wilayah</p>
+            <h1 className="mt-0.5 text-[1.3rem] font-bold leading-tight text-ink">
               Lihat keadaan wilayahmu
             </h1>
           </div>
         </div>
         <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-          Warna peta adalah tingkat kerawanan kasar dua belas bulan terakhir per kecamatan.
-          {summary ? (
-            <>
-              {" "}
-              <span className="text-ink-faint">
-                {longMonth(summary.window_from)} – {longMonth(summary.window_to)}.
-              </span>
-            </>
-          ) : null}
+          Warna peta adalah tingkat kerawanan kasar dua belas bulan terakhir per kecamatan. Ketuk
+          wilayah untuk rinciannya.
         </p>
 
         {summary ? (
@@ -134,12 +130,14 @@ export function MapCanvas({
           </fieldset>
         ) : null}
 
-        <div className="mt-4 flex items-baseline justify-between">
-          <h2 className="text-sm font-bold text-ink">Imbauan berlaku</h2>
+        <div className="warga-rubric mt-5">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-ink">
+            Imbauan berlaku
+          </h2>
           <span className="text-[11px] text-ink-faint">dari Polres</span>
         </div>
         {imbauan.length === 0 ? (
-          <p className="warga-alert-empty mt-2">
+          <p className="warga-empty mt-2">
             Tidak ada imbauan khusus saat ini. Tetap waspada dan kunci kendaraan Anda.
           </p>
         ) : (
@@ -165,8 +163,8 @@ export function MapCanvas({
           </ul>
         )}
 
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <Link href="/lapor" className="warga-btn warga-btn-amber">
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <Link href="/lapor" className="warga-btn warga-btn-primary">
             Lapor kejadian
           </Link>
           <a href="tel:110" className="warga-btn warga-btn-danger">

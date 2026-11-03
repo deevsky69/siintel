@@ -4,11 +4,11 @@ import { type AreaLevel, LEVEL_CLASS, LEVEL_LABEL, monthLabel } from "@/lib/warg
 export function LevelBadge({ level, size = "sm" }: { level: AreaLevel; size?: "sm" | "lg" }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border font-semibold ${LEVEL_CLASS[level]} ${
+      className={`inline-flex items-center gap-1.5 rounded-sm border font-semibold ${LEVEL_CLASS[level]} ${
         size === "lg" ? "px-3 py-1 text-sm" : "px-2 py-0.5 text-xs"
       }`}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+      <span className="h-1.5 w-1.5 rounded-[1px] bg-current" aria-hidden="true" />
       Kerawanan {LEVEL_LABEL[level]}
     </span>
   );

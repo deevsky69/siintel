@@ -14,7 +14,7 @@ export function ReviewForm({ kecamatan, kelurahan }: { kecamatan: string; kelura
 
   if (state.status === "sent") {
     return (
-      <div className="rounded-2xl bg-risk-low/10 px-4 py-4 text-sm text-ink" role="status">
+      <div className="rounded-sm bg-risk-low/10 px-4 py-4 text-sm text-ink" role="status">
         <p className="font-semibold text-risk-low">Terima kasih, ulasan Anda diterima.</p>
         <p className="mt-1 text-ink-muted">{state.message}</p>
         <p className="mt-1 text-xs text-ink-faint">Nomor ulasan {state.code}.</p>
@@ -65,7 +65,7 @@ export function ReviewForm({ kecamatan, kelurahan }: { kecamatan: string; kelura
           maxLength={300}
           rows={3}
           placeholder="Misal: lampu jalan terang, patroli sering lewat, atau sebaliknya."
-          className="mt-1.5 w-full rounded-2xl border border-base-800 bg-base-900 px-4 py-3 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
+          className="mt-1.5 w-full rounded-sm border border-base-800 bg-base-900 px-4 py-3 text-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
         />
       </label>
       {state.status === "error" ? (

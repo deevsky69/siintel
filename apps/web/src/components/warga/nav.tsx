@@ -43,7 +43,10 @@ function isCurrent(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Navigasi atas (layar lebar): pil biru menandai halaman yang sedang dibuka. */
+/**
+ * Navigasi atas (layar lebar): tautan teks polos sejajar dengan tinggi kepala halaman;
+ * garis bawah tebal menandai halaman yang sedang dibuka, garis tipis muncul saat disentuh.
+ */
 export function WargaTopNav() {
   const pathname = usePathname();
   return (
@@ -62,7 +65,7 @@ export function WargaTopNav() {
   );
 }
 
-/** Navigasi bawah (ponsel): garis kuning di atas tab yang sedang dibuka. */
+/** Navigasi bawah (ponsel): garis tinta di atas tab yang sedang dibuka. */
 export function WargaBottomNav() {
   const pathname = usePathname();
   return (
@@ -71,7 +74,7 @@ export function WargaBottomNav() {
         <Link
           key={item.href}
           href={item.href}
-          className="warga-tab flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold"
+          className="warga-tab"
           aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
         >
           <NavIcon name={item.icon} />
