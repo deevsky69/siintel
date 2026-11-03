@@ -1,7 +1,8 @@
 # SIGAP — bot kanal perpesanan
 
 Laporan masyarakat lewat **Telegram** (dan **WhatsApp** setelah akun WhatsApp Business
-Platform tersedia). Bot ini hanya bercakap-cakap; seluruh aturan isian, kuota, audit, dan
+Platform tersedia; untuk **peragaan** ada jalur **WAHA** — klien tidak resmi, nomor cadangan,
+`waha.py`, keputusan 3 November 2026). Bot ini hanya bercakap-cakap; seluruh aturan isian, kuota, audit, dan
 penyimpanan tetap milik API lewat `/api/v1/messaging/*` (kunci bersama `MESSAGING_API_KEY`).
 
 ```text

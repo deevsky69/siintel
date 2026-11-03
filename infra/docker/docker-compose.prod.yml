@@ -184,11 +184,53 @@ services:
       TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
       TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-}
       TWILIO_WEBHOOK_URL: ${TWILIO_WEBHOOK_URL:-}
+      WAHA_BASE_URL: ${WAHA_BASE_URL:-}
+      WAHA_API_KEY: ${WAHA_API_KEY:-}
+      WAHA_SESSION: ${WAHA_SESSION:-default}
+      WAHA_WEBHOOK_HMAC_KEY: ${WAHA_WEBHOOK_HMAC_KEY:-}
+      WAHA_WEBHOOK_URL: http://bot:8080/webhook/waha
       NOTIFY_INTERVAL_SECONDS: ${NOTIFY_INTERVAL_SECONDS:-30}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       TZ: ${APP_TIMEZONE:-Asia/Jakarta}
     expose:
       - "8080"
+    networks:
+      - internal
+
+  # ------------------------------------------------------------ WAHA (peragaan)
+  # WhatsApp lewat klien TIDAK RESMI (WAHA, https://github.com/devlikeapro/waha) — hanya
+  # untuk peragaan dengan NOMOR CADANGAN, keputusan pemilik proyek 3 November 2026
+  # (docs/01 §19.2 "WhatsApp Business Platform"). Nomor dapat diblokir Meta sewaktu-waktu.
+  #
+  # Layanan ini memakai profile sehingga TIDAK ikut menyala pada `up -d` biasa; skrip
+  # deploy menyalakannya hanya bila WAHA_API_KEY terisi di .env.production. Tidak ada port
+  # ke host dan tidak ada rute Traefik: bot memanggilnya lewat jaringan internal, dan WAHA
+  # mendorong webhook ke http://bot:8080/webhook/waha (bertanda tangan HMAC-SHA512).
+  waha:
+    image: ${WAHA_IMAGE:-devlikeapro/waha:noweb}
+    container_name: predpol-prod-waha
+    profiles: ["waha"]
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      WHATSAPP_DEFAULT_ENGINE: NOWEB
+      WAHA_API_KEY: ${WAHA_API_KEY:-}
+      # Dashboard dan Swagger tidak dipakai; QR diambil lewat API oleh scripts/waha-qr.sh.
+      WAHA_DASHBOARD_ENABLED: "false"
+      WHATSAPP_SWAGGER_ENABLED: "false"
+      WAHA_PRINT_QR: "false"
+      # Sesi yang pernah dipasangkan dinyalakan lagi setelah kontainer dimulai ulang.
+      WHATSAPP_RESTART_ALL_SESSIONS: "true"
+      WAHA_RESTART_ALL_SESSIONS: "true"
+      # Media masuk disimpan sebentar saja — bot segera mengunduh dan meneruskannya ke API.
+      WHATSAPP_FILES_LIFETIME: "600"
+      TZ: ${APP_TIMEZONE:-Asia/Jakarta}
+    volumes:
+      # Kredensial sesi (hasil pemindaian QR). Tanpa volume ini QR harus dipindai ulang
+      # setiap kontainer dibangun ulang.
+      - waha-sessions:/app/.sessions
+    expose:
+      - "3000"
     networks:
       - internal
 
@@ -199,3 +241,4 @@ networks:
 volumes:
   db-data:
   attachments:
+  waha-sessions:

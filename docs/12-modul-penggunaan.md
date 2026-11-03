@@ -967,7 +967,7 @@ sigap.awansurya.com  →  Lapor  →  formulir  →  nomor tiket
 Bisa juga lewat **aplikasi Android** — tombol *Lapor Kejadian* pada layar mukanya.
 
 Sejak 8 Oktober 2026 juga lewat **bot Telegram** (dan WhatsApp setelah akun bisnis Meta
-tersedia): warga mengetik `/mulai`, bot bertanya jenis kejadian, kecamatan, lokasi (tombol
+tersedia; untuk peragaan dipakai nomor cadangan lewat WAHA, 3 November 2026): warga mengetik `/mulai`, bot bertanya jenis kejadian, kecamatan, lokasi (tombol
 bagikan lokasi atau pilih kelurahan), uraian, dan foto, lalu memberi nomor tiket. Bedanya
 dari web/Android, atas keputusan pemilik proyek: **pengenal percakapan disimpan** supaya bot
 dapat mengabari pelapor ketika statusnya berubah (`/status` menampilkan laporan miliknya).

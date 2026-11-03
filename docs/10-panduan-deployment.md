@@ -687,6 +687,7 @@ Yang wajib diisi:
 | `MESSAGING_API_KEY` | kunci bersama API ⇄ bot; dibuat `scripts/pasang-kanal-perpesanan.sh`. Kosong = kanal perpesanan tidak aktif |
 | `TELEGRAM_BOT_TOKEN` | token dari @BotFather; kosong = bot Telegram tidak dijalankan |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`, `TWILIO_WEBHOOK_URL` | WhatsApp lewat Twilio (Sandbox untuk peragaan); diisi `scripts/pasang-kanal-perpesanan.sh` |
+| `WAHA_BASE_URL`, `WAHA_API_KEY`, `WAHA_SESSION`, `WAHA_WEBHOOK_HMAC_KEY` | WhatsApp lewat WAHA — klien tidak resmi, **peragaan saja** dengan nomor cadangan (§6b.2c); diisi `WAHA=peragaan bash scripts/pasang-kanal-perpesanan.sh` |
 | `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | dari Meta Business Suite (App Secret dari pengaturan aplikasi Meta; dipakai memverifikasi tanda tangan webhook); kosong = kanal WhatsApp tidak dijalankan |
 
 **Peringatan tentang `DEMO_REFERENCE_TIME`.** Data asli Pusiknas berposisi 29 September 2026
@@ -989,6 +990,56 @@ tanpa tombol (pilihan dijawab nomor); kabar perkembangan hanya sampai dalam 24 j
 pesan terakhir pelapor. Setiap POST diverifikasi tanda tangan `X-Twilio-Signature`
 (HMAC-SHA1 dengan Auth Token atas URL `TWILIO_WEBHOOK_URL`); URL itu harus **persis** sama
 dengan yang didaftarkan di Twilio, termasuk tanpa garis miring akhir.
+
+### 6b.2c WhatsApp lewat WAHA — PERAGAAN SAJA, klien tidak resmi, nomor cadangan
+
+Ditambahkan 3 November 2026 atas keputusan pemilik proyek (pilihan A, lihat `docs/01` §19).
+**WAHA** (WhatsApp HTTP API, https://github.com/devlikeapro/waha, Apache-2.0) membungkus
+klien WhatsApp Web **tidak resmi** menjadi REST API yang dijalankan sendiri. Meta tidak
+mengizinkan klien tidak resmi dan dapat memblokir nomornya kapan saja, karena itu:
+
+- **hanya untuk peragaan dan uji coba internal**, dengan **nomor cadangan** (kartu prabayar
+  khusus), **bukan** nomor resmi Polres dan **bukan** kanal warga umum;
+- kontainer WAHA hanya hidup di jaringan internal (tanpa port ke host, tanpa rute Traefik);
+- kanal resmi untuk warga tetap §6b.2 (Cloud API) atau Twilio.
+
+```text
+pelapor ──WhatsApp──▶ nomor cadangan (sesi WAHA) ──POST http://bot:8080/webhook/waha──▶ bot ──REST WAHA──▶ pelapor
+```
+
+Yang berbeda dari Twilio: nomornya milik sendiri, peserta tidak perlu `join`, tidak ada
+jendela 24 jam, tidak ada biaya per percakapan. Yang sama: tidak ada tombol (pilihan dijawab
+nomor), lokasi lewat ikon lampiran → Lokasi.
+
+1. Siapkan nomor cadangan pada ponsel yang terpasang WhatsApp.
+2. Di server:
+
+```bash
+WAHA=peragaan bash scripts/pasang-kanal-perpesanan.sh   # membuat WAHA_API_KEY, WAHA_WEBHOOK_HMAC_KEY
+bash scripts/deploy-produksi.sh                         # menyalakan layanan `waha` (profile) lalu bot
+```
+
+   Bot membuat sesi WAHA sendiri saat menyala (`POST /api/sessions`, webhook `message` dengan
+   kunci HMAC); konfigurasi sesi yang sudah ada tidak ditimpa.
+3. Pasangkan nomor: `bash scripts/waha-qr.sh` menyimpan kode QR ke `.waha-qr.png` (berlaku
+   ±20 detik). Salin ke komputer Anda, buka, lalu pindai dari WhatsApp nomor cadangan →
+   *Perangkat tertaut* → *Tautkan perangkat*. Ulangi skrip bila QR kedaluwarsa; status
+   `WORKING` berarti terpasang. Kredensial sesi tersimpan di volume `waha-sessions`, jadi
+   QR tidak perlu dipindai ulang setelah `deploy-produksi.sh` berikutnya.
+4. Dari WhatsApp lain kirim `mulai` ke nomor cadangan.
+
+Keamanan: setiap POST webhook diverifikasi tanda tangan `X-Webhook-Hmac` (HMAC-SHA512
+heksadesimal atas isi mentah, kunci `WAHA_WEBHOOK_HMAC_KEY`) sebelum dibaca; kunci API WAHA
+hanya dikirim ke host `waha`; media hanya diunduh dari host itu. Bot membalas saja (tidak
+pernah memulai percakapan) dan mengirim *seen* sebelum menjawab — dua anjuran WAHA untuk
+mengurangi risiko pemblokiran; kabar perkembangan dikirim ke pelapor yang sudah bercakap.
+
+Mematikan: hapus `WAHA_API_KEY` dari `.env.production`, lalu
+`docker compose … stop waha` dan deploy ulang; sesi di ponsel dicabut lewat *Perangkat tertaut*.
+
+Variabel: `WAHA_BASE_URL` (`http://waha:3000`), `WAHA_API_KEY`, `WAHA_SESSION` (`default`),
+`WAHA_WEBHOOK_HMAC_KEY`, opsional `WAHA_IMAGE` (bawaan `devlikeapro/waha:noweb`, mesin tanpa
+Chromium; sematkan tag versi untuk peragaan yang stabil).
 
 ### 6b.3 Yang disimpan dari pelapor
 

@@ -76,3 +76,6 @@ var/lampiran/
 
 # Lampiran hasil test lokal (attachment store tanpa ATTACHMENT_DIR)
 apps/var/
+
+# QR pemasangan nomor WAHA (peragaan) — dibuat scripts/waha-qr.sh
+.waha-qr.png

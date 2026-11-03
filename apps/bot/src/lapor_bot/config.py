@@ -35,6 +35,17 @@ class Settings(BaseSettings):
     #: tangan: https://<domain>/webhook/twilio
     twilio_webhook_url: str = ""
 
+    #: WAHA (WhatsApp HTTP API, klien TIDAK RESMI) — PERAGAAN SAJA dengan nomor cadangan,
+    #: keputusan pemilik proyek 3 November 2026. Kanal berjalan bila base URL, kunci API,
+    #: dan kunci HMAC webhook terisi. Kontainer WAHA hanya di jaringan internal.
+    waha_base_url: str = ""
+    waha_api_key: str = ""
+    waha_session: str = "default"
+    #: Kunci tanda tangan X-Webhook-Hmac; bot memasangnya pada sesi yang ia buat.
+    waha_webhook_hmac_key: str = ""
+    #: Alamat webhook yang dipanggil WAHA dari jaringan internal (bukan lewat Traefik).
+    waha_webhook_url: str = "http://bot:8080/webhook/waha"
+
     #: Port penerima webhook (WhatsApp Cloud API dan Twilio berbagi satu server).
     webhook_port: int = 8080
 

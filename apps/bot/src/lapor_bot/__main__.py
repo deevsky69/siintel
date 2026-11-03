@@ -12,6 +12,7 @@ from .config import Settings
 from .core import Reply
 from .telegram import TelegramChannel, bulletins_forever
 from .twilio import TwilioChannel
+from .waha import WahaChannel
 from .webhook import WebhookServer
 from .whatsapp import WhatsAppChannel
 
@@ -101,6 +102,31 @@ def main() -> None:
             )
     else:
         log.warning("TWILIO_* belum lengkap — kanal Twilio tidak dijalankan.")
+
+    if all((settings.waha_base_url, settings.waha_api_key, settings.waha_webhook_hmac_key)):
+        # Klien tidak resmi: hanya peragaan dengan nomor cadangan (keputusan 3 November 2026).
+        log.warning(
+            "WAHA aktif — kanal WhatsApp TIDAK RESMI untuk peragaan; jangan pakai nomor resmi."
+        )
+        waha = WahaChannel(
+            settings.waha_base_url,
+            settings.waha_api_key,
+            settings.waha_session,
+            settings.waha_webhook_hmac_key,
+            settings.waha_webhook_url,
+            backend,
+            settings.notify_interval_seconds,
+        )
+        waha.register(webhook)
+        if whatsapp_send is None:
+            whatsapp_send = waha.send
+        if not any(t.name in ("whatsapp-kabar", "twilio-kabar") for t in threads):
+            # Kabar WHATSAPP tetap satu pengirim; kanal resmi didahulukan bila ada.
+            threads.append(
+                threading.Thread(target=waha.notify_forever, name="waha-kabar", daemon=True)
+            )
+    else:
+        log.info("WAHA_* kosong — kanal WAHA (peragaan) tidak dijalankan.")
 
     if telegram is not None or whatsapp_send is not None:
         threads.append(

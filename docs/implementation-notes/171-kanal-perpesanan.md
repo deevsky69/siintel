@@ -45,6 +45,31 @@ autentikasi akun dan hanya dari host Twilio. `webhook.py` menjadi satu server un
 kanal yang didorong (Cloud API dan Twilio) di port 8080; rute Traefik menjadi `/webhook/`.
 Kabar WHATSAPP dikirim oleh satu pengirim saja (Cloud API didahulukan bila keduanya ada).
 
+## Tambahan 3 November 2026 — WAHA untuk peragaan (klien tidak resmi)
+
+Pemilik proyek meminta kajian WAHA (https://github.com/devlikeapro/waha). Kajian: Apache-2.0,
+seluruh fitur gratis sejak 2026.6, mesin NOWEB/GOWS tanpa Chromium, webhook `message` dengan
+`payload.location.{latitude,longitude}` (string) dan `payload.media.url`, tanda tangan
+`X-Webhook-Hmac` HMAC-SHA512 heksadesimal (vektor dokumentasi diverifikasi dan dijadikan
+test), tombol interaktif dinyatakan rusak. Konflik dengan keputusan 9 Oktober 2026 (jalur
+tidak resmi ditolak) diangkat; **pilihan A**: peragaan saja, nomor cadangan, keputusan lama
+direvisi menjadi "ditolak untuk produksi".
+
+Implementasi: `waha.py` mengikuti pola Twilio — kanal tetap `WHATSAPP`, `628…@c.us` ↔
+`+628…` (`…@lid` diteruskan apa adanya), `sendSeen` lalu `sendText`, media hanya dari host
+WAHA, webhook `/webhook/waha` dipanggil dari jaringan internal (bukan Traefik) dan diproses
+setelah jawaban 200. Bot membuat sesi (`POST /api/sessions`, `start: true`, webhook `message`
++ HMAC + retries) bila belum ada, dicoba ulang tiap 15 detik sampai WAHA siap; sesi yang ada
+tidak ditimpa. Compose: layanan `waha` dengan `profiles: ["waha"]`, dinyalakan
+`deploy-produksi.sh` hanya bila `WAHA_API_KEY` terisi; volume `waha-sessions`.
+`scripts/waha-qr.sh` mengambil QR lewat kontainer bot (WAHA tidak terbuka ke host).
+Prioritas pengirim kabar WHATSAPP: Cloud API → Twilio → WAHA. Test: 12 kasus `test_waha.py`
+(38 total bot), ruff + mypy strict lulus; `docker compose config` valid dengan/tanpa profile.
+
+Belum diuji dengan WAHA sungguhan (butuh nomor cadangan dan deploy oleh pemilik proyek);
+bentuk `payload.location` pada mesin NOWEB belum dikonfirmasi dari sumber — bila kosong,
+periksa `payload._data` pada pesan lokasi pertama.
+
 ## Belum
 
 - WhatsApp menunggu akun bisnis Meta (gate di docs/01 §19.2).
