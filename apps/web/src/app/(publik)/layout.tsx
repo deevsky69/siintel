@@ -6,14 +6,14 @@ import { WargaBottomNav, WargaTopNav } from "@/components/warga/nav";
  * SIGAP WARGA — kerangka halaman masyarakat (2 November 2026; rupa papan pengumuman
  * 3 November 2026).
  *
- * Satu pembungkus `.warga` mengganti seluruh token warna menjadi tema putih-tinta dengan
+ * Satu pembungkus `.warga` mengganti seluruh token warna menjadi tema gelap-hangat dengan
  * garis-garis 1px, sehingga sisi masyarakat tidak pernah tampak seperti sisi kepolisian
  * (/ops) dan tidak terpengaruh pengalih gelap/terang di sana.
  *
- * Kepala halaman dua baris, meniru situs lembaga dan ruang berita: strip tipis coklat
- * Polri berisi nama satuan dan tautan darurat, lalu baris putih berisi lambang, wordmark
- * berkotak, dan tautan teks polos bergaris bawah bila aktif. Tidak ada pil, tidak ada
- * tombol berwarna di dalam navigasi. Di ponsel navigasi turun ke bawah.
+ * Kepala halaman dua baris, meniru situs lembaga dan ruang berita: strip tipis gelap
+ * berisi nama satuan dan tautan darurat, lalu masthead berisi lambang, wordmark
+ * berkotak emas, dan tautan teks condensed bergaris bawah emas bila aktif. Tidak ada pil,
+ * tidak ada tombol berwarna di dalam navigasi. Di ponsel navigasi turun ke bawah.
  */
 export default function WargaLayout({ children }: { children: React.ReactNode }) {
   return (

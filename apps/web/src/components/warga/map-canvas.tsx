@@ -92,9 +92,7 @@ export function MapCanvas({
           <BersamaRing size={60} light />
           <div className="min-w-0">
             <p className="warga-eyebrow">Keadaan wilayah</p>
-            <h1 className="mt-0.5 text-[1.3rem] font-bold leading-tight text-ink">
-              Lihat keadaan wilayahmu
-            </h1>
+            <h1 className="mt-1 text-[2rem] font-bold text-ink">Lihat keadaan wilayahmu</h1>
           </div>
         </div>
         <p className="mt-3 text-sm leading-relaxed text-ink-muted">

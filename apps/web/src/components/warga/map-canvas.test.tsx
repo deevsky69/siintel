@@ -34,12 +34,12 @@ describe("MapCanvas", () => {
     expect(tinggi.getAttribute("aria-pressed")).toBe("true");
     const setiabudi = screen.getByRole("link", { name: /^Setiabudi/ });
     const tebet = screen.getByRole("link", { name: /^Tebet/ });
-    expect(setiabudi.querySelector("polygon")?.getAttribute("fill-opacity")).toBe("0.12");
-    expect(tebet.querySelector("polygon")?.getAttribute("fill-opacity")).toBe("0.5");
+    expect(setiabudi.querySelector("polygon")?.getAttribute("fill-opacity")).toBe("0.15");
+    expect(tebet.querySelector("polygon")?.getAttribute("fill-opacity")).toBe("0.7");
 
     fireEvent.click(tinggi);
     expect(tinggi.getAttribute("aria-pressed")).toBe("false");
-    expect(setiabudi.querySelector("polygon")?.getAttribute("fill-opacity")).toBe("0.5");
+    expect(setiabudi.querySelector("polygon")?.getAttribute("fill-opacity")).toBe("0.7");
   });
 
   it("menampilkan kartu kecil saat wilayah difokus", () => {
