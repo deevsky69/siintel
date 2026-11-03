@@ -202,3 +202,12 @@ terang", referensi Refero.
   `is-selected`), sehingga komponen yang sama tetap benar bila tema diganti lagi.
 - Verifikasi: 417 test web (nilai kelegapan di `map-canvas.test.tsx` disesuaikan), `tsc`,
   `biome`, `next build` bersih. Tangkapan layar tetap tidak bisa dibuat di mesin ini.
+
+## Lambang Tribrata polos (3 November 2026, malam)
+
+Permintaan pemilik proyek: cincin titik yang mengorbit lambang ("seperti rotasi planet")
+tidak perlu; cukup lambang Tribrata. `BersamaRing` dihapus dari `components/warga/brand.tsx`
+beserta CSS `.warga-ring*` dan keyframes orbit; panel beranda memakai `PolriEmblem` 56 px.
+Gerak sisi warga kini: transisi rute, reveal saat gulir, poligon menggambar diri, dan gerak
+khusus beranda (panel, tag, kartu kecil, imbauan, panah sel). 417 test, tsc, biome,
+`next build` bersih.
