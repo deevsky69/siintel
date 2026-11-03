@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Chakra_Petch, Inter, JetBrains_Mono } from "next/font/google";
+import { Chakra_Petch, Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { THEME_BOOTSTRAP, THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
@@ -11,6 +11,13 @@ const heading = Chakra_Petch({
   variable: "--font-heading",
 });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
+// Wajah huruf sisi warga: Plus Jakarta Sans — dirancang di Jakarta (Tokotype), dipakai
+// untuk judul SIGAP WARGA supaya sisi masyarakat punya suara sendiri.
+const display = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-display",
+});
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
@@ -27,7 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       // mengubah elemen ini sebelum React sempat menghidrasinya. Tanpa itu React
       // memperingatkan tentang perbedaan yang memang kita inginkan.
       suppressHydrationWarning
-      className={`${heading.variable} ${sans.variable} ${mono.variable}`}
+      className={`${heading.variable} ${sans.variable} ${mono.variable} ${display.variable}`}
     >
       <head>
         {/*

@@ -58,7 +58,7 @@ export function PublicMap({
         aria-label="Peta tingkat kerawanan per wilayah"
         className="h-full w-full"
       >
-        {shapes.map((shape) => {
+        {shapes.map((shape, index) => {
           const datum = data.get(shape.name);
           const isSelected = selected === shape.name;
           const isActive = active === shape.name;
@@ -83,7 +83,8 @@ export function PublicMap({
                   stroke={isSelected ? "rgb(22 32 56)" : "white"}
                   strokeWidth={strokeWidth * (isSelected ? 2.5 : 1.2)}
                   strokeLinejoin="round"
-                  className="cursor-pointer transition-[fill-opacity]"
+                  className="warga-poly cursor-pointer"
+                  style={{ animationDelay: `${Math.min(index, 40) * 35}ms` }}
                 />
               ))}
             </Link>

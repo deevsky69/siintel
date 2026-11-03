@@ -89,3 +89,22 @@ proyek dari refero.design. Komponen sisi polisi tidak dipakai ulang di sisi warg
 - Web: `/ops/babin` (kontak + tujuan buletin), `/ops/buletin` (susun, setujui, status kirim);
   warga: kontak Babin di panel kelurahan `/peta`.
 - Keputusan tercatat: grup WhatsApp tidak terjangkau API resmi → Telegram + WA perorangan.
+
+## Rupa baru sisi warga — 3 November 2026
+
+Permintaan pemilik proyek: "transisi yang mantap" dan "logo Polri bersama masyarakat".
+
+- **Lambang Polri** resmi (berkas domain publik dari Wikimedia Commons, `Insignia of the
+  Indonesian National Police` / `Lambang Polri.png`) dikecilkan ke `apps/web/public/brand/`
+  (96/256/512 px). Tampil di kepala halaman, hero, kaki halaman, dan halaman masuk petugas.
+- **Tanda tangan rupa**: `BersamaRing` — lambang di tengah, dua lingkaran titik "warga"
+  mengelilinginya perlahan (48 s dan 32 s), di bawah tulisan "Polri bersama masyarakat".
+- **Gerak** (semua dimatikan pada `prefers-reduced-motion`): isi halaman naik bergiliran pada
+  tiap perpindahan rute (`(publik)/template.tsx` + `.warga-enter`), bagian di bawah lipatan
+  muncul saat digulir (`components/warga/reveal.tsx`, tetap tampil tanpa JavaScript setelah
+  2,5 s), poligon peta mengembang berurutan saat dimuat dan terang saat disentuh
+  (`.warga-poly`), pil navigasi aktif dan garis kuning tab bawah (`components/warga/nav.tsx`).
+- **Tipografi**: judul sisi warga memakai Plus Jakarta Sans (`--font-display`, dibundel lewat
+  next/font); badan tetap Inter. Hero satu-satunya bidang biru malam di sisi warga, tombol
+  utama kuning Polri.
+- Tidak ada perubahan API, data, maupun teks yang diuji; 414 test web tetap lulus.

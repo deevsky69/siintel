@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { PolriEmblem } from "@/components/warga/brand";
 import { LoginForm } from "./login-form";
 
 export const metadata = { title: "Masuk — SIGAP" };
@@ -23,8 +24,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg border border-accent/30 bg-accent/10 font-heading text-lg font-bold text-accent">
-            S
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-accent/30 bg-white/90 p-1.5">
+            <PolriEmblem size={96} className="h-full w-full" />
           </div>
           <h1 className="font-heading text-xl font-bold tracking-wide text-ink">SIGAP</h1>
           <p className="mt-1 text-2xs uppercase tracking-[0.12em] text-accent-soft">

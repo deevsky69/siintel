@@ -304,3 +304,259 @@
   color: rgb(var(--accent));
   border: 1px solid rgb(var(--line-strong));
 }
+
+/* ------------------------------------------------------------------------------------------
+   SIGAP WARGA — rupa dan gerak (3 November 2026)
+
+   Judul memakai Plus Jakarta Sans. Gerak dipakai di empat tempat saja dan semuanya punya
+   alasan: (1) isi halaman naik perlahan saat berpindah rute (template.tsx), (2) bagian di
+   bawah lipatan muncul saat digulir (Reveal), (3) poligon peta "digambar" berurutan saat
+   dimuat, (4) lingkaran warga mengelilingi lambang Polri — "Polri bersama masyarakat" yang
+   dibuat terlihat. Semua dimatikan bila pengguna meminta gerak dikurangi.
+   ------------------------------------------------------------------------------------------ */
+.warga h1,
+.warga h2,
+.warga .font-display {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+@keyframes warga-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes warga-poly {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes warga-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes warga-orbit-back {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes warga-show {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* (1) perpindahan rute: anak-anak langsung template naik bergiliran */
+.warga .warga-enter > * {
+  animation: warga-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.warga .warga-enter > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+.warga .warga-enter > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+.warga .warga-enter > *:nth-child(n + 4) {
+  animation-delay: 210ms;
+}
+
+/* (2) muncul saat digulir; tanpa JavaScript tetap tampil setelah 2,5 detik */
+.warga .warga-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation: warga-show 0s 2.5s forwards;
+}
+.warga .warga-reveal.is-in {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
+/* (3) peta: poligon mengembang satu per satu, lalu terangkat saat disentuh */
+.warga .warga-poly {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: warga-poly 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transition:
+    fill-opacity 0.2s ease,
+    filter 0.2s ease;
+}
+.warga a:hover > .warga-poly,
+.warga a:focus-visible > .warga-poly {
+  filter: brightness(1.08) saturate(1.1);
+}
+
+/* (4) lambang Polri dengan lingkaran warga mengelilinginya */
+.warga .warga-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.warga .warga-ring-orbit {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  animation: warga-orbit 48s linear infinite;
+}
+.warga .warga-ring-orbit.is-inner {
+  inset: 14%;
+  border-style: solid;
+  border-color: rgba(243, 178, 10, 0.35);
+  animation: warga-orbit-back 32s linear infinite;
+}
+.warga .warga-ring-dot {
+  position: absolute;
+  top: -5px;
+  left: calc(50% - 5px);
+  height: 10px;
+  width: 10px;
+  border-radius: 999px;
+  background: rgb(247 245 240);
+  box-shadow: 0 0 0 3px rgba(247, 245, 240, 0.18);
+}
+.warga .warga-ring-dot.is-amber {
+  background: rgb(var(--warga-amber));
+  box-shadow: 0 0 0 3px rgba(243, 178, 10, 0.22);
+}
+.warga .warga-ring-emblem {
+  position: relative;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 10%;
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.08),
+    0 24px 48px -20px rgba(0, 0, 0, 0.5);
+}
+
+/* hero biru malam — satu-satunya bidang gelap di sisi warga */
+.warga .warga-hero {
+  position: relative;
+  overflow: hidden;
+  color: white;
+  background:
+    radial-gradient(60% 80% at 100% 0%, rgba(243, 178, 10, 0.22), transparent 60%),
+    radial-gradient(50% 60% at 0% 100%, rgba(41, 88, 168, 0.55), transparent 65%),
+    linear-gradient(135deg, rgb(16 40 80), rgb(24 58 112) 70%, rgb(30 70 135));
+}
+.warga .warga-hero-eyebrow {
+  color: rgb(var(--warga-amber));
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.warga .warga-btn-amber {
+  background: rgb(var(--warga-amber));
+  color: rgb(16 40 80);
+}
+.warga .warga-btn-amber:hover {
+  background: rgb(255 196 40);
+}
+.warga .warga-btn-outline {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+.warga .warga-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.warga .warga-btn {
+  transition:
+    background-color 0.15s ease,
+    transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.2s ease;
+}
+.warga .warga-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -14px rgba(22, 32, 56, 0.6);
+}
+.warga .warga-btn:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+/* navigasi: pil aktif */
+.warga .warga-nav-link {
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(var(--text-muted));
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+.warga .warga-nav-link:hover {
+  background: rgb(var(--surface-inset));
+  color: rgb(var(--text));
+}
+.warga .warga-nav-link[aria-current="page"] {
+  background: rgb(var(--accent));
+  color: white;
+}
+.warga .warga-tab {
+  position: relative;
+  color: rgb(var(--text-faint));
+  transition: color 0.2s ease;
+}
+.warga .warga-tab[aria-current="page"] {
+  color: rgb(var(--accent));
+}
+.warga .warga-tab[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 3px;
+  width: 28px;
+  transform: translateX(-50%);
+  border-radius: 0 0 999px 999px;
+  background: rgb(var(--warga-amber));
+}
+
+.warga .warga-card {
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.25s ease;
+}
+.warga a:focus-visible,
+.warga button:focus-visible,
+.warga input:focus-visible,
+.warga select:focus-visible,
+.warga textarea:focus-visible {
+  outline: 3px solid rgb(var(--warga-amber));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warga .warga-enter > *,
+  .warga .warga-poly,
+  .warga .warga-ring-orbit {
+    animation: none;
+  }
+  .warga .warga-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+  .warga .warga-btn:hover {
+    transform: none;
+  }
+}
