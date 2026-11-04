@@ -53,6 +53,8 @@ log = logging.getLogger("lapor_bot.waha")
 CHANNEL = "WHATSAPP"
 WEBHOOK_PATH = "/webhook/waha"
 MAX_FILE_BYTES = 16 * 1024 * 1024
+#: Awalan jalur berkas media yang disajikan WAHA.
+MEDIA_PATH = "/api/files/"
 LOCATION_HINT = (
     "\n\nUntuk membagikan lokasi: tekan ikon lampiran (klip) di WhatsApp, pilih Lokasi, lalu kirim."
 )
@@ -136,7 +138,6 @@ class WahaChannel:
                 "pesan palsu ke webhook."
             )
         self._base = base_url.rstrip("/")
-        self._host = (urlparse(self._base).hostname or "").lower()
         self._session = session
         self._hmac_key = hmac_key
         self._webhook_url = webhook_url
@@ -221,9 +222,14 @@ class WahaChannel:
             raise RuntimeError(f"WAHA kirim: {response.status_code} {response.text[:200]}")
 
     def fetch(self, url: str, filename: str, media_type: str) -> tuple[str, bytes, str]:
-        if (urlparse(url).hostname or "").lower() != self._host:
+        # WAHA menulis URL media dengan host sesuai WAHA_BASE_URL-nya (bawaan localhost),
+        # yang tidak selalu sama dengan alamat yang dipakai bot. Hanya jalurnya yang dipakai,
+        # dan harus jalur berkas WAHA; unduhan selalu ke host WAHA yang dikenal bot, sehingga
+        # kunci API tidak pernah terkirim ke host lain.
+        path = urlparse(url).path
+        if not path.startswith(MEDIA_PATH):
             raise RuntimeError("Alamat media di luar WAHA.")
-        response = self._http.get(url)
+        response = self._http.get(path)
         if response.status_code >= 400:
             raise RuntimeError(f"WAHA media: {response.status_code}")
         if len(response.content) > MAX_FILE_BYTES:
