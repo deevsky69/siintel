@@ -15,6 +15,7 @@
 #   TELEGRAM_BOT_TOKEN='...' WHATSAPP_ACCESS_TOKEN='...' WHATSAPP_PHONE_NUMBER_ID='...' \
 #     bash scripts/pasang-kanal-perpesanan.sh
 #   TWILIO_ACCOUNT_SID='AC...' TWILIO_AUTH_TOKEN='...' bash scripts/pasang-kanal-perpesanan.sh
+#   WAHA=peragaan bash scripts/pasang-kanal-perpesanan.sh   # klien tidak resmi, nomor cadangan
 #
 # Token Telegram didapat dari @BotFather (perintah /newbot). Nilai WhatsApp dari Meta
 # Business Suite → WhatsApp → API Setup. WHATSAPP_VERIFY_TOKEN dibuat di sini bila kosong;
@@ -84,6 +85,22 @@ if [ -n "${TWILIO_ACCOUNT_SID:-}" ] && [ -n "${TWILIO_AUTH_TOKEN:-}" ]; then
   echo "  'When a message comes in' = https://$(grep '^DOMAIN=' "$ENV_FILE" | cut -d= -f2)/webhook/twilio  (HTTP POST)"
 else
   echo "  TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN tidak diberikan — dilewati"
+fi
+
+echo "== WAHA (klien WhatsApp TIDAK RESMI — peragaan saja, nomor cadangan; keputusan 3 November 2026)"
+if [ "${WAHA:-}" = "peragaan" ]; then
+  set_var WAHA_BASE_URL "http://waha:3000"
+  set_var WAHA_SESSION "${WAHA_SESSION:-default}"
+  for name in WAHA_API_KEY WAHA_WEBHOOK_HMAC_KEY; do
+    if grep -q "^${name}=.\+" "$ENV_FILE"; then
+      echo "  $name sudah ada, dipertahankan"
+    else
+      set_var "$name" "$(openssl rand -hex 32)"
+    fi
+  done
+  echo "  setelah deploy, pasangkan nomor cadangan dengan: bash scripts/waha-qr.sh"
+else
+  echo "  WAHA=peragaan tidak diberikan — dilewati"
 fi
 
 chmod 600 "$ENV_FILE"

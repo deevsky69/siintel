@@ -32,6 +32,10 @@ echo "== migration"
 docker exec "$API" alembic upgrade head
 docker exec "$API" alembic current
 echo "== bot kanal perpesanan"
+if grep -q '^WAHA_API_KEY=.\+' "$ENV_FILE"; then
+  # WAHA (peragaan, klien tidak resmi) memakai profile: dinyalakan hanya bila dikonfigurasi.
+  "${COMPOSE[@]}" up -d waha
+fi
 "${COMPOSE[@]}" up -d bot
 
 echo "== pemeriksaan"
