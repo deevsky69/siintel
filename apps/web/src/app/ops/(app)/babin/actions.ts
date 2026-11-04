@@ -14,6 +14,7 @@ export async function saveBabin(_previous: BabinState, form: FormData): Promise<
     telegram_chat_id: String(form.get("telegram_chat_id") ?? "").trim() || null,
     whatsapp_group_link: String(form.get("whatsapp_group_link") ?? "").trim() || null,
     whatsapp_number: String(form.get("whatsapp_number") ?? "").trim() || null,
+    whatsapp_group_chat_id: String(form.get("whatsapp_group_chat_id") ?? "").trim() || null,
     is_dummy: form.get("is_dummy") === "on",
   };
   if (!kelurahan || body.name.length < 2 || body.phone_display.length < 6) {

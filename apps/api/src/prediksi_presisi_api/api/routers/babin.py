@@ -52,6 +52,8 @@ def _full(row: Babinkamtibmas) -> dict[str, Any]:
         **_public(row),
         "telegram_chat_id": row.telegram_chat_id,
         "whatsapp_number": row.whatsapp_number,
+        "whatsapp_group_chat_id": row.whatsapp_group_chat_id,
+        "advisory_sent_month": row.advisory_sent_month,
         "updated_at": row.updated_at,
     }
 
@@ -93,6 +95,8 @@ class BabinRequest(BaseModel):
         default=None, max_length=20, description="Internasional tanpa +"
     )
     is_dummy: bool = False
+    #: Chat id grup WhatsApp warga (…@g.us); biasanya terisi otomatis lewat /daftar di grup.
+    whatsapp_group_chat_id: str | None = Field(default=None, max_length=64)
 
     @field_validator("whatsapp_group_link")
     @classmethod
@@ -142,6 +146,7 @@ def upsert_babin(
         "".join(ch for ch in (payload.whatsapp_number or "") if ch.isdigit()) or None
     )
     row.is_dummy = payload.is_dummy
+    row.whatsapp_group_chat_id = (payload.whatsapp_group_chat_id or "").strip() or None
     session.flush()
     audit.record(
         session,

@@ -11,6 +11,9 @@ export type BabinRow = {
   whatsapp_group_link: string | null;
   telegram_chat_id: string | null;
   whatsapp_number: string | null;
+  /** Grup WhatsApp warga (…@g.us) yang didaftarkan lewat /daftar; tujuan imbauan bulanan. */
+  whatsapp_group_chat_id: string | null;
+  advisory_sent_month: string | null;
   is_dummy: boolean;
   updated_at: string;
 };

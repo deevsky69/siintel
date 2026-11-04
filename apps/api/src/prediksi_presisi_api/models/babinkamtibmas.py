@@ -36,6 +36,11 @@ class Babinkamtibmas(TimestampMixin, Base):
     #: Nomor WhatsApp Babin (internasional, tanpa +) untuk dikirimi buletin perorangan.
     whatsapp_number: Mapped[str | None] = mapped_column(String(20))
     is_dummy: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    #: Chat id grup WhatsApp warga (…@g.us) yang didaftarkan lewat /daftar di dalam grup;
+    #: tujuan imbauan bulanan (4 November 2026). Hanya dapat dikirimi lewat WAHA.
+    whatsapp_group_chat_id: Mapped[str | None] = mapped_column(String(64))
+    #: Bulan (YYYY-MM) imbauan terakhir yang terkirim ke grup itu; penanda "awal bulan".
+    advisory_sent_month: Mapped[str | None] = mapped_column(String(7))
 
     __table_args__ = (
         Index("ix_babinkamtibmas_kecamatan", "kecamatan"),

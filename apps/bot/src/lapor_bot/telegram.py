@@ -194,13 +194,41 @@ def deliver_bulletins(
     return sent
 
 
+def deliver_advisories(backend: Backend, *, whatsapp_send: Any) -> int:
+    """Imbauan bulan berjalan ke grup WhatsApp warga yang belum dikirimi (4 November 2026).
+
+    Tanpa persetujuan manusia — keputusan pemilik proyek. Hanya kanal WhatsApp lewat WAHA
+    yang dapat mengirim ke grup; bila pengirimnya Cloud API/Twilio, pengiriman gagal dan
+    dicatat, tidak diulang-ulang."""
+    if whatsapp_send is None:
+        return 0
+    sent = 0
+    for row in backend.pending_advisories():
+        delivery: dict[str, str] = {}
+        try:
+            whatsapp_send(str(row["chat_id"]), Reply(str(row["text"])))
+            delivery["whatsapp"] = "ok"
+            sent += 1
+        except Exception as error:  # noqa: BLE001
+            log.warning("Imbauan grup %s gagal: %s", row.get("kelurahan"), type(error).__name__)
+            delivery["whatsapp"] = f"gagal: {type(error).__name__}"
+        backend.advisory_sent(str(row["kelurahan"]), str(row["month"]), delivery)
+    return sent
+
+
 def bulletins_forever(
-    backend: Backend, *, telegram: TelegramChannel | None, whatsapp_send: Any, interval: int
+    backend: Backend,
+    *,
+    telegram: TelegramChannel | None,
+    whatsapp_send: Any,
+    interval: int,
+    group_send: Any = None,
 ) -> None:
     log.info("Buletin: memeriksa yang disetujui tiap %s detik", interval)
     while True:
         try:
             deliver_bulletins(backend, telegram=telegram, whatsapp_send=whatsapp_send)
+            deliver_advisories(backend, whatsapp_send=group_send)
         except BackendError as error:
             log.warning("Buletin: ditunda, API menjawab %s (%s)", error.status, error.message)
         except Exception:  # noqa: BLE001

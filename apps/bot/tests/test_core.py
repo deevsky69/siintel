@@ -29,6 +29,10 @@ class FakeBackend:
         self.contact: dict[str, Any] | None = None
         self.bulletins: list[dict[str, Any]] = []
         self.acked_bulletins: dict[str, dict[str, str]] = {}
+        self.groups: dict[str, str] = {}
+        self.last_sender: str | None = None
+        self.advisory_acks: dict[str, str] = {}
+        self.advisory_deliveries: dict[str, dict[str, str]] = {}
 
     def options(self) -> Options:
         return Options(
@@ -81,6 +85,32 @@ class FakeBackend:
 
     def bulletin_sent(self, bulletin_id: str, delivery: dict[str, str]) -> None:
         self.acked_bulletins[bulletin_id] = delivery
+
+    def register_group(
+        self, channel: str, chat_id: str, kelurahan: str, sender: str | None = None
+    ) -> dict[str, Any]:
+        self.last_sender = sender
+        if kelurahan.casefold() != "tebet timur":
+            raise BackendError(404, "Kelurahan tidak dikenal pada master lokasi.")
+        self.groups[chat_id] = "Tebet Timur"
+        return {"kelurahan": "Tebet Timur", "kecamatan": "Tebet", "polsek": "Polsek Tebet"}
+
+    def advisory(self, kelurahan: str, month: str | None = None) -> dict[str, Any]:
+        if kelurahan.casefold() != "tebet timur":
+            raise BackendError(404, "Kelurahan tidak dikenal pada master lokasi.")
+        return {"kelurahan": "Tebet Timur", "text": f"IMBAUAN {kelurahan} {month or 'depan'}"}
+
+    def pending_advisories(self) -> list[dict[str, Any]]:
+        return [
+            {"kelurahan": kel, "chat_id": chat, "month": "2026-11", "text": f"IMBAUAN {kel}"}
+            for chat, kel in self.groups.items()
+            if self.advisory_acks.get(kel) != "2026-11"
+        ]
+
+    def advisory_sent(self, kelurahan: str, month: str, delivery: dict[str, str]) -> None:
+        self.advisory_deliveries[kelurahan] = delivery
+        if "ok" in delivery.values():
+            self.advisory_acks[kelurahan] = month
 
 
 def talk() -> tuple[Conversation, FakeBackend]:
@@ -245,3 +275,54 @@ def test_bulletins_are_delivered_to_group_and_babin_then_acknowledged() -> None:
     assert sent_tg == [("-100", "BULETIN A")] and sent_wa == [("628100", "BULETIN A")]
     assert backend.acked_bulletins["b1"] == {"telegram": "ok", "whatsapp": "ok"}
     assert "catatan" in backend.acked_bulletins["b2"]
+
+
+def test_group_commands_register_then_serve_advisory_and_stay_silent_otherwise() -> None:
+    from lapor_bot.core import group_command
+
+    backend = FakeBackend()
+    group = "120363@g.us"
+    assert group_command(backend, "WHATSAPP", group, "halo semua") is None
+    assert group_command(backend, "WHATSAPP", group, "/mulai") is None
+    need = group_command(backend, "WHATSAPP", group, "/rekomendasi")
+    assert need is not None and "/daftar" in need.text
+    bad = group_command(backend, "WHATSAPP", group, "/daftar Nirwana")
+    assert bad is not None and "tidak dikenal" in bad.text
+    ok = group_command(backend, "WHATSAPP", group, "/daftar tebet timur", "628@c.us")
+    assert ok is not None and "Tebet Timur" in ok.text and backend.groups[group] == "Tebet Timur"
+    assert backend.last_sender == "628@c.us"
+    advisory = group_command(backend, "WHATSAPP", group, "/rekomendasi")
+    assert advisory is not None and advisory.text == "IMBAUAN Tebet Timur depan"
+    explicit = group_command(backend, "WHATSAPP", group, "/rekomendasi Tebet Timur")
+    assert explicit is not None and "IMBAUAN" in explicit.text
+    help_ = group_command(backend, "WHATSAPP", group, "/bantuan")
+    assert help_ is not None and "/daftar" in help_.text
+
+
+def test_private_advisory_command_needs_a_kelurahan() -> None:
+    chat, backend = talk()
+    ask = chat.handle(Incoming(text="/rekomendasi"))
+    assert "Sebutkan kelurahannya" in ask.text
+    got = chat.handle(Incoming(text="/rekomendasi Tebet Timur"))
+    assert got.text == "IMBAUAN Tebet Timur depan"
+    assert "/rekomendasi" in chat.handle(Incoming(text="/bantuan")).text
+
+
+def test_monthly_advisories_go_to_registered_groups_once() -> None:
+    from lapor_bot.telegram import deliver_advisories
+
+    backend = FakeBackend()
+    backend.groups = {"g1@g.us": "Tebet Timur", "g2@g.us": "Manggarai"}
+    sent: list[tuple[str, str]] = []
+
+    def wa(chat_id: str, reply: Reply) -> None:
+        if chat_id == "g2@g.us":
+            raise RuntimeError("WAHA kirim: 500")
+        sent.append((chat_id, reply.text))
+
+    assert deliver_advisories(backend, whatsapp_send=None) == 0
+    assert deliver_advisories(backend, whatsapp_send=wa) == 1
+    assert sent == [("g1@g.us", "IMBAUAN Tebet Timur")]
+    assert backend.advisory_deliveries["Manggarai"]["whatsapp"].startswith("gagal")
+    # Bulan yang sama tidak dikirim dua kali ke grup yang sudah menerima.
+    assert deliver_advisories(backend, whatsapp_send=wa) == 0

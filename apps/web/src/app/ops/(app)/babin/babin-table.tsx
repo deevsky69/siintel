@@ -147,6 +147,14 @@ export function BabinTable({
                           <Chip on={Boolean(row.telegram_chat_id)} label="Telegram" />
                           <Chip on={Boolean(row.whatsapp_number)} label="WA Babin" />
                           <Chip on={Boolean(row.whatsapp_group_link)} label="Grup WA" />
+                          <Chip
+                            on={Boolean(row.whatsapp_group_chat_id)}
+                            label={
+                              row.advisory_sent_month
+                                ? `Imbauan ${row.advisory_sent_month}`
+                                : "Imbauan grup"
+                            }
+                          />
                         </span>
                       ) : (
                         <span className="text-ink-faint">—</span>
@@ -361,6 +369,19 @@ function BabinDrawer({
             </div>
           </div>
         </fieldset>
+        <div>
+          <label className="field-label" htmlFor="babin-group-chat">
+            Grup WhatsApp warga (imbauan bulanan){" "}
+            <span className="normal-case text-ink-faint">terisi lewat /daftar di grup</span>
+          </label>
+          <input
+            id="babin-group-chat"
+            name="whatsapp_group_chat_id"
+            defaultValue={row?.whatsapp_group_chat_id ?? ""}
+            placeholder="…@g.us"
+            className="field font-mono"
+          />
+        </div>
         <label className="flex items-center gap-2 text-xs text-ink-muted">
           <input type="checkbox" name="is_dummy" defaultChecked={row?.is_dummy ?? false} />
           Data dummy (berlabel di layar warga)

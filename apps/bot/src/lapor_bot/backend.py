@@ -49,6 +49,12 @@ class Backend(Protocol):
     def babin(self, kelurahan: str) -> dict[str, Any] | None: ...
     def pending_bulletins(self) -> list[dict[str, Any]]: ...
     def bulletin_sent(self, bulletin_id: str, delivery: dict[str, str]) -> None: ...
+    def register_group(
+        self, channel: str, chat_id: str, kelurahan: str, sender: str | None = None
+    ) -> dict[str, Any]: ...
+    def advisory(self, kelurahan: str, month: str | None = None) -> dict[str, Any]: ...
+    def pending_advisories(self) -> list[dict[str, Any]]: ...
+    def advisory_sent(self, kelurahan: str, month: str, delivery: dict[str, str]) -> None: ...
 
 
 def _message(response: httpx.Response) -> str:
@@ -151,5 +157,38 @@ class ApiBackend:
     def bulletin_sent(self, bulletin_id: str, delivery: dict[str, str]) -> None:
         response = self._client.post(
             f"/messaging/bulletins/{bulletin_id}/sent", json={"delivery": delivery}
+        )
+        self._raise(response)
+
+    def register_group(
+        self, channel: str, chat_id: str, kelurahan: str, sender: str | None = None
+    ) -> dict[str, Any]:
+        response = self._client.post(
+            "/messaging/groups",
+            json={"channel": channel, "chat_id": chat_id, "kelurahan": kelurahan, "sender": sender},
+        )
+        self._raise(response)
+        data: dict[str, Any] = response.json()
+        return data
+
+    def advisory(self, kelurahan: str, month: str | None = None) -> dict[str, Any]:
+        params: dict[str, str] = {"kelurahan": kelurahan}
+        if month:
+            params["month"] = month
+        response = self._client.get("/messaging/advisory", params=params)
+        self._raise(response)
+        data: dict[str, Any] = response.json()
+        return data
+
+    def pending_advisories(self) -> list[dict[str, Any]]:
+        response = self._client.get("/messaging/advisories/pending")
+        self._raise(response)
+        rows: list[dict[str, Any]] = response.json()["data"]
+        return rows
+
+    def advisory_sent(self, kelurahan: str, month: str, delivery: dict[str, str]) -> None:
+        response = self._client.post(
+            "/messaging/advisories/sent",
+            json={"kelurahan": kelurahan, "month": month, "delivery": delivery},
         )
         self._raise(response)

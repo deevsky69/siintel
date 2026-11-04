@@ -19,6 +19,7 @@ from .api.errors import register_error_handlers
 from .api.middleware import RequestContextMiddleware, SecurityHeadersMiddleware
 from .api.routers import (
     administration,
+    advisory,
     analytics,
     attachments,
     audit,
@@ -118,6 +119,7 @@ def create_app() -> FastAPI:
     api.include_router(case_files.router)
     api.include_router(babin.router)
     api.include_router(bulletins.router)
+    api.include_router(advisory.router)
     api.include_router(analytics.router)
     api.include_router(scoring.router)
     api.include_router(prediction_center.router)

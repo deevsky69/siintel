@@ -36,6 +36,7 @@ def main() -> None:
 
     telegram: TelegramChannel | None = None
     whatsapp_send: Callable[[str, Reply], None] | None = None
+    group_send: Callable[[str, Reply], None] | None = None
     if settings.telegram_bot_token:
         telegram = TelegramChannel(
             settings.telegram_bot_token, backend, settings.notify_interval_seconds
@@ -118,6 +119,8 @@ def main() -> None:
             settings.notify_interval_seconds,
         )
         waha.register(webhook)
+        # Imbauan ke GRUP hanya mungkin lewat WAHA; pengirim grup selalu WAHA bila ada.
+        group_send = waha.send
         # Sesi dibuat/diawasi terlepas dari siapa pengirim kabar WHATSAPP.
         threads.append(
             threading.Thread(target=waha.watch_session_forever, name="waha-sesi", daemon=True)
@@ -140,6 +143,7 @@ def main() -> None:
                     "backend": backend,
                     "telegram": telegram,
                     "whatsapp_send": whatsapp_send,
+                    "group_send": group_send,
                     "interval": max(60, settings.notify_interval_seconds * 4),
                 },
                 name="buletin",
