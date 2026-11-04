@@ -52,6 +52,7 @@ class Backend(Protocol):
     def register_group(
         self, channel: str, chat_id: str, kelurahan: str, sender: str | None = None
     ) -> dict[str, Any]: ...
+    def group_of(self, channel: str, chat_id: str) -> dict[str, Any] | None: ...
     def advisory(self, kelurahan: str, month: str | None = None) -> dict[str, Any]: ...
     def pending_advisories(self) -> list[dict[str, Any]]: ...
     def advisory_sent(self, kelurahan: str, month: str, delivery: dict[str, str]) -> None: ...
@@ -167,6 +168,16 @@ class ApiBackend:
             "/messaging/groups",
             json={"channel": channel, "chat_id": chat_id, "kelurahan": kelurahan, "sender": sender},
         )
+        self._raise(response)
+        data: dict[str, Any] = response.json()
+        return data
+
+    def group_of(self, channel: str, chat_id: str) -> dict[str, Any] | None:
+        response = self._client.get(
+            "/messaging/groups", params={"channel": channel, "chat_id": chat_id}
+        )
+        if response.status_code == 404:
+            return None
         self._raise(response)
         data: dict[str, Any] = response.json()
         return data

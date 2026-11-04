@@ -2,6 +2,7 @@
 
 ```text
 POST /messaging/groups                     daftarkan grup (chat id) ke satu kelurahan   kunci bot
+GET  /messaging/groups?channel=&chat_id=   kelurahan yang terdaftar untuk grup itu
 GET  /messaging/advisory?kelurahan=&month= teks imbauan satu kelurahan (untuk /rekomendasi)
 GET  /messaging/advisories/pending         grup terdaftar yang belum menerima imbauan bulan ini
 POST /messaging/advisories/sent            hasil pengiriman; menandai bulan terkirim
@@ -120,6 +121,26 @@ def register_group(payload: GroupRequest, session: Session = Depends(get_db)) ->
         detail={"channel": "WHATSAPP", "replaced": previous is not None},
     )
     session.commit()
+    return {"kelurahan": row.kelurahan, "kecamatan": row.kecamatan, "polsek": row.polsek}
+
+
+@router.get(
+    "/messaging/groups",
+    summary="Kelurahan yang terdaftar untuk satu grup",
+    dependencies=[Depends(require_messaging_key)],
+)
+def group_of(
+    channel: str = Query(),
+    chat_id: str = Query(min_length=3, max_length=64),
+    session: Session = Depends(get_db),
+) -> dict[str, Any]:
+    if channel.upper() != "WHATSAPP":
+        raise ApiError(status.HTTP_400_BAD_REQUEST, "Grup hanya untuk WHATSAPP.")
+    row = session.scalar(
+        select(Babinkamtibmas).where(Babinkamtibmas.whatsapp_group_chat_id == chat_id)
+    )
+    if row is None:
+        raise ApiError(status.HTTP_404_NOT_FOUND, "Grup ini belum didaftarkan.")
     return {"kelurahan": row.kelurahan, "kecamatan": row.kecamatan, "polsek": row.polsek}
 
 

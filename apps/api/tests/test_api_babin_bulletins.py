@@ -307,6 +307,22 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
     )
     assert moved.status_code == 200
 
+    # Bot mencari kelurahan grup lewat chat id-nya.
+    found = client.get(
+        "/api/v1/messaging/groups",
+        params={"channel": "WHATSAPP", "chat_id": "120363@g.us"},
+        headers=key,
+    )
+    assert found.status_code == 200 and found.json()["kelurahan"] == area.kelurahan
+    assert (
+        client.get(
+            "/api/v1/messaging/groups",
+            params={"channel": "WHATSAPP", "chat_id": "nope@g.us"},
+            headers=key,
+        ).status_code
+        == 404
+    )
+
     # /rekomendasi: teks bulan depan, tanpa skor/fungsi kepolisian.
     advisory = client.get(
         "/api/v1/messaging/advisory", params={"kelurahan": area.kelurahan}, headers=key

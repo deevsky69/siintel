@@ -234,17 +234,7 @@ class Conversation:
                 f"Kontak Babinkamtibmas Kelurahan {choice} belum tercatat. "
                 "Hubungi Polsek setempat atau 110 untuk keadaan darurat."
             )
-        rank = f"{contact['rank']} " if contact.get("rank") else ""
-        label = " (data peragaan)" if contact.get("is_dummy") else ""
-        lines = [
-            f"Babinkamtibmas Kelurahan {contact['kelurahan']}{label}:",
-            f"{rank}{contact['name']}",
-            f"Nomor dinas: {contact['phone_display']}",
-        ]
-        if contact.get("whatsapp_group_link"):
-            lines.append(f"Grup warga: {contact['whatsapp_group_link']}")
-        lines.append("Keadaan darurat: hubungi 110.")
-        return Reply("\n".join(lines))
+        return Reply("\n".join([*babin_lines(contact), "Keadaan darurat: hubungi 110."]))
 
     def _start(self) -> Reply:
         self._reset()
@@ -453,13 +443,65 @@ def advisory_reply(backend: Backend, kelurahan: str, month: str | None = None) -
     return Reply(str(data["text"]))
 
 
+def babin_lines(contact: dict[str, Any]) -> list[str]:
+    """Baris kontak Babin untuk warga: nomor dinas saja, tanpa tujuan buletin."""
+    rank = f"{contact['rank']} " if contact.get("rank") else ""
+    label = " (data peragaan)" if contact.get("is_dummy") else ""
+    lines = [
+        f"Babinkamtibmas Kelurahan {contact['kelurahan']}{label}: {rank}{contact['name']}",
+        f"Nomor dinas: {contact['phone_display']}",
+    ]
+    if contact.get("whatsapp_group_link"):
+        lines.append(f"Grup warga: {contact['whatsapp_group_link']}")
+    return lines
+
+
+def group_info(backend: Backend, channel: str, chat_id: str) -> Reply:
+    """Pesan pengenalan di grup (permintaan pemilik proyek 4 November 2026): fitur bot,
+    tautan SIGAP WARGA, dan kontak Babin kelurahan grup ini."""
+    area = backend.group_of(channel, chat_id)
+    lines = [
+        "*SIGAP* — bot kamtibmas Polres Metro Jakarta Selatan.",
+        "",
+        "Di grup ini saya bisa:",
+        "• /rekomendasi — imbauan kehati-hatian bulan depan: jenis kejadian yang biasa "
+        "terjadi di kelurahan ini, jam rawannya, dan tips pencegahan. Dikirim otomatis juga "
+        "setiap awal bulan.",
+        "• /babin — kontak Babinkamtibmas kelurahan ini.",
+        "• /bantuan — pesan ini.",
+        "",
+        f"Peta kerawanan, lapor kejadian, lacak laporan, dan Survey Rasa Aman: {DASHBOARD_URL}",
+        "Untuk melapor lewat WhatsApp, kirim pesan pribadi ke nomor ini dan ketik /mulai.",
+        "",
+    ]
+    if area is None:
+        lines.append(
+            "Grup ini belum didaftarkan ke kelurahan mana pun. Ketik /daftar <nama kelurahan> "
+            "agar imbauan bulanan dan kontak Babin sesuai wilayah grup."
+        )
+    else:
+        lines.append(
+            f"Grup ini terdaftar untuk Kelurahan {area['kelurahan']} ({area['kecamatan']})."
+        )
+        contact = backend.babin(str(area["kelurahan"]))
+        if contact:
+            lines.extend(babin_lines(contact))
+        else:
+            lines.append("Kontak Babinkamtibmas kelurahan ini belum tercatat.")
+    lines.append("Keadaan darurat: hubungi 110.")
+    return Reply("\n".join(lines))
+
+
 def group_command(
     backend: Backend, channel: str, chat_id: str, text: str, sender: str | None = None
 ) -> Reply | None:
-    """Perintah yang dilayani DI DALAM GRUP. Selain ini bot diam: alur laporan (tanpa nama,
-    berisi lokasi dan foto) tidak boleh berjalan di hadapan seluruh anggota grup."""
+    """Perintah yang dilayani DI DALAM GRUP. Pesan biasa dibiarkan: alur laporan (tanpa nama,
+    berisi lokasi dan foto) tidak boleh berjalan di hadapan seluruh anggota grup. Perintah
+    yang tidak dikenal dijawab pesan pengenalan."""
     stripped = text.strip()
     command = first_word(stripped.casefold())
+    if not command.startswith("/"):
+        return None
     if command in COMMAND_REGISTER:
         kelurahan = rest_of(stripped)
         if not kelurahan:
@@ -476,33 +518,27 @@ def group_command(
     if command in COMMAND_ADVISORY:
         kelurahan = rest_of(stripped)
         if not kelurahan:
-            registered = backend_group_kelurahan(backend, channel, chat_id)
+            registered = backend.group_of(channel, chat_id)
             if registered is None:
                 return Reply(
                     "Grup ini belum didaftarkan. Ketik /daftar <nama kelurahan>, "
                     "atau sebutkan kelurahannya: /rekomendasi Tebet Timur"
                 )
-            kelurahan = registered
+            kelurahan = str(registered["kelurahan"])
         return advisory_reply(backend, kelurahan)
-    if command in COMMAND_HELP:
-        return Reply(
-            "Perintah di grup:\n"
-            "/daftar <kelurahan> — mendaftarkan grup ini untuk imbauan bulanan\n"
-            "/rekomendasi — imbauan kehati-hatian bulan depan\n"
-            "Untuk melapor, kirim pesan pribadi ke nomor ini dan ketik /mulai."
-        )
-    return None
-
-
-def backend_group_kelurahan(backend: Backend, channel: str, chat_id: str) -> str | None:
-    """Kelurahan yang terdaftar untuk grup ini, dari antrean imbauan (tanpa endpoint baru)."""
-    try:
-        for row in backend.pending_advisories():
-            if str(row.get("chat_id")) == chat_id:
-                return str(row["kelurahan"])
-    except BackendError:
-        return None
-    return None
+    if command in COMMAND_BABIN:
+        registered = backend.group_of(channel, chat_id)
+        if registered is None:
+            return Reply("Grup ini belum didaftarkan. Ketik /daftar <nama kelurahan> dulu.")
+        contact = backend.babin(str(registered["kelurahan"]))
+        if not contact:
+            return Reply(
+                f"Kontak Babinkamtibmas Kelurahan {registered['kelurahan']} belum tercatat. "
+                "Keadaan darurat: 110."
+            )
+        return Reply("\n".join([*babin_lines(contact), "Keadaan darurat: hubungi 110."]))
+    # /mulai, /bantuan, /help, dan perintah lain yang tidak dikenal → pesan pengenalan.
+    return group_info(backend, channel, chat_id)
 
 
 def advisory_message(row: dict[str, Any]) -> str:

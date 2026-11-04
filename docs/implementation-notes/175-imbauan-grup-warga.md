@@ -47,9 +47,12 @@ panel samping Babinkamtibmas; lencana "Imbauan YYYY-MM" menunjukkan bulan terakh
   pemeriksaan pertama setelah bulan berganti; bila gagal, dicatat (audit
   `SEND_CITIZEN_ADVISORY`, hasil FAILED) dan dicoba lagi pada putaran berikutnya.
 - Permintaan: di grup `/rekomendasi` (kelurahan dari pendaftaran) atau `/rekomendasi <kelurahan>`;
-  di pesan pribadi `/rekomendasi <kelurahan>`. Di grup bot **hanya** melayani `/daftar`,
-  `/rekomendasi`, `/bantuan`; pesan lain diabaikan supaya alur laporan tidak berjalan di
-  hadapan seluruh anggota grup.
+  di pesan pribadi `/rekomendasi <kelurahan>`. Di grup bot melayani `/daftar`,
+  `/rekomendasi`, `/babin` (kontak Babin kelurahan grup), dan `/mulai`/`/bantuan`/perintah
+  tak dikenal → pesan pengenalan (fitur, tautan sigap.awansurya.com, kontak Babin; permintaan
+  pemilik proyek 4 November 2026 sore). Pesan biasa tanpa garis miring diabaikan supaya alur
+  laporan tidak berjalan di hadapan seluruh anggota grup. Kelurahan grup dicari lewat
+  `GET /messaging/groups` (bukan antrean imbauan, yang kosong setelah bulan itu terkirim).
 - Hanya WAHA yang dapat mengirim ke grup; pengirim grup selalu WAHA bila dikonfigurasi.
 
 ## Uji
