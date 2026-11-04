@@ -118,6 +118,10 @@ def main() -> None:
             settings.notify_interval_seconds,
         )
         waha.register(webhook)
+        # Sesi dibuat/diawasi terlepas dari siapa pengirim kabar WHATSAPP.
+        threads.append(
+            threading.Thread(target=waha.watch_session_forever, name="waha-sesi", daemon=True)
+        )
         if whatsapp_send is None:
             whatsapp_send = waha.send
         if not any(t.name in ("whatsapp-kabar", "twilio-kabar") for t in threads):

@@ -196,3 +196,32 @@ def test_ensure_session_leaves_existing_session_alone() -> None:
 
 def test_documented_vector_is_plain_hmac_sha512() -> None:
     assert hmac.new(b"my-secret-key", DOC_BODY, hashlib.sha512).hexdigest() == DOC_HMAC
+
+
+def test_watch_session_logs_status_changes_and_survives_errors(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    chan = channel()
+    statuses = iter([RuntimeError("belum siap"), "SCAN_QR_CODE", "WORKING", "WORKING"])
+
+    def ensure() -> str:
+        item = next(statuses)
+        if isinstance(item, Exception):
+            raise item
+        return item
+
+    ticks = {"n": 0}
+
+    def sleep(_seconds: float) -> None:
+        ticks["n"] += 1
+        if ticks["n"] >= 4:
+            raise StopIteration
+
+    monkeypatch.setattr(chan, "ensure_session", ensure)
+    monkeypatch.setattr(waha.time, "sleep", sleep)
+    with caplog.at_level("INFO", logger="lapor_bot.waha"), pytest.raises(StopIteration):
+        chan.watch_session_forever()
+    messages = [r.getMessage() for r in caplog.records]
+    assert any("belum siap" in m for m in messages)
+    assert any("scripts/waha-qr.sh" in m for m in messages)
+    assert sum("status WORKING" in m for m in messages) == 1

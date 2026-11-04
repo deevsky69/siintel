@@ -141,7 +141,6 @@ class WahaChannel:
         self._interval = notify_interval
         self._conversations: dict[str, Conversation] = {}
         self._lock = threading.Lock()
-        self._session_ready = False
 
     # -- sesi -------------------------------------------------------------------------
 
@@ -172,9 +171,24 @@ class WahaChannel:
             )
         if response.status_code >= 400:
             raise RuntimeError(f"WAHA sesi: {response.status_code} {response.text[:200]}")
-        status = str(response.json().get("status") or "")
-        self._session_ready = True
-        return status
+        return str(response.json().get("status") or "")
+
+    def watch_session_forever(self) -> None:
+        """Memastikan sesi ada dan mencatat perubahan statusnya; dijalankan di thread sendiri
+        supaya tidak bergantung pada siapa pengirim kabar WHATSAPP (Cloud API/Twilio/WAHA)."""
+        last: str | None = None
+        while True:
+            try:
+                status = self.ensure_session()
+                if status != last:
+                    log.info("WAHA: sesi '%s' status %s", self._session, status)
+                    if status == "SCAN_QR_CODE":
+                        log.warning("WAHA: nomor belum dipasangkan — jalankan scripts/waha-qr.sh")
+                    last = status
+            except Exception as error:  # noqa: BLE001
+                log.warning("WAHA belum siap (%s); mencoba lagi", str(error)[:160])
+                last = None
+            time.sleep(SESSION_RETRY_SECONDS)
 
     # -- kirim/terima -----------------------------------------------------------------
 
@@ -248,16 +262,6 @@ class WahaChannel:
     def notify_forever(self) -> None:
         log.info("WAHA: memeriksa kabar perkembangan tiap %s detik", self._interval)
         while True:
-            if not self._session_ready:
-                try:
-                    status = self.ensure_session()
-                    log.info("WAHA: sesi '%s' status %s", self._session, status)
-                    if status == "SCAN_QR_CODE":
-                        log.warning("WAHA: nomor belum dipasangkan — jalankan scripts/waha-qr.sh")
-                except Exception as error:  # noqa: BLE001
-                    log.warning("WAHA belum siap (%s); mencoba lagi", str(error)[:160])
-                    time.sleep(SESSION_RETRY_SECONDS)
-                    continue
             try:
                 for row in self._backend.updates(CHANNEL):
                     self.send(str(row["chat_id"]), Reply(progress_message(row)))

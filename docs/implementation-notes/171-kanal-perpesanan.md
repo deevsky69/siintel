@@ -63,7 +63,7 @@ setelah jawaban 200. Bot membuat sesi (`POST /api/sessions`, `start: true`, webh
 tidak ditimpa. Compose: layanan `waha` dengan `profiles: ["waha"]`, dinyalakan
 `deploy-produksi.sh` hanya bila `WAHA_API_KEY` terisi; volume `waha-sessions`.
 `scripts/waha-qr.sh` mengambil QR lewat kontainer bot (WAHA tidak terbuka ke host).
-Prioritas pengirim kabar WHATSAPP: Cloud API → Twilio → WAHA. Test: 12 kasus `test_waha.py`
+Prioritas pengirim kabar WHATSAPP: Cloud API → Twilio → WAHA. Pembuatan/pengawasan sesi berjalan di thread tersendiri (`watch_session_forever`), terlepas dari siapa pengirim kabar — deploy pertama 4 November 2026 memperlihatkan sesi tidak dibuat karena Twilio masih terpasang. Test: 12 kasus `test_waha.py`
 (38 total bot), ruff + mypy strict lulus; `docker compose config` valid dengan/tanpa profile.
 
 Belum diuji dengan WAHA sungguhan (butuh nomor cadangan dan deploy oleh pemilik proyek);
