@@ -124,6 +124,32 @@ def test_public_contact_shows_service_number_but_never_delivery_targets(
     )
 
 
+def test_babin_contact_can_be_deleted_by_manager_only(client: TestClient, session: Session) -> None:
+    """CRUD Babin (4 November 2026): hapus hanya oleh pemegang babin:manage, tercatat audit."""
+    area = _kelurahan(session)
+    admin = _login(client, session, "Administrator")
+    assert (
+        client.put(
+            f"/api/v1/babin/{area.kelurahan}",
+            json={"name": "Bripka Hapus", "phone_display": "021-0000000"},
+            headers=admin,
+        ).status_code
+        == 200
+    )
+    assert (
+        client.delete(
+            f"/api/v1/babin/{area.kelurahan}", headers=_login(client, session, "Pimpinan")
+        ).status_code
+        == 403
+    )
+    assert client.delete(f"/api/v1/babin/{area.kelurahan}", headers=admin).status_code == 204
+    assert client.delete(f"/api/v1/babin/{area.kelurahan}", headers=admin).status_code == 404
+    public = client.get("/api/v1/public/babin", params={"kelurahan": area.kelurahan})
+    assert public.status_code in (200, 404)
+    if public.status_code == 200:
+        assert public.json().get("data") in (None, {})
+
+
 def test_group_link_accepts_only_official_whatsapp_invites(
     client: TestClient, session: Session
 ) -> None:

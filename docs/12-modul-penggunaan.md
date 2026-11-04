@@ -29,7 +29,7 @@ Moderasi Survey Rasa Aman ada di menu **Laporan → Survey Rasa Aman** (Administ
 
 **Babinkamtibmas dan buletin kelurahan (tahap 3).** Kontak Babin per kelurahan (nomor dinas)
 tampil di panel kelurahan pada peta warga dan lewat perintah bot `/babin`; dikelola Administrator
-di **Laporan → Babinkamtibmas** (dummy berlabel dulu). **Buletin mingguan** disusun sistem dari
+di **Laporan → Babinkamtibmas** (dummy berlabel dulu) — sejak 4 November 2026 berupa tabel per kelurahan: cari, centang *Belum terisi*, **+ Tambah**, **Ubah/Isi**, dan **Hapus** di panel samping. **Buletin mingguan** disusun sistem dari
 minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetujui Pimpinan**, lalu
 bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
 `/dasbor` menautkan ke SIGAP WARGA.
@@ -461,7 +461,7 @@ di daftarnya, atau lewat formulir di menu **Input Data**.
 | Alur | Tahapannya | Diubah dari |
 |---|---|---|
 | **Laporan Petugas** (kejadian) | Dilaporkan → Penyelidikan → Penyidikan → Selesai | Kolom **Ubah status** pada menu Laporan Petugas |
-| **Laporan Masyarakat** | Diterima → Diverifikasi → Diteruskan → Ditangani → Selesai | Kolom **Ubah tahapan** pada menu Laporan Masyarakat, atau tab **Triase** di Input Data |
+| **Laporan Masyarakat** | Diterima → Diverifikasi → Diteruskan → Ditangani → Selesai | Kolom **Aksi** pada menu Laporan Masyarakat (**Rincian** membuka panel samping; pilihan tahapan di sebelahnya), atau tab **Triase** di Input Data |
 
 Caranya sama untuk keduanya: pilih tahapan baru dari daftar di baris yang bersangkutan, lalu
 tekan **Simpan**. Status yang sedang berlaku tidak muncul di pilihan — memilihnya akan

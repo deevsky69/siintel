@@ -4,6 +4,7 @@ import { Basis } from "@/components/basis";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { Attachments } from "@/components/reports/attachments";
+import { ReportDetail } from "@/components/reports/report-detail";
 import { StatusForm } from "@/components/reports/status-form";
 import { StatusNotice } from "@/components/warnings/status-notice";
 import {
@@ -32,28 +33,18 @@ function filterHref(current: CommunityFilters, change: Partial<CommunityFilters>
   return suffix ? `/ops/masyarakat?${suffix}` : "/ops/masyarakat";
 }
 
-function MetricCard({ label, value, hint }: { label: string; value: string; hint: string }) {
-  return (
-    <div className="rounded border border-base-800 bg-base-850 px-3 py-2.5">
-      <div className="stat-label">{label}</div>
-      <div className="mt-1 font-heading text-2xl font-bold leading-none text-ink">{value}</div>
-      <div className="mt-1.5 text-2xs leading-relaxed text-ink-muted">{hint}</div>
-    </div>
-  );
-}
-
-/** Satu pilihan penyaring: tautan, bukan tombol, supaya keadaannya tersimpan di URL. */
-function FilterChip({
+/** Ubin angka yang sekaligus penyaring: tautan, supaya keadaannya tersimpan di URL. */
+function StatTile({
   href,
   active,
   label,
-  count,
+  value,
   title,
 }: {
   href: string;
   active: boolean;
   label: string;
-  count: number;
+  value: number;
   title?: string;
 }) {
   return (
@@ -61,14 +52,38 @@ function FilterChip({
       href={href}
       title={title}
       aria-current={active ? "true" : undefined}
-      className={`flex items-center justify-between gap-3 rounded border px-3 py-2 text-xs transition ${
+      className={`flex min-w-[7.5rem] flex-col rounded border px-3 py-2 transition ${
         active
-          ? "border-accent/60 bg-accent/10 text-accent"
-          : "border-base-800 text-ink hover:border-accent/40 hover:text-accent-soft"
+          ? "border-accent/60 bg-accent/10"
+          : "border-base-800 bg-base-850/60 hover:border-accent/40"
       }`}
     >
-      <span className="min-w-0 truncate">{label}</span>
-      <span className="shrink-0 font-mono text-xs text-ink-muted">{count}</span>
+      <span className="stat-label">{label}</span>
+      <span className="mt-1 font-heading text-xl font-bold leading-none text-ink">{value}</span>
+    </Link>
+  );
+}
+
+function Chip({
+  href,
+  active,
+  label,
+  count,
+}: {
+  href: string;
+  active: boolean;
+  label: string;
+  count: number;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "true" : undefined}
+      className={`badge normal-case tracking-normal ${
+        active ? "bg-accent/15 text-accent" : "bg-base-850 text-ink-muted hover:text-accent-soft"
+      }`}
+    >
+      {label} <span className="font-mono">{count}</span>
     </Link>
   );
 }
@@ -80,75 +95,63 @@ function ReportTable({
   reports: CitizenReportRow[];
   statusLabels: Record<string, string>;
 }) {
+  const canWrite = Object.keys(statusLabels).length > 0;
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-xs">
+    <div className="table-scroll">
+      <table className="data-table">
         <thead>
-          <tr className="border-b border-base-800">
-            <th className="stat-label pb-2">Kode</th>
-            <th className="stat-label pb-2">Masuk</th>
-            <th className="stat-label pb-2">Kategori</th>
-            <th className="stat-label pb-2">Wilayah</th>
-            <th className="stat-label pb-2 text-right">Urgensi</th>
-            <th className="stat-label pb-2 text-right">Verifikasi</th>
-            <th className="stat-label pb-2">Tahapan</th>
-            <th className="stat-label pb-2">Ubah tahapan</th>
+          <tr>
+            <th>Kode</th>
+            <th>Masuk</th>
+            <th>Kategori</th>
+            <th>Wilayah</th>
+            <th className="num">Urgensi</th>
+            <th className="num">Verifikasi</th>
+            <th>Tahapan</th>
+            <th className="act">Aksi</th>
           </tr>
         </thead>
         <tbody>
           {reports.map((report) => (
-            <tr key={report.code} className="border-b border-base-800/60 align-top last:border-0">
-              <td className="py-2 pr-3 font-mono text-xs text-ink-muted">{report.code}</td>
-              <td className="py-2 pr-3 text-ink">{formatMoment(report.reported_at)}</td>
-              <td className="py-2 pr-3">
-                <div className="text-ink">{report.category}</div>
-                {report.description ? (
-                  <div className="mt-0.5 max-w-md text-2xs leading-relaxed text-ink-muted">
-                    {report.description}
-                  </div>
-                ) : null}
-                <Attachments code={report.code} count={report.attachments} />
+            <tr key={report.code}>
+              <td className="font-mono text-ink-muted">{report.code}</td>
+              <td className="whitespace-nowrap">{formatMoment(report.reported_at)}</td>
+              <td>
+                <span className="inline-flex flex-wrap items-center gap-1.5">
+                  {report.category}
+                  <Attachments code={report.code} count={report.attachments} />
+                </span>
               </td>
-              <td className="py-2 pr-3">
-                <div className={report.kecamatan ? "text-ink" : "text-ink-faint italic"}>
+              <td>
+                <span className={report.kecamatan ? "" : "italic text-ink-faint"}>
                   {areaOf(report)}
-                </div>
-                {report.location_text ? (
-                  <div className="mt-0.5 text-2xs text-ink-muted">{report.location_text}</div>
-                ) : null}
-                {/* Titik peranti pelapor dan titik pusat kecamatan terlihat sama sebagai
-                    sepasang angka. Yang pertama menunjuk tempat kejadian; yang kedua
-                    berjarak kilometer darinya. Petugas yang menriase perlu tahu yang mana. */}
+                </span>
                 {report.coordinate_source === "REPORTER_GPS" ? (
-                  <div className="mt-0.5 text-2xs text-accent">Titik dibagikan pelapor</div>
+                  <span className="mt-0.5 block text-2xs text-accent">Titik dibagikan pelapor</span>
                 ) : null}
               </td>
-              <td className="py-2 pr-3 text-right font-mono text-ink">
-                {report.urgency_score ?? "—"}
-              </td>
-              <td className="py-2 pr-3 text-right font-mono text-ink">
-                {report.verification_score ?? "—"}
-              </td>
-              <td className="py-2 pr-3">
+              <td className="num">{report.urgency_score ?? "—"}</td>
+              <td className="num">{report.verification_score ?? "—"}</td>
+              <td>
                 <span className={`badge ${REPORT_STATUS_CLASSES[report.status] ?? ""}`}>
                   {labelOf(REPORT_STATUS_LABELS, report.status)}
                 </span>
               </td>
-              <td className="py-2">
-                {/* Triase langsung di daftar. Formulir pada Input Data tetap ada — ia
-                    berguna ketika beberapa laporan ditriase berurutan — tetapi pertanyaan
-                    "bagaimana cara mengubah tahapan?" muncul justru saat seseorang sedang
-                    menatap daftarnya. */}
-                {Object.keys(statusLabels).length > 0 ? (
-                  <StatusForm
-                    code={report.code}
-                    current={report.status}
-                    options={statusLabels}
-                    action={changeReportStatus}
+              <td className="act">
+                <span className="inline-flex items-center gap-1.5">
+                  <ReportDetail
+                    report={report}
+                    statusLabel={labelOf(REPORT_STATUS_LABELS, report.status)}
                   />
-                ) : (
-                  <span className="text-2xs text-ink-faint">Perlu kewenangan menulis</span>
-                )}
+                  {canWrite ? (
+                    <StatusForm
+                      code={report.code}
+                      current={report.status}
+                      options={statusLabels}
+                      action={changeReportStatus}
+                    />
+                  ) : null}
+                </span>
               </td>
             </tr>
           ))}
@@ -159,14 +162,12 @@ function ReportTable({
 }
 
 /**
- * Community Signal Dashboard (TASK 024) — bagian tampilan.
+ * Laporan Masyarakat — tampilan tabel (TASK 024, 163; dirapikan 4 November 2026 atas
+ * permintaan pemilik proyek: matriks yang dapat dipindai, teks seperlunya).
  *
- * Dipisahkan dari pengambilan data supaya dapat diuji tanpa backend.
- *
- * Kalimat "belum memengaruhi risk score" diletakkan di atas seluruh angka, bukan sebagai
- * catatan kaki. Layar yang menampilkan urgensi dan verifikasi tanpa menyebutkan bahwa
- * keduanya sintetis akan membuat pembaca menyimpulkan ada mekanisme penilaian yang
- * sesungguhnya belum dibangun (spesifikasi §4, CLAUDE.md §27).
+ * Yang tetap wajib tampil dan tidak dihaluskan: laporan **belum memengaruhi risk score**,
+ * urgensi/verifikasi adalah isian petugas, dan deteksi duplikasi/spam belum dibangun
+ * (spesifikasi §4, CLAUDE.md §27). Ketiganya kini satu baris notice dan satu catatan kaki.
  */
 export function CommunityView({
   summary,
@@ -188,159 +189,109 @@ export function CommunityView({
       <StatusNotice status={summary.status} tone="caution">
         Laporan masyarakat <strong>belum memengaruhi risk score</strong>.
       </StatusNotice>
-      <Basis className="mt-0">{summary.basis}</Basis>
 
-      <Panel
-        title="Sinyal Masyarakat"
-        action={<span className="panel-action">kanal tanpa akun, tanpa identitas pelapor</span>}
-      >
-        {summary.total_reports === 0 ? (
+      {summary.total_reports === 0 ? (
+        <Panel title="Ringkasan">
           <EmptyState label="Belum ada laporan masyarakat pada cakupan Anda." />
-        ) : (
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-            <MetricCard
-              label="Laporan Masuk"
-              value={String(summary.total_reports)}
-              hint="Seluruh laporan pada cakupan wilayah akun Anda"
+          <p className="mt-2 text-2xs text-ink-faint">Tidak ada kategori laporan.</p>
+        </Panel>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            <StatTile
+              href="/ops/masyarakat"
+              active={!filtered}
+              label="Laporan masuk"
+              value={summary.total_reports}
             />
-            <MetricCard
-              label="Belum Terpetakan"
-              value={String(summary.unmapped_reports)}
-              hint={summary.unmapped_basis}
-            />
+            {REPORT_STATUSES.map((status) => (
+              <StatTile
+                key={status}
+                href={filterHref(filters, { status: filters.status === status ? null : status })}
+                active={filters.status === status}
+                label={REPORT_STATUS_LABELS[status]}
+                value={summary.per_status[status] ?? 0}
+                title={REPORT_STATUS_HINTS[status]}
+              />
+            ))}
           </div>
-        )}
-      </Panel>
-
-      <div className="grid grid-cols-12 gap-3">
-        <div className="col-span-12 xl:col-span-4">
-          <Panel title="Tahapan Penanganan">
-            {summary.total_reports === 0 ? (
-              <EmptyState label="Tidak ada laporan untuk dirinci." />
-            ) : (
-              <div className="space-y-1.5">
-                {REPORT_STATUSES.map((status) => (
-                  <FilterChip
-                    key={status}
-                    href={filterHref(filters, {
-                      status: filters.status === status ? null : status,
-                    })}
-                    active={filters.status === status}
-                    label={REPORT_STATUS_LABELS[status]}
-                    count={summary.per_status[status] ?? 0}
-                    title={REPORT_STATUS_HINTS[status]}
-                  />
-                ))}
-              </div>
-            )}
-          </Panel>
-        </div>
-
-        <div className="col-span-12 xl:col-span-4">
-          <Panel title="Kategori Laporan">
+          <div className="flex flex-wrap items-center gap-1.5 text-2xs text-ink-muted">
+            <span className="stat-label">Kategori</span>
             {categories.length === 0 ? (
-              <EmptyState label="Tidak ada kategori laporan." />
+              <span>Tidak ada kategori laporan.</span>
             ) : (
-              <div className="space-y-1.5">
-                {categories.map(([category, total]) => (
-                  <FilterChip
-                    key={category}
-                    href={filterHref(filters, {
-                      category: filters.category === category ? null : category,
-                    })}
-                    active={filters.category === category}
-                    label={category}
-                    count={total}
-                  />
-                ))}
-              </div>
+              categories.map(([category, total]) => (
+                <Chip
+                  key={category}
+                  href={filterHref(filters, {
+                    category: filters.category === category ? null : category,
+                  })}
+                  active={filters.category === category}
+                  label={category}
+                  count={total}
+                />
+              ))
             )}
-          </Panel>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-2xs text-ink-muted">
+            <span>
+              <span className="stat-label">Terbanyak</span>{" "}
+              {summary.top_areas.length === 0
+                ? "—"
+                : summary.top_areas.map((area) => `${area.kecamatan} ${area.total}`).join(" · ")}
+              <span className="text-ink-faint">
+                {" "}
+                (di mana warga melapor, bukan wilayah berisiko)
+              </span>
+            </span>
+            <span>
+              <span className="stat-label">Belum terpetakan</span> {summary.unmapped_reports}{" "}
+              <span className="text-ink-faint" title={summary.unmapped_basis}>
+                {summary.unmapped_basis}
+              </span>
+            </span>
+          </div>
         </div>
-
-        <div className="col-span-12 xl:col-span-4">
-          <Panel title="Wilayah dengan Laporan Terbanyak">
-            {summary.top_areas.length === 0 ? (
-              <EmptyState label="Tidak ada wilayah dengan laporan terpetakan." />
-            ) : (
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-base-800">
-                    <th className="stat-label pb-2">Kecamatan</th>
-                    <th className="stat-label pb-2">Polsek</th>
-                    <th className="stat-label pb-2 text-right">Laporan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {summary.top_areas.map((area) => (
-                    <tr key={area.kecamatan} className="border-b border-base-800/60 last:border-0">
-                      <td className="py-2 font-heading font-semibold text-ink">{area.kecamatan}</td>
-                      <td className="py-2 text-ink-muted">{area.polsek ?? "—"}</td>
-                      <td className="py-2 text-right font-mono text-ink">{area.total}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-            <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
-              Urutan ini menggambarkan <strong>di mana warga melapor</strong>, bukan di mana
-              risikonya tertinggi. Keduanya tidak selalu sejalan: wilayah yang warganya aktif
-              melapor akan tampak menonjol meskipun kejadiannya tidak lebih banyak.
-            </p>
-          </Panel>
-        </div>
-      </div>
+      )}
 
       <Panel
         title="Daftar Laporan"
         action={
-          <span className="panel-action">
-            {reports.pagination.total_items > 0
-              ? `${reports.data.length} dari ${reports.pagination.total_items} laporan`
-              : "tidak ada laporan"}
-          </span>
-        }
-      >
-        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-          {filtered ? (
-            <>
-              <span>Disaring:</span>
-              {filters.status ? (
-                <span className="badge bg-accent/15 text-accent">
-                  {labelOf(REPORT_STATUS_LABELS, filters.status)}
-                </span>
-              ) : null}
-              {filters.category ? (
-                <span className="badge bg-accent/15 text-accent">{filters.category}</span>
-              ) : null}
-              <Link href="/ops/masyarakat" className="text-accent hover:text-accent-soft">
+          <span className="flex items-center gap-2 text-2xs text-ink-muted">
+            {filtered ? (
+              <Link href="/ops/masyarakat" className="panel-action">
                 Hapus penyaringan
               </Link>
-            </>
-          ) : (
-            <span>Menampilkan seluruh laporan pada cakupan wilayah akun Anda.</span>
-          )}
-        </div>
-
+            ) : null}
+            <span>
+              {reports.pagination.total_items > 0
+                ? `${reports.data.length} dari ${reports.pagination.total_items} laporan`
+                : "tidak ada laporan"}
+            </span>
+          </span>
+        }
+        bodyClassName="p-0"
+      >
         {reports.data.length === 0 ? (
-          <EmptyState
-            label={
-              filtered
-                ? "Tidak ada laporan yang cocok dengan penyaringan ini."
-                : "Belum ada laporan masyarakat pada cakupan Anda."
-            }
-          />
+          <div className="p-4">
+            <EmptyState
+              label={
+                filtered
+                  ? "Tidak ada laporan yang cocok dengan penyaringan ini."
+                  : "Belum ada laporan masyarakat pada cakupan Anda."
+              }
+            />
+          </div>
         ) : (
           <ReportTable reports={reports.data} statusLabels={statusLabels} />
         )}
-
-        <p className="mt-3 border-t border-base-800 pt-3 text-2xs leading-relaxed text-ink-muted">
-          <strong>Urgensi</strong> dan <strong>verifikasi</strong> pada tabel ini diisi petugas saat
-          triase ({summary.status}); kosong berarti belum dinilai, dan tidak ada penilaian otomatis
-          di baliknya. Deteksi duplikasi dan deteksi spam yang disyaratkan spesifikasi §4 belum
-          dibangun, sehingga laporan di sini belum tersaring dari kemungkinan pengulangan.
+        <p className="border-t border-base-800 px-3 py-2 text-2xs leading-relaxed text-ink-faint">
+          Urgensi dan verifikasi diisi petugas saat triase ({summary.status}); tidak ada penilaian
+          otomatis. Deteksi duplikasi dan deteksi spam (spesifikasi §4) belum dibangun.
         </p>
       </Panel>
+
+      <Basis className="mt-0">{summary.basis}</Basis>
     </div>
   );
 }
