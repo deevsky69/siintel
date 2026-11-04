@@ -45,7 +45,7 @@ from urllib.parse import urlparse
 import httpx
 
 from .backend import Backend, BackendError
-from .core import Attachment, Conversation, Incoming, Reply, progress_message
+from .core import Attachment, Conversation, Incoming, Reply, group_command, progress_message
 from .webhook import Response, WebhookServer, run_later
 from .whatsapp import render
 
@@ -72,6 +72,10 @@ def signature_valid(key: str, raw: bytes, header: str) -> bool:
         return False
     expected = hmac.new(key.encode(), raw, hashlib.sha512).hexdigest()
     return hmac.compare_digest(header.strip().lower(), expected)
+
+
+def is_group(from_: str) -> bool:
+    return from_.endswith("@g.us")
 
 
 def chat_id_of(from_: str) -> str | None:
@@ -249,7 +253,13 @@ class WahaChannel:
         payload = event.get("payload") or {}
         if payload.get("fromMe"):
             return
-        chat = chat_id_of(str(payload.get("from") or ""))
+        sender = str(payload.get("from") or "")
+        if is_group(sender):
+            # Di grup hanya perintah imbauan yang dilayani (4 November 2026); alur laporan
+            # tidak pernah berjalan di hadapan seluruh anggota grup.
+            self.handle_group(sender, str(payload.get("body") or ""))
+            return
+        chat = chat_id_of(sender)
         if chat is None:
             return
         try:
@@ -257,6 +267,14 @@ class WahaChannel:
             self.send(chat, reply)
         except Exception:  # noqa: BLE001
             log.exception("WAHA: gagal menangani pesan dari satu percakapan")
+
+    def handle_group(self, group_id: str, text: str) -> None:
+        try:
+            reply = group_command(self._backend, CHANNEL, group_id, text)
+            if reply is not None:
+                self.send(group_id, reply)
+        except Exception:  # noqa: BLE001
+            log.exception("WAHA: gagal menangani perintah grup")
 
     def register(self, server: WebhookServer) -> None:
         def on_post(raw: bytes, headers: dict[str, str], _path: str) -> Response:

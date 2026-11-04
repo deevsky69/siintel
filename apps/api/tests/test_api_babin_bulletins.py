@@ -233,3 +233,94 @@ def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_b
     )
     assert entry is not None
     assert session.get(Bulletin, uuid.UUID(mine["id"])).sent_at is not None
+
+
+def test_citizen_group_registration_and_monthly_advisory_for_bot(
+    client: TestClient, session: Session
+) -> None:
+    """Imbauan grup warga (4 November 2026): /daftar mendaftarkan grup ke kelurahan ber-Babin,
+    bot menarik imbauan bulan berjalan untuk grup yang belum dikirimi, lalu menandainya."""
+    from prediksi_presisi_api.services import citizen_advisory, clock
+
+    key = BOT
+    area = _kelurahan(session)
+    admin = _login(client, session, "Administrator")
+    # Belum ada kontak Babin → pendaftaran ditolak dengan petunjuk, bukan dibuat diam-diam.
+    missing = client.post(
+        "/api/v1/messaging/groups",
+        json={"channel": "WHATSAPP", "chat_id": "120363@g.us", "kelurahan": area.kelurahan},
+        headers=key,
+    )
+    assert missing.status_code == 404 and "Babinkamtibmas" in missing.text
+    assert (
+        client.put(
+            f"/api/v1/babin/{area.kelurahan}",
+            json={"name": "Bripka Grup", "phone_display": "021-1234567"},
+            headers=admin,
+        ).status_code
+        == 200
+    )
+    assert (
+        client.post(
+            "/api/v1/messaging/groups",
+            json={"channel": "WHATSAPP", "chat_id": "628@c.us", "kelurahan": area.kelurahan},
+            headers=key,
+        ).status_code
+        == 400
+    )
+    registered = client.post(
+        "/api/v1/messaging/groups",
+        json={"channel": "WHATSAPP", "chat_id": "120363@g.us", "kelurahan": area.kelurahan},
+        headers=key,
+    )
+    assert registered.status_code == 200, registered.text
+    assert client.post("/api/v1/messaging/groups", json={}).status_code in (401, 422)
+
+    # /rekomendasi: teks bulan depan, tanpa skor/fungsi kepolisian.
+    advisory = client.get(
+        "/api/v1/messaging/advisory", params={"kelurahan": area.kelurahan}, headers=key
+    )
+    assert advisory.status_code == 200, advisory.text
+    body = advisory.json()
+    year, month = citizen_advisory.month_after(clock.citizen_now().astimezone(clock.JAKARTA).date())
+    assert body["target_month"] == f"{year:04d}-{month:02d}"
+    text = body["text"]
+    assert "IMBAUAN KAMTIBMAS" in text and str(area.kelurahan).upper() in text
+    for forbidden in ("SAMAPTA", "RESKRIM", "risk_score", "confidence", "patroli oleh"):
+        assert forbidden not in text
+    assert (
+        client.get(
+            "/api/v1/messaging/advisory", params={"kelurahan": "Nirwana"}, headers=key
+        ).status_code
+        == 404
+    )
+    assert (
+        client.get(
+            "/api/v1/messaging/advisory",
+            params={"kelurahan": area.kelurahan, "month": "2026-13"},
+            headers=key,
+        ).status_code
+        == 400
+    )
+
+    # Awal bulan: grup terdaftar masuk antrean sampai ditandai terkirim.
+    pending = client.get("/api/v1/messaging/advisories/pending", headers=key).json()
+    mine = next(row for row in pending["data"] if row["kelurahan"] == area.kelurahan)
+    assert mine["chat_id"] == "120363@g.us" and mine["month"] == pending["month"]
+    assert "IMBAUAN KAMTIBMAS" in mine["text"]
+    sent = client.post(
+        "/api/v1/messaging/advisories/sent",
+        json={
+            "kelurahan": area.kelurahan,
+            "month": pending["month"],
+            "delivery": {"whatsapp": "ok"},
+        },
+        headers=key,
+    )
+    assert sent.status_code == 200 and sent.json()["advisory_sent_month"] == pending["month"]
+    again = client.get("/api/v1/messaging/advisories/pending", headers=key).json()
+    assert all(row["kelurahan"] != area.kelurahan for row in again["data"])
+    # Layar petugas melihat grupnya terdaftar.
+    listing = client.get("/api/v1/babin", headers=admin).json()
+    row = next(r for r in listing["data"] if r["kelurahan"] == area.kelurahan)
+    assert row["whatsapp_group_chat_id"] == "120363@g.us"

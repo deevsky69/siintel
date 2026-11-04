@@ -976,6 +976,13 @@ tampil sama dengan laporan lain; pengenal percakapan tidak pernah tampil di laya
 Sejak 4 November 2026 **jam masuk laporan warga adalah waktu sebenarnya**, bukan jam acuan
 aplikasi; kejadian, skor, dan prediksi tetap mengikuti jam acuan.
 
+**Imbauan bulanan di grup WhatsApp warga (4 November 2026, peragaan lewat WAHA).** Nomor bot
+dimasukkan ke grup kelurahan (RT/RW dan Babin); di dalam grup ketik `/daftar <kelurahan>` sekali.
+Setiap awal bulan bot mengirim **imbauan kehati-hatian** (jenis ancaman, jam rawan menurut pola
+bulan yang sama tahun-tahun sebelumnya, tips) secara otomatis; `/rekomendasi` membalas imbauan
+bulan depan. Tanpa skor atau rekomendasi kepolisian — itu tetap di `/ops`. Di grup bot hanya
+menjawab `/daftar`, `/rekomendasi`, dan `/bantuan`; melapor tetap lewat pesan pribadi.
+
 Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
 pengiriman adalah **nomor tiket** seperti `RPT-0151` — satu-satunya penanda yang
 dipegangnya, dan ia tidak terikat ke nama siapa pun.

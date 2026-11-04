@@ -1,0 +1,56 @@
+# IMBAUAN KEHATI-HATIAN WARGA — SIGAP
+#
+# Status: PROPOSED — REQUIRES USER APPROVAL (teks imbauan belum ditinjau pemilik proyek).
+#
+# Dipakai bot WhatsApp (grup warga/RT/RW/Babin) untuk "imbauan bulan depan" — keputusan
+# pemilik proyek 4 November 2026: dikirim OTOMATIS awal bulan ke grup yang terdaftar, dan
+# atas permintaan lewat perintah /rekomendasi. Isinya untuk WARGA: jenis ancaman, jam rawan
+# menurut pola bulan yang sama tahun-tahun sebelumnya, dan tips. TIDAK memuat skor risiko,
+# fungsi, atau taktik kepolisian — itu tetap di aplikasi petugas (/ops), sesuai batas
+# informasi publik 2 November 2026.
+#
+# Satu tempat untuk mengubah kata-kata; kode tidak memuat teks imbauan (CLAUDE.md §12, §27).
+
+status: PROPOSED
+usulan: 2026-11-04
+
+#: Teks pembuka dan penutup pesan. {kelurahan} dan {bulan} diisi sistem.
+intro: "Imbauan kamtibmas Kelurahan {kelurahan} untuk {bulan}, dari pola kejadian bulan yang sama tahun-tahun sebelumnya."
+outro: "Keadaan darurat: 110. Melapor: ketik *lapor* di sini atau buka sigap.awansurya.com."
+
+#: Label jenis ancaman untuk warga.
+labels:
+  CURANMOR: Pencurian kendaraan bermotor
+  CURAT: Pencurian dengan pemberatan (rumah/toko)
+  CURAS: Pencurian dengan kekerasan
+  BEGAL: Begal
+  KEJAHATAN_JALANAN: Kejahatan jalanan
+  TAWURAN: Tawuran
+  PREMANISME: Premanisme
+  NARKOBA: Narkoba
+
+#: Tips per jenis — maksimal tiga baris pendek agar terbaca di WhatsApp.
+tips:
+  CURANMOR:
+    - Parkir di tempat terang dan berpenjaga; hindari meninggalkan motor di pinggir jalan pada jam rawan.
+    - Pakai kunci ganda (kunci stang + gembok cakram) dan jangan tinggalkan kunci di kendaraan.
+    - Catat nomor rangka dan mesin; laporkan segera bila hilang.
+  CURAT:
+    - Kunci pintu dan jendela sebelum tidur dan saat rumah kosong; nyalakan lampu teras.
+    - Titipkan rumah ke tetangga/RT bila bepergian lama; jangan umumkan di media sosial.
+    - Pasang kunci tambahan pada pintu belakang dan pagar.
+  CURAS:
+    - Hindari jalan sepi dan gelap pada jam rawan; bepergian berdua bila terpaksa.
+    - Simpan ponsel dan dompet tidak terlihat; jangan melawan pelaku bersenjata.
+    - Segera lapor 110 dan catat ciri pelaku serta arah kabur.
+  BEGAL:
+    - Hindari jalan sepi pada jam rawan; pilih jalur ramai meski lebih jauh.
+    - Jangan berhenti bila dibuntuti; menuju pos polisi atau tempat ramai terdekat.
+  KEJAHATAN_JALANAN:
+    - Waspada saat berjalan sendirian pada jam rawan; simpan barang berharga tidak terlihat.
+    - Laporkan orang/kendaraan mencurigakan ke Babinkamtibmas atau 110.
+  TAWURAN:
+    - Jauhi kerumunan remaja bersenjata; segera lapor 110 bila melihat tanda-tanda tawuran.
+    - Orang tua: pastikan anak berada di rumah pada jam rawan.
+  default:
+    - Tingkatkan kewaspadaan pada jam rawan; laporkan hal mencurigakan ke Babinkamtibmas atau 110.

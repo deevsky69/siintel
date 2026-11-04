@@ -35,6 +35,8 @@ COMMAND_CANCEL = ("/batal", "batal")
 COMMAND_HELP = ("/bantuan", "bantuan", "/help", "help")
 COMMAND_BABIN = ("/babin", "babin", "babinkamtibmas")
 COMMAND_DASHBOARD = ("/dasbor", "dasbor", "/web", "web")
+COMMAND_ADVISORY = ("/rekomendasi", "rekomendasi", "/imbauan", "imbauan")
+COMMAND_REGISTER = ("/daftar", "daftar")
 DASHBOARD_URL = "https://sigap.awansurya.com"
 
 MIN_DESCRIPTION = 10
@@ -51,6 +53,7 @@ HELP = (
     "/status — melihat status laporan Anda\n"
     "/babin — kontak Babinkamtibmas kelurahan Anda\n"
     "/dasbor — peta kerawanan, lacak laporan, dan survey di SIGAP WARGA\n"
+    "/rekomendasi <kelurahan> — imbauan kehati-hatian bulan depan\n"
     "/batal — membatalkan laporan yang sedang diisi\n\n"
     "Keadaan darurat: hubungi 110."
 )
@@ -184,6 +187,8 @@ class Conversation:
                     "SIGAP WARGA — peta kerawanan wilayah, lacak laporan, cek kendaraan, dan "
                     f"Survey Rasa Aman:\n{DASHBOARD_URL}"
                 )
+            if first_word(lowered) in COMMAND_ADVISORY:
+                return advisory_reply(self._backend, rest_of(text))
             if lowered in COMMAND_BABIN:
                 self._reset()
                 self.step = Step.BABIN_KECAMATAN
@@ -416,3 +421,87 @@ def progress_message(row: dict[str, Any]) -> str:
 def bulletin_message(row: dict[str, Any]) -> str:
     """Teks buletin apa adanya dari API (sudah disetujui Pimpinan)."""
     return str(row["content"])
+
+
+# ---------------------------------------------------------------------------
+# Imbauan bulanan untuk grup warga (4 November 2026)
+# ---------------------------------------------------------------------------
+
+
+def first_word(text: str) -> str:
+    return text.split(maxsplit=1)[0] if text.strip() else ""
+
+
+def rest_of(text: str) -> str:
+    parts = text.strip().split(maxsplit=1)
+    return parts[1].strip() if len(parts) > 1 else ""
+
+
+def advisory_reply(backend: Backend, kelurahan: str, month: str | None = None) -> Reply:
+    """Teks imbauan bulan depan untuk satu kelurahan; tanpa kelurahan, diminta menyebutkannya."""
+    if not kelurahan:
+        return Reply(
+            "Sebutkan kelurahannya, misalnya: /rekomendasi Tebet Timur\n"
+            "Di grup warga yang sudah didaftarkan (/daftar), cukup ketik /rekomendasi."
+        )
+    try:
+        data = backend.advisory(kelurahan, month)
+    except BackendError as error:
+        if error.status == 404:
+            return Reply(f'Kelurahan "{kelurahan}" tidak dikenal. Periksa ejaannya.')
+        return Reply(f"Imbauan belum dapat disusun: {error.message}")
+    return Reply(str(data["text"]))
+
+
+def group_command(backend: Backend, channel: str, chat_id: str, text: str) -> Reply | None:
+    """Perintah yang dilayani DI DALAM GRUP. Selain ini bot diam: alur laporan (tanpa nama,
+    berisi lokasi dan foto) tidak boleh berjalan di hadapan seluruh anggota grup."""
+    stripped = text.strip()
+    command = first_word(stripped.casefold())
+    if command in COMMAND_REGISTER:
+        kelurahan = rest_of(stripped)
+        if not kelurahan:
+            return Reply("Sebutkan kelurahannya, misalnya: /daftar Tebet Timur")
+        try:
+            area = backend.register_group(channel, chat_id, kelurahan)
+        except BackendError as error:
+            return Reply(error.message)
+        return Reply(
+            f"Grup ini terdaftar untuk Kelurahan {area['kelurahan']} ({area['kecamatan']}). "
+            "Imbauan kehati-hatian dikirim otomatis setiap awal bulan; ketik /rekomendasi "
+            "untuk imbauan bulan depan."
+        )
+    if command in COMMAND_ADVISORY:
+        kelurahan = rest_of(stripped)
+        if not kelurahan:
+            registered = backend_group_kelurahan(backend, channel, chat_id)
+            if registered is None:
+                return Reply(
+                    "Grup ini belum didaftarkan. Ketik /daftar <nama kelurahan>, "
+                    "atau sebutkan kelurahannya: /rekomendasi Tebet Timur"
+                )
+            kelurahan = registered
+        return advisory_reply(backend, kelurahan)
+    if command in COMMAND_HELP:
+        return Reply(
+            "Perintah di grup:\n"
+            "/daftar <kelurahan> — mendaftarkan grup ini untuk imbauan bulanan\n"
+            "/rekomendasi — imbauan kehati-hatian bulan depan\n"
+            "Untuk melapor, kirim pesan pribadi ke nomor ini dan ketik /mulai."
+        )
+    return None
+
+
+def backend_group_kelurahan(backend: Backend, channel: str, chat_id: str) -> str | None:
+    """Kelurahan yang terdaftar untuk grup ini, dari antrean imbauan (tanpa endpoint baru)."""
+    try:
+        for row in backend.pending_advisories():
+            if str(row.get("chat_id")) == chat_id:
+                return str(row["kelurahan"])
+    except BackendError:
+        return None
+    return None
+
+
+def advisory_message(row: dict[str, Any]) -> str:
+    return str(row["text"])
