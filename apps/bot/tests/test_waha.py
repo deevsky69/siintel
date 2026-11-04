@@ -227,16 +227,20 @@ def test_watch_session_logs_status_changes_and_survives_errors(
     assert sum("status WORKING" in m for m in messages) == 1
 
 
-def test_ensure_session_restarts_failed_session() -> None:
+@pytest.mark.parametrize(("status", "action"), [("FAILED", "restart"), ("STOPPED", "start")])
+def test_ensure_session_revives_dead_session_once_per_cooldown(status: str, action: str) -> None:
     calls: list[tuple[str, str]] = []
 
     def respond(request: httpx.Request) -> httpx.Response:
         calls.append((request.method, request.url.path))
         if request.method == "GET":
-            return httpx.Response(200, json={"name": "default", "status": "FAILED"})
+            return httpx.Response(200, json={"name": "default", "status": status})
         return httpx.Response(201, json={"name": "default", "status": "STARTING"})
 
     chan = channel()
     chan._http = httpx.Client(base_url="http://waha:3000", transport=httpx.MockTransport(respond))
     assert chan.ensure_session() == "STARTING"
-    assert calls == [("GET", "/api/sessions/default"), ("POST", "/api/sessions/default/start")]
+    assert calls == [("GET", "/api/sessions/default"), ("POST", f"/api/sessions/default/{action}")]
+    # Dalam masa jeda, status mati dilaporkan apa adanya tanpa POST lagi.
+    assert chan.ensure_session() == status
+    assert [m for m, _ in calls].count("POST") == 1

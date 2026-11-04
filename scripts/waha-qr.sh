@@ -4,7 +4,7 @@
 # WAHA tidak membuka port ke host dan tidak punya rute Traefik, jadi API-nya dipanggil dari
 # dalam kontainer bot (python + httpx sudah ada di sana). Yang dilakukan:
 #   1. memeriksa status sesi; bila FAILED/STOPPED (WAHA menghentikan paksa sesi yang QR-nya
-#      tidak dipindai ±3 menit) sesi dinyalakan lagi dan ditunggu sampai QR siap;
+#      tidak dipindai ±3 menit) sesi di-restart/start dan ditunggu sampai QR siap;
 #   2. MENCETAK kode QR di terminal — pindai langsung dari layar dalam ±20 detik; bila
 #      kedaluwarsa jalankan lagi.
 #
@@ -38,7 +38,9 @@ def status() -> str:
 
 s = status()
 if s in ("FAILED", "STOPPED"):
-    http.post(f"/api/sessions/{name}/start").raise_for_status()
+    # FAILED: `start` ditolak WAHA ("already running"); yang bekerja `restart`.
+    action = "restart" if s == "FAILED" else "start"
+    http.post(f"/api/sessions/{name}/{action}").raise_for_status()
     s = "STARTING"
 for _ in range(12):  # tunggu QR siap, paling lama ±60 detik
     if s not in ("STARTING",):

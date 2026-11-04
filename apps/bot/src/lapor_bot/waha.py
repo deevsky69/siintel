@@ -58,8 +58,10 @@ LOCATION_HINT = (
 )
 #: Jeda antar percobaan membuat sesi saat WAHA belum siap (detik).
 SESSION_RETRY_SECONDS = 15
-#: Status sesi yang perlu dinyalakan lagi lewat POST /api/sessions/{name}/start.
-RESTARTABLE = ("FAILED", "STOPPED")
+#: Status sesi yang perlu dinyalakan lagi, dan aksi POST /api/sessions/{name}/<aksi>-nya.
+RESTART_ACTION = {"FAILED": "restart", "STOPPED": "start"}
+#: Jangan menyalakan ulang sesi yang sama lebih sering dari ini (detik).
+RESTART_COOLDOWN_SECONDS = 120
 
 
 def signature_valid(key: str, raw: bytes, header: str) -> bool:
@@ -143,6 +145,7 @@ class WahaChannel:
         self._interval = notify_interval
         self._conversations: dict[str, Conversation] = {}
         self._lock = threading.Lock()
+        self._last_restart: float = -RESTART_COOLDOWN_SECONDS
 
     # -- sesi -------------------------------------------------------------------------
 
@@ -174,12 +177,14 @@ class WahaChannel:
         if response.status_code >= 400:
             raise RuntimeError(f"WAHA sesi: {response.status_code} {response.text[:200]}")
         status = str(response.json().get("status") or "")
-        if status in RESTARTABLE:
+        action = RESTART_ACTION.get(status)
+        if action and time.monotonic() - self._last_restart >= RESTART_COOLDOWN_SECONDS:
             # WAHA menghentikan paksa sesi yang QR-nya tidak dipindai ±3 menit (FAILED);
-            # dinyalakan lagi supaya QR baru tersedia saat pemilik siap memindai.
-            response = self._http.post(f"/api/sessions/{self._session}/start")
+            # `start` ditolak ("already running"), yang bekerja `restart`. STOPPED cukup `start`.
+            self._last_restart = time.monotonic()
+            response = self._http.post(f"/api/sessions/{self._session}/{action}")
             if response.status_code >= 400:
-                raise RuntimeError(f"WAHA start: {response.status_code} {response.text[:200]}")
+                raise RuntimeError(f"WAHA {action}: {response.status_code} {response.text[:200]}")
             status = str(response.json().get("status") or "STARTING")
         return status
 
