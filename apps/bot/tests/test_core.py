@@ -95,6 +95,14 @@ class FakeBackend:
         self.groups[chat_id] = "Tebet Timur"
         return {"kelurahan": "Tebet Timur", "kecamatan": "Tebet", "polsek": "Polsek Tebet"}
 
+    def group_of(self, channel: str, chat_id: str) -> dict[str, Any] | None:
+        kel = self.groups.get(chat_id)
+        return (
+            None
+            if kel is None
+            else {"kelurahan": kel, "kecamatan": "Tebet", "polsek": "Polsek Tebet"}
+        )
+
     def advisory(self, kelurahan: str, month: str | None = None) -> dict[str, Any]:
         if kelurahan.casefold() != "tebet timur":
             raise BackendError(404, "Kelurahan tidak dikenal pada master lokasi.")
@@ -283,7 +291,8 @@ def test_group_commands_register_then_serve_advisory_and_stay_silent_otherwise()
     backend = FakeBackend()
     group = "120363@g.us"
     assert group_command(backend, "WHATSAPP", group, "halo semua") is None
-    assert group_command(backend, "WHATSAPP", group, "/mulai") is None
+    intro = group_command(backend, "WHATSAPP", group, "/mulai")
+    assert intro is not None and "/daftar" in intro.text  # belum terdaftar → diarahkan
     need = group_command(backend, "WHATSAPP", group, "/rekomendasi")
     assert need is not None and "/daftar" in need.text
     bad = group_command(backend, "WHATSAPP", group, "/daftar Nirwana")
@@ -295,8 +304,26 @@ def test_group_commands_register_then_serve_advisory_and_stay_silent_otherwise()
     assert advisory is not None and advisory.text == "IMBAUAN Tebet Timur depan"
     explicit = group_command(backend, "WHATSAPP", group, "/rekomendasi Tebet Timur")
     assert explicit is not None and "IMBAUAN" in explicit.text
-    help_ = group_command(backend, "WHATSAPP", group, "/bantuan")
-    assert help_ is not None and "/daftar" in help_.text
+    # /mulai, /bantuan, dan perintah tak dikenal → pengenalan: fitur, tautan, kontak Babin.
+    backend.contact = {
+        "kelurahan": "Tebet Timur",
+        "rank": "Aipda",
+        "name": "Budi (dummy)",
+        "phone_display": "021-555",
+        "is_dummy": True,
+        "whatsapp_group_link": None,
+    }
+    for word in ("/mulai", "/bantuan", "/apaan"):
+        info = group_command(backend, "WHATSAPP", group, word)
+        assert info is not None
+        assert "/rekomendasi" in info.text and "sigap.awansurya.com" in info.text
+        assert "Aipda Budi (dummy)" in info.text and "021-555" in info.text
+        assert "Tebet Timur" in info.text
+    babin = group_command(backend, "WHATSAPP", group, "/babin")
+    assert babin is not None and "021-555" in babin.text and "110" in babin.text
+    # Grup yang belum terdaftar diarahkan ke /daftar, tanpa kontak.
+    fresh = group_command(backend, "WHATSAPP", "lain@g.us", "/mulai")
+    assert fresh is not None and "/daftar" in fresh.text and "021-555" not in fresh.text
 
 
 def test_private_advisory_command_needs_a_kelurahan() -> None:

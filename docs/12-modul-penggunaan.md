@@ -980,8 +980,9 @@ aplikasi; kejadian, skor, dan prediksi tetap mengikuti jam acuan.
 dimasukkan ke grup kelurahan (RT/RW dan Babin); di dalam grup ketik `/daftar <kelurahan>` sekali.
 Setiap awal bulan bot mengirim **imbauan kehati-hatian** (jenis ancaman, jam rawan menurut pola
 bulan yang sama tahun-tahun sebelumnya, tips) secara otomatis; `/rekomendasi` membalas imbauan
-bulan depan. Tanpa skor atau rekomendasi kepolisian — itu tetap di `/ops`. Di grup bot hanya
-menjawab `/daftar`, `/rekomendasi`, dan `/bantuan`; melapor tetap lewat pesan pribadi.
+bulan depan. Tanpa skor atau rekomendasi kepolisian — itu tetap di `/ops`. Di grup bot menjawab
+`/daftar`, `/rekomendasi`, `/babin`, dan `/mulai`/`/bantuan` (pengenalan: fitur, tautan SIGAP
+WARGA, kontak Babin); melapor tetap lewat pesan pribadi.
 
 Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
 pengiriman adalah **nomor tiket** seperti `RPT-0151` — satu-satunya penanda yang
