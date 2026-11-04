@@ -37,7 +37,9 @@ logger = logging.getLogger("prediksi_presisi.retention")
 
 def run() -> int:
     """Menjalankan satu putaran retensi. Mengembalikan jumlah berkas yang dihapus."""
-    now = clock.reference_now()
+    # `closed_at` laporan warga memakai waktu sebenarnya (`clock.citizen_now`), maka masa
+    # retensinya pun diukur dengan waktu sebenarnya — bukan jam acuan demo yang beku.
+    now = clock.citizen_now()
 
     orphans = attachments.sweep_staging()
     if orphans:

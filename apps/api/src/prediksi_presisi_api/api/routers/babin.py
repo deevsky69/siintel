@@ -4,6 +4,7 @@
 GET  /public/babin?kelurahan=       warga: nama, pangkat, nomor dinas, tautan grup   —
 GET  /babin                          daftar lengkap                                  babin:read
 PUT  /babin/{kelurahan}              buat/ubah kontak kelurahan                      babin:manage
+DELETE /babin/{kelurahan}            hapus kontak kelurahan (4 November 2026)        babin:manage
 ```
 Nomor yang ditampilkan adalah nomor DINAS (keputusan pemilik proyek). Baris dummy berlabel.
 Nomor WhatsApp Babin dan chat id grup Telegram tidak pernah keluar ke kanal publik: keduanya
@@ -15,7 +16,7 @@ from __future__ import annotations
 from typing import Any
 from urllib.parse import urlparse
 
-from fastapi import APIRouter, Depends, Path, Query, status
+from fastapi import APIRouter, Depends, Path, Query, Response, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -154,3 +155,38 @@ def upsert_babin(
     session.commit()
     session.refresh(row)
     return _full(row)
+
+
+@router.delete(
+    "/babin/{kelurahan}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Menghapus kontak Babin satu kelurahan",
+)
+def delete_babin(
+    kelurahan: str = Path(max_length=100),
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("babin:manage"),
+) -> Response:
+    """Kelurahan tanpa kontak kembali tampil "belum terisi" di layar petugas dan tanpa
+    kontak Babin di peta warga. Penghapusannya tercatat di jejak audit."""
+    row = session.scalar(
+        select(Babinkamtibmas).where(
+            func.lower(Babinkamtibmas.kelurahan) == kelurahan.strip().lower()
+        )
+    )
+    if row is None:
+        raise ApiError(status.HTTP_404_NOT_FOUND, "Kontak Babin kelurahan ini tidak ada.")
+    detail = {"name": row.name, "is_dummy": row.is_dummy}
+    resource_id = row.kelurahan
+    session.delete(row)
+    audit.record(
+        session,
+        action="DELETE_BABIN",
+        resource_type="babinkamtibmas",
+        result=audit.RESULT_SUCCESS,
+        user_id=current.user.user_id,
+        resource_id=resource_id,
+        detail=detail,
+    )
+    session.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

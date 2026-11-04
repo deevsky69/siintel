@@ -30,6 +30,19 @@ def reference_now() -> datetime:
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=JAKARTA)
 
 
+def citizen_now() -> datetime:
+    """Waktu SEBENARNYA untuk cap waktu laporan warga (keputusan pemilik proyek 4 November 2026,
+    pilihan A).
+
+    Laporan warga adalah interaksi langsung saat peragaan — lewat web, Android, Telegram, atau
+    WhatsApp — bukan arsip kejadian. Memberinya cap waktu acuan (`reference_now`, beku pada
+    1 Januari 2026) membuat setiap laporan tercatat pukul 00.00 tanggal itu, yang pada layar
+    petugas terbaca sebagai jam yang salah. Kejadian, skor risiko, prediksi, dan peringatan
+    tetap memakai waktu acuan.
+    """
+    return datetime.now(UTC)
+
+
 def is_demo_clock() -> bool:
     """Benar bila aplikasi memakai waktu acuan, bukan waktu sebenarnya.
 

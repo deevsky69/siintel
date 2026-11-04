@@ -98,10 +98,20 @@ def test_channel_requires_base_url_api_key_and_hmac_key() -> None:
         channel(base_url="")
 
 
-def test_fetch_only_downloads_from_waha_host() -> None:
+def test_fetch_uses_waha_file_path_on_known_host_only() -> None:
+    seen: list[str] = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        seen.append(str(request.url))
+        return httpx.Response(200, content=b"isi")
+
     chan = channel()
+    chan._http = httpx.Client(base_url="http://waha:3000", transport=httpx.MockTransport(respond))
+    # WAHA menulis host sesuai WAHA_BASE_URL-nya (bawaan localhost); hanya jalurnya dipakai.
+    assert chan.fetch("http://localhost:3000/api/files/x.jpg", "x.jpg", "image/jpeg")[1] == b"isi"
+    assert seen == ["http://waha:3000/api/files/x.jpg"]
     with pytest.raises(RuntimeError, match="di luar WAHA"):
-        chan.fetch("http://evil.example.com/api/files/x.jpg", "x.jpg", "image/jpeg")
+        chan.fetch("http://waha:3000/api/sessions/default", "x", "image/jpeg")
 
 
 def test_webhook_rejects_unsigned_posts_and_registers_route() -> None:
@@ -225,3 +235,22 @@ def test_watch_session_logs_status_changes_and_survives_errors(
     assert any("belum siap" in m for m in messages)
     assert any("scripts/waha-qr.sh" in m for m in messages)
     assert sum("status WORKING" in m for m in messages) == 1
+
+
+@pytest.mark.parametrize(("status", "action"), [("FAILED", "restart"), ("STOPPED", "start")])
+def test_ensure_session_revives_dead_session_once_per_cooldown(status: str, action: str) -> None:
+    calls: list[tuple[str, str]] = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        calls.append((request.method, request.url.path))
+        if request.method == "GET":
+            return httpx.Response(200, json={"name": "default", "status": status})
+        return httpx.Response(201, json={"name": "default", "status": "STARTING"})
+
+    chan = channel()
+    chan._http = httpx.Client(base_url="http://waha:3000", transport=httpx.MockTransport(respond))
+    assert chan.ensure_session() == "STARTING"
+    assert calls == [("GET", "/api/sessions/default"), ("POST", f"/api/sessions/default/{action}")]
+    # Dalam masa jeda, status mati dilaporkan apa adanya tanpa POST lagi.
+    assert chan.ensure_session() == status
+    assert [m for m, _ in calls].count("POST") == 1

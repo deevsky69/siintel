@@ -125,6 +125,7 @@ export default async function LaporanPetugasPage({
             {page.pagination.total_items} kejadian dalam cakupan Anda
           </span>
         }
+        bodyClassName="p-0 [&>p]:px-3 [&>p]:pb-3"
       >
         {rows.length === 0 ? (
           <EmptyState
@@ -135,39 +136,39 @@ export default async function LaporanPetugasPage({
             }
           />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="table-scroll">
+            <table className="data-table">
               <thead>
-                <tr className="text-2xs uppercase tracking-wider text-ink-faint">
-                  <th className="pb-1 font-normal">Kode</th>
-                  <th className="pb-1 font-normal">Waktu</th>
-                  <th className="pb-1 font-normal">Jenis</th>
-                  <th className="pb-1 font-normal">Wilayah</th>
-                  <th className="pb-1 font-normal">Modus</th>
-                  <th className="pb-1 font-normal">Status</th>
-                  <th className="pb-1 font-normal">Ubah status</th>
+                <tr>
+                  <th>Kode</th>
+                  <th>Waktu</th>
+                  <th>Jenis</th>
+                  <th>Wilayah</th>
+                  <th>Modus</th>
+                  <th>Status</th>
+                  <th className="act">Ubah status</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.code} className="border-t border-base-800 align-top">
-                    <td className="py-1.5 pr-3 font-mono text-2xs text-ink-muted">{row.code}</td>
-                    <td className="py-1.5 pr-3 whitespace-nowrap">
-                      <span className="text-ink">{row.incident_date}</span>{" "}
+                  <tr key={row.code}>
+                    <td className="font-mono text-ink-muted">{row.code}</td>
+                    <td className="whitespace-nowrap">
+                      {row.incident_date}{" "}
                       <span className="font-mono text-2xs text-ink-faint">{jamKejadian(row)}</span>
                     </td>
-                    <td className="py-1.5 pr-3 text-ink">{row.incident_type}</td>
-                    <td className="py-1.5 pr-3 text-ink-muted">
+                    <td>{row.incident_type}</td>
+                    <td className="text-ink-muted">
                       {row.kecamatan}
                       {row.kelurahan ? (
                         <span className="block text-2xs text-ink-faint">{row.kelurahan}</span>
                       ) : null}
                     </td>
-                    <td className="py-1.5 pr-3 text-ink-muted">{row.modus ?? "—"}</td>
-                    <td className="py-1.5 pr-3 text-ink-muted">
+                    <td className="text-ink-muted">{row.modus ?? "—"}</td>
+                    <td className="text-ink-muted">
                       {row.status ? (statusLabels[row.status] ?? row.status) : "—"}
                     </td>
-                    <td className="py-1.5">
+                    <td className="act">
                       {Object.keys(statusLabels).length > 0 ? (
                         <StatusForm
                           code={row.code}
@@ -187,15 +188,9 @@ export default async function LaporanPetugasPage({
         )}
 
         <p className="mt-3 text-2xs leading-relaxed text-ink-faint">
-          Alur penanganan <strong>Dilaporkan → Penyelidikan → Penyidikan → Selesai</strong> boleh
-          <strong> mundur dan melompat</strong>. Itu disengaja: belum ada SOP yang menetapkan
-          urutannya wajib, dan melarang mundur berarti perkara yang keliru ditutup tidak akan pernah
-          dapat dibuka kembali. Setiap perpindahan tercatat di jejak audit lengkap dengan status
-          sebelum dan sesudahnya.
-        </p>
-        <p className="mt-1.5 text-2xs leading-relaxed text-ink-faint">
-          Setiap baris di sini <strong>dicatat petugas</strong> dan karenanya sudah terverifikasi.
-          Identitas korban, pelaku, dan saksi tidak disimpan pada sistem ini.
+          Status boleh mundur dan melompat (belum ada SOP urutan wajib); setiap perpindahan tercatat
+          di jejak audit. Baris di sini dicatat petugas; identitas korban, pelaku, dan saksi tidak
+          disimpan.
         </p>
       </Panel>
     </div>

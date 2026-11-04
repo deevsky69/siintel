@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { putBabin } from "@/lib/babin";
+import { deleteBabin, putBabin } from "@/lib/babin";
 
 export type BabinState = { error: string | null; done: string | null };
 
@@ -26,4 +26,16 @@ export async function saveBabin(_previous: BabinState, form: FormData): Promise<
   }
   revalidatePath("/ops/babin");
   return { error: null, done: `Kontak ${kelurahan} tersimpan.` };
+}
+
+export async function removeBabin(_previous: BabinState, form: FormData): Promise<BabinState> {
+  const kelurahan = String(form.get("kelurahan") ?? "");
+  if (!kelurahan) return { error: "Kelurahan tidak dikenal.", done: null };
+  try {
+    await deleteBabin(kelurahan);
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Gagal menghapus.", done: null };
+  }
+  revalidatePath("/ops/babin");
+  return { error: null, done: `Kontak ${kelurahan} dihapus.` };
 }

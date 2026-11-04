@@ -53,11 +53,17 @@ log = logging.getLogger("lapor_bot.waha")
 CHANNEL = "WHATSAPP"
 WEBHOOK_PATH = "/webhook/waha"
 MAX_FILE_BYTES = 16 * 1024 * 1024
+#: Awalan jalur berkas media yang disajikan WAHA.
+MEDIA_PATH = "/api/files/"
 LOCATION_HINT = (
     "\n\nUntuk membagikan lokasi: tekan ikon lampiran (klip) di WhatsApp, pilih Lokasi, lalu kirim."
 )
 #: Jeda antar percobaan membuat sesi saat WAHA belum siap (detik).
 SESSION_RETRY_SECONDS = 15
+#: Status sesi yang perlu dinyalakan lagi, dan aksi POST /api/sessions/{name}/<aksi>-nya.
+RESTART_ACTION = {"FAILED": "restart", "STOPPED": "start"}
+#: Jangan menyalakan ulang sesi yang sama lebih sering dari ini (detik).
+RESTART_COOLDOWN_SECONDS = 120
 
 
 def signature_valid(key: str, raw: bytes, header: str) -> bool:
@@ -132,7 +138,6 @@ class WahaChannel:
                 "pesan palsu ke webhook."
             )
         self._base = base_url.rstrip("/")
-        self._host = (urlparse(self._base).hostname or "").lower()
         self._session = session
         self._hmac_key = hmac_key
         self._webhook_url = webhook_url
@@ -141,6 +146,7 @@ class WahaChannel:
         self._interval = notify_interval
         self._conversations: dict[str, Conversation] = {}
         self._lock = threading.Lock()
+        self._last_restart: float = -RESTART_COOLDOWN_SECONDS
 
     # -- sesi -------------------------------------------------------------------------
 
@@ -171,7 +177,17 @@ class WahaChannel:
             )
         if response.status_code >= 400:
             raise RuntimeError(f"WAHA sesi: {response.status_code} {response.text[:200]}")
-        return str(response.json().get("status") or "")
+        status = str(response.json().get("status") or "")
+        action = RESTART_ACTION.get(status)
+        if action and time.monotonic() - self._last_restart >= RESTART_COOLDOWN_SECONDS:
+            # WAHA menghentikan paksa sesi yang QR-nya tidak dipindai ±3 menit (FAILED);
+            # `start` ditolak ("already running"), yang bekerja `restart`. STOPPED cukup `start`.
+            self._last_restart = time.monotonic()
+            response = self._http.post(f"/api/sessions/{self._session}/{action}")
+            if response.status_code >= 400:
+                raise RuntimeError(f"WAHA {action}: {response.status_code} {response.text[:200]}")
+            status = str(response.json().get("status") or "STARTING")
+        return status
 
     def watch_session_forever(self) -> None:
         """Memastikan sesi ada dan mencatat perubahan statusnya; dijalankan di thread sendiri
@@ -206,9 +222,14 @@ class WahaChannel:
             raise RuntimeError(f"WAHA kirim: {response.status_code} {response.text[:200]}")
 
     def fetch(self, url: str, filename: str, media_type: str) -> tuple[str, bytes, str]:
-        if (urlparse(url).hostname or "").lower() != self._host:
+        # WAHA menulis URL media dengan host sesuai WAHA_BASE_URL-nya (bawaan localhost),
+        # yang tidak selalu sama dengan alamat yang dipakai bot. Hanya jalurnya yang dipakai,
+        # dan harus jalur berkas WAHA; unduhan selalu ke host WAHA yang dikenal bot, sehingga
+        # kunci API tidak pernah terkirim ke host lain.
+        path = urlparse(url).path
+        if not path.startswith(MEDIA_PATH):
             raise RuntimeError("Alamat media di luar WAHA.")
-        response = self._http.get(url)
+        response = self._http.get(path)
         if response.status_code >= 400:
             raise RuntimeError(f"WAHA media: {response.status_code}")
         if len(response.content) > MAX_FILE_BYTES:

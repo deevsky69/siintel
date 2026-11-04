@@ -65,6 +65,9 @@ const CALLBACK_ALLOWED: Record<string, string> = {
   "components/shell/topbar.tsx":
     "prop `onMenu` datang dari ShellFrame, yang juga komponen klien — laci navigasi " +
     "memerlukan keadaan, dan keadaan tidak dapat hidup di komponen server.",
+  "components/drawer.tsx":
+    "prop `onClose` datang dari BabinTable dan ReportDetail, keduanya komponen klien — " +
+    "panel samping dibuka/ditutup oleh keadaan klien (4 November 2026).",
 };
 
 /** Jalur modul yang diimpor sebuah berkas, dinyatakan relatif terhadap `src`. */

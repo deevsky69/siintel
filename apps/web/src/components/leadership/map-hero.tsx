@@ -88,7 +88,7 @@ export function MapHero({
             <>
               <nav aria-label="Tingkat wilayah" className="flex flex-wrap items-center gap-1.5">
                 <Link
-                  href="/?tingkat=polda"
+                  href="/ops?tingkat=polda"
                   scroll={false}
                   aria-current={level === "polda" ? "page" : undefined}
                   className={`rounded px-1.5 py-0.5 text-xs transition-colors ${
@@ -103,7 +103,7 @@ export function MapHero({
                   &#8250;
                 </span>
                 <Link
-                  href="/?tingkat=kecamatan"
+                  href="/ops?tingkat=kecamatan"
                   scroll={false}
                   aria-current={level === "kecamatan" ? "page" : undefined}
                   className={`${crumb} ${level === "kecamatan" ? crumbOn : crumbOff}`}
@@ -116,7 +116,7 @@ export function MapHero({
                       &#8250;
                     </span>
                     <Link
-                      href={`/?tingkat=kelurahan&wilayah=${encodeURIComponent(selected)}`}
+                      href={`/ops?tingkat=kelurahan&wilayah=${encodeURIComponent(selected)}`}
                       scroll={false}
                       aria-current="page"
                       className={`${crumb} ${crumbOn}`}

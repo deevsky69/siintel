@@ -196,6 +196,48 @@
   .table-scroll {
     @apply -mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0;
   }
+
+  /* Tabel data padat untuk layar CRUD (4 November 2026): kepala kolom kecil dan lengket,
+     baris rapat, sorotan saat kursor lewat, kolom aksi rata kanan. Rujukan pola: tabel
+     kontak Attio / Cake Equity (Refero). */
+  .data-table {
+    @apply w-full border-separate border-spacing-0 text-left text-xs;
+  }
+  .data-table th {
+    @apply sticky top-0 z-10 border-b border-base-800 bg-base-900 px-2.5 py-2 text-2xs font-medium uppercase tracking-[0.12em] text-ink-muted;
+  }
+  .data-table td {
+    @apply border-b border-base-800/60 px-2.5 py-2 align-middle text-ink;
+  }
+  .data-table tbody tr:hover td {
+    @apply bg-base-850/60;
+  }
+  .data-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+  .data-table .num {
+    @apply text-right font-mono;
+  }
+  .data-table .act {
+    @apply whitespace-nowrap text-right;
+  }
+
+  /* Tombol kecil di baris tabel dan toolbar. */
+  .btn-sm {
+    @apply inline-flex items-center gap-1 rounded border border-base-700 bg-base-850 px-2 py-1 text-2xs font-semibold text-ink transition-colors hover:border-accent/50 hover:text-accent disabled:opacity-50;
+  }
+  .btn-sm-primary {
+    @apply inline-flex items-center gap-1 rounded border border-accent/60 bg-accent/15 px-2.5 py-1 text-2xs font-semibold uppercase tracking-wider text-accent transition-colors hover:bg-accent/25 disabled:opacity-50;
+  }
+  .btn-sm-danger {
+    @apply inline-flex items-center gap-1 rounded border border-risk-critical/50 bg-risk-critical/10 px-2 py-1 text-2xs font-semibold text-risk-critical transition-colors hover:bg-risk-critical/20 disabled:opacity-50;
+  }
+  .field {
+    @apply w-full rounded border border-base-700 bg-base-850 px-2 py-1.5 text-xs text-ink placeholder:text-ink-faint focus:border-accent/60 focus:outline-none;
+  }
+  .field-label {
+    @apply mb-1 block text-2xs font-medium uppercase tracking-wider text-ink-muted;
+  }
 }
 
 /* Sorotan notifikasi mendesak (darurat, tawuran, begal) — 9 Oktober 2026. */

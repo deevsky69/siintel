@@ -215,6 +215,8 @@ services:
     environment:
       WHATSAPP_DEFAULT_ENGINE: NOWEB
       WAHA_API_KEY: ${WAHA_API_KEY:-}
+      # Dipakai WAHA menulis URL media di webhook; bot tetap hanya memakai jalurnya.
+      WAHA_BASE_URL: http://waha:3000
       # Dashboard dan Swagger tidak dipakai; QR diambil lewat API oleh scripts/waha-qr.sh.
       WAHA_DASHBOARD_ENABLED: "false"
       WHATSAPP_SWAGGER_ENABLED: "false"

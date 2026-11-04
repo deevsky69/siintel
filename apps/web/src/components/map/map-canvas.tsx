@@ -352,7 +352,9 @@ export function MapCanvas({
       // Hanya Jakarta Selatan yang dapat diselami: sebelas wilayah lain berada di luar
       // wilayah hukum Polres ini, dan sistem tidak memegang datanya.
       if (name !== HOME_AREA) return null;
-      return linkTo === "home" ? "/?tingkat=kecamatan" : mapHref(null, layer, months, "kecamatan");
+      return linkTo === "home"
+        ? "/ops?tingkat=kecamatan"
+        : mapHref(null, layer, months, "kecamatan");
     }
     // Kelurahan tidak dapat diselami lebih jauh, tetapi dapat DIBUKA rinciannya: sejak data
     // asli sel penilaian memang setingkat kelurahan (5 Oktober 2026). Beranda ikut turun
@@ -360,11 +362,11 @@ export function MapCanvas({
     if (level === "kelurahan") {
       if (focus == null) return null;
       return linkTo === "home"
-        ? `/?tingkat=kelurahan&wilayah=${encodeURIComponent(focus)}&kelurahan=${encodeURIComponent(name)}`
+        ? `/ops?tingkat=kelurahan&wilayah=${encodeURIComponent(focus)}&kelurahan=${encodeURIComponent(name)}`
         : mapHref(focus, layer, months, "kelurahan", name);
     }
     return linkTo === "home"
-      ? `/?tingkat=kelurahan&wilayah=${encodeURIComponent(name)}`
+      ? `/ops?tingkat=kelurahan&wilayah=${encodeURIComponent(name)}`
       : mapHref(name, layer, months, "kelurahan");
   };
 

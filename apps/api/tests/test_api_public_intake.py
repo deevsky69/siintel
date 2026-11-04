@@ -256,8 +256,21 @@ def test_an_unknown_kecamatan_is_refused(client: TestClient, session: Session) -
     assert response.status_code == 400, response.text
 
 
+def test_reported_at_uses_the_real_clock_not_the_demo_reference(
+    client: TestClient, session: Session
+) -> None:
+    """Keputusan 4 November 2026 (A): laporan warga bercap waktu sebenarnya, bukan jam acuan."""
+    from datetime import datetime
+
+    response = client.post("/api/v1/public/citizen-reports", json=_payload(session))
+    assert response.status_code == 201, response.text
+    reported_at = datetime.fromisoformat(response.json()["reported_at"])
+    assert abs((reported_at - clock.citizen_now()).total_seconds()) < 60
+    assert abs((reported_at - clock.reference_now()).total_seconds()) > 3600
+
+
 def test_a_future_incident_time_is_refused(client: TestClient, session: Session) -> None:
-    ahead = (clock.reference_now() + timedelta(hours=2)).isoformat()
+    ahead = (clock.citizen_now() + timedelta(hours=2)).isoformat()
 
     response = client.post(
         "/api/v1/public/citizen-reports", json=_payload(session, incident_time=ahead)
@@ -271,7 +284,7 @@ def test_a_very_old_incident_is_pointed_to_the_proper_channel(
 ) -> None:
     from prediksi_presisi_api.api.routers.public_intake import MAX_INCIDENT_AGE_DAYS
 
-    old = (clock.reference_now() - timedelta(days=MAX_INCIDENT_AGE_DAYS + 1)).isoformat()
+    old = (clock.citizen_now() - timedelta(days=MAX_INCIDENT_AGE_DAYS + 1)).isoformat()
 
     response = client.post(
         "/api/v1/public/citizen-reports", json=_payload(session, incident_time=old)

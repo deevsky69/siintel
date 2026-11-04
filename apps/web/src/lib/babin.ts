@@ -38,6 +38,21 @@ export async function putBabin(
   return payload as BabinRow;
 }
 
+export async function deleteBabin(kelurahan: string): Promise<void> {
+  const { BASE_URL } = await import("./api");
+  const { readSession } = await import("./session");
+  const session = await readSession();
+  const response = await fetch(`${BASE_URL}/api/v1/babin/${encodeURIComponent(kelurahan)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${session?.accessToken ?? ""}` },
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload?.error?.message ?? `API ${response.status}`);
+  }
+}
+
 export type BulletinRow = {
   id: string;
   week_start: string;

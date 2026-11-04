@@ -70,6 +70,20 @@ Belum diuji dengan WAHA sungguhan (butuh nomor cadangan dan deploy oleh pemilik 
 bentuk `payload.location` pada mesin NOWEB belum dikonfirmasi dari sumber — bila kosong,
 periksa `payload._data` pada pesan lokasi pertama.
 
+## Tambahan 4 November 2026 — uji WAHA dari ponsel sungguhan, dan cap waktu laporan warga
+
+Uji nyata: nomor cadangan dipasangkan (QR dicetak di terminal oleh `scripts/waha-qr.sh`),
+`mulai` → kategori → kecamatan → lokasi → uraian → foto → tiket, semuanya berhasil. Tiga
+cacat ditemukan dan diperbaiki di hari yang sama: sesi WAHA tidak dibuat bila Twilio masih
+terpasang (thread sesi dipisah), sesi `FAILED` setelah QR tidak dipindai ±3 menit (`restart`,
+bukan `start`, dengan jeda 2 menit), dan URL media WAHA berhost `localhost` ditolak pengaman
+host (kini hanya jalur `/api/files/` yang dipakai, unduhan selalu ke host WAHA milik bot).
+
+Laporan hasil uji tercatat **1 Januari 2026 00.00**: `reported_at` memakai jam acuan demo.
+Pemilik proyek memilih **A**: laporan warga bercap waktu sebenarnya (`clock.citizen_now`
+di `public_intake`, `closed_at` di `data_entry`, dan pembersih retensi), jam acuan tetap
+untuk yang lain. Test `test_reported_at_uses_the_real_clock_not_the_demo_reference`.
+
 ## Belum
 
 - WhatsApp menunggu akun bisnis Meta (gate di docs/01 §19.2).
