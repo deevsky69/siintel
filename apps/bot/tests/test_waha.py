@@ -133,20 +133,26 @@ def test_group_messages_only_answer_advisory_commands(monkeypatch: pytest.Monkey
     monkeypatch.setattr(
         waha,
         "group_command",
-        lambda backend, channel_, chat, text: (
-            Reply(f"grup:{text}") if text.startswith("/") else None
+        lambda backend, channel_, chat, text, sender=None: (
+            Reply(f"grup:{text}:{sender}") if text.startswith("/") else None
         ),
     )
 
     def event(body: str) -> dict[str, Any]:
         return {
             "event": "message",
-            "payload": {"from": "120363@g.us", "fromMe": False, "body": body, "hasMedia": False},
+            "payload": {
+                "from": "120363@g.us",
+                "participant": "628@c.us",
+                "fromMe": False,
+                "body": body,
+                "hasMedia": False,
+            },
         }
 
     chan.handle(event("halo"))
     chan.handle(event("/rekomendasi"))
-    assert sent == [("120363@g.us", "grup:/rekomendasi")]
+    assert sent == [("120363@g.us", "grup:/rekomendasi:628@c.us")]
     assert waha.to_waha_chat("120363@g.us") == "120363@g.us"
 
 
