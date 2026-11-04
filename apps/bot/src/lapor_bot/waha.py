@@ -58,6 +58,8 @@ LOCATION_HINT = (
 )
 #: Jeda antar percobaan membuat sesi saat WAHA belum siap (detik).
 SESSION_RETRY_SECONDS = 15
+#: Status sesi yang perlu dinyalakan lagi lewat POST /api/sessions/{name}/start.
+RESTARTABLE = ("FAILED", "STOPPED")
 
 
 def signature_valid(key: str, raw: bytes, header: str) -> bool:
@@ -171,7 +173,15 @@ class WahaChannel:
             )
         if response.status_code >= 400:
             raise RuntimeError(f"WAHA sesi: {response.status_code} {response.text[:200]}")
-        return str(response.json().get("status") or "")
+        status = str(response.json().get("status") or "")
+        if status in RESTARTABLE:
+            # WAHA menghentikan paksa sesi yang QR-nya tidak dipindai ±3 menit (FAILED);
+            # dinyalakan lagi supaya QR baru tersedia saat pemilik siap memindai.
+            response = self._http.post(f"/api/sessions/{self._session}/start")
+            if response.status_code >= 400:
+                raise RuntimeError(f"WAHA start: {response.status_code} {response.text[:200]}")
+            status = str(response.json().get("status") or "STARTING")
+        return status
 
     def watch_session_forever(self) -> None:
         """Memastikan sesi ada dan mencatat perubahan statusnya; dijalankan di thread sendiri

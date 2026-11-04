@@ -225,3 +225,18 @@ def test_watch_session_logs_status_changes_and_survives_errors(
     assert any("belum siap" in m for m in messages)
     assert any("scripts/waha-qr.sh" in m for m in messages)
     assert sum("status WORKING" in m for m in messages) == 1
+
+
+def test_ensure_session_restarts_failed_session() -> None:
+    calls: list[tuple[str, str]] = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        calls.append((request.method, request.url.path))
+        if request.method == "GET":
+            return httpx.Response(200, json={"name": "default", "status": "FAILED"})
+        return httpx.Response(201, json={"name": "default", "status": "STARTING"})
+
+    chan = channel()
+    chan._http = httpx.Client(base_url="http://waha:3000", transport=httpx.MockTransport(respond))
+    assert chan.ensure_session() == "STARTING"
+    assert calls == [("GET", "/api/sessions/default"), ("POST", "/api/sessions/default/start")]
