@@ -835,3 +835,20 @@ describe("jendela historis dari alamat", () => {
     expect(toHistoricalMonths("36")).toBe(36);
   });
 });
+
+/**
+ * Sejak 2 November 2026 akar situs adalah SIGAP WARGA; beranda kepolisian di `/ops`.
+ * Tautan tingkat wilayah pada peta beranda harus tetap di dalam `/ops` — regresi
+ * 4 November 2026: klik wilayah di beranda petugas berpindah ke peta warga.
+ */
+describe("tautan peta beranda tetap di /ops", () => {
+  it("tidak ada tautan ke akar situs di map-canvas dan map-hero", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    for (const file of ["map/map-canvas.tsx", "leadership/map-hero.tsx"]) {
+      const source = fs.readFileSync(path.join(__dirname, "..", file), "utf8");
+      expect(source).not.toMatch(/["`]\/\?tingkat=/);
+      expect(source).toMatch(/\/ops\?tingkat=/);
+    }
+  });
+});
