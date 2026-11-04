@@ -731,7 +731,7 @@ def update_report_status(
     # lampirannya dihitung. Ia dikosongkan lagi bila laporan dibuka kembali: berkas yang
     # dibutuhkan pemeriksaan yang berlanjut tidak boleh hilang karena hitungan lama.
     if new_status == attachment_store.CLOSED_STATUS:
-        report.closed_at = clock.reference_now()
+        report.closed_at = clock.citizen_now()  # waktu sebenarnya, seperti `reported_at`
     elif previous == attachment_store.CLOSED_STATUS:
         report.closed_at = None
 

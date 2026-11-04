@@ -973,6 +973,8 @@ dari web/Android, atas keputusan pemilik proyek: **pengenal percakapan disimpan*
 dapat mengabari pelapor ketika statusnya berubah (`/status` menampilkan laporan miliknya).
 Yang tetap tidak disimpan: nama dan nomor yang ditampilkan. Bagi petugas, laporan dari bot
 tampil sama dengan laporan lain; pengenal percakapan tidak pernah tampil di layar mana pun.
+Sejak 4 November 2026 **jam masuk laporan warga adalah waktu sebenarnya**, bukan jam acuan
+aplikasi; kejadian, skor, dan prediksi tetap mengikuti jam acuan.
 
 Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
 pengiriman adalah **nomor tiket** seperti `RPT-0151` — satu-satunya penanda yang

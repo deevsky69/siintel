@@ -576,7 +576,9 @@ def accept_report(
             details=[{"field": "kecamatan", "issue": "pilih dari GET /public/report-options"}],
         )
 
-    now = clock.reference_now()
+    # Waktu sebenarnya, bukan jam acuan demo: laporan warga adalah interaksi langsung
+    # (keputusan 4 November 2026, lihat `clock.citizen_now`).
+    now = clock.citizen_now()
     incident_time = payload.incident_time or now
     if incident_time > now:
         raise ApiError(
