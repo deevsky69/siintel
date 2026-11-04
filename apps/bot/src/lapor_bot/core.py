@@ -453,7 +453,9 @@ def advisory_reply(backend: Backend, kelurahan: str, month: str | None = None) -
     return Reply(str(data["text"]))
 
 
-def group_command(backend: Backend, channel: str, chat_id: str, text: str) -> Reply | None:
+def group_command(
+    backend: Backend, channel: str, chat_id: str, text: str, sender: str | None = None
+) -> Reply | None:
     """Perintah yang dilayani DI DALAM GRUP. Selain ini bot diam: alur laporan (tanpa nama,
     berisi lokasi dan foto) tidak boleh berjalan di hadapan seluruh anggota grup."""
     stripped = text.strip()
@@ -463,7 +465,7 @@ def group_command(backend: Backend, channel: str, chat_id: str, text: str) -> Re
         if not kelurahan:
             return Reply("Sebutkan kelurahannya, misalnya: /daftar Tebet Timur")
         try:
-            area = backend.register_group(channel, chat_id, kelurahan)
+            area = backend.register_group(channel, chat_id, kelurahan, sender)
         except BackendError as error:
             return Reply(error.message)
         return Reply(

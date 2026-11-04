@@ -275,6 +275,37 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
     )
     assert registered.status_code == 200, registered.text
     assert client.post("/api/v1/messaging/groups", json={}).status_code in (401, 422)
+    # Grup lain tidak dapat membajak pendaftaran; Babin kelurahan itu boleh memindahkannya.
+    hijack = client.post(
+        "/api/v1/messaging/groups",
+        json={"channel": "WHATSAPP", "chat_id": "999999@g.us", "kelurahan": area.kelurahan},
+        headers=key,
+    )
+    assert hijack.status_code == 409
+    assert (
+        client.put(
+            f"/api/v1/babin/{area.kelurahan}",
+            json={
+                "name": "Bripka Grup",
+                "phone_display": "021-1234567",
+                "whatsapp_number": "6281200009999",
+                "whatsapp_group_chat_id": "120363@g.us",
+            },
+            headers=admin,
+        ).status_code
+        == 200
+    )
+    moved = client.post(
+        "/api/v1/messaging/groups",
+        json={
+            "channel": "WHATSAPP",
+            "chat_id": "120363@g.us",
+            "kelurahan": area.kelurahan,
+            "sender": "6281200009999@c.us",
+        },
+        headers=key,
+    )
+    assert moved.status_code == 200
 
     # /rekomendasi: teks bulan depan, tanpa skor/fungsi kepolisian.
     advisory = client.get(

@@ -50,12 +50,24 @@ def _kelurahan_row(session: Session, kelurahan: str) -> tuple[str, str, str] | N
     return None if area is None else (str(area[0]), str(area[1]), str(area[2]))
 
 
+def _digits(value: str | None) -> str:
+    return "".join(ch for ch in (value or "") if ch.isdigit())
+
+
+def _sender_is_babin(row: Babinkamtibmas, sender: str | None) -> bool:
+    """`sender` berbentuk `628…@c.us`; cocok bila digitnya sama dengan nomor Babin tercatat."""
+    number = _digits(row.whatsapp_number)
+    return bool(number) and _digits(sender.split("@", 1)[0] if sender else None) == number
+
+
 class GroupRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     channel: str = Field(description="WHATSAPP")
     chat_id: str = Field(min_length=3, max_length=64, description="mis. 1203…@g.us")
     kelurahan: str = Field(min_length=2, max_length=100)
+    #: Pengirim perintah di grup (participant), untuk mencocokkan dengan nomor Babin.
+    sender: str | None = Field(default=None, max_length=64)
 
 
 @router.post(
@@ -77,6 +89,16 @@ def register_group(payload: GroupRequest, session: Session = Depends(get_db)) ->
             status.HTTP_404_NOT_FOUND,
             f"Kelurahan {area[0]} belum punya kontak Babinkamtibmas. Minta Administrator "
             "mengisinya di menu Laporan → Babinkamtibmas, lalu ulangi /daftar.",
+        )
+    # Kelurahan yang sudah punya grup tidak dapat dibajak dari grup lain (tinjauan keamanan
+    # 4 November 2026): hanya Babin kelurahan itu (nomor WhatsApp tercatat) yang boleh
+    # memindahkannya lewat /daftar; selain itu perubahan lewat Administrator di /ops/babin.
+    current = row.whatsapp_group_chat_id
+    if current and current != payload.chat_id and not _sender_is_babin(row, payload.sender):
+        raise ApiError(
+            status.HTTP_409_CONFLICT,
+            f"Kelurahan {row.kelurahan} sudah terdaftar pada grup lain. Perubahan hanya oleh "
+            "Babinkamtibmas kelurahan itu, atau Administrator di menu Laporan → Babinkamtibmas.",
         )
     # Satu grup hanya untuk satu kelurahan: pendaftaran di kelurahan lain dilepas.
     for other in session.scalars(

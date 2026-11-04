@@ -257,7 +257,9 @@ class WahaChannel:
         if is_group(sender):
             # Di grup hanya perintah imbauan yang dilayani (4 November 2026); alur laporan
             # tidak pernah berjalan di hadapan seluruh anggota grup.
-            self.handle_group(sender, str(payload.get("body") or ""))
+            self.handle_group(
+                sender, str(payload.get("body") or ""), str(payload.get("participant") or "")
+            )
             return
         chat = chat_id_of(sender)
         if chat is None:
@@ -268,9 +270,9 @@ class WahaChannel:
         except Exception:  # noqa: BLE001
             log.exception("WAHA: gagal menangani pesan dari satu percakapan")
 
-    def handle_group(self, group_id: str, text: str) -> None:
+    def handle_group(self, group_id: str, text: str, participant: str = "") -> None:
         try:
-            reply = group_command(self._backend, CHANNEL, group_id, text)
+            reply = group_command(self._backend, CHANNEL, group_id, text, participant or None)
             if reply is not None:
                 self.send(group_id, reply)
         except Exception:  # noqa: BLE001

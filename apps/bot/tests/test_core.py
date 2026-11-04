@@ -30,6 +30,7 @@ class FakeBackend:
         self.bulletins: list[dict[str, Any]] = []
         self.acked_bulletins: dict[str, dict[str, str]] = {}
         self.groups: dict[str, str] = {}
+        self.last_sender: str | None = None
         self.advisory_acks: dict[str, str] = {}
         self.advisory_deliveries: dict[str, dict[str, str]] = {}
 
@@ -85,7 +86,10 @@ class FakeBackend:
     def bulletin_sent(self, bulletin_id: str, delivery: dict[str, str]) -> None:
         self.acked_bulletins[bulletin_id] = delivery
 
-    def register_group(self, channel: str, chat_id: str, kelurahan: str) -> dict[str, Any]:
+    def register_group(
+        self, channel: str, chat_id: str, kelurahan: str, sender: str | None = None
+    ) -> dict[str, Any]:
+        self.last_sender = sender
         if kelurahan.casefold() != "tebet timur":
             raise BackendError(404, "Kelurahan tidak dikenal pada master lokasi.")
         self.groups[chat_id] = "Tebet Timur"
@@ -284,8 +288,9 @@ def test_group_commands_register_then_serve_advisory_and_stay_silent_otherwise()
     assert need is not None and "/daftar" in need.text
     bad = group_command(backend, "WHATSAPP", group, "/daftar Nirwana")
     assert bad is not None and "tidak dikenal" in bad.text
-    ok = group_command(backend, "WHATSAPP", group, "/daftar tebet timur")
+    ok = group_command(backend, "WHATSAPP", group, "/daftar tebet timur", "628@c.us")
     assert ok is not None and "Tebet Timur" in ok.text and backend.groups[group] == "Tebet Timur"
+    assert backend.last_sender == "628@c.us"
     advisory = group_command(backend, "WHATSAPP", group, "/rekomendasi")
     assert advisory is not None and advisory.text == "IMBAUAN Tebet Timur depan"
     explicit = group_command(backend, "WHATSAPP", group, "/rekomendasi Tebet Timur")
