@@ -42,3 +42,8 @@ ikw:
 # Pimpinan tetap bebas memilih jumlah dan kelurahan mana pun yang tidak ditolak analis.
 product:
   draft_top_n: 10
+
+# Evaluasi bulanan (Modul 5): jumlah kelurahan teratas yang dinilai cakupannya bila Pimpinan
+# belum menetapkan jumlah — mengikuti Uji Prediksi 2025 (enam kelurahan per metode).
+evaluation:
+  default_top_n: 6

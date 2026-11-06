@@ -12,14 +12,15 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...models import CrimeIncident, Prediction, PredictionActual
-from ...services import recommendation_outcome, visibility
+from ...services import monthly_evaluation, monthly_ranking, recommendation_outcome, visibility
 from ...services import risk_engine as risk
 from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
+from ..errors import ApiError
 
 router = APIRouter(prefix="/evaluation", tags=["evaluasi"])
 
@@ -217,3 +218,18 @@ def recommendations_vs_actual(
     nyata 2026. Cakupan Polsek dihormati lewat kelurahan prediksinya."""
     polsek = jurisdiction_filter(current, "evaluation:read")
     return recommendation_outcome.evaluate_recommendations(session, polsek)
+
+
+@router.get(
+    "/monthly", summary="Evaluasi bulanan: cakupan, pembanding historis, mutu usulan, pelaksanaan"
+)
+def monthly(
+    session: Session = Depends(get_db),
+    _: CurrentUser = require_permission("evaluation:read"),
+    month: str = Query(..., description="YYYY-MM bulan sasaran yang sudah berakhir"),
+) -> dict[str, Any]:
+    try:
+        target = monthly_ranking.parse_month(month)
+    except monthly_ranking.RankingError as error:
+        raise ApiError(status.HTTP_400_BAD_REQUEST, str(error)) from error
+    return monthly_evaluation.evaluate(session, target)

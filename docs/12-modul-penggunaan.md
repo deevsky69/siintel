@@ -34,6 +34,11 @@ minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetuju
 bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
 `/dasbor` menautkan ke SIGAP WARGA.
 
+**Evaluasi bulanan (Modul 5 mekanisme).** Menu **Evaluasi → Cakupan Bulanan**: setelah bulan
+berakhir, berapa persen kejadian jatuh di kelurahan pilihan (peringkat beku dan keputusan
+Pimpinan), dibanding peta 3 dan 12 bulan pada jumlah kelurahan dan batas data yang sama; rekap
+usulan diterima/direvisi/ditolak beserta alasan; kegiatan yang tercatat per kelurahan prioritas.
+
 **Produk bulanan (Modul 4 mekanisme).** Menu **Analisis → Produk Bulanan**. Analis Intelkam
 menyusun draf dari peringkat yang dibekukan, lalu memeriksanya: terima, perbaiki, atau tolak
 tiap usulan dengan alasan. Kasat Intelkam memeriksa mutu (tahap KBO) dan memvalidasi. Pimpinan

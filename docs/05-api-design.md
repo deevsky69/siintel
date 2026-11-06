@@ -498,6 +498,15 @@ Tabel `case_files` dan `case_file_stages` (migration 0016). Data dummy berlabel:
 `predpol seed-case-files-dummy` / `scripts/isi-perkara-dummy-produksi.sh` (deterministik,
 idempoten, mencetak LP + PIN contoh).
 
+### 2.11j Evaluasi bulanan (Modul 5 mekanisme, 6 November 2026)
+
+| Method | Path | Permission | Keterangan |
+|---|---|---|---|
+| GET | `/evaluation/monthly?month=YYYY-MM` | `evaluation:read` | per peringkat beku: **cakupan** = kejadian aktual bulan itu di N kelurahan teratas / seluruh yang dapat dipetakan (N = jumlah yang ditetapkan Pimpinan, atau `evaluation.default_top_n` = 6); pembanding peta 3/12 bulan pada N dan batas data yang sama; `decision` (kelurahan pilihan: aktual, jumlah kegiatan); `quality` (diterima/direvisi/ditolak + alasan, tahap yang dikembalikan). PAI `null` — luas kelurahan belum ada di API |
+
+Kejadian bulan sasaran dibaca melewati batas tampilan (`visibility.all_incidents`) — hanya
+untuk pencocokan.
+
 ### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026)
 
 | Method | Path | Permission | Keterangan |

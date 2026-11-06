@@ -217,6 +217,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         hint: "Skor risiko beserta bobot yang menghasilkannya",
       },
       {
+        href: "/ops/evaluasi-bulanan",
+        label: "Cakupan Bulanan",
+        icon: "evaluation",
+        permissions: ["evaluation:read"],
+        hint: "Cakupan kejadian di kelurahan pilihan dibanding peta historis",
+      },
+      {
         href: "/ops/evaluasi",
         label: "Evaluasi",
         icon: "evaluation",

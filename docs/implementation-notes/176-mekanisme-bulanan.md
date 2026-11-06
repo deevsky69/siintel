@@ -10,7 +10,7 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
 | 2 | Modul 2–3: peringkat bulanan 65 kelurahan tersimpan (peta 3 bulan, 12 bulan, IKW), batas data, layar Peringkat (0020) | **selesai 6 Nov 2026** |
 | 3 | Modul 4: produk bulanan, empat tahap (Analis → KBO → Kasat → Pimpinan), peran baru, pimpinan memilih N kelurahan, alasan wajib (0021) | **selesai 6 Nov 2026** |
 | 4 | Modul 4b: pelaksanaan dicatat Fungsi/Polsek per kelurahan prioritas (`monthly_actions`, 0021) | **selesai 6 Nov 2026** |
-| 5 | Modul 5: cakupan, pembanding peta historis pada N sama, PAI, rekap usulan, tinjauan pelaksanaan | — |
+| 5 | Modul 5: cakupan, pembanding peta historis pada N sama, rekap usulan, tinjauan pelaksanaan (`GET /evaluation/monthly`) | **selesai 6 Nov 2026**; PAI menunggu luas kelurahan di API |
 | 6 | Menu ringkas, teks dipangkas, peringatan harian keluar dari alur utama, imbauan warga perlu persetujuan | — |
 
 ## Tahap 1 — pilihan teknis
@@ -54,3 +54,14 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
   pemeriksa scope.
 - Rekomendasi harian (`recommendations`, `commander_decisions`) dibiarkan; keluar dari menu
   pada tahap 6.
+
+## Tahap 5 — pilihan teknis
+
+- Cakupan dihitung per peringkat beku pada N teratas; N = `priority_count` produk bila sudah
+  ditetapkan, selain itu `evaluation.default_top_n` (6, seperti Uji Prediksi 2025).
+- Pembanding dihitung ulang dengan batas data peringkat beku (`ranking.compute(..., data_cutoff)`)
+  — bukan dari data yang diketahui belakangan.
+- Kejadian tanpa kelurahan / `area_pending` dilaporkan sebagai "belum dapat dipetakan", tidak
+  masuk pembilang maupun penyebut.
+- PAI belum dihitung: `locations.geom` titik; poligon kelurahan hanya ada di web
+  (`lib/wilayah`). Memindahkannya ke API adalah pekerjaan tersendiri.
