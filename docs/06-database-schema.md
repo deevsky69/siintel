@@ -106,6 +106,10 @@ crime_incidents.location_id        → locations
 crime_incident_revisions.incident_id → crime_incidents   (0019; riwayat koreksi: field, before, after, by, note)
 monthly_rankings.generated_by      → users              (0020; peringkat bulanan: target_month, method, scope, data_cutoff, model_version, basis_from/to, pending_count)
 monthly_ranking_rows.ranking_id    → monthly_rankings   (0020; rank, kelurahan, predicted_count, ikw, ikw_category, basis JSONB)
+monthly_products.ranking_id        → monthly_rankings   (0021; target_month unik, status DRAFT→ANALYST_REVIEWED→KBO_CHECKED→VALIDATED→DECIDED, facts, priority_count)
+monthly_product_items.product_id   → monthly_products   (0021; rank, kelurahan, pattern, proposal_text, proposed_function, analyst_status/text/reason, selected, decided_action)
+monthly_product_stages.product_id  → monthly_products   (0021; stage ANALYST/KBO/KASAT/PIMPINAN, outcome, reason, payload, acted_by)
+monthly_actions.item_id            → monthly_product_items (0021; unit, acted_at, place, action, result, recorded_by)
 intelligence_reports.location_id   → locations
 patrol_activity.location_id        → locations
 patrol_activity.unit_id            → police_units

@@ -90,26 +90,34 @@ approved development plan rather than added indiscriminately.
 
 # 4. USER ROLES
 
-Initial role hierarchy:
+Enam peran (keputusan pemilik proyek 6 November 2026, 1B — mengikuti "Mekanisme dan Fungsi
+SIGAP"; sumber kebenaran `config/rbac/permissions.yaml`, matriks di docs/03):
 
 ## Level 1 — Pimpinan
-Strategic dashboard, prediction, recommendation, approval.
+Menetapkan jumlah dan kelurahan prioritas beserta tindak lanjut (Kapolres / pejabat
+berwenang); menyetujui buletin dan imbauan publik.
 
-## Level 2 — Command Center
-Monitoring, warning, tasking, deployment.
+## Level 2 — Kasat Intelkam
+Memeriksa mutu analisis (tahap KBO) dan memvalidasi produk intelijen bulanan untuk
+disampaikan kepada Pimpinan.
 
-## Level 3 — Analyst
-Analytics, spatial analysis, modelling, evaluation.
+## Level 3 — Analis Intelkam
+Membekukan peringkat bulanan, menyusun dan memeriksa draf produk bulanan dengan informasi
+lapangan (terima / perbaiki / tolak, dengan alasan), dapat mencatat tahap KBO.
 
 ## Level 4 — Fungsi
-Access according to authorized function:
-Intelkam / Reskrim / Samapta / Binmas / Lantas.
+Fungsi pelaksana (Samapta / Binmas / Reskrim / Lantas): membaca produk bulanan dan
+mencatat kegiatan di kelurahan prioritas.
 
 ## Level 5 — Polsek
-Data and situation within its jurisdiction.
+Data dan situasi wilayahnya; mencatat kegiatan di kelurahan prioritas wilayahnya.
 
 ## Level 6 — Administrator
-Technical configuration and user/system management.
+Konfigurasi teknis, pengguna, pembakuan data; menyusun draf produk bulanan bila diminta.
+Tidak memeriksa, memvalidasi, menetapkan, maupun mencatat pelaksanaan.
+
+Sebelum 6 November 2026: Command Center dan Analyst dilebur ke Administrator (1 September
+2026); jenjang 2 dan 3 kini ditempati dua peran Satintelkam.
 
 All important activities must be recorded in audit trail.
 

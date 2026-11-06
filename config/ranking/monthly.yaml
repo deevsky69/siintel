@@ -37,3 +37,8 @@ ikw:
     RENDAH: [0, 34]
     SEDANG: [35, 64]
     TINGGI: [65, 100]
+
+# Produk bulanan (Modul 4): berapa kelurahan teratas yang dibuatkan draf usulan oleh sistem.
+# Pimpinan tetap bebas memilih jumlah dan kelurahan mana pun yang tidak ditolak analis.
+product:
+  draft_top_n: 10

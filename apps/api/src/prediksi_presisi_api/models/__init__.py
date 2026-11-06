@@ -32,6 +32,12 @@ from .crime_incident import CrimeIncident, CrimeIncidentRevision
 from .early_warning import EarlyWarning
 from .intelligence_report import IntelligenceReport
 from .location import Location
+from .monthly_product import (
+    MonthlyAction,
+    MonthlyProduct,
+    MonthlyProductItem,
+    MonthlyProductStage,
+)
 from .monthly_ranking import MonthlyRanking, MonthlyRankingRow
 from .operational_action import OperationalAction
 from .panic_event import PanicEvent
@@ -65,6 +71,10 @@ __all__ = [
     "EarlyWarning",
     "IntelligenceReport",
     "Location",
+    "MonthlyAction",
+    "MonthlyProduct",
+    "MonthlyProductItem",
+    "MonthlyProductStage",
     "MonthlyRanking",
     "MonthlyRankingRow",
     "OperationalAction",

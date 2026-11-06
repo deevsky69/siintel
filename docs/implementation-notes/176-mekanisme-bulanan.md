@@ -8,8 +8,8 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
 |---|---|---|
 | 1 | Modul 1: `vehicle_object`, `area_pending`, dugaan ganda, `crime_incident_revisions`, layar Pembakuan (0019) | **selesai 6 Nov 2026** |
 | 2 | Modul 2–3: peringkat bulanan 65 kelurahan tersimpan (peta 3 bulan, 12 bulan, IKW), batas data, layar Peringkat (0020) | **selesai 6 Nov 2026** |
-| 3 | Modul 4: produk bulanan, empat tahap (Analis → KBO → Kasat → Pimpinan), peran baru, pimpinan memilih N kelurahan, alasan wajib | — |
-| 4 | Modul 4b: pelaksanaan dicatat Fungsi/Polsek per kelurahan prioritas | — |
+| 3 | Modul 4: produk bulanan, empat tahap (Analis → KBO → Kasat → Pimpinan), peran baru, pimpinan memilih N kelurahan, alasan wajib (0021) | **selesai 6 Nov 2026** |
+| 4 | Modul 4b: pelaksanaan dicatat Fungsi/Polsek per kelurahan prioritas (`monthly_actions`, 0021) | **selesai 6 Nov 2026** |
 | 5 | Modul 5: cakupan, pembanding peta historis pada N sama, PAI, rekap usulan, tinjauan pelaksanaan | — |
 | 6 | Menu ringkas, teks dipangkas, peringatan harian keluar dari alur utama, imbauan warga perlu persetujuan | — |
 
@@ -37,3 +37,20 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
   + 0,25·konsistensi(bagian bulan ≥1 kejadian). Bobot dan kategori di
   `config/ranking/monthly.yaml`, PROPOSED; tidak menentukan urutan.
 - Pembekuan satu kali per (bulan, metode, cakupan); `generated_at` memakai waktu sebenarnya.
+
+## Tahap 3–4 — pilihan teknis
+
+- Peran baru menempati jenjang kosong: Kasat Intelkam level 2 (ROLE-02), Analis Intelkam
+  level 3 (ROLE-03). Akun peragaan `demo.kasat`/`demo.analis` dibuat TERKUNCI oleh migrasi;
+  kata sandi lewat `scripts/sandi-peragaan-produksi.sh` (kini enam akun).
+- Tahap KBO: `monthly_product:review` dipegang Kasat Intelkam dan Analis Intelkam (1B). Siapa
+  yang mencatatnya terlihat di `monthly_product_stages.acted_by`.
+- Administrator hanya `read` + `draft`; `review`/`validate`/`decide`/`execute` bukan
+  pekerjaannya (test pemisahan tugas diperbarui).
+- Draf mengusulkan `draft_top_n = 10` kelurahan teratas (config/ranking/monthly.yaml);
+  Pimpinan bebas memilih jumlah dan kelurahan mana pun yang tidak ditolak analis.
+- Polsek mencatat kegiatan hanya di kelurahan polseknya — ditegakkan endpoint (404), bukan
+  lewat scope OWN_JURISDICTION, karena item membawa `polsek` tetapi bukan tabel yang dikenal
+  pemeriksa scope.
+- Rekomendasi harian (`recommendations`, `commander_decisions`) dibiarkan; keluar dari menu
+  pada tahap 6.

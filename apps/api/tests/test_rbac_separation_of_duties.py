@@ -147,4 +147,14 @@ def test_the_permissions_administrator_lacks_are_all_command_decisions() -> None
 
     # Sejak 9 Oktober 2026 commander_decision:approve diberikan pemilik proyek; sejak
     # 2 November 2026 bulletin:approve (penerbitan buletin ke masyarakat) hanya Pimpinan.
-    assert catalogue - admin == {"evaluation:run", "public_alert:publish", "bulletin:approve"}
+    # 6 November 2026 (Modul 4 mekanisme): pemeriksaan, validasi, penetapan, dan pelaksanaan
+    # produk bulanan bukan pekerjaan Administrator.
+    assert catalogue - admin == {
+        "evaluation:run",
+        "public_alert:publish",
+        "bulletin:approve",
+        "monthly_product:review",
+        "monthly_product:validate",
+        "monthly_product:decide",
+        "monthly_product:execute",
+    }

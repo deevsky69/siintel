@@ -97,38 +97,39 @@ permission atas resource tersebut.
 
 <!-- matriks:mulai -->
 
-| Resource | Pimpinan | Fungsi | Polsek | Administrator |
-|---|---|---|---|---|
-| dashboard | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
-| location | read(ALL) | read(ALL) | read(ALL) | read, write(ALL) |
-| crime | read(ALL) | read, write(ALL) | read, write(OWN_JURISDICTION) | read, write, export, triage(ALL) |
-| intelligence | read(ALL) | — | read(OWN_JURISDICTION) | read, write(ALL) |
-| patrol | read(ALL) | read, write(OWN_FUNCTION) | read, write(OWN_JURISDICTION) | read, write(ALL) |
-| police_unit | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
-| map | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
-| analytics | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, export(ALL) |
-| risk_score | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run(ALL) |
-| prediction | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run, publish(ALL) |
-| warning | read(ALL) | read(ALL) | read, acknowledge(OWN_JURISDICTION) | read, acknowledge, resolve(ALL) |
-| public_alert | read, publish(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
-| recommendation | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
-| commander_decision | read, approve(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, approve(ALL) |
-| operation | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
-| citizen_report | read(ALL) | — | read, write(OWN_JURISDICTION) | read, write, triage(ALL) |
-| community_feedback | read(ALL) | — | read(OWN_JURISDICTION) | read(ALL) |
-| evaluation | read, run(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
-| user | — | — | — | read, manage(ALL) |
-| role | — | — | — | read, manage(ALL) |
-| audit | read(ALL) | — | — | read(ALL) |
-| config | read(ALL) | — | — | read, manage(ALL) |
-| panic | read(ALL) | — | read, acknowledge(OWN_JURISDICTION) | read, acknowledge(ALL) |
-| review | — | — | — | moderate(ALL) |
-| case_file | read(ALL) | — | read, write(OWN_JURISDICTION) | read, write(ALL) |
-| babin | read(ALL) | — | read(ALL) | read, manage(ALL) |
-| bulletin | read, approve(ALL) | — | read(ALL) | read, manage(ALL) |
-| ranking | read(ALL) | read(ALL) | read(ALL) | read, manage(ALL) |
+| Resource | Pimpinan | Kasat Intelkam | Analis Intelkam | Fungsi | Polsek | Administrator |
+|---|---|---|---|---|---|---|
+| dashboard | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| location | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read, write(ALL) |
+| crime | read(ALL) | read(ALL) | read(ALL) | read, write(ALL) | read, write(OWN_JURISDICTION) | read, write, export, triage(ALL) |
+| intelligence | read(ALL) | read(ALL) | read(ALL) | — | read(OWN_JURISDICTION) | read, write(ALL) |
+| patrol | read(ALL) | — | — | read, write(OWN_FUNCTION) | read, write(OWN_JURISDICTION) | read, write(ALL) |
+| police_unit | read(ALL) | — | — | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
+| map | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| analytics | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, export(ALL) |
+| risk_score | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run(ALL) |
+| prediction | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run, publish(ALL) |
+| warning | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read, acknowledge(OWN_JURISDICTION) | read, acknowledge, resolve(ALL) |
+| public_alert | read, publish(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| recommendation | read(ALL) | read(ALL) | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
+| commander_decision | read, approve(ALL) | read(ALL) | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, approve(ALL) |
+| operation | read(ALL) | — | — | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
+| citizen_report | read(ALL) | — | — | — | read, write(OWN_JURISDICTION) | read, write, triage(ALL) |
+| community_feedback | read(ALL) | — | — | — | read(OWN_JURISDICTION) | read(ALL) |
+| evaluation | read, run(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| user | — | — | — | — | — | read, manage(ALL) |
+| role | — | — | — | — | — | read, manage(ALL) |
+| audit | read(ALL) | — | — | — | — | read(ALL) |
+| config | read(ALL) | — | — | — | — | read, manage(ALL) |
+| panic | read(ALL) | — | — | — | read, acknowledge(OWN_JURISDICTION) | read, acknowledge(ALL) |
+| review | — | — | — | — | — | moderate(ALL) |
+| case_file | read(ALL) | — | — | — | read, write(OWN_JURISDICTION) | read, write(ALL) |
+| babin | read(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read, manage(ALL) |
+| bulletin | read, approve(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read, manage(ALL) |
+| ranking | read(ALL) | read(ALL) | read, manage(ALL) | read(ALL) | read(ALL) | read, manage(ALL) |
+| monthly_product | read, decide(ALL) | read, review, validate(ALL) | read, draft, review(ALL) | read, execute(ALL) | read, execute(ALL) | read, draft(ALL) |
 
-Jumlah permission per peran: Pimpinan 29, Fungsi 18, Polsek 29, Administrator 54.
+Jumlah permission per peran: Pimpinan 31, Kasat Intelkam 19, Analis Intelkam 20, Fungsi 20, Polsek 31, Administrator 56.
 
 <!-- matriks:selesai -->
 

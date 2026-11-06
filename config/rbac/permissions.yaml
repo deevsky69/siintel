@@ -47,6 +47,8 @@ permissions:
   bulletin: [read, manage, approve]
   # Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026).
   ranking: [read, manage]
+  # Produk bulanan (Modul 4 mekanisme): draf → analis → KBO → Kasat → Pimpinan → pelaksanaan.
+  monthly_product: [read, draft, review, validate, decide, execute]
 
 roles:
   Pimpinan:
@@ -75,6 +77,9 @@ roles:
       - babin:read
       - bulletin:read
       - ranking:read
+      - monthly_product:read
+      # Produk bulanan ditetapkan Pimpinan (Kapolres) — Modul 4 mekanisme, 6 November 2026.
+      - monthly_product:decide
       # Buletin kelurahan adalah penerbitan kepada masyarakat — disetujui Pimpinan,
       # seperti imbauan (2 November 2026).
       - bulletin:approve
@@ -112,6 +117,52 @@ roles:
       - public_alert:publish
       - audit:read
       - config:read
+  # KEPUTUSAN PEMILIK PROYEK 6 November 2026 (1B): dua peran Satintelkam untuk rantai
+  # validasi produk bulanan (Modul 4 mekanisme). Pemeriksaan mutu (tahap KBO) dicatat
+  # sebagai tahap yang dikerjakan Kasat atau Analis senior — keduanya memegang `review`.
+  Kasat Intelkam:
+    ALL:
+      - dashboard:read
+      - location:read
+      - crime:read
+      - intelligence:read
+      - map:read
+      - analytics:read
+      - risk_score:read
+      - prediction:read
+      - warning:read
+      - public_alert:read
+      - recommendation:read
+      - commander_decision:read
+      - evaluation:read
+      - babin:read
+      - bulletin:read
+      - ranking:read
+      - monthly_product:read
+      - monthly_product:review
+      - monthly_product:validate
+  Analis Intelkam:
+    ALL:
+      - dashboard:read
+      - location:read
+      - crime:read
+      - intelligence:read
+      - map:read
+      - analytics:read
+      - risk_score:read
+      - prediction:read
+      - warning:read
+      - public_alert:read
+      - recommendation:read
+      - commander_decision:read
+      - evaluation:read
+      - babin:read
+      - bulletin:read
+      - ranking:read
+      - ranking:manage
+      - monthly_product:read
+      - monthly_product:draft
+      - monthly_product:review
 
   # KOREKSI 1 September 2026 — cakupan disesuaikan dengan yang benar-benar dapat
   # ditegakkan. Sebelumnya `crime:read` dan sembilan permission lain dinyatakan
@@ -125,6 +176,9 @@ roles:
   Fungsi:
     ALL:
       - ranking:read
+      - monthly_product:read
+      # Fungsi pelaksana mencatat kegiatan di kelurahan prioritas (Modul 4 mekanisme).
+      - monthly_product:execute
       - location:read
       - map:read
       - risk_score:read
@@ -179,6 +233,10 @@ roles:
       - babin:read
       - bulletin:read
       - ranking:read
+      - monthly_product:read
+      # Polsek mencatat kegiatan di kelurahan prioritas wilayahnya; endpoint menolak di luar
+      # polseknya (item membawa polsek).
+      - monthly_product:execute
       - location:read
     OWN_JURISDICTION:
       - public_alert:read
@@ -264,6 +322,8 @@ roles:
       - bulletin:manage
       - ranking:read
       - ranking:manage
+      - monthly_product:read
+      - monthly_product:draft
       - dashboard:read
       - location:read
       - location:write

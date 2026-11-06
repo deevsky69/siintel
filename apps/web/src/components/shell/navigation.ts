@@ -168,6 +168,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     icon: "analytics",
     items: [
       {
+        href: "/ops/produk-bulanan",
+        label: "Produk Bulanan",
+        icon: "recommendation",
+        permissions: ["monthly_product:read"],
+        hint: "Draf sistem, diperiksa analis, KBO, Kasat Intelkam, ditetapkan Pimpinan",
+      },
+      {
         href: "/ops/peringkat",
         label: "Peringkat Bulanan",
         icon: "analytics",

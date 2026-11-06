@@ -39,6 +39,7 @@ from .api.routers import (
     leadership,
     map_view,
     messaging,
+    monthly_products,
     notifications,
     operations,
     panic,
@@ -122,6 +123,7 @@ def create_app() -> FastAPI:
     api.include_router(babin.router)
     api.include_router(standardization.router)
     api.include_router(rankings.router)
+    api.include_router(monthly_products.router)
     api.include_router(bulletins.router)
     api.include_router(advisory.router)
     api.include_router(analytics.router)

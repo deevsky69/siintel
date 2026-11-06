@@ -72,6 +72,11 @@ EXPECTED_TABLES = {
     # 0020 — peringkat bulanan (6 November 2026)
     "monthly_rankings",
     "monthly_ranking_rows",
+    # 0021 — produk bulanan (6 November 2026)
+    "monthly_products",
+    "monthly_product_items",
+    "monthly_product_stages",
+    "monthly_actions",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat
     "citizen_report_attachments",

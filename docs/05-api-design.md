@@ -498,6 +498,24 @@ Tabel `case_files` dan `case_file_stages` (migration 0016). Data dummy berlabel:
 `predpol seed-case-files-dummy` / `scripts/isi-perkara-dummy-produksi.sh` (deterministik,
 idempoten, mencetak LP + PIN contoh).
 
+### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026)
+
+| Method | Path | Permission | Keterangan |
+|---|---|---|---|
+| GET | `/monthly-products` | `monthly_product:read` | daftar bulan + status, bulan yang disarankan |
+| POST | `/monthly-products {month}` | `monthly_product:draft` (Analis Intelkam, Administrator) | draf dari peringkat yang **dibekukan** (400 bila belum); item = `draft_top_n` kelurahan teratas dengan pola (jenis dominan, blok jam puncak) dan usulan dari function-rules; 409 bila sudah ada |
+| GET | `/monthly-products/{month}` | `monthly_product:read` | item, tahap, kegiatan |
+| POST | `/monthly-products/{month}/analyst {items[{kelurahan,status,text?,reason?}], note?}` | `monthly_product:draft` | ACCEPTED / REVISED (teks + alasan wajib) / REJECTED (alasan wajib); status → ANALYST_REVIEWED |
+| POST | `/monthly-products/{month}/kbo {outcome, reason?}` | `monthly_product:review` (Kasat, Analis) | ACCEPTED → KBO_CHECKED; REJECTED (alasan wajib) → DRAFT |
+| POST | `/monthly-products/{month}/kasat {outcome, reason?}` | `monthly_product:validate` (Kasat Intelkam) | ACCEPTED → VALIDATED; REJECTED (alasan wajib) → DRAFT |
+| POST | `/monthly-products/{month}/decide {selected[{kelurahan,action?}], reason?}` | `monthly_product:decide` (Pimpinan) | menetapkan jumlah dan kelurahan prioritas; yang ditolak analis tidak dapat dipilih; → DECIDED |
+| POST | `/monthly-products/{month}/items/{kelurahan}/actions {unit?, acted_at, place, action, result?}` | `monthly_product:execute` (Fungsi, Polsek) | kegiatan nyata; Polsek hanya kelurahan di polseknya (404) |
+
+Tabel `monthly_products`, `monthly_product_items`, `monthly_product_stages`, `monthly_actions`
+(0021). Audit: `DRAFT_/REVIEW_/VALIDATE_/DECIDE_MONTHLY_PRODUCT`, `RECORD_MONTHLY_ACTION`.
+Peringkat awal (tabel 0020) dan keputusan Pimpinan (item `selected`/`decided_action`,
+tahap PIMPINAN) tersimpan terpisah.
+
 ### 2.11h Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026)
 
 | Method | Path | Permission | Keterangan |

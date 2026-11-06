@@ -55,14 +55,13 @@ def test_master_seed_loads_expected_volumes(session: Session) -> None:
         "users": session.scalar(select(func.count()).select_from(User)),
     }
 
-    # Empat peran sejak Command Center dan Analyst dilebur ke Administrator
-    # (keputusan pemilik proyek, 1 September 2026).
-    assert counts["roles"] == 4
-    # + panic, triage, review, case_file, babin x2, bulletin x3, ranking x2
-    assert counts["permissions"] == 57
-    # Enam akun tetap: dua di antaranya kini berperan Administrator. Akunnya tidak
-    # dihapus karena masih dirujuk keputusan dan tindakan operasional yang tercatat.
-    assert counts["users"] == 6
+    # Empat peran sejak 1 September 2026, ditambah Kasat Intelkam dan Analis Intelkam
+    # (keputusan pemilik proyek 6 November 2026, 1B).
+    assert counts["roles"] == 6
+    # + panic, triage, review, case_file, babin x2, bulletin x3, ranking x2, monthly_product x6
+    assert counts["permissions"] == 63
+    # Enam akun tetap (dua kini Administrator) + demo.kasat + demo.analis.
+    assert counts["users"] == 8
 
 
 def test_master_seed_is_idempotent(session: Session) -> None:

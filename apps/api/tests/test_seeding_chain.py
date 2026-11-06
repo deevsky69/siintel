@@ -120,7 +120,7 @@ def test_the_whole_chain_runs_in_a_single_transaction(empty_database: Session) -
     # (`scripts/tambah-pesanggrahan.py`). Jakarta Selatan memiliki sepuluh kecamatan; dataset
     # peragaan sebelumnya hanya memuat sembilan.
     assert _count(session, Location) == 37
-    assert _count(session, User) == 6
+    assert _count(session, User) == 8
     assert _count(session, CrimeIncident) == 1345
     assert _count(session, Prediction) == 202
     assert _count(session, Recommendation) == 94
