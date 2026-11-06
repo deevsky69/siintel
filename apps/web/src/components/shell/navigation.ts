@@ -147,6 +147,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         hint: "Permintaan bantuan darurat",
       },
       {
+        href: "/ops/pembakuan",
+        label: "Pembakuan",
+        icon: "entry",
+        permissions: ["crime:triage"],
+        hint: "Kelurahan belum pasti dan dugaan laporan ganda",
+      },
+      {
         href: "/ops/input",
         label: "Input Data",
         icon: "write",

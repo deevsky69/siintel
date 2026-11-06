@@ -51,6 +51,7 @@ from .api.routers import (
     public_intake,
     reviews,
     scoring,
+    standardization,
     warning_actions,
 )
 from .config import get_settings
@@ -118,6 +119,7 @@ def create_app() -> FastAPI:
     api.include_router(public_cases.router)
     api.include_router(case_files.router)
     api.include_router(babin.router)
+    api.include_router(standardization.router)
     api.include_router(bulletins.router)
     api.include_router(advisory.router)
     api.include_router(analytics.router)

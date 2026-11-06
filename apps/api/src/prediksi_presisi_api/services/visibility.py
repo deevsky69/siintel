@@ -70,12 +70,27 @@ def _apply_cutoff(state: ORMExecuteState) -> None:
     if state.execution_options.get(INCLUDE_ALL) or state.session.info.get(INCLUDE_ALL):
         return
     cutoff = display_cutoff()
+    # Laporan ganda yang sudah DIPASTIKAN (Modul 1 mekanisme) tidak pernah ikut dihitung —
+    # di sini, satu kali, bukan di setiap query. Yang baru diduga tetap tampil dan dihitung
+    # sampai dicocokkan.
     if cutoff is None:
+        state.statement = state.statement.options(
+            with_loader_criteria(
+                CrimeIncident,
+                lambda cls: (
+                    (cls.duplicate_status.is_(None)) | (cls.duplicate_status != "CONFIRMED")
+                ),
+                include_aliases=True,
+            )
+        )
         return
     state.statement = state.statement.options(
         with_loader_criteria(
             CrimeIncident,
-            lambda cls: cls.incident_date <= cutoff,
+            lambda cls: (
+                (cls.incident_date <= cutoff)
+                & ((cls.duplicate_status.is_(None)) | (cls.duplicate_status != "CONFIRMED"))
+            ),
             include_aliases=True,
         )
     )

@@ -28,7 +28,7 @@ from .citizen_report import (
 from .citizen_report_contact import CitizenReportContact
 from .commander_decision import CommanderDecision
 from .community_feedback import CommunityFeedback
-from .crime_incident import CrimeIncident
+from .crime_incident import CrimeIncident, CrimeIncidentRevision
 from .early_warning import EarlyWarning
 from .intelligence_report import IntelligenceReport
 from .location import Location
@@ -60,6 +60,7 @@ __all__ = [
     "CommanderDecision",
     "CommunityFeedback",
     "CrimeIncident",
+    "CrimeIncidentRevision",
     "EarlyWarning",
     "IntelligenceReport",
     "Location",

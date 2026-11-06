@@ -67,6 +67,8 @@ EXPECTED_TABLES = {
     # 0017 — tahap 3 (2 November 2026)
     "babinkamtibmas",
     "bulletins",
+    # 0019 — pembakuan laporan (6 November 2026)
+    "crime_incident_revisions",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat
     "citizen_report_attachments",

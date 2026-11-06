@@ -274,6 +274,8 @@ def build_incidents(df: pd.DataFrame) -> tuple[list[dict[str, Any]], dict[str, i
                 "location_type": str(rec["Kategori TKP"]).strip(),
                 "modus": str(rec["Modus operandi"]).strip(),
                 "target_type": str(rec["Objek sasaran"]).strip(),
+                # Modul 1 mekanisme: penanda objek kendaraan bermotor pada kolom tersendiri.
+                "vehicle_object": "1" if str(rec["Objek sasaran"]).strip() == "Kendaraan bermotor" else "0",
                 "status": "",
                 "reported_at": reported_at,
                 "report_lag_hours": f"{float(lag):.1f}" if pd.notna(lag) else "",

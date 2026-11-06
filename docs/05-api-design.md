@@ -498,6 +498,20 @@ Tabel `case_files` dan `case_file_stages` (migration 0016). Data dummy berlabel:
 `predpol seed-case-files-dummy` / `scripts/isi-perkara-dummy-produksi.sh` (deterministik,
 idempoten, mencetak LP + PIN contoh).
 
+### 2.11g Pembakuan laporan kejadian (Modul 1 mekanisme, 6 November 2026)
+
+| Method | Path | Permission | Keterangan |
+|---|---|---|---|
+| GET | `/crimes/standardization` | `crime:triage` | antrean: kelurahan tertunda (`area_pending`) dan dugaan ganda (`SUSPECTED`), beserta jumlahnya dan pilihan kelurahan per kecamatan |
+| POST | `/crimes/{code}/area {location_code, note?}` | `crime:triage` | memastikan kelurahan (harus di kecamatan yang sama); revisi `location`; audit `CONFIRM_CRIME_AREA` |
+| POST | `/crimes/{code}/duplicate {status: CONFIRMED/CLEARED, duplicate_of?, note?}` | `crime:triage` | mencocokkan dugaan ganda; revisi `duplicate_status`; audit `RESOLVE_CRIME_DUPLICATE` |
+| GET | `/crimes/{code}/revisions` | `crime:read` | riwayat koreksi |
+| GET | `/crimes?vehicle_object=&area_pending=&duplicate_status=` | `crime:read` | saringan baru; tiap baris memuat keempat penanda dan `data_source` |
+
+`POST /crimes` (entri petugas) kini mengisi `data_source = ENTRI:<polsek/fungsi/peran>`,
+`receiving_unit`, `vehicle_object`, `area_pending`, dan menandai dugaan ganda
+(sejenis, lokasi sama, ±1 hari — PROPOSED). Perubahan status juga menulis revisi.
+
 ### 2.11f Babinkamtibmas dan buletin kelurahan (tahap 3, 2 November 2026)
 
 | Method | Path | Permission | Keterangan |

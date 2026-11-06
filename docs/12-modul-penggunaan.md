@@ -34,6 +34,11 @@ minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetuju
 bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
 `/dasbor` menautkan ke SIGAP WARGA.
 
+**Pembakuan laporan (Modul 1 mekanisme).** Menu **Laporan → Pembakuan** (Administrator):
+kejadian yang kelurahannya belum pasti dipastikan ke kelurahan di kecamatannya, dan dugaan
+laporan ganda dinyatakan ganda (hilang dari perhitungan) atau bukan. Setiap koreksi tersimpan
+sebagai riwayat. Objek kendaraan bermotor kini kolom tersendiri dan dapat disaring.
+
 **Lacak laporan dan cek kendaraan (tahap 2).** Di `/lacak` warga memasukkan **nomor LP + PIN**
 (PIN diberikan petugas saat melapor) untuk melihat tahap perkaranya, dan di tab **Cek
 kendaraan** memasukkan plat atau nomor rangka untuk tahu apakah kendaraan tercatat dalam

@@ -19,7 +19,11 @@ from sqlalchemy import (
     Index,
     Numeric,
     String,
+    Text,
     Time,
+    false,
+    func,
+    text,
     true,
 )
 from sqlalchemy.dialects.postgresql import UUID
@@ -35,6 +39,9 @@ if TYPE_CHECKING:
 
 #: Pembagian latih/uji oleh pemilik data (Pusiknas). Sama dengan migration 0010.
 DATA_GROUPS = ("TRAIN", "TEST")
+#: Nilai `target_type` Pusiknas yang berarti objek sasaran kendaraan bermotor.
+VEHICLE_TARGET = "Kendaraan bermotor"
+DUPLICATE_STATUSES = ("SUSPECTED", "CONFIRMED", "CLEARED")
 
 
 class CrimeIncident(TimestampMixin, Base):
@@ -93,8 +100,29 @@ class CrimeIncident(TimestampMixin, Base):
     target_type: Mapped[str | None] = mapped_column(String(100))
     status: Mapped[str | None] = mapped_column(String(50))
 
+    # --- Modul 1 mekanisme (migration 0019, 6 November 2026) ---
+    #: Objek sasaran kendaraan bermotor pada kolom tersendiri (dokumen mekanisme, Modul 1).
+    #: Diturunkan dari `target_type == "Kendaraan bermotor"` — nilai Pusiknas apa adanya.
+    vehicle_object: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=false()
+    )
+    #: TRUE bila kelurahan belum pasti: lokasinya tingkat kecamatan. Dihitung terpisah
+    #: ("masih memerlukan konfirmasi") dan tidak masuk perhitungan per kelurahan.
+    area_pending: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=false()
+    )
+    #: Kode kejadian yang diduga sama; `duplicate_status` SUSPECTED → CONFIRMED / CLEARED.
+    #: Yang CONFIRMED disembunyikan dari seluruh perhitungan (services/visibility.py).
+    duplicate_of: Mapped[str | None] = mapped_column(String(50))
+    duplicate_status: Mapped[str | None] = mapped_column(String(20))
+
     location: Mapped[Location] = relationship(back_populates="crime_incidents")
     evaluations: Mapped[list[PredictionActual]] = relationship(back_populates="actual_incident")
+    revisions: Mapped[list[CrimeIncidentRevision]] = relationship(
+        back_populates="incident",
+        cascade="all, delete-orphan",
+        order_by="CrimeIncidentRevision.changed_at",
+    )
 
     __table_args__ = (
         # Jam yang tidak tercatat tidak boleh mengaku tercatat, dan sebaliknya.
@@ -104,9 +132,56 @@ class CrimeIncident(TimestampMixin, Base):
         CheckConstraint(
             "data_group IS NULL OR data_group IN " + str(DATA_GROUPS), name="data_group_known"
         ),
+        CheckConstraint(
+            "duplicate_status IS NULL OR duplicate_status IN " + str(DUPLICATE_STATUSES),
+            name="duplicate_status_known",
+        ),
         Index("ix_crime_incidents_occurred_at", "occurred_at"),
         Index("ix_crime_incidents_location_occurred", "location_id", "occurred_at"),
         Index("ix_crime_incidents_incident_type", "incident_type"),
         Index("ix_crime_incidents_reported_at", "reported_at"),
         Index("ix_crime_incidents_data_group", "data_group"),
+        Index(
+            "ix_crime_incidents_area_pending", "area_pending", postgresql_where=text("area_pending")
+        ),
+        Index(
+            "ix_crime_incidents_duplicate_status",
+            "duplicate_status",
+            postgresql_where=text("duplicate_status IS NOT NULL"),
+        ),
+    )
+
+
+class CrimeIncidentRevision(Base):
+    """Riwayat koreksi satu kejadian: bidang apa, dari apa menjadi apa, oleh siapa, kapan.
+
+    Dokumen mekanisme (Modul 1): "Simpan rujukan sumber dan riwayat setiap koreksi."
+    Audit log mencatat *peristiwa*; tabel ini mencatat *nilai* supaya kejadian dapat
+    dibaca ulang sebagaimana adanya pada tanggal mana pun.
+    """
+
+    __tablename__ = "crime_incident_revisions"
+
+    revision_id: Mapped[uuid.UUID] = uuid_pk()
+    incident_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("crime_incidents.incident_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    changed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    changed_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="SET NULL")
+    )
+    field: Mapped[str] = mapped_column(String(50), nullable=False)
+    value_before: Mapped[str | None] = mapped_column(Text)
+    value_after: Mapped[str | None] = mapped_column(Text)
+    note: Mapped[str | None] = mapped_column(Text)
+
+    incident: Mapped[CrimeIncident] = relationship(back_populates="revisions")
+
+    __table_args__ = (
+        Index("ix_crime_incident_revisions_incident", "incident_id", "changed_at"),
+        Index("ix_crime_incident_revisions_changed_by", "changed_by"),
     )

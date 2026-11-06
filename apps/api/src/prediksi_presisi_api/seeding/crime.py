@@ -20,6 +20,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..models import CrimeIncident, IntelligenceReport, Location, PatrolActivity, PoliceUnit
+from ..models.crime_incident import VEHICLE_TARGET
 from . import csv_source as src
 from .errors import SeedError
 from .master import SeedSummary
@@ -101,6 +102,12 @@ def seed_crime_incidents(session: Session, taxonomy: Taxonomy, summary: SeedSumm
                 location_type=src.text(row, "location_type"),
                 modus=src.text(row, "modus"),
                 target_type=src.text(row, "target_type"),
+                # Modul 1 mekanisme: objek kendaraan pada kolom tersendiri (dari nilai
+                # sasaran Pusiknas apa adanya); kelurahan tertunda bila lokasinya kecamatan.
+                vehicle_object=(src.text(row, "vehicle_object") or "").strip()
+                in ("1", "true", "TRUE")
+                or src.text(row, "target_type") == VEHICLE_TARGET,
+                area_pending=(src.text(row, "grid_id") or "").startswith("kec:"),
                 status=taxonomy.map("status_crime", src.text(row, "status")),
                 # Kolom yang dibawa Laporan Polisi asli; kosong pada data sintetis.
                 reported_at=src.parse_datetime(raw_reported, where) if raw_reported else None,

@@ -76,6 +76,11 @@ def list_crimes(
     date_to: date | None = Query(None),
     incident_type: str | None = Query(None),
     kecamatan: str | None = Query(None),
+    vehicle_object: bool | None = Query(None, description="Hanya objek kendaraan bermotor"),
+    area_pending: bool | None = Query(
+        None, description="Hanya yang kelurahannya menunggu konfirmasi"
+    ),
+    duplicate_status: str | None = Query(None, description="SUSPECTED, CONFIRMED, atau CLEARED"),
 ) -> dict[str, Any]:
     polsek = jurisdiction_filter(current, "crime:read")
 
@@ -94,6 +99,12 @@ def list_crimes(
         query = query.where(CrimeIncident.incident_type == incident_type)
     if kecamatan:
         query = query.where(Location.kecamatan == kecamatan)
+    if vehicle_object is not None:
+        query = query.where(CrimeIncident.vehicle_object.is_(vehicle_object))
+    if area_pending is not None:
+        query = query.where(CrimeIncident.area_pending.is_(area_pending))
+    if duplicate_status:
+        query = query.where(CrimeIncident.duplicate_status == duplicate_status)
 
     total = session.scalar(select(func.count()).select_from(query.subquery())) or 0
     rows = session.execute(query.offset(params.offset).limit(params.page_size)).all()
@@ -102,6 +113,11 @@ def list_crimes(
         [
             {
                 "code": incident.code,
+                "vehicle_object": incident.vehicle_object,
+                "area_pending": incident.area_pending,
+                "duplicate_of": incident.duplicate_of,
+                "duplicate_status": incident.duplicate_status,
+                "data_source": incident.data_source,
                 "incident_type": incident.incident_type,
                 "occurred_at": incident.occurred_at,
                 "incident_date": incident.incident_date,

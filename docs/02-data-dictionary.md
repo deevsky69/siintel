@@ -66,6 +66,10 @@
 | modus | text | Tidak | | |
 | target_type | text | Tidak | | |
 | status | text/enum | Tidak | | Lihat §22 |
+| vehicle_object | boolean | Ya | default false | **0019** — objek sasaran kendaraan bermotor pada kolom tersendiri (Modul 1 mekanisme); diturunkan dari `target_type = 'Kendaraan bermotor'` |
+| area_pending | boolean | Ya | default false | **0019** — kelurahan belum pasti (lokasi tingkat kecamatan); dihitung terpisah sebagai "masih memerlukan konfirmasi" |
+| duplicate_of | text | Tidak | | **0019** — kode kejadian yang diduga sama |
+| duplicate_status | text/enum | Tidak | SUSPECTED / CONFIRMED / CLEARED | **0019** — CONFIRMED disembunyikan dari seluruh perhitungan (saringan ORM global) |
 | reported_at | timestamptz | Tidak | | Tanggal lapor (LP). Evaluasi mundur membatasi bukti menurut kolom ini |
 | report_lag_hours | numeric | Tidak | | `reported_at − occurred_at`, jam; p90 pada data asli 3,4 hari |
 | report_source | text/enum | Tidak | | `CITIZEN_REPORT` / `POLICE_FINDING` (§22) |

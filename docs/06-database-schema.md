@@ -103,6 +103,7 @@ MODEL UPDATE
 
 ```text
 crime_incidents.location_id        → locations
+crime_incident_revisions.incident_id → crime_incidents   (0019; riwayat koreksi: field, before, after, by, note)
 intelligence_reports.location_id   → locations
 patrol_activity.location_id        → locations
 patrol_activity.unit_id            → police_units

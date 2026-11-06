@@ -42,9 +42,10 @@ from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
 from ...models import CitizenReport, CrimeIncident, IntelligenceReport, Location
+from ...models.crime_incident import VEHICLE_TARGET
 from ...seeding.taxonomy import Taxonomy, load_taxonomy
 from ...services import attachments as attachment_store
-from ...services import audit, clock
+from ...services import audit, clock, standardization
 from ..deps import (
     CurrentUser,
     get_db,
@@ -405,8 +406,16 @@ def create_crime(
         modus=payload.modus,
         target_type=payload.target_type,
         status=incident_status,
+        # Modul 1 mekanisme: entri petugas dicatat TERPISAH dari Pusiknas lewat sumbernya,
+        # objek kendaraan pada kolom tersendiri, kelurahan tertunda bila lokasinya kecamatan.
+        data_source=standardization.officer_source(current.user),
+        receiving_unit=current.user.polsek,
+        vehicle_object=(payload.target_type or "").strip() == VEHICLE_TARGET,
+        area_pending=location.kelurahan is None,
     )
     session.add(incident)
+    # Dugaan laporan ganda: kejadian sejenis di lokasi sama dalam ±1 hari sudah tercatat.
+    standardization.flag_suspected_duplicate(session, incident)
 
     audit.record(
         session,
@@ -430,6 +439,10 @@ def create_crime(
         "incident_type": incident.incident_type,
         "occurred_at": incident.occurred_at,
         "status": incident.status,
+        "vehicle_object": incident.vehicle_object,
+        "area_pending": incident.area_pending,
+        "duplicate_of": incident.duplicate_of,
+        "duplicate_status": incident.duplicate_status,
         "location_code": location.code,
         "kecamatan": location.kecamatan,
         "kelurahan": location.kelurahan,
@@ -613,6 +626,9 @@ def update_crime_status(
         )
 
     incident.status = new_status
+    standardization.record_revision(
+        session, incident, current.user.user_id, "status", previous, new_status, payload.note
+    )
 
     detail: dict[str, Any] = {"status_before": previous, "status_after": new_status}
     if payload.note:
