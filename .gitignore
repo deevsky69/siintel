@@ -79,3 +79,6 @@ apps/var/
 
 # QR pemasangan nomor WAHA (peragaan) — dibuat scripts/waha-qr.sh
 .waha-qr.png
+
+# Sesi Claude Code (worktree, cache)
+.claude/
