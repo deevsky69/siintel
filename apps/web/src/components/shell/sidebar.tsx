@@ -64,7 +64,7 @@ export function Sidebar({
     >
       {groups.map((group) => {
         const open = group.id === activeGroup ? !opened.has(group.id) : opened.has(group.id);
-        const badge = group.items.some((item) => item.href === "/ops/rekomendasi")
+        const badge = group.items.some((item) => item.href === "/ops/produk-bulanan")
           ? pendingDecisions
           : 0;
 
@@ -109,7 +109,7 @@ export function Sidebar({
                     <SubmenuLink
                       item={item}
                       active={isActive(item.href)}
-                      badge={item.href === "/ops/rekomendasi" ? pendingDecisions : 0}
+                      badge={item.href === "/ops/produk-bulanan" ? pendingDecisions : 0}
                     />
                   </li>
                 ))}
@@ -143,7 +143,7 @@ function SubmenuLink({ item, active, badge }: { item: NavItem; active: boolean; 
           >
             {badge > 99 ? "99+" : badge}
           </span>
-          <span className="sr-only">{badge} rekomendasi menunggu keputusan Anda</span>
+          <span className="sr-only">{badge} produk bulanan menunggu penetapan Anda</span>
         </>
       ) : null}
     </Link>

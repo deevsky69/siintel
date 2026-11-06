@@ -9,7 +9,9 @@ POST /messaging/advisories/sent            hasil pengiriman; menandai bulan terk
 ```
 
 Keputusan pemilik proyek 4 November 2026: grup berisi perwakilan RT/RW dan Babin; pengiriman
-OTOMATIS awal bulan tanpa persetujuan (berbeda dari buletin mingguan yang disetujui Pimpinan).
+awal bulan. DIREVISI 6 November 2026 (3A, dokumen mekanisme): imbauan bulan tertentu hanya
+terkirim — dan hanya dapat diminta lewat /rekomendasi — setelah **disetujui Pimpinan**
+(`advisory_approvals`, `POST /advisories/approvals`, `bulletin:approve`).
 Isinya imbauan warga (`services/citizen_advisory.py`), bukan rekomendasi operasional.
 """
 
@@ -23,9 +25,9 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ...models import Babinkamtibmas, Location
+from ...models import AdvisoryApproval, Babinkamtibmas, Location
 from ...services import audit, citizen_advisory, clock
-from ..deps import get_db
+from ..deps import CurrentUser, get_db, require_permission
 from ..errors import ApiError
 from .messaging import require_messaging_key
 
@@ -159,6 +161,7 @@ def advisory_text(
         raise ApiError(status.HTTP_404_NOT_FOUND, "Kelurahan tidak dikenal pada master lokasi.")
     today = clock.citizen_now().astimezone(clock.JAKARTA).date()
     year, month_number = _parse_month(month, default=citizen_advisory.month_after(today))
+    _require_approved(session, f"{year:04d}-{month_number:02d}")
     advisory = citizen_advisory.build_advisory(session, year, month_number, area[0])
     return {**advisory, "text": citizen_advisory.render_text(advisory)}
 
@@ -171,6 +174,9 @@ def advisory_text(
 def pending_advisories(session: Session = Depends(get_db)) -> dict[str, Any]:
     year, month_number = citizen_advisory.current_month()
     key = f"{year:04d}-{month_number:02d}"
+    if _approval(session, key) is None:
+        # Belum disetujui Pimpinan: tidak ada yang dikirim bulan ini (3A).
+        return {"month": key, "approved": False, "data": []}
     rows = session.scalars(
         select(Babinkamtibmas)
         .where(
@@ -192,7 +198,7 @@ def pending_advisories(session: Session = Depends(get_db)) -> dict[str, Any]:
                 "text": citizen_advisory.render_text(advisory),
             }
         )
-    return {"month": key, "data": data}
+    return {"month": key, "approved": True, "data": data}
 
 
 class SentRequest(BaseModel):
@@ -228,3 +234,99 @@ def advisory_sent(payload: SentRequest, session: Session = Depends(get_db)) -> d
     )
     session.commit()
     return {"kelurahan": row.kelurahan, "advisory_sent_month": row.advisory_sent_month}
+
+
+# ---------------------------------------------------------------------------------------
+# Persetujuan Pimpinan (keputusan 3A, 6 November 2026) — endpoint berkunci sesi, bukan bot.
+# ---------------------------------------------------------------------------------------
+
+
+def _approval(session: Session, month: str) -> AdvisoryApproval | None:
+    return session.scalar(select(AdvisoryApproval).where(AdvisoryApproval.month == month))
+
+
+def _require_approved(session: Session, month: str) -> None:
+    if _approval(session, month) is None:
+        raise ApiError(
+            status.HTTP_409_CONFLICT,
+            f"Imbauan bulan {month} belum disetujui Pimpinan; belum dapat dibagikan.",
+        )
+
+
+class ApprovalRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    note: str | None = Field(default=None, max_length=500)
+
+
+@router.get("/advisories/approvals", summary="Status persetujuan imbauan bulanan + contoh teks")
+def approval_status(
+    session: Session = Depends(get_db),
+    _: CurrentUser = require_permission("bulletin:read"),
+    month: str | None = Query(default=None, description="YYYY-MM; bawaan bulan berjalan"),
+) -> dict[str, Any]:
+    year, month_number = _parse_month(month, default=citizen_advisory.current_month())
+    key = f"{year:04d}-{month_number:02d}"
+    row = _approval(session, key)
+    groups = int(
+        session.scalar(
+            select(func.count())
+            .select_from(Babinkamtibmas)
+            .where(Babinkamtibmas.whatsapp_group_chat_id.is_not(None))
+        )
+        or 0
+    )
+    sample_area = session.scalar(
+        select(Babinkamtibmas.kelurahan)
+        .where(Babinkamtibmas.whatsapp_group_chat_id.is_not(None))
+        .order_by(Babinkamtibmas.kelurahan)
+    ) or session.scalar(
+        select(Location.kelurahan)
+        .where(Location.kelurahan.is_not(None))
+        .order_by(Location.kelurahan)
+    )
+    sample = None
+    if sample_area:
+        advisory = citizen_advisory.build_advisory(session, year, month_number, str(sample_area))
+        sample = {"kelurahan": sample_area, "text": citizen_advisory.render_text(advisory)}
+    return {
+        "month": key,
+        "approved": row is not None,
+        "approved_at": row.approved_at if row else None,
+        "note": row.note if row else None,
+        "groups_registered": groups,
+        "sample": sample,
+    }
+
+
+@router.post(
+    "/advisories/approvals",
+    status_code=status.HTTP_201_CREATED,
+    summary="Menyetujui imbauan bulanan untuk dibagikan ke grup warga",
+)
+def approve_advisory(
+    payload: ApprovalRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("bulletin:approve"),
+) -> dict[str, Any]:
+    if _approval(session, payload.month) is not None:
+        raise ApiError(status.HTTP_409_CONFLICT, f"Imbauan {payload.month} sudah disetujui.")
+    row = AdvisoryApproval(
+        month=payload.month,
+        approved_by=current.user.user_id,
+        note=(payload.note or "").strip() or None,
+    )
+    session.add(row)
+    audit.record(
+        session,
+        action="APPROVE_CITIZEN_ADVISORY",
+        resource_type="advisory",
+        result=audit.RESULT_SUCCESS,
+        user_id=current.user.user_id,
+        resource_id=payload.month,
+        detail={"note": row.note},
+    )
+    session.commit()
+    session.refresh(row)
+    return {"month": row.month, "approved": True, "approved_at": row.approved_at, "note": row.note}

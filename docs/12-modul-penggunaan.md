@@ -34,6 +34,17 @@ minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetuju
 bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
 `/dasbor` menautkan ke SIGAP WARGA.
 
+**Imbauan bulanan ke grup warga perlu persetujuan (3A).** Di menu **Warga → Buletin & Imbauan**,
+Pimpinan menyetujui imbauan bulan berjalan setelah melihat contoh teksnya; sebelum itu bot
+tidak mengirim ke grup dan `/rekomendasi` menjawab "belum disetujui".
+
+**Menu ringkas (6 November 2026).** Lima kelompok: **Wilayah** (beranda, peta, wilayah rawan,
+pola, analitik), **Bulan Ini** (peringkat, produk bulanan, evaluasi, rencana patroli), **Data**
+(laporan petugas dan masyarakat, pembakuan, input, berkas perkara, panic button), **Warga**
+(Babinkamtibmas, buletin & imbauan, survey), **Sistem**. Layar harian (peringatan dini,
+prediksi, penilaian risiko, rekomendasi harian, operasi, brief) keluar dari menu; alamatnya
+tetap dapat dibuka langsung.
+
 **Evaluasi bulanan (Modul 5 mekanisme).** Menu **Evaluasi → Cakupan Bulanan**: setelah bulan
 berakhir, berapa persen kejadian jatuh di kelurahan pilihan (peringkat beku dan keputusan
 Pimpinan), dibanding peta 3 dan 12 bulan pada jumlah kelurahan dan batas data yang sama; rekap

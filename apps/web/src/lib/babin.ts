@@ -98,3 +98,19 @@ export const generateBulletins = (week: string | null) =>
   );
 
 export const approveBulletin = (id: string) => apiPost<BulletinRow>(`/bulletins/${id}/approve`, {});
+
+/** Persetujuan imbauan bulanan ke grup warga (3A, 6 November 2026). */
+export type AdvisoryApproval = {
+  month: string;
+  approved: boolean;
+  approved_at: string | null;
+  note: string | null;
+  groups_registered: number;
+  sample: { kelurahan: string; text: string } | null;
+};
+
+export const getAdvisoryApproval = (month?: string) =>
+  apiGet<AdvisoryApproval>(`/advisories/approvals${month ? `?month=${month}` : ""}`);
+
+export const approveAdvisory = (month: string, note?: string) =>
+  apiPost<{ month: string; approved: boolean }>("/advisories/approvals", { month, note });

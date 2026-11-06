@@ -83,3 +83,7 @@ export const recordAction = (
     `/monthly-products/${month}/items/${encodeURIComponent(kelurahan)}/actions`,
     body,
   );
+
+/** Produk bulanan yang sudah divalidasi dan menunggu penetapan Pimpinan — lencana sidebar. */
+export const countAwaitingDecision = async (): Promise<number> =>
+  (await listProducts()).data.filter((row) => row.status === "VALIDATED").length;

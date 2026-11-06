@@ -498,6 +498,17 @@ Tabel `case_files` dan `case_file_stages` (migration 0016). Data dummy berlabel:
 `predpol seed-case-files-dummy` / `scripts/isi-perkara-dummy-produksi.sh` (deterministik,
 idempoten, mencetak LP + PIN contoh).
 
+### 2.11k Persetujuan imbauan bulanan warga (3A, 6 November 2026)
+
+| Method | Path | Permission | Keterangan |
+|---|---|---|---|
+| GET | `/advisories/approvals?month=` | `bulletin:read` | status persetujuan bulan (bawaan bulan berjalan), jumlah grup terdaftar, contoh teks |
+| POST | `/advisories/approvals {month, note?}` | `bulletin:approve` (Pimpinan) | menyetujui; 409 bila sudah; audit `APPROVE_CITIZEN_ADVISORY` |
+
+`GET /messaging/advisories/pending` mengembalikan `approved: false` dan `data: []` sampai
+bulan berjalan disetujui; `GET /messaging/advisory` (perintah `/rekomendasi`) menjawab 409
+untuk bulan yang belum disetujui.
+
 ### 2.11j Evaluasi bulanan (Modul 5 mekanisme, 6 November 2026)
 
 | Method | Path | Permission | Keterangan |

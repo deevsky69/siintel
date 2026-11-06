@@ -11,7 +11,7 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
 | 3 | Modul 4: produk bulanan, empat tahap (Analis → KBO → Kasat → Pimpinan), peran baru, pimpinan memilih N kelurahan, alasan wajib (0021) | **selesai 6 Nov 2026** |
 | 4 | Modul 4b: pelaksanaan dicatat Fungsi/Polsek per kelurahan prioritas (`monthly_actions`, 0021) | **selesai 6 Nov 2026** |
 | 5 | Modul 5: cakupan, pembanding peta historis pada N sama, rekap usulan, tinjauan pelaksanaan (`GET /evaluation/monthly`) | **selesai 6 Nov 2026**; PAI menunggu luas kelurahan di API |
-| 6 | Menu ringkas, teks dipangkas, peringatan harian keluar dari alur utama, imbauan warga perlu persetujuan | — |
+| 6 | Menu ringkas (lima kelompok), layar harian keluar dari menu, imbauan warga perlu persetujuan (0022) | **selesai 6 Nov 2026** |
 
 ## Tahap 1 — pilihan teknis
 
@@ -65,3 +65,16 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
   masuk pembilang maupun penyebut.
 - PAI belum dihitung: `locations.geom` titik; poligon kelurahan hanya ada di web
   (`lib/wilayah`). Memindahkannya ke API adalah pekerjaan tersendiri.
+
+## Tahap 6 — pilihan teknis
+
+- Menu: Wilayah · Bulan Ini · Data · Warga · Sistem. Rute harian (`/ops/peringatan`,
+  `/ops/prediksi`, `/ops/skoring`, `/ops/rekomendasi`, `/ops/operasi`, `/ops/brief`,
+  `/ops/informasi`, `/ops/evaluasi`) tidak dihapus — hanya tidak ada di menu — supaya tautan
+  lama dan data yang sudah tercatat tetap dapat dibuka.
+- Lencana sidebar kini menghitung produk bulanan yang menunggu penetapan Pimpinan (status
+  VALIDATED), bukan rekomendasi harian.
+- Imbauan bulanan: satu persetujuan per bulan (`advisory_approvals`); bot membaca
+  `approved` dari antrean. Keputusan 4 November (otomatis) direvisi oleh pemilik proyek (3A).
+- Beranda `/ops` masih memuat ringkasan harian (peringatan, prediksi); penyusunan ulang
+  beranda mengikuti siklus bulanan adalah pekerjaan berikutnya.

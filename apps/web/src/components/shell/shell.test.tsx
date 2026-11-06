@@ -16,7 +16,7 @@ describe("shell aplikasi", () => {
   it("menampilkan kelima kelompok menu", () => {
     render(<Sidebar permissions={ALL_PERMISSIONS} />);
 
-    for (const label of ["Pemantauan", "Laporan", "Analisis", "Operasi", "Sistem"]) {
+    for (const label of ["Wilayah", "Bulan Ini", "Data", "Warga", "Sistem"]) {
       expect(screen.getByRole("button", { name: new RegExp(label, "i") })).toBeDefined();
     }
   });
@@ -26,18 +26,18 @@ describe("shell aplikasi", () => {
     // dua puluh baris setara yang harus dibaca semuanya untuk menemukan satu.
     render(<Sidebar permissions={ALL_PERMISSIONS} />);
 
-    // usePathname dipalsukan ke "/", yang berada di kelompok Pemantauan.
+    // usePathname dipalsukan ke "/", yang berada di kelompok Wilayah.
     expect(screen.getByRole("link", { name: /beranda/i })).toBeDefined();
     expect(screen.queryByRole("link", { name: /audit log/i })).toBeNull();
   });
 
   it("tidak menutup kelompok yang baru dibuka setelah salah satu submenunya dituju", () => {
-    // 8 Oktober 2026: membuka Laporan dari Beranda lalu mengeklik "Laporan Masyarakat"
-    // justru MENUTUP kelompok Laporan begitu halaman berganti. Pilihan buka/tutup dicatat
+    // 8 Oktober 2026: membuka Data dari Beranda lalu mengeklik "Laporan Masyarakat"
+    // justru MENUTUP kelompok itu begitu halaman berganti. Pilihan buka/tutup dicatat
     // untuk halaman tempat ia dibuat; di halaman baru, kelompok aktif terbuka apa adanya.
     pathname.value = "/ops";
     const view = render(<Sidebar permissions={ALL_PERMISSIONS} />);
-    fireEvent.click(screen.getByRole("button", { name: /^laporan$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^data$/i }));
     expect(screen.getByRole("link", { name: /laporan masyarakat/i })).toBeDefined();
 
     pathname.value = "/ops/masyarakat";
@@ -63,7 +63,7 @@ describe("shell aplikasi", () => {
   it("membuat setiap submenu dapat dicapai setelah kelompoknya dibuka", () => {
     render(<Sidebar permissions={ALL_PERMISSIONS} />);
 
-    for (const group of ["Laporan", "Analisis", "Operasi", "Sistem"]) {
+    for (const group of ["Bulan Ini", "Data", "Warga", "Sistem"]) {
       fireEvent.click(screen.getByRole("button", { name: new RegExp(group, "i") }));
     }
 
@@ -103,7 +103,7 @@ describe("shell aplikasi", () => {
     ];
 
     render(<Sidebar permissions={pimpinan} />);
-    fireEvent.click(screen.getByRole("button", { name: /laporan/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^data/i }));
     fireEvent.click(screen.getByRole("button", { name: /sistem/i }));
 
     expect(screen.queryByRole("link", { name: /input data/i })).toBeNull();
@@ -122,18 +122,18 @@ describe("shell aplikasi", () => {
 
   it("menampilkan lencana keputusan yang menunggu pada submenunya", () => {
     render(<Sidebar permissions={ALL_PERMISSIONS} pendingDecisions={19} />);
-    fireEvent.click(screen.getByRole("button", { name: /operasi/i }));
+    fireEvent.click(screen.getByRole("button", { name: /bulan ini/i }));
 
-    expect(screen.getByText("19 rekomendasi menunggu keputusan Anda")).toBeDefined();
+    expect(screen.getByText("19 produk bulanan menunggu penetapan Anda")).toBeDefined();
   });
 
   it("memindahkan lencana ke judul kelompok saat submenunya tertutup", () => {
     // Keputusan yang menunggu harus tetap terlihat tanpa membuka apa pun.
     render(<Sidebar permissions={ALL_PERMISSIONS} pendingDecisions={19} />);
 
-    const operasi = screen.getByRole("button", { name: /operasi/i });
-    expect(operasi.getAttribute("aria-expanded")).toBe("false");
-    expect(operasi.textContent).toContain("19");
+    const bulanan = screen.getByRole("button", { name: /bulan ini/i });
+    expect(bulanan.getAttribute("aria-expanded")).toBe("false");
+    expect(bulanan.textContent).toContain("19");
   });
 
   it("tidak menggambar lencana ketika tidak ada yang menunggu", () => {

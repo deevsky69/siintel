@@ -1,5 +1,8 @@
 # 175 — Imbauan bulanan ke grup WhatsApp warga (4 November 2026)
 
+> **Revisi 6 November 2026 (3A):** pengiriman **menunggu persetujuan Pimpinan** per bulan
+> (`advisory_approvals`, migrasi 0022). Butir 2 di bawah tidak berlaku lagi; lihat catatan 176.
+
 Pertanyaan pemilik proyek: bila bot WhatsApp (WAHA) dimasukkan ke grup, bisakah ia otomatis
 mengirim "isi rekomendasi satu bulan ke depan"? Keputusan pemilik proyek:
 

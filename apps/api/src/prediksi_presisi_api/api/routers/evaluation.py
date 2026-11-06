@@ -225,11 +225,14 @@ def recommendations_vs_actual(
 )
 def monthly(
     session: Session = Depends(get_db),
-    _: CurrentUser = require_permission("evaluation:read"),
+    current: CurrentUser = require_permission("evaluation:read"),
     month: str = Query(..., description="YYYY-MM bulan sasaran yang sudah berakhir"),
 ) -> dict[str, Any]:
     try:
         target = monthly_ranking.parse_month(month)
     except monthly_ranking.RankingError as error:
         raise ApiError(status.HTTP_400_BAD_REQUEST, str(error)) from error
-    return monthly_evaluation.evaluate(session, target)
+    # Cakupan wilayah seperti endpoint evaluasi lainnya: Polsek hanya melihat angkanya sendiri.
+    return monthly_evaluation.evaluate(
+        session, target, jurisdiction_filter(current, "evaluation:read")
+    )

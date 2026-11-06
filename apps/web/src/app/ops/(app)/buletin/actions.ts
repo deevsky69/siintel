@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api";
-import { approveBulletin, generateBulletins } from "@/lib/babin";
+import { approveAdvisory, approveBulletin, generateBulletins } from "@/lib/babin";
 
 export type BulletinState = { error: string | null; done: string | null };
 
@@ -27,6 +27,24 @@ export async function approve(_previous: BulletinState, form: FormData): Promise
     const row = await approveBulletin(id);
     revalidatePath("/ops/buletin");
     return { error: null, done: `${row.kelurahan} disetujui; bot akan mengirimnya.` };
+  } catch (error) {
+    if (error instanceof ApiError) return { error: error.message, done: null };
+    throw error;
+  }
+}
+
+export async function approveAdvisoryAction(
+  _previous: BulletinState,
+  form: FormData,
+): Promise<BulletinState> {
+  const month = String(form.get("month") ?? "");
+  try {
+    await approveAdvisory(month, String(form.get("note") ?? "") || undefined);
+    revalidatePath("/ops/buletin");
+    return {
+      error: null,
+      done: `Imbauan ${month} disetujui; bot akan mengirimnya ke grup terdaftar.`,
+    };
   } catch (error) {
     if (error instanceof ApiError) return { error: error.message, done: null };
     throw error;

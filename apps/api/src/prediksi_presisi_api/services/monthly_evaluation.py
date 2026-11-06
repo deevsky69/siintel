@@ -43,7 +43,9 @@ def _default_top_n() -> int:
     return int((raw.get("evaluation") or {}).get("default_top_n", 6))
 
 
-def _actual_by_kelurahan(session: Session, month: Any, scope: str) -> tuple[dict[str, int], int]:
+def _actual_by_kelurahan(
+    session: Session, month: Any, scope: str, polsek: str | None = None
+) -> tuple[dict[str, int], int]:
     """Kejadian aktual bulan sasaran per kelurahan, dan jumlah yang tidak dapat dipetakan."""
     start = ranking.month_start(month)
     end = ranking.add_months(start, 1) - timedelta(days=1)
@@ -59,6 +61,8 @@ def _actual_by_kelurahan(session: Session, month: Any, scope: str) -> tuple[dict
     )
     if scope == "VEHICLE":
         base = base.where(CrimeIncident.vehicle_object.is_(True))
+    if polsek is not None:
+        base = base.where(Location.polsek == polsek)
     mapped = base.where(
         Location.kelurahan.is_not(None), CrimeIncident.area_pending.is_(False)
     ).group_by(Location.kelurahan)
@@ -77,6 +81,8 @@ def _actual_by_kelurahan(session: Session, month: Any, scope: str) -> tuple[dict
     )
     if scope == "VEHICLE":
         unmapped_q = unmapped_q.where(CrimeIncident.vehicle_object.is_(True))
+    if polsek is not None:
+        unmapped_q = unmapped_q.where(Location.polsek == polsek)
     unmapped = int(session.scalar(visibility.all_incidents(unmapped_q)) or 0)
     return counts, unmapped
 
@@ -92,7 +98,9 @@ def _coverage(selected: list[str], actual: dict[str, int]) -> dict[str, Any]:
     }
 
 
-def evaluate(session: Session, month: Any) -> dict[str, Any]:
+def evaluate(session: Session, month: Any, polsek: str | None = None) -> dict[str, Any]:
+    """`polsek` membatasi SELURUH angka ke wilayah itu (pengguna Polsek): kejadian aktual,
+    kelurahan pilihan, dan kelurahan prioritas di luar polseknya tidak ikut dihitung."""
     start = ranking.month_start(month)
     product = session.scalar(select(MonthlyProduct).where(MonthlyProduct.target_month == start))
     frozen = session.scalars(
@@ -105,13 +113,16 @@ def evaluate(session: Session, month: Any) -> dict[str, Any]:
 
     def actual_for(scope: str) -> tuple[dict[str, int], int]:
         if scope not in actual_cache:
-            actual_cache[scope] = _actual_by_kelurahan(session, start, scope)
+            actual_cache[scope] = _actual_by_kelurahan(session, start, scope, polsek)
         return actual_cache[scope]
+
+    def within(rows: Any) -> list[str]:
+        return [r.kelurahan for r in rows if polsek is None or r.polsek == polsek]
 
     methods: list[dict[str, Any]] = []
     for row in frozen:
         actual, unmapped = actual_for(row.scope)
-        selected = [r.kelurahan for r in row.rows[:top_n]]
+        selected = within(row.rows[:top_n])
         methods.append(
             {
                 "method": row.method,
@@ -139,7 +150,7 @@ def evaluate(session: Session, month: Any) -> dict[str, Any]:
                     "data_cutoff": computed.data_cutoff,
                     "top_n": top_n,
                     "unmappable": unmapped,
-                    **_coverage([r.kelurahan for r in computed.rows[:top_n]], actual),
+                    **_coverage(within(computed.rows[:top_n]), actual),
                     "pai": None,
                 }
             )
@@ -148,7 +159,11 @@ def evaluate(session: Session, month: Any) -> dict[str, Any]:
     quality: dict[str, Any] | None = None
     if product is not None:
         actual, _ = actual_for(str(product.facts.get("scope", "ALL_3C")))
-        chosen = [item for item in product.items if item.selected]
+        chosen = [
+            item
+            for item in product.items
+            if item.selected and (polsek is None or item.polsek == polsek)
+        ]
         decision = {
             "status": product.status,
             "priority_count": product.priority_count,

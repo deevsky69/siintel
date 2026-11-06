@@ -26,11 +26,12 @@ const ALL = [...new Set(NAV_ITEMS.flatMap((item) => item.permissions))];
 
 describe("susunan menu", () => {
   it("memakai lima kelompok sesuai permintaan pemilik proyek", () => {
+    // 6 November 2026: mengikuti siklus bulanan "Mekanisme dan Fungsi SIGAP".
     expect(NAV_GROUPS.map((group) => group.id)).toEqual([
       "pemantauan",
+      "bulanan",
       "laporan",
-      "analisis",
-      "operasi",
+      "warga",
       "sistem",
     ]);
   });
@@ -59,20 +60,22 @@ describe("susunan menu", () => {
     expect(new Set(routes).size).toBe(routes.length);
   });
 
-  it("mempertahankan seluruh layar rantai tertutup di dalam menu", () => {
-    // Prediksi dan Evaluasi tidak disebut dalam permintaan, tetapi menghilangkannya
-    // memutus rantai yang menjadi inti sistem ini: tanpa keduanya tidak ada yang dapat
-    // menunjukkan bahwa ramalannya pernah diuji terhadap kenyataan (CLAUDE.md §9).
+  it("mempertahankan seluruh layar siklus bulanan di dalam menu", () => {
+    // Rantai tertutup versi bulanan (Mekanisme dan Fungsi SIGAP): peringkat → produk →
+    // evaluasi. Tanpa evaluasi tidak ada yang menunjukkan peringkatnya pernah diuji.
     const routes = NAV_ITEMS.map((item) => item.href);
 
     for (const href of [
-      "/ops/prediksi",
-      "/ops/evaluasi",
-      "/ops/rekomendasi",
-      "/ops/peringatan",
-      "/ops/skoring",
+      "/ops/peringkat",
+      "/ops/produk-bulanan",
+      "/ops/evaluasi-bulanan",
+      "/ops/pembakuan",
     ]) {
       expect(routes, `${href} hilang dari menu`).toContain(href);
+    }
+    // Layar harian keluar dari menu (rutenya tetap ada).
+    for (const href of ["/ops/prediksi", "/ops/peringatan", "/ops/skoring", "/ops/rekomendasi"]) {
+      expect(routes, `${href} masih di menu`).not.toContain(href);
     }
   });
 });
@@ -92,7 +95,7 @@ describe("penyaringan menu menurut kewenangan", () => {
     // Judul kelompok yang membuka daftar kosong hanya menjanjikan sesuatu yang tidak ada.
     const groups = visibleNavGroups(["dashboard:read"]);
 
-    expect(groups.map((group) => group.id)).toEqual(["pemantauan", "operasi"]);
+    expect(groups.map((group) => group.id)).toEqual(["pemantauan"]);
     expect(groups[0].items.map((item) => item.href)).toEqual(["/ops"]);
   });
 
@@ -117,14 +120,15 @@ describe("kelompok yang sedang aktif", () => {
     expect(groupOf("/ops")).toBe("pemantauan");
     expect(groupOf("/ops/peta")).toBe("pemantauan");
     expect(groupOf("/ops/masyarakat")).toBe("laporan");
-    expect(groupOf("/ops/analitik")).toBe("analisis");
-    expect(groupOf("/ops/operasi")).toBe("operasi");
+    expect(groupOf("/ops/analitik")).toBe("pemantauan");
+    expect(groupOf("/ops/produk-bulanan")).toBe("bulanan");
+    expect(groupOf("/ops/babin")).toBe("warga");
     expect(groupOf("/ops/audit")).toBe("sistem");
   });
 
   it("mengenali rute turunan sebagai bagian submenunya", () => {
-    // `/ops/wilayah/Tebet` harus tetap membuka kelompok Analisis.
-    expect(groupOf("/ops/wilayah/Tebet")).toBe("analisis");
+    // `/ops/wilayah/Tebet` harus tetap membuka kelompok Wilayah.
+    expect(groupOf("/ops/wilayah/Tebet")).toBe("pemantauan");
     expect(groupOf("/ops/peta?wilayah=Tebet")).toBe("pemantauan");
   });
 

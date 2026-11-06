@@ -323,6 +323,25 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
         == 404
     )
 
+    # 3A (6 November 2026): /rekomendasi bulan depan ditolak sampai bulan itu disetujui.
+    nxt_y, nxt_m = citizen_advisory.month_after(
+        clock.citizen_now().astimezone(clock.JAKARTA).date()
+    )
+    next_key = f"{nxt_y:04d}-{nxt_m:02d}"
+    assert (
+        client.get(
+            "/api/v1/messaging/advisory", params={"kelurahan": area.kelurahan}, headers=key
+        ).status_code
+        == 409
+    )
+    leader = _login(client, session, "Pimpinan")
+    assert (
+        client.post(
+            "/api/v1/advisories/approvals", json={"month": next_key}, headers=leader
+        ).status_code
+        == 201
+    )
+
     # /rekomendasi: teks bulan depan, tanpa skor/fungsi kepolisian.
     advisory = client.get(
         "/api/v1/messaging/advisory", params={"kelurahan": area.kelurahan}, headers=key
@@ -350,8 +369,42 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
         == 400
     )
 
-    # Awal bulan: grup terdaftar masuk antrean sampai ditandai terkirim.
+    # 6 November 2026 (3A): sebelum Pimpinan menyetujui bulan ini, antrean kosong dan
+    # /rekomendasi ditolak 409; Administrator tidak boleh menyetujui.
+    closed = client.get("/api/v1/messaging/advisories/pending", headers=key).json()
+    assert closed["approved"] is False and closed["data"] == []
+    this_month = closed["month"]
+    assert (
+        client.post(
+            "/api/v1/advisories/approvals", json={"month": this_month}, headers=admin
+        ).status_code
+        == 403
+    )
+    status_before = client.get("/api/v1/advisories/approvals", headers=leader).json()
+    assert status_before["approved"] is False and status_before["sample"] is not None
+    approved = client.post(
+        "/api/v1/advisories/approvals", json={"month": this_month, "note": "ok"}, headers=leader
+    )
+    assert approved.status_code == 201, approved.text
+    assert (
+        client.post(
+            "/api/v1/advisories/approvals", json={"month": this_month}, headers=leader
+        ).status_code
+        == 409
+    )
+    # /rekomendasi untuk bulan depan tetap tertutup sampai bulan itu disetujui.
+    assert (
+        client.get(
+            "/api/v1/messaging/advisory",
+            params={"kelurahan": area.kelurahan, "month": this_month},
+            headers=key,
+        ).status_code
+        == 200
+    )
+
+    # Setelah disetujui: grup terdaftar masuk antrean sampai ditandai terkirim.
     pending = client.get("/api/v1/messaging/advisories/pending", headers=key).json()
+    assert pending["approved"] is True
     mine = next(row for row in pending["data"] if row["kelurahan"] == area.kelurahan)
     assert mine["chat_id"] == "120363@g.us" and mine["month"] == pending["month"]
     assert "IMBAUAN KAMTIBMAS" in mine["text"]

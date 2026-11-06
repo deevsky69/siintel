@@ -2,7 +2,8 @@ import { NotificationBell } from "@/components/shell/notification-bell";
 import { PanicBanner } from "@/components/shell/panic-banner";
 import { ShellFrame } from "@/components/shell/shell-frame";
 import { Sidebar } from "@/components/shell/sidebar";
-import { getPendingDecisionCount, getProfile } from "@/lib/dashboard";
+import { getProfile } from "@/lib/dashboard";
+import { countAwaitingDecision } from "@/lib/monthly-products";
 import { getNotifications } from "@/lib/notifications";
 
 /**
@@ -20,9 +21,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Lencana hanya bermakna bagi yang dapat memutuskan. Bagi peran lain, rekomendasi yang
   // menunggu bukan pekerjaan mereka — angka yang tidak dapat mereka selesaikan hanya
   // menjadi kecemasan tanpa jalan keluar.
-  const canDecide = profile.permissions.includes("commander_decision:approve");
+  const canDecide = profile.permissions.includes("monthly_product:decide");
   const [pendingDecisions, feed] = await Promise.all([
-    canDecide ? countPending() : Promise.resolve(0),
+    canDecide ? countAwaitingDecision().catch(() => 0) : Promise.resolve(0),
     // Kegagalan memuat antrean tidak boleh menjatuhkan seluruh shell: lonceng adalah
     // penanda tambahan, dan halaman yang gagal seluruhnya karena satu angka jauh lebih
     // merugikan daripada lonceng yang tidak muncul.
@@ -40,19 +41,4 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {children}
     </ShellFrame>
   );
-}
-
-/**
- * Jumlah rekomendasi tertunda, atau 0 bila tidak dapat diambil.
- *
- * Kegagalan di sini **tidak boleh menjatuhkan seluruh shell**: lencana adalah penanda
- * tambahan, dan halaman yang gagal dimuat seluruhnya karena satu angka hiasan jauh lebih
- * merugikan daripada lencana yang tidak muncul.
- */
-async function countPending(): Promise<number> {
-  try {
-    return await getPendingDecisionCount();
-  } catch {
-    return 0;
-  }
 }

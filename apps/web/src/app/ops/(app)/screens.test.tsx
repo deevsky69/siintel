@@ -52,6 +52,19 @@ describe("menu dan rutenya", () => {
       "tidak ada layar terbaca — pemeriksaan ini tidak menguji apa pun",
     ).toBeGreaterThan(10);
 
-    expect(onDisk.filter((name) => !inMenu.has(name))).toEqual([]);
+    // 6 November 2026 (Mekanisme dan Fungsi SIGAP): layar harian SENGAJA keluar dari menu
+    // tetapi rutenya dipertahankan untuk tautan lama dan data yang sudah tercatat. Daftar
+    // ini tertutup: layar baru di luar menu tetap tertangkap di sini.
+    const keptOffMenu = [
+      "brief",
+      "evaluasi",
+      "informasi",
+      "operasi",
+      "peringatan",
+      "prediksi",
+      "rekomendasi",
+      "skoring",
+    ];
+    expect(onDisk.filter((name) => !inMenu.has(name)).sort()).toEqual(keptOffMenu);
   });
 });

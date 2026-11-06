@@ -2,9 +2,9 @@ import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
-import { getBulletins } from "@/lib/babin";
+import { getAdvisoryApproval, getBulletins } from "@/lib/babin";
 import { getProfile } from "@/lib/decisions";
-import { ApproveButton, GenerateForm } from "./bulletin-forms";
+import { AdvisoryApproveForm, ApproveButton, GenerateForm } from "./bulletin-forms";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,10 @@ export default async function BuletinPage({
     return (Array.isArray(value) ? value[0] : value) ?? "";
   };
   const profile = await getProfile();
-  const list = await getBulletins(one("minggu"), one("status").toUpperCase());
+  const [list, advisory] = await Promise.all([
+    getBulletins(one("minggu"), one("status").toUpperCase()),
+    getAdvisoryApproval().catch(() => null),
+  ]);
   const canManage = profile.permissions.includes("bulletin:manage");
   const canApprove = profile.permissions.includes("bulletin:approve");
   const week = one("minggu") || list.weeks[0] || "";
@@ -37,6 +40,33 @@ export default async function BuletinPage({
         Buletin adalah penerbitan informasi kepada warga: hanya yang disetujui Pimpinan yang
         dikirim.
       </StatusNotice>
+      {advisory ? (
+        <Panel
+          title={`Imbauan bulanan ke grup warga · ${advisory.month}`}
+          action={
+            <span className="panel-action">
+              {advisory.approved ? "Disetujui" : "Menunggu persetujuan Pimpinan"} ·{" "}
+              {advisory.groups_registered} grup terdaftar
+            </span>
+          }
+        >
+          {advisory.sample ? (
+            <details>
+              <summary className="cursor-pointer text-2xs text-accent">
+                Contoh teks ({advisory.sample.kelurahan})
+              </summary>
+              <pre className="mt-1 whitespace-pre-wrap rounded bg-base-850 p-3 font-sans text-xs leading-relaxed text-ink">
+                {advisory.sample.text}
+              </pre>
+            </details>
+          ) : null}
+          {!advisory.approved && canApprove ? (
+            <div className="mt-2">
+              <AdvisoryApproveForm month={advisory.month} />
+            </div>
+          ) : null}
+        </Panel>
+      ) : null}
       {canManage ? (
         <Panel title="Susun Buletin">
           <GenerateForm suggested={list.suggested_week} />
