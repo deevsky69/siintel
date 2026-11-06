@@ -498,6 +498,19 @@ Tabel `case_files` dan `case_file_stages` (migration 0016). Data dummy berlabel:
 `predpol seed-case-files-dummy` / `scripts/isi-perkara-dummy-produksi.sh` (deterministik,
 idempoten, mencetak LP + PIN contoh).
 
+### 2.11h Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026)
+
+| Method | Path | Permission | Keterangan |
+|---|---|---|---|
+| GET | `/rankings/options` | `ranking:read` | metode (HISTORY_3M bawaan — keputusan 2A; HISTORY_12M; MODEL belum tersedia), cakupan (ALL_3C/VEHICLE), bulan yang disarankan, daftar yang sudah dibekukan |
+| GET | `/rankings?month=YYYY-MM&method=&scope=` | `ranking:read` | peringkat 65 kelurahan; `frozen: true` bila sudah dibekukan, selain itu hitungan saat ini |
+| POST | `/rankings/freeze {month, method?, scope?, data_cutoff?}` | `ranking:manage` (Administrator) | membekukan beserta batas data, versi metode, jumlah laporan menunggu konfirmasi; 409 bila sudah ada; audit `FREEZE_RANKING` |
+
+Tabel `monthly_rankings` + `monthly_ranking_rows` (0020). Perkiraan = rata-rata bulanan
+pada bulan dasar, hanya kejadian yang **dilaporkan** sampai batas data; seri menurut nama.
+IKW (frekuensi 12 bulan, tren, konsistensi; `config/ranking/monthly.yaml`, PROPOSED)
+tampil di samping, tidak menentukan urutan.
+
 ### 2.11g Pembakuan laporan kejadian (Modul 1 mekanisme, 6 November 2026)
 
 | Method | Path | Permission | Keterangan |

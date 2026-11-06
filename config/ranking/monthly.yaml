@@ -1,0 +1,39 @@
+# Peringkat bulanan 65 kelurahan — Modul 2–3 "Mekanisme dan Fungsi SIGAP".
+#
+# Keputusan pemilik proyek 6 November 2026 (2A): metode yang dipakai sebagai dasar usulan
+# SEKARANG adalah peta 3 bulan terakhir; model menyusul setelah diuji di dalam aplikasi.
+# Dokumen mekanisme sendiri: "Jika hasil evaluasi lebih mendukung peta historis, gunakan
+# peta tersebut sebagai dasar usulan sampai model berikutnya selesai diuji."
+#
+# IKW (Indeks Kerawanan Wilayah) — rancangan: frekuensi 12 bulan, tren, konsistensi.
+# Bobot dan ambang kategori di bawah ini BELUM diuji: status PROPOSED (dokumen: "diuji
+# sebelum dipakai"). IKW ditampilkan di samping peringkat, tidak menentukan urutan.
+version: peringkat-2026-11-06
+status: PROPOSED
+
+default_method: HISTORY_3M
+methods:
+  HISTORY_3M:
+    label: Peta 3 bulan terakhir
+    basis_months: 3
+  HISTORY_12M:
+    label: Peta 12 bulan terakhir
+    basis_months: 12
+  MODEL:
+    label: Model (belum tersedia)
+    basis_months: 12
+
+# Cakupan kejadian yang dihitung: seluruh 3C, atau hanya berobjek kendaraan bermotor
+# (saringan yang dipakai Uji Prediksi 2025).
+scopes: [ALL_3C, VEHICLE]
+default_scope: ALL_3C
+
+ikw:
+  weights:
+    frequency: 0.50    # jumlah 12 bulan, dinormalkan ke kelurahan tertinggi
+    trend: 0.25        # rata-rata 3 bulan terakhir dibanding 9 bulan sebelumnya
+    consistency: 0.25  # bagian bulan (dari 12) yang mencatat >= 1 kejadian
+  categories:          # 0–100, PROPOSED
+    RENDAH: [0, 34]
+    SEDANG: [35, 64]
+    TINGGI: [65, 100]

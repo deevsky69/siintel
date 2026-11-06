@@ -34,6 +34,12 @@ minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetuju
 bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
 `/dasbor` menautkan ke SIGAP WARGA.
 
+**Peringkat bulanan (Modul 2–3 mekanisme).** Menu **Analisis → Peringkat Bulanan**: 65
+kelurahan diurutkan untuk bulan depan dari peta 3 bulan terakhir (atau 12 bulan), hanya dari
+kejadian yang sudah dilaporkan sampai batas data. Administrator **membekukan** peringkat
+sebelum bulan berjalan; yang dibekukan itulah yang dievaluasi setelah bulan berakhir. IKW
+tampil di samping (PROPOSED).
+
 **Pembakuan laporan (Modul 1 mekanisme).** Menu **Laporan → Pembakuan** (Administrator):
 kejadian yang kelurahannya belum pasti dipastikan ke kelurahan di kecamatannya, dan dugaan
 laporan ganda dinyatakan ganda (hilang dari perhitungan) atau bukan. Setiap koreksi tersimpan

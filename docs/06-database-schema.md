@@ -104,6 +104,8 @@ MODEL UPDATE
 ```text
 crime_incidents.location_id        → locations
 crime_incident_revisions.incident_id → crime_incidents   (0019; riwayat koreksi: field, before, after, by, note)
+monthly_rankings.generated_by      → users              (0020; peringkat bulanan: target_month, method, scope, data_cutoff, model_version, basis_from/to, pending_count)
+monthly_ranking_rows.ranking_id    → monthly_rankings   (0020; rank, kelurahan, predicted_count, ikw, ikw_category, basis JSONB)
 intelligence_reports.location_id   → locations
 patrol_activity.location_id        → locations
 patrol_activity.unit_id            → police_units

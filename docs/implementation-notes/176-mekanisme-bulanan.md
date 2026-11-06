@@ -7,7 +7,7 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
 | Tahap | Isi | Status |
 |---|---|---|
 | 1 | Modul 1: `vehicle_object`, `area_pending`, dugaan ganda, `crime_incident_revisions`, layar Pembakuan (0019) | **selesai 6 Nov 2026** |
-| 2 | Modul 2–3: peringkat bulanan 65 kelurahan tersimpan (peta 3 bulan, 12 bulan, IKW), batas data, layar Peringkat | — |
+| 2 | Modul 2–3: peringkat bulanan 65 kelurahan tersimpan (peta 3 bulan, 12 bulan, IKW), batas data, layar Peringkat (0020) | **selesai 6 Nov 2026** |
 | 3 | Modul 4: produk bulanan, empat tahap (Analis → KBO → Kasat → Pimpinan), peran baru, pimpinan memilih N kelurahan, alasan wajib | — |
 | 4 | Modul 4b: pelaksanaan dicatat Fungsi/Polsek per kelurahan prioritas | — |
 | 5 | Modul 5: cakupan, pembanding peta historis pada N sama, PAI, rekap usulan, tinjauan pelaksanaan | — |
@@ -23,3 +23,17 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
   CONFIRMED disembunyikan lewat saringan ORM global (`services/visibility.py`) — satu tempat.
 - Entri petugas diberi `data_source = ENTRI:<unit>` supaya terpisah dari rekaman Pusiknas tanpa
   tabel baru.
+
+## Tahap 2 — pilihan teknis
+
+- Perkiraan per kelurahan = rata-rata bulanan pada 3 bulan kalender terakhir sebelum bulan
+  sasaran (HISTORY_3M, keputusan 2A); HISTORY_12M tersedia sebagai pembanding; MODEL ditolak
+  400 sampai ada model yang diuji.
+- Batas data = hari terakhir bulan sebelum bulan sasaran; hanya kejadian dengan
+  `coalesce(reported_at, occurred_at)` ≤ batas (klausa `_known_by` yang sama dengan evaluasi
+  mundur). Kejadian `area_pending` tidak ikut; jumlahnya disimpan (`pending_count`).
+- Seri: nama kelurahan (abjad), sesuai dokumen. Seluruh kelurahan masuk, termasuk yang nol.
+- IKW = 0,5·frekuensi(12 bulan, dinormalkan ke tertinggi) + 0,25·tren(3 vs 9 bulan, 0–100)
+  + 0,25·konsistensi(bagian bulan ≥1 kejadian). Bobot dan kategori di
+  `config/ranking/monthly.yaml`, PROPOSED; tidak menentukan urutan.
+- Pembekuan satu kali per (bulan, metode, cakupan); `generated_at` memakai waktu sebenarnya.

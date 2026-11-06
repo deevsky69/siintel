@@ -45,6 +45,8 @@ permissions:
   # Tahap 3 (2 November 2026): kontak Babinkamtibmas dan buletin mingguan kelurahan.
   babin: [read, manage]
   bulletin: [read, manage, approve]
+  # Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026).
+  ranking: [read, manage]
 
 roles:
   Pimpinan:
@@ -72,6 +74,7 @@ roles:
       - case_file:read
       - babin:read
       - bulletin:read
+      - ranking:read
       # Buletin kelurahan adalah penerbitan kepada masyarakat — disetujui Pimpinan,
       # seperti imbauan (2 November 2026).
       - bulletin:approve
@@ -121,6 +124,7 @@ roles:
   # Dijaga oleh `test_rbac_scope_is_enforceable`.
   Fungsi:
     ALL:
+      - ranking:read
       - location:read
       - map:read
       - risk_score:read
@@ -174,6 +178,7 @@ roles:
       # Kontak Babin dan buletin kelurahan boleh dibaca lintas wilayah (bukan data sensitif).
       - babin:read
       - bulletin:read
+      - ranking:read
       - location:read
     OWN_JURISDICTION:
       - public_alert:read
@@ -257,6 +262,8 @@ roles:
       - babin:manage
       - bulletin:read
       - bulletin:manage
+      - ranking:read
+      - ranking:manage
       - dashboard:read
       - location:read
       - location:write

@@ -69,6 +69,9 @@ EXPECTED_TABLES = {
     "bulletins",
     # 0019 — pembakuan laporan (6 November 2026)
     "crime_incident_revisions",
+    # 0020 — peringkat bulanan (6 November 2026)
+    "monthly_rankings",
+    "monthly_ranking_rows",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat
     "citizen_report_attachments",
