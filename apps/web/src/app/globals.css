@@ -264,166 +264,226 @@
 }
 
 /* ------------------------------------------------------------------------------------------
-   SIGAP WARGA — tema sisi masyarakat (2 November 2026; rupa gelap-tegas 3 November malam).
+   SIGAP WARGA — tema sisi masyarakat (rupa lembaga terang, 10 November 2026).
 
-   Dasbor warga memakai rupa yang SENGAJA berbeda dari sisi kepolisian (/ops): konsol peta
-   gelap-hangat, bukan hitam pekat — arang hangat sebagai kanvas, panel sedikit lebih terang,
-   teks putih-gading, garis 1px membentuk sel, dan judul condensed tebal kapital. Referensi
-   (refero.design): Felt (konsol GIS gelap: kanvas gelap, panel bertingkat nada, satu aksen
-   hangat untuk tindakan utama, garis tipis, radius kecil), Eat Real Food/realfood.gov (judul
-   condensed tebal berjarak rapat, strip lembaga tipis), Axiom (lapisan nada alih-alih
-   bayangan). Ditolak: hitam pekat, glow neon, gradien, pil, kartu radius 16 px, aksen biru.
+   Mengikuti mockup "SIGAP WARGA Redesign" (Beranda, Peta, Survey, Lacak, Lapor, Masuk
+   petugas) yang diserahkan pemilik proyek 10 November 2026: kanvas abu sangat muda, panel
+   putih bergaris tipis, **navy** #000B47 untuk kepala/hero/tombol utama, **emas** #C1801E /
+   #DF9A33 untuk garis ganda kepala, garis aktif menu, eyebrow, dan tombol kedua; **merah**
+   #B91C1C hanya untuk Darurat dan spanduk peringatan. Sudut persegi (radius 0), Inter untuk
+   badan, Manrope tebal untuk judul.
 
-   Tiga keluarga warna: gading (teks, bingkai kuat), **emas Polri** (tindakan utama, eyebrow,
-   garis aktif, cincin), dan **sinyal** merah (Darurat, imbauan, tingkat tinggi). Token yang
-   sama (surface/text/accent/risk) didefinisikan ulang di dalam pembungkus `.warga`,
-   sehingga komponen Tailwind bekerja apa adanya, tetapi tidak terpengaruh pengalih tema
-   gelap/terang milik /ops (`.dark .warga` ikut ditimpa).
+   Token yang sama (surface/text/accent/risk) didefinisikan ulang di dalam pembungkus
+   `.warga`, sehingga komponen Tailwind bekerja apa adanya dan tidak terpengaruh pengalih
+   gelap/terang milik /ops (`.dark .warga` ikut ditimpa — sisi warga selalu terang).
    ------------------------------------------------------------------------------------------ */
 .warga,
 .dark .warga {
-  color-scheme: dark;
+  color-scheme: light;
 
-  --surface-app: 28 27 24; /* arang hangat: kanvas */
-  --surface-panel: 38 37 33; /* panel */
-  --surface-inset: 48 46 41; /* sel sekunder, latar tag */
-  --line: 61 58 51; /* garis 1px */
-  --line-strong: 92 88 78;
-  --line-stronger: 237 233 223; /* bingkai gading */
+  --surface-app: 248 248 248; /* #F8F8F8 kanvas */
+  --surface-panel: 255 255 255; /* panel putih */
+  --surface-inset: 238 240 245; /* #EEF0F5 sel sekunder */
+  --line: 226 230 236; /* #E2E6EC */
+  --line-strong: 213 219 227; /* #D5DBE3 bingkai isian */
+  --line-stronger: 154 166 184; /* #9AA6B8 bayangan 1px */
 
-  --text: 240 236 226; /* gading */
-  --text-muted: 184 178 164; /* 8,5:1 di atas kanvas */
-  --text-faint: 140 134 121; /* 4,9:1 */
+  --text: 26 33 71; /* #1A2147 */
+  --text-muted: 75 85 99; /* #4B5563 — 7,5:1 di atas putih */
+  --text-faint: 104 118 147; /* #687693 — 4,9:1 */
 
-  --accent: 230 173 58; /* emas Polri: tindakan utama */
-  --accent-soft: 230 173 58;
-  --accent-deep: 196 143 36;
+  --accent: 0 11 71; /* navy: tindakan utama */
+  --accent-soft: 28 42 110; /* #1C2A6E tautan */
+  --accent-deep: 14 26 94; /* #0E1A5E */
 
-  /* tingkat kerawanan kasar: rendah / sedang / tinggi — tangga panas hijau → jingga → merah */
-  --risk-low: 61 163 113;
-  --risk-moderate: 217 122 36;
-  --risk-high: 236 75 60;
-  --risk-critical: 236 75 60;
+  /* tingkat kerawanan kasar untuk TEKS/lencana (kontras di atas putih); warna isian peta
+     ada di lib/warga LEVEL_FILL (#BFD7EA / #F2B45A / #EA580C sesuai mockup) */
+  --risk-low: 30 90 140;
+  --risk-moderate: 154 94 10;
+  --risk-high: 194 65 12;
+  --risk-critical: 185 28 28;
 
-  --warga-gold: 230 173 58;
-  --warga-signal: 236 75 60;
-  --warga-amber: 230 173 58; /* bintang ulasan */
+  --warga-navy: 0 11 71;
+  --warga-navy2: 14 26 94;
+  --warga-gold: 193 128 30; /* #C1801E */
+  --warga-goldl: 223 154 51; /* #DF9A33 */
+  --warga-goldd: 138 90 18; /* #8A5A12 teks emas di atas putih */
+  --warga-signal: 185 28 28; /* #B91C1C */
+  --warga-amber: 193 128 30; /* bintang ulasan */
+  --warga-soft: 201 207 222; /* #C9CFDE teks redup di atas navy */
   --glow-a: transparent;
   --glow-b: transparent;
   --shadow-panel: none;
   --shadow-glow: none;
 
-  font-family: var(--font-sans), system-ui, sans-serif;
-  letter-spacing: 0.01em;
+  font-family: var(--font-sans), "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
+  font-feature-settings:
+    "calt" 0,
+    "liga" 0,
+    "cv01",
+    "cv10";
 }
 .warga .font-heading {
-  font-family: var(--font-sans), system-ui, sans-serif;
-  letter-spacing: 0;
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  letter-spacing: -0.01em;
 }
 .warga h1,
 .warga h2,
 .warga .font-display {
-  font-family: var(--font-display), "Arial Narrow", sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-  line-height: 0.95;
+  font-family: var(--font-display), "Helvetica Neue", Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.warga h2 {
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
-/* --- kepala halaman: strip lembaga + masthead -------------------------------------------- */
+/* pembungkus lebar isi: 1280px, gutter 24px (16px di ponsel) */
+.warga .warga-wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+@media (min-width: 640px) {
+  .warga .warga-wrap {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+.warga select.warga-field {
+  appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M0 0h10L5 6z' fill='%23000B47'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+/* --- kepala halaman: strip navy + masthead putih bergaris emas ganda ---------------------- */
 .warga .warga-strip {
-  background: rgb(18 17 15);
-  color: rgb(var(--text-muted));
-  font-size: 0.75rem;
-  line-height: 1;
+  background: rgb(var(--warga-navy));
+  color: rgb(var(--warga-soft));
+  font-size: 13px;
+  line-height: 1.2;
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgb(var(--line));
 }
 .warga .warga-strip-sep {
-  color: rgb(var(--warga-gold));
+  color: rgb(var(--warga-goldl));
   margin: 0 0.15rem;
 }
 .warga .warga-strip-link {
-  color: rgb(var(--text));
+  color: rgb(var(--warga-goldl));
   font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: rgb(var(--line-strong));
-  transition: text-decoration-color 0.2s ease;
+  text-decoration: none;
 }
 .warga .warga-strip-link:hover {
-  text-decoration-color: rgb(var(--warga-gold));
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .warga .warga-masthead {
-  background: rgb(var(--surface-app) / 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgb(var(--line-strong));
+  background: rgb(var(--surface-panel));
+  border-bottom: 4px double rgb(var(--warga-gold));
 }
-.warga .warga-wordmark {
-  display: inline-block;
-  border: 1.5px solid rgb(var(--warga-gold));
-  border-radius: 2px;
-  padding: 0.3rem 0.5rem 0.22rem;
-  font-family: var(--font-display), "Arial Narrow", sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  text-transform: uppercase;
-  color: rgb(var(--text));
+.warga .warga-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
 }
+.warga .warga-brand b {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  color: rgb(var(--warga-navy));
+}
+.warga .warga-brand small {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: rgb(var(--text-faint));
+}
+/* menu: garis emas tipis di bawah; saat disentuh/aktif bingkai emas "menggambar" dari dua
+   sudut (kiri-bawah dan kanan-atas), persis mockup */
 .warga .warga-nav-link {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0 0.9rem;
-  font-family: var(--font-display), "Arial Narrow", sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgb(var(--text-muted));
-  transition: color 0.2s ease;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #3b4466;
+  border-bottom: 2px solid rgb(var(--warga-gold));
+  transition: color 0.25s ease;
 }
+.warga .warga-nav-link::before,
 .warga .warga-nav-link::after {
   content: "";
   position: absolute;
-  left: 0.9rem;
-  right: 0.9rem;
-  bottom: -1px;
-  height: 3px;
-  background: rgb(var(--warga-gold));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+  pointer-events: none;
 }
-.warga .warga-nav-link:hover {
-  color: rgb(var(--text));
+.warga .warga-nav-link::before {
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 0;
+  border-left: 2px solid rgb(var(--warga-gold));
+  border-top: 2px solid rgb(var(--warga-gold));
+  transition:
+    width 0.28s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+    height 0.22s cubic-bezier(0.4, 0, 0.2, 1) 0.28s;
 }
-.warga .warga-nav-link:hover::after {
-  transform: scaleX(1);
-  background: rgb(var(--line-strong));
+.warga .warga-nav-link::after {
+  right: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-right: 2px solid rgb(var(--warga-gold));
+  transition: height 0.22s cubic-bezier(0.4, 0, 0.2, 1) 0s;
+}
+.warga .warga-nav-link:hover,
+.warga .warga-nav-link[aria-current="page"] {
+  color: rgb(var(--warga-goldd));
 }
 .warga .warga-nav-link[aria-current="page"] {
-  color: rgb(var(--text));
+  font-weight: 600;
 }
+.warga .warga-nav-link:hover::before,
+.warga .warga-nav-link[aria-current="page"]::before {
+  height: calc(100% + 2px);
+  width: 100%;
+  transition:
+    height 0.22s cubic-bezier(0.4, 0, 0.2, 1) 0s,
+    width 0.28s cubic-bezier(0.4, 0, 0.2, 1) 0.22s;
+}
+.warga .warga-nav-link:hover::after,
 .warga .warga-nav-link[aria-current="page"]::after {
-  transform: scaleX(1);
-  background: rgb(var(--warga-gold));
+  height: 100%;
+  transition: height 0.22s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
 }
 .warga .warga-footer {
-  border-top: 1px solid rgb(var(--line-strong));
-  margin-top: 2rem;
+  background: rgb(var(--warga-navy));
+  color: rgb(var(--warga-soft));
+}
+.warga .warga-footer-rule {
+  border-top: 1px solid rgb(var(--accent-soft));
 }
 .warga .warga-link {
-  color: rgb(var(--text));
+  color: rgb(var(--accent-soft));
   font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: rgb(var(--line-strong));
-  transition: text-decoration-color 0.2s ease;
+  text-decoration: none;
 }
 .warga .warga-link:hover {
-  text-decoration-color: rgb(var(--warga-gold));
+  color: rgb(var(--warga-navy));
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* --- navigasi bawah (ponsel) -------------------------------------------------------------- */
@@ -433,9 +493,6 @@
   border-top: 1px solid rgb(var(--line-strong));
   background: rgb(var(--surface-panel));
 }
-/* `.warga .warga-tabbar` lebih spesifik daripada `sm:hidden` milik Tailwind, sehingga tab
-   bawah ikut tampil di desktop (laporan pemilik proyek 3 November 2026). Media query ini
-   menutupnya pada lebar yang sama dengan `sm`. */
 @media (min-width: 640px) {
   .warga .warga-tabbar {
     display: none;
@@ -454,7 +511,7 @@
   transition: color 0.2s ease;
 }
 .warga .warga-tab[aria-current="page"] {
-  color: rgb(var(--text));
+  color: rgb(var(--warga-navy));
 }
 .warga .warga-tab[aria-current="page"]::after {
   content: "";
@@ -466,43 +523,70 @@
   background: rgb(var(--warga-gold));
 }
 
-/* --- grid bergaris: sel-sel berbagi garis 1px ------------------------------------------- */
-.warga .warga-rubric {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-  border-top: 2px solid rgb(var(--line-stronger));
-  padding-top: 0.45rem;
-  margin-bottom: 0.75rem;
-  font-family: var(--font-display), "Arial Narrow", sans-serif;
-  font-size: 1rem;
+/* --- blok dasar: eyebrow, kartu, tombol, isian --------------------------------------------- */
+.warga .warga-eyebrow {
+  color: rgb(var(--warga-goldd));
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgb(var(--text));
 }
-.warga .warga-grid {
-  display: grid;
-  gap: 1px;
-  border: 1px solid rgb(var(--line-strong));
-  background: rgb(var(--line));
-  border-radius: 2px;
+.warga .warga-hero {
+  background: rgb(var(--warga-navy));
+  color: #fff;
 }
-.warga .warga-cell {
-  background: rgb(var(--surface-panel));
-  padding: 1.1rem 1.15rem 1.25rem;
-  min-width: 0;
+.warga .warga-hero .warga-eyebrow {
+  color: rgb(var(--warga-goldl));
 }
-.warga .warga-cell-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: rgb(var(--text));
+.warga .warga-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgb(var(--warga-navy2));
+  border: 1px solid #2a3a80;
+  color: rgb(var(--warga-goldl));
+  font-size: 13px;
+  font-weight: 600;
+}
+.warga .warga-pill::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: rgb(var(--warga-goldl));
 }
 .warga .warga-card {
   background: rgb(var(--surface-panel));
-  border: 1px solid rgb(var(--line-strong));
-  border-radius: 2px;
+  border: 1px solid rgb(var(--line));
+  border-radius: 0;
+}
+.warga .warga-card-gold {
+  border-top: 3px solid rgb(var(--warga-gold));
+}
+.warga .warga-card-raised {
+  background: rgb(var(--surface-panel));
+  box-shadow: 0 0 0 1px rgb(var(--line-stronger));
+}
+.warga .warga-card-navy {
+  background: rgb(var(--warga-navy));
+  color: #fff;
+  border-radius: 0;
+}
+.warga .warga-card-link {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgb(var(--surface-panel));
+  border: 1.5px solid rgb(var(--line));
+  border-top: 3px solid rgb(var(--warga-gold));
+  padding: 24px;
+  color: rgb(var(--text));
+  text-decoration: none;
+  transition: border-color 0.2s ease;
+}
+.warga .warga-card-link:hover {
+  border-color: rgb(var(--accent-soft));
+  border-top-color: rgb(var(--warga-gold));
 }
 .warga .warga-list {
   border-top: 1px solid rgb(var(--line));
@@ -510,80 +594,52 @@
 .warga .warga-list > li {
   border-bottom: 1px solid rgb(var(--line));
 }
-.warga .warga-empty {
-  border: 1px dashed rgb(var(--line-strong));
-  border-radius: 2px;
-  padding: 0.7rem 0.9rem;
-  font-size: 0.85rem;
-  color: rgb(var(--text-muted));
-}
-
-/* sel jalan pintas: panah berlingkar terisi emas saat disentuh */
-.warga .warga-tile {
-  position: relative;
-  display: block;
-  padding-bottom: 3.4rem;
-  transition: background-color 0.25s ease;
-}
-.warga .warga-tile:hover,
-.warga .warga-tile:focus-visible {
-  background: rgb(var(--surface-inset));
-}
-.warga .warga-tile-arrow {
-  position: absolute;
-  left: 1.15rem;
-  bottom: 1.1rem;
-  display: grid;
-  place-items: center;
-  height: 2rem;
-  width: 2rem;
-  border: 1.5px solid rgb(var(--line-stronger));
-  border-radius: 999px;
-  color: rgb(var(--text));
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    color 0.25s ease,
-    transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-.warga .warga-tile:hover .warga-tile-arrow,
-.warga .warga-tile:focus-visible .warga-tile-arrow {
-  background: rgb(var(--warga-gold));
-  border-color: rgb(var(--warga-gold));
-  color: rgb(var(--surface-app));
-  transform: translateX(4px);
-}
-
-/* baris wilayah di dalam daftar */
 .warga .warga-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.7rem 0.25rem;
-  transition:
-    background-color 0.2s ease,
-    padding-left 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+  gap: 1rem;
+  padding: 14px 4px;
+  min-height: 44px;
+  color: rgb(var(--text));
+  text-decoration: none;
+  transition: background-color 0.2s ease;
 }
 .warga .warga-row:hover {
-  background: rgb(var(--surface-inset));
-  padding-left: 0.6rem;
+  background: rgb(var(--surface-app));
+}
+.warga .warga-num {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--surface-app));
+  color: rgb(var(--warga-navy));
+  font-weight: 800;
+  font-size: 14px;
+}
+.warga .warga-empty {
+  border: 1.5px dashed rgb(var(--line-strong));
+  padding: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgb(var(--text-faint));
 }
 
-/* --- tombol: persegi, flat, teks gelap di atas warna ------------------------------------- */
 .warga .warga-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 2px;
-  padding: 0.75rem 1.1rem;
-  font-family: var(--font-display), "Arial Narrow", sans-serif;
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 0;
   border: 1.5px solid transparent;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
@@ -592,36 +648,600 @@
 .warga .warga-btn:active {
   transform: translateY(1px);
 }
+.warga .warga-btn-sm {
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 14px;
+}
 .warga .warga-btn-primary {
-  background: rgb(var(--warga-gold));
-  border-color: rgb(var(--warga-gold));
-  color: rgb(var(--surface-app));
+  background: rgb(var(--warga-navy));
+  border-color: rgb(var(--warga-navy));
+  color: #fff;
 }
 .warga .warga-btn-primary:hover {
-  background: rgb(243 190 78);
-  border-color: rgb(243 190 78);
+  background: rgb(var(--accent-soft));
+  border-color: rgb(var(--accent-soft));
+}
+.warga .warga-btn-gold,
+.warga .warga-btn-amber {
+  background: rgb(var(--warga-goldl));
+  border-color: rgb(var(--warga-goldl));
+  color: rgb(var(--warga-navy));
+}
+.warga .warga-btn-gold:hover,
+.warga .warga-btn-amber:hover {
+  background: #f2b45a;
+  border-color: #f2b45a;
 }
 .warga .warga-btn-danger {
   background: rgb(var(--warga-signal));
   border-color: rgb(var(--warga-signal));
-  color: rgb(var(--surface-app));
+  color: #fff;
 }
 .warga .warga-btn-danger:hover {
-  background: rgb(246 98 84);
-  border-color: rgb(246 98 84);
+  background: #991b1b;
+  border-color: #991b1b;
 }
 .warga .warga-btn-ghost {
-  background: transparent;
-  color: rgb(var(--text));
-  border-color: rgb(var(--line-stronger));
+  background: rgb(var(--surface-panel));
+  color: rgb(var(--warga-navy));
+  border-color: rgb(var(--warga-navy));
 }
 .warga .warga-btn-ghost:hover {
   background: rgb(var(--surface-inset));
 }
-.warga .warga-btn-amber {
+.warga .warga-btn-danger-outline {
+  background: transparent;
+  color: rgb(var(--warga-signal));
+  border-color: rgb(var(--warga-signal));
+}
+.warga .warga-btn-danger-outline:hover {
+  background: #fef2f2;
+}
+.warga .warga-btn-white-outline {
+  background: transparent;
+  color: #fff;
+  border-color: #fff;
+}
+.warga .warga-btn-white-outline:hover {
+  background: rgb(255 255 255 / 0.1);
+}
+
+.warga .warga-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(var(--warga-navy));
+}
+.warga .warga-field {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1.5px solid rgb(var(--line-strong));
+  border-radius: 0;
+  background: rgb(var(--surface-panel));
+  font: inherit;
+  font-size: 15px;
+  color: rgb(var(--warga-navy));
+  transition: border-color 0.2s ease;
+}
+.warga textarea.warga-field {
+  min-height: 0;
+  padding: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.warga .warga-field:hover {
+  border-color: rgb(var(--line-stronger));
+}
+.warga .warga-field:focus {
+  border-color: rgb(var(--warga-navy));
+  outline: none;
+}
+.warga .warga-field::placeholder {
+  color: rgb(var(--text-faint));
+}
+.warga .warga-field:disabled {
+  background: rgb(var(--surface-app));
+  color: rgb(var(--text-faint));
+}
+/* garis emas yang "mengisi" dari kiri saat isian difokus (mockup Masuk) */
+.warga .warga-inp {
+  position: relative;
+}
+.warga .warga-inp::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
   background: rgb(var(--warga-gold));
-  border-color: rgb(var(--warga-gold));
-  color: rgb(var(--surface-app));
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.warga .warga-inp:focus-within::after {
+  width: 100%;
+}
+.warga .warga-help {
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(var(--text-faint));
+}
+.warga .warga-error {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fef2f2;
+  border-left: 3px solid rgb(var(--warga-signal));
+  color: #7f1d1d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.warga .warga-ok {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 20px;
+  color: #166534;
+}
+.warga .warga-ok b {
+  color: #14532d;
+}
+.warga .warga-warn {
+  background: #fff7ed;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #7c2d12;
+}
+
+/* tag saring tingkat: persegi; yang ditekan terisi navy */
+.warga .warga-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 36px;
+  border: 1.5px solid rgb(var(--line-strong));
+  border-radius: 0;
+  background: rgb(var(--surface-panel));
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(var(--warga-navy));
+  --chip: var(--line-stronger);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.warga .warga-chip.is-tinggi {
+  --chip: 234 88 12;
+}
+.warga .warga-chip.is-sedang {
+  --chip: 242 180 90;
+}
+.warga .warga-chip.is-rendah {
+  --chip: 191 215 234;
+}
+.warga .warga-chip i {
+  height: 10px;
+  width: 10px;
+  background: rgb(var(--chip));
+}
+.warga .warga-chip b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgb(var(--text-faint));
+}
+.warga .warga-chip:hover {
+  border-color: rgb(var(--accent-soft));
+}
+.warga .warga-chip[aria-pressed="true"] {
+  border-color: rgb(var(--warga-navy));
+  background: rgb(var(--warga-navy));
+  color: #fff;
+}
+.warga .warga-chip[aria-pressed="true"] b {
+  color: rgb(var(--warga-soft));
+}
+
+/* lencana tingkat */
+.warga .warga-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.warga .warga-level-lg {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.warga .warga-level i {
+  width: 8px;
+  height: 8px;
+}
+.warga .warga-level.is-rendah {
+  background: #eaf3fa;
+  color: rgb(var(--risk-low));
+  border-color: #bfd7ea;
+}
+.warga .warga-level.is-rendah i {
+  background: #bfd7ea;
+}
+.warga .warga-level.is-sedang {
+  background: #fdf3e3;
+  color: rgb(var(--risk-moderate));
+  border-color: #f2b45a;
+}
+.warga .warga-level.is-sedang i {
+  background: #f2b45a;
+}
+.warga .warga-level.is-tinggi {
+  background: #fdebe3;
+  color: rgb(var(--risk-high));
+  border-color: #ea580c;
+}
+.warga .warga-level.is-tinggi i {
+  background: #ea580c;
+}
+.warga .warga-hero .warga-level {
+  background: rgb(255 255 255 / 0.1);
+  color: #fff;
+}
+
+/* --- spanduk peringatan merah (Survey, Lapor) --------------------------------------------- */
+.warga .warga-banner {
+  background: rgb(var(--warga-signal));
+  color: #fff;
+}
+.warga .warga-banner a:not(.warga-btn) {
+  color: #fff;
+  text-decoration: underline;
+}
+.warga .warga-banner .warga-btn {
+  background: #fff;
+  border-color: #fff;
+  color: #991b1b;
+  font-weight: 800;
+}
+
+/* --- peta ----------------------------------------------------------------------------------- */
+.warga .warga-poly {
+  transform-box: fill-box;
+  transform-origin: center;
+  stroke: #fff;
+  animation: warga-poly 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transition:
+    fill-opacity 0.35s ease,
+    filter 0.2s ease,
+    stroke 0.2s ease;
+}
+.warga .warga-poly.is-selected {
+  stroke: rgb(var(--warga-navy));
+}
+.warga a:hover > .warga-poly,
+.warga a:focus-visible > .warga-poly {
+  filter: saturate(1.15);
+  stroke: rgb(var(--warga-navy));
+}
+.warga .warga-map-label {
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 2px 6px;
+  background: rgb(255 255 255 / 0.85);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgb(var(--warga-navy));
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+.warga .warga-map-surface {
+  position: relative;
+  background:
+    linear-gradient(rgb(255 255 255) 2px, transparent 2px) 0 0 / 100% 60px,
+    linear-gradient(90deg, rgb(255 255 255) 2px, transparent 2px) 0 0 / 70px 100%,
+    #f1f3f4;
+}
+.warga .warga-legend {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  align-items: center;
+  font-size: 13px;
+  color: #374151;
+}
+.warga .warga-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.warga .warga-legend i {
+  height: 14px;
+  width: 14px;
+}
+.warga .warga-legend-note {
+  color: rgb(var(--text-faint));
+}
+.warga .warga-period {
+  display: inline-block;
+  background: rgb(var(--surface-panel));
+  padding: 6px 10px;
+  font-size: 12px;
+  color: rgb(var(--text-faint));
+}
+.warga .warga-tip {
+  position: absolute;
+  z-index: 3;
+  min-width: 150px;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 16px));
+  background: rgb(var(--surface-panel));
+  box-shadow: 0 0 0 1px rgb(var(--line-stronger));
+  padding: 0.5rem 0.65rem;
+  animation: warga-tip 0.22s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.warga .warga-tip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  height: 10px;
+  width: 10px;
+  transform: translateX(-50%) rotate(45deg);
+  border-right: 1px solid rgb(var(--line-stronger));
+  border-bottom: 1px solid rgb(var(--line-stronger));
+  background: rgb(var(--surface-panel));
+}
+
+/* kartu imbauan di strip beranda */
+.warga .warga-alert {
+  border-left: 3px solid rgb(var(--warga-gold));
+  background: rgb(var(--surface-app));
+  padding: 10px 12px;
+}
+
+/* halaman Peta: panggung penuh lebar */
+.warga .warga-bleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+.warga .warga-stage {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  background: #f1f3f4;
+  background-image:
+    linear-gradient(rgb(255 255 255) 2px, transparent 2px),
+    linear-gradient(90deg, rgb(255 255 255) 2px, transparent 2px);
+  background-size:
+    100% 140px,
+    140px 100%;
+}
+@media (min-width: 1024px) {
+  .warga .warga-stage {
+    grid-template-columns: 340px minmax(0, 1fr) 340px;
+    align-items: start;
+    min-height: 720px;
+    padding: 20px;
+  }
+}
+.warga .warga-panel {
+  background: rgb(var(--surface-panel));
+  box-shadow: 0 0 0 1px rgb(var(--line-stronger));
+  display: flex;
+  flex-direction: column;
+}
+.warga .warga-panel-head {
+  padding: 18px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px solid rgb(var(--surface-inset));
+}
+.warga .warga-panel-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 1.5px solid transparent;
+  text-align: left;
+  color: rgb(var(--text));
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.warga .warga-panel-item:hover {
+  background: rgb(var(--surface-app));
+}
+.warga .warga-panel-item[aria-current="true"] {
+  background: rgb(var(--surface-app));
+  border-color: rgb(var(--warga-navy));
+}
+.warga .warga-crumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: rgb(var(--text-faint));
+}
+.warga .warga-crumb a {
+  color: rgb(var(--accent-soft));
+  font-weight: 600;
+  text-decoration: none;
+}
+.warga .warga-babin {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgb(var(--surface-app));
+  padding: 12px;
+}
+.warga .warga-babin-icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--warga-navy));
+  color: rgb(var(--warga-goldl));
+}
+
+/* --- Lacak: tab dan linimasa --------------------------------------------------------------- */
+.warga .warga-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid rgb(var(--line));
+}
+.warga .warga-tabs a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgb(var(--text-faint));
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.warga .warga-tabs a[aria-selected="true"] {
+  color: rgb(var(--warga-navy));
+  border-bottom-color: rgb(var(--warga-gold));
+  background: rgb(var(--surface-app));
+}
+.warga .warga-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.warga .warga-timeline li {
+  display: flex;
+  gap: 16px;
+}
+.warga .warga-timeline-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.warga .warga-timeline-dot {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--warga-navy));
+  color: rgb(var(--warga-goldl));
+  font-size: 12px;
+  font-weight: 800;
+}
+.warga .warga-timeline-dot.is-pending {
+  background: rgb(var(--surface-inset));
+  color: rgb(var(--text-faint));
+}
+.warga .warga-timeline-line {
+  flex: 1;
+  width: 2px;
+  min-height: 18px;
+  background: rgb(var(--line));
+}
+.warga .warga-status {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #e0ecf7;
+  color: rgb(var(--accent-soft));
+  font-size: 13px;
+  font-weight: 700;
+}
+.warga .warga-dummy {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fbf1e2;
+  color: #6b4e10;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* --- Lapor: fieldset bernomor, kartu pilihan ----------------------------------------------- */
+.warga .warga-fieldset {
+  margin: 0;
+  padding: 24px;
+  background: rgb(var(--surface-panel));
+  border: 1px solid rgb(var(--line));
+}
+@media (min-width: 640px) {
+  .warga .warga-fieldset {
+    padding: 28px;
+  }
+}
+.warga .warga-legend-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 18px;
+  font-size: 18px;
+  font-weight: 800;
+  color: rgb(var(--warga-navy));
+}
+.warga .warga-legend-step i {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(var(--warga-navy));
+  color: #fff;
+  font-size: 14px;
+  font-style: normal;
+}
+.warga .warga-option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 64px;
+  padding: 14px 16px;
+  border: 1.5px solid rgb(var(--line-strong));
+  background: rgb(var(--surface-panel));
+  text-align: left;
+  color: rgb(var(--text));
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+.warga .warga-option:hover {
+  border-color: rgb(var(--accent-soft));
+}
+.warga .warga-option:has(input:checked),
+.warga .warga-option.is-on {
+  border-color: rgb(var(--warga-navy));
+  background: rgb(var(--surface-inset));
+}
+.warga .warga-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 
 /* --- gerak umum --------------------------------------------------------------------------- */
@@ -651,8 +1271,16 @@
     transform: none;
   }
 }
-
-/* (1) perpindahan rute: anak-anak langsung template naik bergiliran */
+@keyframes warga-tip {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 8px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, calc(-100% - 16px));
+  }
+}
 .warga .warga-enter > * {
   animation: warga-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
@@ -665,8 +1293,6 @@
 .warga .warga-enter > *:nth-child(n + 4) {
   animation-delay: 210ms;
 }
-
-/* (2) muncul saat digulir; tanpa JavaScript tetap tampil setelah 2,5 detik */
 .warga .warga-reveal {
   opacity: 0;
   transform: translateY(18px);
@@ -681,247 +1307,124 @@
   animation: none;
 }
 
-/* (3) peta: poligon mengembang satu per satu, lalu terang saat disentuh; garis antar
-   wilayah berwarna kanvas supaya bentuk tampak "diukir" pada latar gelap */
-.warga .warga-poly {
-  transform-box: fill-box;
-  transform-origin: center;
-  stroke: rgb(var(--surface-app));
-  animation: warga-poly 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  transition:
-    fill-opacity 0.35s ease,
-    filter 0.2s ease;
+/* --- Masuk petugas: hero navy, kartu putih bergaris emas (mockup sigap-login-petugas) ---- */
+.warga.masuk {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: rgb(var(--warga-navy));
 }
-.warga .warga-poly.is-selected {
-  stroke: rgb(var(--line-stronger));
+.warga .masuk-hero {
+  position: relative;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(60% 50% at 20% 10%, rgb(223 154 51 / 0.16), transparent 70%),
+    radial-gradient(50% 45% at 85% 90%, rgb(28 42 110 / 0.9), transparent 70%),
+    linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px) 0 0 / 100% 48px,
+    linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px) 0 0 / 48px 100%,
+    rgb(var(--warga-navy));
 }
-.warga a:hover > .warga-poly,
-.warga a:focus-visible > .warga-poly {
-  filter: brightness(1.12) saturate(1.1);
+.warga .masuk-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgb(223 154 51 / 0.07) 50%, transparent 100%);
+  background-size: 100% 220px;
+  animation: masuk-scan 9s linear infinite;
 }
-
-/* ------------------------------------------------------------------------------------------
-   Beranda — kanvas peta dengan panel di sisinya (3 November 2026)
-
-   Peta memenuhi bidang seperti meja kerja: kanvas arang dengan garis buku besar yang samar,
-   panel di kirinya (tag saring, imbauan, dua tombol). Di ponsel peta di atas dan panel di
-   bawahnya. Gerak: panel meluncur masuk, tag dan poligon bertransisi saat disaring, kartu
-   kecil muncul di wilayah yang disentuh, kartu imbauan naik bergiliran, panah sel bergeser.
-   ------------------------------------------------------------------------------------------ */
-.warga .warga-canvas {
+@keyframes masuk-scan {
+  from {
+    background-position: 0 -220px;
+  }
+  to {
+    background-position: 0 100vh;
+  }
+}
+.warga .masuk-emblem {
   position: relative;
   display: grid;
-  overflow: hidden;
-  border: 1px solid rgb(var(--line-strong));
-  border-radius: 2px;
-  background:
-    linear-gradient(rgb(var(--text) / 0.05) 1px, transparent 1px) 0 0 / 100% 24px,
-    linear-gradient(90deg, rgb(var(--text) / 0.05) 1px, transparent 1px) 0 0 / 24px 100%,
-    rgb(var(--surface-app));
+  place-items: center;
 }
-.warga .warga-canvas-map {
-  position: relative;
-  padding: 1rem 0.75rem 0.75rem;
-}
-.warga .warga-float {
-  position: relative;
-  z-index: 2;
-  margin: 0;
-  border-top: 1px solid rgb(var(--line-strong));
-  background: rgb(var(--surface-panel));
-  padding: 1rem 1.1rem 1.1rem;
-  animation: warga-sheet 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  animation-delay: 120ms;
-}
-@media (min-width: 640px) {
-  .warga .warga-canvas {
-    grid-template-columns: minmax(300px, 360px) 1fr;
-    min-height: 460px;
-  }
-  .warga .warga-canvas-map {
-    order: 2;
-    display: grid;
-    align-content: center;
-    padding: 1.25rem 1.25rem 3rem;
-  }
-  .warga .warga-float {
-    order: 1;
-    align-self: stretch;
-    border-top: 0;
-    border-right: 1px solid rgb(var(--line-strong));
-    padding: 1.35rem 1.35rem 1.5rem;
-    animation-name: warga-float;
-  }
-  .warga .warga-legend {
-    position: absolute;
-    left: auto;
-    right: 1rem;
-    bottom: 0.9rem;
-    margin: 0;
-    transform: none;
-  }
-}
-@keyframes warga-sheet {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes warga-float {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-.warga .warga-eyebrow {
-  color: rgb(var(--warga-gold));
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-/* keterangan warna: baris teks dengan kotak kecil — di bawah peta pada ponsel, di sudut
-   kanan bawah peta pada layar lebar */
-.warga .warga-legend {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.9rem;
-  margin: 0.5rem auto 0;
-  width: fit-content;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 1px solid rgb(var(--line-strong));
-  border-radius: 2px;
-  background: rgb(var(--surface-panel));
-  padding: 0.35rem 0.7rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: rgb(var(--text-muted));
-}
-.warga .warga-legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.warga .warga-legend i {
-  height: 0.6rem;
-  width: 0.6rem;
-  border-radius: 1px;
-}
-.warga .warga-legend-note {
-  font-weight: 500;
-  color: rgb(var(--text-faint));
-}
-
-/* kartu kecil di wilayah yang disentuh/difokus */
-.warga .warga-tip {
-  position: absolute;
-  z-index: 3;
-  min-width: 150px;
-  pointer-events: none;
-  transform: translate(-50%, calc(-100% - 16px));
-  border: 1px solid rgb(var(--line-stronger));
-  border-radius: 2px;
-  background: rgb(var(--surface-panel));
-  padding: 0.5rem 0.65rem;
-  animation: warga-tip 0.22s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
-.warga .warga-tip::after {
+.warga .masuk-emblem::before {
   content: "";
   position: absolute;
-  left: 50%;
-  bottom: -6px;
-  height: 10px;
-  width: 10px;
-  transform: translateX(-50%) rotate(45deg);
-  border-right: 1px solid rgb(var(--line-stronger));
-  border-bottom: 1px solid rgb(var(--line-stronger));
+  inset: -26px;
+  background: radial-gradient(closest-side, rgb(223 154 51 / 0.34), transparent 72%);
+}
+.warga .masuk-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
   background: rgb(var(--surface-panel));
-}
-@keyframes warga-tip {
-  from {
-    opacity: 0;
-    transform: translate(-50%, calc(-100% - 8px));
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, calc(-100% - 16px));
-  }
-}
-
-/* tag saring tingkat: persegi, yang ditekan terisi warnanya dengan teks gelap */
-.warga .warga-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  border: 1px solid rgb(var(--line-strong));
-  border-radius: 2px;
-  background: rgb(var(--surface-app));
-  padding: 0.3rem 0.6rem 0.3rem 0.55rem;
-  font-size: 0.78rem;
-  font-weight: 600;
   color: rgb(var(--text));
-  --chip: var(--line-stronger);
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease,
-    border-color 0.25s ease;
+  text-align: left;
+  border: 1px solid rgb(var(--line));
+  border-top: 3px solid rgb(var(--warga-gold));
+  padding: 28px;
+  box-shadow: 0 24px 60px -28px rgb(0 0 0 / 0.7);
 }
-.warga .warga-chip.is-tinggi {
-  --chip: var(--risk-high);
-}
-.warga .warga-chip.is-sedang {
-  --chip: var(--risk-moderate);
-}
-.warga .warga-chip.is-rendah {
-  --chip: var(--risk-low);
-}
-.warga .warga-chip i {
-  height: 0.5rem;
-  width: 0.5rem;
-  border-radius: 1px;
-  background: rgb(var(--chip));
-  transition: background-color 0.25s ease;
-}
-.warga .warga-chip b {
+.warga .masuk-btn {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  background: rgb(var(--warga-navy));
+  color: #fff;
+  font: inherit;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: rgb(var(--text-faint));
+  font-size: 15px;
+  cursor: pointer;
+}
+.warga .masuk-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(var(--warga-goldl));
+  transform: scaleX(0);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.warga .masuk-btn:hover::before,
+.warga .masuk-btn:focus-visible::before {
+  transform: scaleX(1);
+}
+.warga .masuk-btn span {
+  position: relative;
   transition: color 0.25s ease;
 }
-.warga .warga-chip:hover {
-  border-color: rgb(var(--chip));
+.warga .masuk-btn:hover span {
+  color: rgb(var(--warga-navy));
 }
-.warga .warga-chip[aria-pressed="true"] {
-  border-color: rgb(var(--chip));
-  background: rgb(var(--chip));
-  color: rgb(var(--surface-app));
+.warga .masuk-btn:disabled {
+  opacity: 0.85;
+  pointer-events: none;
 }
-.warga .warga-chip[aria-pressed="true"] i {
-  background: rgb(var(--surface-app));
+.warga .masuk-alt a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
 }
-.warga .warga-chip[aria-pressed="true"] b {
-  color: rgb(var(--surface-app) / 0.75);
+.warga .masuk-alt .is-gold {
+  background: rgb(var(--warga-goldl));
+  color: rgb(var(--warga-navy));
 }
-
-/* kartu imbauan: panel merah gelap dengan garis sinyal di kiri, naik bergiliran */
-.warga .warga-alert {
-  position: relative;
-  border-radius: 2px;
-  border-left: 3px solid rgb(var(--warga-signal));
-  background: rgb(var(--warga-signal) / 0.12);
-  padding: 0.65rem 0.85rem 0.7rem;
-  animation: warga-rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+.warga .masuk-alt .is-gold:hover {
+  background: #f2b45a;
+}
+.warga .masuk-alt .is-white {
+  border: 1.5px solid #fff;
+  color: #fff;
+}
+.warga .masuk-alt .is-white:hover {
+  background: rgb(255 255 255 / 0.1);
 }
 
 /* --- fokus & gerak dikurangi ------------------------------------------------------------- */
@@ -930,16 +1433,15 @@
 .warga input:focus-visible,
 .warga select:focus-visible,
 .warga textarea:focus-visible {
-  outline: 2px solid rgb(var(--warga-gold));
+  outline: 3px solid rgb(var(--warga-goldl));
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .warga .warga-enter > *,
   .warga .warga-poly,
-  .warga .warga-float,
   .warga .warga-tip,
-  .warga .warga-alert {
+  .warga .masuk-scan {
     animation: none;
   }
   .warga .warga-reveal {
@@ -948,15 +1450,10 @@
     transition: none;
     animation: none;
   }
-  .warga .warga-tile:hover .warga-tile-arrow,
-  .warga .warga-nav-link::after {
+  .warga .warga-nav-link::before,
+  .warga .warga-nav-link::after,
+  .warga .warga-inp::after,
+  .warga .masuk-btn::before {
     transition: none;
-    transform: none;
-  }
-  .warga .warga-nav-link[aria-current="page"]::after {
-    transform: scaleX(1);
-  }
-  .warga .warga-row:hover {
-    padding-left: 0.25rem;
   }
 }

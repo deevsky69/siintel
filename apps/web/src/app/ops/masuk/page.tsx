@@ -3,69 +3,68 @@ import { Suspense } from "react";
 import { PolriEmblem } from "@/components/warga/brand";
 import { LoginForm } from "./login-form";
 
-export const metadata = { title: "Masuk — SIGAP" };
+export const metadata = { title: "Masuk Petugas — SIGAP" };
 
 /**
- * Halaman masuk untuk personel.
+ * Halaman masuk untuk personel (mockup `sigap-login-petugas`, 10 November 2026): bidang
+ * navy dengan sapuan cahaya emas yang bergerak pelan, lambang berhalo, judul SIGAP, kartu
+ * putih bergaris emas di atasnya, dan dua tautan bagi warga yang tersasar.
  *
  * Sejak kanal publik ada, halaman ini juga menjadi tempat warga tersasar: tombol "Masuk
- * Petugas" bertetangga dengan "Lapor Kejadian" di halaman muka, dan salah tekan itu
- * wajar. Karena itu ada jalan kembali yang terlihat **tanpa harus menekan tombol mundur
- * peramban** — pengunjung yang merasa tersesat cenderung menutup tab, bukan mencari cara
- * kembali.
+ * petugas" bertetangga dengan "Lapor kejadian" di halaman muka, dan salah tekan itu wajar.
+ * Karena itu ada jalan kembali yang terlihat **tanpa harus menekan tombol mundur peramban**,
+ * dan tautannya menyebut "Lapor kejadian" secara eksplisit, bukan hanya "kembali".
  *
- * Tautannya menyebut "Lapor Kejadian" secara eksplisit, bukan hanya "kembali": yang
- * dibutuhkan warga yang salah tekan bukan halaman muka, melainkan tujuan yang tadi
- * dimaksudkannya.
+ * Dibungkus `.warga` supaya memakai token sisi masyarakat (selalu terang di kartunya) dan
+ * tidak terpengaruh pengalih tema /ops; animasi latar mockup (shader WebGL) diganti sapuan
+ * CSS ringan yang berhenti pada `prefers-reduced-motion`.
  */
-
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-accent/30 bg-white/90 p-1.5">
-            <PolriEmblem size={96} className="h-full w-full" />
+    <div className="warga masuk">
+      <main className="masuk-hero">
+        <div className="masuk-scan" aria-hidden="true" />
+        <div className="relative z-[1] flex w-full flex-col items-center justify-center px-6 pb-11 pt-8 text-center">
+          <div className="masuk-emblem">
+            <PolriEmblem size={256} className="relative h-[84px] w-auto" />
           </div>
-          <h1 className="font-heading text-xl font-bold tracking-wide text-ink">SIGAP</h1>
-          <p className="mt-1 text-2xs uppercase tracking-[0.12em] text-accent-soft">
+          <h1 className="mt-4 text-[clamp(30px,4.6vw,44px)] text-white">SIGAP</h1>
+          <p className="mt-2 max-w-[70ch] text-base text-[rgb(var(--warga-soft))]">
             Sistem Inteligensi Geospasial dan Analitik Prediktif
           </p>
-          <p className="mt-1 text-xs uppercase tracking-[0.14em] text-ink-muted">
+          <p className="mt-1 text-sm font-medium text-[rgb(var(--warga-goldl))]">
             Polres Metro Jakarta Selatan
           </p>
-        </div>
 
-        {/* useSearchParams membuat formulir dirender di klien; Suspense diperlukan
-            agar halaman tetap dapat di-prerender. */}
-        <Suspense fallback={<div className="panel h-[268px] animate-pulse" />}>
-          <LoginForm />
-        </Suspense>
+          <section className="masuk-card mt-6" aria-labelledby="masuk-judul">
+            <h2 id="masuk-judul" className="text-[22px] text-[rgb(var(--warga-navy))]">
+              Masuk
+            </h2>
+            <p className="mb-4 mt-1 text-sm text-ink-faint">Gunakan akun petugas Anda.</p>
+            {/* useSearchParams membuat formulir dirender di klien; Suspense diperlukan
+                agar halaman tetap dapat di-prerender. */}
+            <Suspense fallback={<div className="h-[232px] animate-pulse bg-base-950" />}>
+              <LoginForm />
+            </Suspense>
+            <p className="mt-4 border-t border-base-800 pt-4 text-center text-[13px] leading-relaxed text-ink-faint">
+              Akses terbatas untuk personel berwenang. Seluruh percobaan masuk dicatat pada audit
+              trail.
+            </p>
+          </section>
 
-        <p className="mt-6 text-center text-xs leading-relaxed text-ink-muted">
-          Akses terbatas untuk personel berwenang. Seluruh percobaan masuk dicatat pada audit trail.
-        </p>
-
-        <div className="mt-6 border-t border-base-800 pt-5 text-center">
-          <p className="text-xs leading-relaxed text-ink-muted">
+          <p className="mt-6 text-sm text-[rgb(var(--warga-soft))]">
             Bukan petugas dan ingin melaporkan kejadian?
           </p>
-          <div className="mt-2.5 flex flex-col items-center justify-center gap-2 sm:flex-row">
-            <Link
-              href="/lapor"
-              className="w-full rounded border border-accent/40 bg-accent/10 px-4 py-2 text-center text-xs uppercase tracking-wider text-accent transition-colors hover:bg-accent/20 sm:w-auto"
-            >
-              Lapor Kejadian
+          <div className="masuk-alt mt-3 flex flex-wrap justify-center gap-2.5">
+            <Link href="/lapor" className="is-gold">
+              Lapor kejadian
             </Link>
-            <Link
-              href="/ops"
-              className="w-full rounded border border-base-700 px-4 py-2 text-center text-xs uppercase tracking-wider text-ink-muted transition-colors hover:border-accent/40 hover:text-ink sm:w-auto"
-            >
-              Halaman Muka
+            <Link href="/" className="is-white">
+              Halaman muka
             </Link>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -69,10 +69,11 @@ export const LEVEL_CLASS: Record<AreaLevel, string> = {
   TINGGI: "bg-risk-high/12 text-risk-high border-risk-high/30",
 };
 
+/** Warna isian peta — mengikuti mockup SIGAP WARGA (10 November 2026): biru muda, kuning, jingga. */
 export const LEVEL_FILL: Record<AreaLevel, string> = {
-  RENDAH: "rgb(18 120 86)",
-  SEDANG: "rgb(196 110 10)",
-  TINGGI: "rgb(184 30 52)",
+  RENDAH: "#BFD7EA",
+  SEDANG: "#F2B45A",
+  TINGGI: "#EA580C",
 };
 
 export const THREAT_LABEL: Record<string, string> = {

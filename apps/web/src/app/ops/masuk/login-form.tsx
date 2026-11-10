@@ -5,16 +5,18 @@ import { useState } from "react";
 import { safeNextPath } from "@/lib/navigation";
 
 /**
- * Formulir masuk.
+ * Formulir masuk (mockup 10 November 2026): isian bergaris emas yang mengisi dari kiri saat
+ * difokus, tombol navy yang tersapu emas saat disentuh, tombol lihat/sembunyikan sandi.
  *
- * Kredensial dikirim ke route handler Next.js, yang meneruskannya ke backend dan
- * menyimpan token pada cookie httpOnly. Token tidak pernah menyentuh kode klien.
+ * Kredensial dikirim ke route handler Next.js, yang meneruskannya ke backend dan menyimpan
+ * token pada cookie httpOnly. Token tidak pernah menyentuh kode klien.
  */
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [shown, setShown] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -44,40 +46,69 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={submit} className="panel p-5">
-      <label className="block">
-        <span className="stat-label">Username</span>
-        <input
-          name="username"
-          autoComplete="username"
-          required
-          className="mt-1.5 w-full rounded border border-base-700 bg-base-950/60 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-        />
-      </label>
-
-      <label className="mt-4 block">
-        <span className="stat-label">Password</span>
-        <input
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          className="mt-1.5 w-full rounded border border-base-700 bg-base-950/60 px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-        />
-      </label>
-
+    <form onSubmit={submit} noValidate>
       {error ? (
-        <p role="alert" className="mt-4 text-xs text-risk-critical">
+        <p role="alert" className="warga-error mb-4">
           {error}
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={busy}
-        className="mt-5 w-full rounded bg-accent/20 px-4 py-2 font-heading text-sm font-semibold uppercase tracking-wider text-accent transition hover:bg-accent/30 disabled:opacity-50"
-      >
-        {busy ? "Memeriksa…" : "Masuk"}
+      <div className="mb-4">
+        <label htmlFor="masuk-username" className="warga-label mb-1.5 text-[13px]">
+          Username
+        </label>
+        <div className="warga-inp">
+          <input
+            id="masuk-username"
+            name="username"
+            autoComplete="username"
+            autoCapitalize="none"
+            spellCheck={false}
+            required
+            className="warga-field text-base"
+          />
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <label htmlFor="masuk-password" className="warga-label mb-1.5 text-[13px]">
+          Password
+        </label>
+        <div className="warga-inp">
+          <input
+            id="masuk-password"
+            name="password"
+            type={shown ? "text" : "password"}
+            autoComplete="current-password"
+            required
+            className="warga-field pr-11 text-base"
+          />
+          <button
+            type="button"
+            onClick={() => setShown((value) => !value)}
+            aria-label={shown ? "Sembunyikan password" : "Tampilkan password"}
+            aria-pressed={shown}
+            className="absolute bottom-0.5 right-0.5 top-0.5 grid w-[42px] place-items-center text-ink-faint aria-pressed:text-[rgb(var(--warga-navy))]"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              aria-hidden="true"
+            >
+              <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" />
+              <circle cx="12" cy="12" r="3" />
+              {shown ? <path d="M4 4l16 16" /> : null}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" disabled={busy} className="masuk-btn">
+        <span>{busy ? "Memeriksa…" : "Masuk"}</span>
       </button>
     </form>
   );
