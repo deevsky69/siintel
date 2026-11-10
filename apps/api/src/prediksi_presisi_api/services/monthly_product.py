@@ -1,15 +1,21 @@
-"""Produk bulanan — Modul 4 "Menyusun dan memvalidasi rekomendasi" (6 November 2026).
+"""Produk bulanan — Modul 4 "Menyusun dan memvalidasi rekomendasi".
 
-    AI menyusun draf (fakta, peringkat, pola, usulan langkah per kelurahan teratas)
-      → Analis memeriksa dengan informasi lapangan: terima / perbaiki / tolak, dengan alasan
-      → KBO memeriksa mutu analisis (diterima / dikembalikan dengan alasan)
-      → Kasat Intelkam memvalidasi (diterima / dikembalikan dengan alasan)
+Dua tahap sejak 10 November 2026 (keputusan pemilik proyek 1B, catatan 177):
+
+    Analis menyusun draf — peringkat bulan itu DIBEKUKAN otomatis bila belum —
+      lalu memeriksanya dengan informasi lapangan: terima / perbaiki / tolak, dengan alasan,
+      dan mengirimkannya ke Pimpinan
       → Pimpinan menetapkan JUMLAH dan KELURAHAN prioritas beserta tindak lanjutnya
-      → Fungsi pelaksana mencatat waktu, tempat, tindakan, hasil.
+      → Fungsi pelaksana / Polsek mencatat waktu, tempat, tindakan, hasil.
 
-Draf hanya dapat disusun dari peringkat yang sudah DIBEKUKAN, supaya "peringkat awal model
-dan daftar keputusan pimpinan disimpan terpisah" (dokumen mekanisme). Usulan langkah
-mengikuti config/recommendation/function-rules.yaml (PROPOSED) — bukan model bahasa.
+Tahap KBO dan validasi Kasat Intelkam (6–10 November 2026) dihapus: keduanya diklik orang
+yang sama berturut-turut dan tidak menambah kontrol. Produk yang sudah terlanjur berstatus
+KBO_CHECKED / VALIDATED tetap terbaca dan langsung dapat ditetapkan Pimpinan.
+
+Draf tetap disusun dari peringkat yang dibekukan, supaya "peringkat awal model dan daftar
+keputusan pimpinan disimpan terpisah" (dokumen mekanisme) — pembekuan kini bagian dari
+tombol "Susun", bukan langkah tersendiri. Usulan langkah mengikuti
+config/recommendation/function-rules.yaml (PROPOSED) — bukan model bahasa.
 """
 
 from __future__ import annotations
@@ -45,18 +51,22 @@ class ProductError(ValueError):
         self.status = status
 
 
+#: Status yang menunggu penetapan Pimpinan. KBO_CHECKED dan VALIDATED hanya tinggalan alur
+#: empat tahap (6–10 November 2026); produk lama di status itu tetap dapat ditetapkan.
+AWAITING_DECISION = ("ANALYST_REVIEWED", "KBO_CHECKED", "VALIDATED")
 STAGE_FOR_STATUS = {
     "DRAFT": "ANALYST",
-    "ANALYST_REVIEWED": "KBO",
-    "KBO_CHECKED": "KASAT",
+    "ANALYST_REVIEWED": "PIMPINAN",
+    "KBO_CHECKED": "PIMPINAN",
     "VALIDATED": "PIMPINAN",
     "DECIDED": None,
 }
 BASIS = (
-    "Draf disusun sistem dari peringkat yang dibekukan dan pola kejadian pada bulan dasar; "
-    "usulan langkah dari aturan fungsi (PROPOSED). Analis, KBO, dan Kasat Intelkam memeriksa "
-    "berurutan; alasan wajib bila ditolak atau diperbaiki. Pimpinan menetapkan jumlah dan "
-    "kelurahan prioritas. Fungsi pelaksana mencatat kegiatan. Usulan, bukan perintah."
+    "Draf disusun sistem dari peringkat bulan sasaran — dibekukan saat draf disusun — dan pola "
+    "kejadian pada bulan dasar; usulan langkah dari aturan fungsi (PROPOSED). Analis memeriksa "
+    "dengan informasi lapangan; alasan wajib bila ditolak atau diperbaiki. Pimpinan menetapkan "
+    "jumlah dan kelurahan prioritas. Fungsi pelaksana dan Polsek mencatat kegiatan. Usulan, "
+    "bukan perintah."
 )
 
 
@@ -116,10 +126,16 @@ def draft(session: Session, target_month: Any, user_id: Any) -> MonthlyProduct:
     if session.scalar(select(MonthlyProduct).where(MonthlyProduct.target_month == month)):
         raise ProductError("Produk bulan ini sudah ada.", 409)
     frozen = ranking.stored(session, month, config.default_method, config.default_scope)
+    frozen_now = False
     if frozen is None:
-        raise ProductError(
-            f"Bekukan peringkat {month.isoformat()[:7]} ({config.default_method}) lebih dulu."
-        )
+        # Pembekuan ikut tombol "Susun" (10 November 2026): satu langkah lebih sedikit, dan
+        # yang dibekukan tetap peringkat yang dievaluasi setelah bulan berakhir.
+        try:
+            computed = ranking.compute(session, month, config.default_method, config.default_scope)
+            frozen = ranking.freeze(session, computed, user_id)
+        except ranking.RankingError as error:
+            raise ProductError(str(error)) from error
+        frozen_now = True
     rules = load_function_rules()
     top = frozen.rows[: _draft_top_n()]
     patterns = _patterns(session, frozen, [row.kelurahan for row in top])
@@ -165,6 +181,7 @@ def draft(session: Session, target_month: Any, user_id: Any) -> MonthlyProduct:
             "total_basis": int(sum(float(r.basis.get("basis_total", 0)) for r in frozen.rows)),
             "draft_top_n": len(items),
             "function_rules_status": rules.status,
+            "ranking_frozen_by_draft": frozen_now,
         },
         created_by=user_id,
         items=items,
@@ -189,9 +206,10 @@ def load(session: Session, target_month: Any) -> MonthlyProduct:
     return product
 
 
-def _require(product: MonthlyProduct, status: str) -> None:
-    if product.status != status:
-        raise ProductError(f"Produk berstatus {product.status}; tahap ini butuh {status}.", 409)
+def _require(product: MonthlyProduct, *statuses: str) -> None:
+    if product.status not in statuses:
+        wanted = " / ".join(statuses)
+        raise ProductError(f"Produk berstatus {product.status}; tahap ini butuh {wanted}.", 409)
 
 
 def _stage(
@@ -262,32 +280,6 @@ def analyst_review(
     return product
 
 
-def kbo_check(
-    session: Session, product: MonthlyProduct, outcome: str, reason: str | None, user_id: Any
-) -> MonthlyProduct:
-    _require(product, "ANALYST_REVIEWED")
-    outcome = outcome.upper()
-    if outcome not in ("ACCEPTED", "REJECTED"):
-        raise ProductError("Hasil KBO harus ACCEPTED atau REJECTED.")
-    _stage(product, "KBO", outcome, user_id, reason)
-    product.status = "KBO_CHECKED" if outcome == "ACCEPTED" else "DRAFT"
-    session.flush()
-    return product
-
-
-def validate(
-    session: Session, product: MonthlyProduct, outcome: str, reason: str | None, user_id: Any
-) -> MonthlyProduct:
-    _require(product, "KBO_CHECKED")
-    outcome = outcome.upper()
-    if outcome not in ("ACCEPTED", "REJECTED"):
-        raise ProductError("Hasil validasi harus ACCEPTED atau REJECTED.")
-    _stage(product, "KASAT", outcome, user_id, reason)
-    product.status = "VALIDATED" if outcome == "ACCEPTED" else "DRAFT"
-    session.flush()
-    return product
-
-
 def decide(
     session: Session,
     product: MonthlyProduct,
@@ -295,7 +287,7 @@ def decide(
     reason: str | None,
     user_id: Any,
 ) -> MonthlyProduct:
-    _require(product, "VALIDATED")
+    _require(product, *AWAITING_DECISION)
     if not selected:
         raise ProductError("Pilih sedikitnya satu kelurahan prioritas.")
     by_name = {item.kelurahan: item for item in product.items}
@@ -359,6 +351,7 @@ def as_dict(product: MonthlyProduct) -> dict[str, Any]:
         "target_month": product.target_month.isoformat()[:7],
         "status": product.status,
         "next_stage": STAGE_FOR_STATUS.get(product.status),
+        "awaiting_decision": product.status in AWAITING_DECISION,
         "facts": product.facts,
         "priority_count": product.priority_count,
         "decided_at": product.decided_at,

@@ -47,8 +47,10 @@ permissions:
   bulletin: [read, manage, approve]
   # Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026).
   ranking: [read, manage]
-  # Produk bulanan (Modul 4 mekanisme): draf → analis → KBO → Kasat → Pimpinan → pelaksanaan.
-  monthly_product: [read, draft, review, validate, decide, execute]
+  # Produk bulanan (Modul 4 mekanisme), dua tahap sejak 10 November 2026 (1B, catatan 177):
+  # Analis menyusun & memeriksa (draft) → Pimpinan menetapkan (decide) → pelaksanaan (execute).
+  # `review` dan `validate` (tahap KBO dan Kasat Intelkam) dihapus bersama perannya.
+  monthly_product: [read, draft, decide, execute]
 
 roles:
   Pimpinan:
@@ -117,30 +119,10 @@ roles:
       - public_alert:publish
       - audit:read
       - config:read
-  # KEPUTUSAN PEMILIK PROYEK 6 November 2026 (1B): dua peran Satintelkam untuk rantai
-  # validasi produk bulanan (Modul 4 mekanisme). Pemeriksaan mutu (tahap KBO) dicatat
-  # sebagai tahap yang dikerjakan Kasat atau Analis senior — keduanya memegang `review`.
-  Kasat Intelkam:
-    ALL:
-      - dashboard:read
-      - location:read
-      - crime:read
-      - intelligence:read
-      - map:read
-      - analytics:read
-      - risk_score:read
-      - prediction:read
-      - warning:read
-      - public_alert:read
-      - recommendation:read
-      - commander_decision:read
-      - evaluation:read
-      - babin:read
-      - bulletin:read
-      - ranking:read
-      - monthly_product:read
-      - monthly_product:review
-      - monthly_product:validate
+  # KEPUTUSAN PEMILIK PROYEK 6 November 2026 (1B): peran Satintelkam untuk produk bulanan.
+  # 10 November 2026 (1B, catatan 177): Kasat Intelkam DIBEKUKAN — tahap KBO dan validasinya
+  # dihapus karena diklik orang yang sama berturut-turut tanpa menambah kontrol. Analis
+  # menyusun, memeriksa, dan langsung mengirim ke Pimpinan. Akun demo.kasat dikunci (0023).
   Analis Intelkam:
     ALL:
       - dashboard:read
@@ -162,7 +144,6 @@ roles:
       - ranking:manage
       - monthly_product:read
       - monthly_product:draft
-      - monthly_product:review
 
   # KOREKSI 1 September 2026 — cakupan disesuaikan dengan yang benar-benar dapat
   # ditegakkan. Sebelumnya `crime:read` dan sembilan permission lain dinyatakan

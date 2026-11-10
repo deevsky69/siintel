@@ -1,6 +1,11 @@
 import { apiGet, apiPost } from "./api";
 
-/** Produk bulanan (Modul 4 mekanisme). */
+/**
+ * Produk bulanan (Modul 4 mekanisme), dua tahap sejak 10 November 2026 (catatan 177):
+ * Analis menyusun & memeriksa (peringkat dibekukan otomatis) → Pimpinan menetapkan →
+ * Fungsi/Polsek mencatat. `KBO_CHECKED` / `VALIDATED` hanya tinggalan alur empat tahap dan
+ * diperlakukan sama dengan `ANALYST_REVIEWED`: menunggu Pimpinan.
+ */
 export type ProductItem = {
   rank: number;
   kelurahan: string;
@@ -36,23 +41,40 @@ export type ProductStage = {
   acted_at: string;
 };
 
+export type ProductStatus = "DRAFT" | "ANALYST_REVIEWED" | "KBO_CHECKED" | "VALIDATED" | "DECIDED";
+
 export type MonthlyProduct = {
   product_id: string;
   target_month: string;
-  status: "DRAFT" | "ANALYST_REVIEWED" | "KBO_CHECKED" | "VALIDATED" | "DECIDED";
-  next_stage: "ANALYST" | "KBO" | "KASAT" | "PIMPINAN" | null;
-  facts: Record<string, string | number>;
+  status: ProductStatus;
+  next_stage: "ANALYST" | "PIMPINAN" | null;
+  awaiting_decision: boolean;
+  facts: Record<string, string | number | boolean>;
   priority_count: number | null;
   items: ProductItem[];
   stages: ProductStage[];
   basis: string;
 };
 
+export type ProductSummary = {
+  target_month: string;
+  status: ProductStatus;
+  priority_count: number | null;
+};
+
 export type ProductList = {
-  data: { target_month: string; status: string; priority_count: number | null }[];
+  data: ProductSummary[];
   suggested_month: string;
   basis: string;
 };
+
+/** Status yang menunggu penetapan Pimpinan — satu tempat, dipakai lencana dan beranda. */
+export const AWAITING_DECISION: readonly ProductStatus[] = [
+  "ANALYST_REVIEWED",
+  "KBO_CHECKED",
+  "VALIDATED",
+];
+export const isAwaitingDecision = (status: ProductStatus) => AWAITING_DECISION.includes(status);
 
 export const listProducts = () => apiGet<ProductList>("/monthly-products");
 export const getProduct = (month: string) => apiGet<MonthlyProduct>(`/monthly-products/${month}`);
@@ -65,11 +87,6 @@ export const analystReview = (
     note?: string;
   },
 ) => apiPost<MonthlyProduct>(`/monthly-products/${month}/analyst`, body);
-export const stageOutcome = (
-  month: string,
-  stage: "kbo" | "kasat",
-  body: { outcome: string; reason?: string },
-) => apiPost<MonthlyProduct>(`/monthly-products/${month}/${stage}`, body);
 export const decideProduct = (
   month: string,
   body: { selected: { kelurahan: string; action?: string }[]; reason?: string },
@@ -84,6 +101,6 @@ export const recordAction = (
     body,
   );
 
-/** Produk bulanan yang sudah divalidasi dan menunggu penetapan Pimpinan — lencana sidebar. */
+/** Produk bulanan yang menunggu penetapan Pimpinan — lencana sidebar. */
 export const countAwaitingDecision = async (): Promise<number> =>
-  (await listProducts()).data.filter((row) => row.status === "VALIDATED").length;
+  (await listProducts()).data.filter((row) => isAwaitingDecision(row.status)).length;

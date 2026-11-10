@@ -1,4 +1,7 @@
-"""Produk bulanan (Modul 4 mekanisme): draf → analis → KBO → Kasat → Pimpinan → pelaksanaan."""
+"""Produk bulanan (Modul 4 mekanisme), dua tahap sejak 10 November 2026:
+Analis menyusun & memeriksa (peringkat dibekukan otomatis) → Pimpinan menetapkan → pelaksanaan.
+
+Endpoint `/kbo` dan `/kasat` (6–10 November 2026) dihapus bersama tahapnya — catatan 177."""
 
 from __future__ import annotations
 
@@ -35,12 +38,6 @@ class AnalystRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
     items: list[ItemDecision] = Field(default_factory=list)
     note: str | None = Field(default=None, max_length=2000)
-
-
-class OutcomeRequest(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    outcome: str
-    reason: str | None = Field(default=None, max_length=2000)
 
 
 class Selection(BaseModel):
@@ -124,7 +121,25 @@ def create_draft(
     product = _run(
         session, lambda: products.draft(session, _month(payload.month), current.user.user_id)
     )
-    _audit(session, "DRAFT_MONTHLY_PRODUCT", current, product, {"items": len(product.items)})
+    frozen_now = bool(product.facts.get("ranking_frozen_by_draft"))
+    if frozen_now:
+        # Pembekuan ikut tercatat tersendiri supaya jejaknya sama dengan pembekuan manual.
+        audit.record(
+            session,
+            action="FREEZE_RANKING",
+            resource_type="ranking",
+            result=audit.RESULT_SUCCESS,
+            user_id=current.user.user_id,
+            resource_id=str(product.ranking_id),
+            detail={"target_month": product.target_month.isoformat()[:7], "by": "draft"},
+        )
+    _audit(
+        session,
+        "DRAFT_MONTHLY_PRODUCT",
+        current,
+        product,
+        {"items": len(product.items), "ranking_frozen_by_draft": frozen_now},
+    )
     session.commit()
     return products.as_dict(products.load(session, product.target_month))
 
@@ -138,7 +153,7 @@ def get_product(
     return products.as_dict(_load(session, month))
 
 
-@router.post("/monthly-products/{month}/analyst", summary="Pemeriksaan analis")
+@router.post("/monthly-products/{month}/analyst", summary="Pemeriksaan analis, kirim ke Pimpinan")
 def analyst(
     month: str,
     payload: AnalystRequest,
@@ -159,52 +174,6 @@ def analyst(
         current,
         product,
         {"stage": "ANALYST", "items": len(decisions)},
-    )
-    session.commit()
-    return products.as_dict(_load(session, month))
-
-
-@router.post("/monthly-products/{month}/kbo", summary="Pemeriksaan mutu (KBO)")
-def kbo(
-    month: str,
-    payload: OutcomeRequest,
-    session: Session = Depends(get_db),
-    current: CurrentUser = require_permission("monthly_product:review"),
-) -> dict[str, Any]:
-    product = _load(session, month)
-    _run(
-        session,
-        lambda: products.kbo_check(
-            session, product, payload.outcome, payload.reason, current.user.user_id
-        ),
-    )
-    _audit(
-        session,
-        "REVIEW_MONTHLY_PRODUCT",
-        current,
-        product,
-        {"stage": "KBO", "outcome": payload.outcome.upper()},
-    )
-    session.commit()
-    return products.as_dict(_load(session, month))
-
-
-@router.post("/monthly-products/{month}/kasat", summary="Validasi Kasat Intelkam")
-def kasat(
-    month: str,
-    payload: OutcomeRequest,
-    session: Session = Depends(get_db),
-    current: CurrentUser = require_permission("monthly_product:validate"),
-) -> dict[str, Any]:
-    product = _load(session, month)
-    _run(
-        session,
-        lambda: products.validate(
-            session, product, payload.outcome, payload.reason, current.user.user_id
-        ),
-    )
-    _audit(
-        session, "VALIDATE_MONTHLY_PRODUCT", current, product, {"outcome": payload.outcome.upper()}
     )
     session.commit()
     return products.as_dict(_load(session, month))

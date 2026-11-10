@@ -36,10 +36,23 @@ bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercata
 
 **Imbauan bulanan ke grup warga perlu persetujuan (3A).** Di menu **Warga → Buletin & Imbauan**,
 Pimpinan menyetujui imbauan bulan berjalan setelah melihat contoh teksnya; sebelum itu bot
-tidak mengirim ke grup dan `/rekomendasi` menjawab "belum disetujui".
+tidak mengirim ke grup dan `/rekomendasi` menjawab "belum disetujui". Sejak 10 November 2026
+imbauan bulanan dan buletin mingguan berada dalam **satu antrean "Menunggu persetujuan"** di
+layar itu, disetujui per baris; riwayat buletin per minggu di bawahnya.
+
+**Alur /ops diringkas (10 November 2026, keputusan pemilik proyek 1B dan 2.i–iii; catatan
+177).** (1) Produk bulanan **dua tahap**: Analis menyusun — tombol *Susun* sekaligus
+**membekukan peringkat** bulan itu — lalu memeriksa dan *Kirim ke Pimpinan*; Pimpinan
+menetapkan. Tahap KBO dan validasi Kasat Intelkam dihapus; peran **Kasat Intelkam dibekukan**
+(akun `demo.kasat` dikunci), kembali **lima peran**. (2) **Beranda** menjadi papan *Bulan ini*:
+kartu posisi naskah, kegiatan prioritas, evaluasi, persetujuan warga — kartu yang menunggu
+pembaca ditandai; ringkasan harian keluar dari beranda. (3) **Rencana Patroli** keluar dari
+menu: perkiraan jam rawan bulan sasaran menjadi **lampiran** Produk Bulanan dan ikut penetapan
+Pimpinan (tidak ada persetujuan tersendiri); `/ops/rencana-patroli` tetap sebagai bacaan dan
+unduhan .docx. (4) Buletin dan imbauan satu antrean (di atas).
 
 **Menu ringkas (6 November 2026).** Lima kelompok: **Wilayah** (beranda, peta, wilayah rawan,
-pola, analitik), **Bulan Ini** (peringkat, produk bulanan, evaluasi, rencana patroli), **Data**
+pola, analitik), **Bulan Ini** (peringkat, produk bulanan, evaluasi), **Data**
 (laporan petugas dan masyarakat, pembakuan, input, berkas perkara, panic button), **Warga**
 (Babinkamtibmas, buletin & imbauan, survey), **Sistem**. Layar harian (peringatan dini,
 prediksi, penilaian risiko, rekomendasi harian, operasi, brief) keluar dari menu; alamatnya
@@ -50,16 +63,18 @@ berakhir, berapa persen kejadian jatuh di kelurahan pilihan (peringkat beku dan 
 Pimpinan), dibanding peta 3 dan 12 bulan pada jumlah kelurahan dan batas data yang sama; rekap
 usulan diterima/direvisi/ditolak beserta alasan; kegiatan yang tercatat per kelurahan prioritas.
 
-**Produk bulanan (Modul 4 mekanisme).** Menu **Analisis → Produk Bulanan**. Analis Intelkam
-menyusun draf dari peringkat yang dibekukan, lalu memeriksanya: terima, perbaiki, atau tolak
-tiap usulan dengan alasan. Kasat Intelkam memeriksa mutu (tahap KBO) dan memvalidasi. Pimpinan
-menetapkan berapa dan kelurahan mana yang diprioritaskan. Fungsi dan Polsek mencatat kegiatan
-(waktu, tempat, tindakan, hasil) di kelurahan prioritas. Akun peragaan: `demo.kasat`,
-`demo.analis`.
+**Produk bulanan (Modul 4 mekanisme).** Menu **Bulan Ini → Produk Bulanan**. Analis Intelkam
+menyusun draf (peringkat bulan itu dibekukan sekaligus), lalu memeriksanya: terima, perbaiki,
+atau tolak tiap usulan dengan alasan, dan mengirimnya ke Pimpinan. Pimpinan menetapkan berapa
+dan kelurahan mana yang diprioritaskan; lampiran perkiraan jam rawan ikut ditetapkan. Fungsi
+dan Polsek mencatat kegiatan (waktu, tempat, tindakan, hasil) di kelurahan prioritas. Akun
+peragaan: `demo.analis`. (Tahap KBO/Kasat 6–10 November 2026 dihapus; produk lama yang
+tertahan di tahap itu langsung dapat ditetapkan Pimpinan.)
 
 **Peringkat bulanan (Modul 2–3 mekanisme).** Menu **Analisis → Peringkat Bulanan**: 65
 kelurahan diurutkan untuk bulan depan dari peta 3 bulan terakhir (atau 12 bulan), hanya dari
-kejadian yang sudah dilaporkan sampai batas data. Administrator **membekukan** peringkat
+kejadian yang sudah dilaporkan sampai batas data. Peringkat **dibekukan otomatis saat draf
+produk bulanan disusun** (Administrator/Analis masih dapat membekukannya lebih dulu secara manual)
 sebelum bulan berjalan; yang dibekukan itulah yang dievaluasi setelah bulan berakhir. IKW
 tampil di samping (PROPOSED).
 
@@ -326,6 +341,12 @@ enggan melapor.
 ---
 
 ## 5. DASHBOARD — LAYAR PERTAMA
+
+> **10 November 2026.** Beranda kini dibuka dengan papan **Bulan ini**: produk bulanan (posisi
+> naskah dan siapa yang dinanti), kegiatan di kelurahan prioritas, evaluasi cakupan, dan
+> persetujuan warga. Kartu yang menunggu pembaca berbingkai aksen dan menyebut jumlahnya
+> ("2 menunggu Anda"). Peta tetap isi utama di bawahnya. Sorotan harian yang diuraikan di
+> bawah ini tidak lagi tampil di beranda; layarnya tetap ada di alamat lama.
 
 Beranda menjawab **apa yang menonjol hari ini**, bukan menyajikan seluruh yang diketahui
 sistem. Susunannya:
@@ -897,7 +918,12 @@ sel, jenis, dan jendela 6 jam yang sama.
 
 ## 16a. RENCANA PATROLI — USULAN TAHUN INI, DICOCOKKAN DENGAN KENYATAAN
 
-Menu **Operasi → Rencana Patroli**. Sejak 4 Oktober 2026 aplikasi diperagakan seolah
+> **10 November 2026.** Layar ini **keluar dari menu** dan tidak lagi memuat persetujuan
+> tersendiri. Perkiraan jam rawan bulan sasaran kini **lampiran Produk Bulanan** dan ikut
+> penetapan Pimpinan di sana. Alamat `/ops/rencana-patroli` tetap dapat dibuka sebagai bacaan
+> (usulan tahunan, pencocokan, unduhan .docx). Uraian di bawah dipertahankan sebagai rujukan.
+
+Alamat `/ops/rencana-patroli` (dahulu menu **Operasi → Rencana Patroli**). Sejak 4 Oktober 2026 aplikasi diperagakan seolah
 berdiri di **awal 2026**: seluruh layar hanya memuat kejadian sampai 31 Desember 2025, dan
 halaman ini menjawab pertanyaan Pimpinan untuk tahun berjalan — **di kelurahan mana dan
 pada blok jam berapa patroli dilakukan**, untuk tiap jenis (Curanmor, Curat, Curas).

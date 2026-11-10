@@ -2,13 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api";
-import {
-  analystReview,
-  decideProduct,
-  draftProduct,
-  recordAction,
-  stageOutcome,
-} from "@/lib/monthly-products";
+import { analystReview, decideProduct, draftProduct, recordAction } from "@/lib/monthly-products";
 
 export type ProductState = { error: string | null; done: string | null };
 const IDLE_OK = (done: string): ProductState => ({ error: null, done });
@@ -28,7 +22,7 @@ export async function draftAction(_p: ProductState, form: FormData): Promise<Pro
   const month = String(form.get("month") ?? "");
   return guard(async () => {
     await draftProduct(month);
-    return IDLE_OK("Draf disusun.");
+    return IDLE_OK("Draf disusun; peringkat bulan ini dibekukan.");
   });
 }
 
@@ -43,20 +37,7 @@ export async function analystAction(_p: ProductState, form: FormData): Promise<P
   }));
   return guard(async () => {
     await analystReview(month, { items, note: String(form.get("note") ?? "") || undefined });
-    return IDLE_OK("Pemeriksaan analis tersimpan.");
-  });
-}
-
-export async function outcomeAction(_p: ProductState, form: FormData): Promise<ProductState> {
-  const month = String(form.get("month") ?? "");
-  const stage = form.get("stage") === "kasat" ? "kasat" : "kbo";
-  const outcome = form.get("outcome") === "REJECTED" ? "REJECTED" : "ACCEPTED";
-  return guard(async () => {
-    await stageOutcome(month, stage, {
-      outcome,
-      reason: String(form.get("reason") ?? "") || undefined,
-    });
-    return IDLE_OK(outcome === "ACCEPTED" ? "Diterima." : "Dikembalikan ke analis.");
+    return IDLE_OK("Pemeriksaan tersimpan; produk dikirim ke Pimpinan.");
   });
 }
 

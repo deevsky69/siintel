@@ -1,5 +1,9 @@
 # 176 — Penyesuaian ke "Mekanisme dan Fungsi SIGAP" (6 November 2026)
 
+> **Revisi 10 November 2026 (catatan 177):** produk bulanan menjadi **dua tahap** (Analis →
+> Pimpinan); tahap KBO/Kasat dan peran Kasat Intelkam dibekukan (0023); beranda menjadi papan
+> bulanan; Rencana Patroli dilebur sebagai lampiran; buletin + imbauan satu antrean.
+
 Dokumen mekanisme (lima modul) menjadi acuan baru. Keputusan pemilik proyek: **1B** enam
 peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator), **2A** peta
 3 bulan dulu, **3A** imbauan bulanan warga perlu persetujuan; menu dan teks diringkas.

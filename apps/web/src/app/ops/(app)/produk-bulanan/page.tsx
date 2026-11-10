@@ -3,26 +3,40 @@ import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { ApiError } from "@/lib/api";
 import { getProfile } from "@/lib/decisions";
-import { getProduct, listProducts, type MonthlyProduct } from "@/lib/monthly-products";
-import { ActionForm, AnalystForm, DecideForm, DraftForm, OutcomeForm } from "./forms";
+import {
+  getProduct,
+  isAwaitingDecision,
+  listProducts,
+  type MonthlyProduct,
+} from "@/lib/monthly-products";
+import { getMonthlyOutlook, type MonthlyOutlook } from "@/lib/patrol-plan-api";
+import { ActionForm, AnalystForm, DecideForm, DraftForm } from "./forms";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Dua tahap sejak 10 November 2026 (keputusan pemilik proyek 1B, catatan 177):
+ * Analis menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa dan
+ * mengirim; Pimpinan menetapkan; Fungsi/Polsek mencatat. Tahap KBO dan Kasat dihapus.
+ */
 const STEPS = [
-  { key: "ANALYST", label: "Analis" },
-  { key: "KBO", label: "KBO" },
-  { key: "KASAT", label: "Kasat Intelkam" },
-  { key: "PIMPINAN", label: "Pimpinan" },
+  { key: "ANALYST", label: "Analis menyusun & memeriksa" },
+  { key: "PIMPINAN", label: "Pimpinan menetapkan" },
+  { key: "EXECUTE", label: "Pelaksanaan dicatat" },
 ] as const;
-const DONE_AT: Record<MonthlyProduct["status"], number> = {
-  DRAFT: 0,
-  ANALYST_REVIEWED: 1,
-  KBO_CHECKED: 2,
-  VALIDATED: 3,
-  DECIDED: 4,
+const THREAT_LABEL: Record<string, string> = {
+  CURANMOR: "curanmor",
+  CURAT: "curat",
+  CURAS: "curas",
 };
 
-/** Produk bulanan (Modul 4 mekanisme): satu naskah per bulan, empat tahap, lalu pelaksanaan. */
+function doneAt(product: MonthlyProduct | null): number {
+  if (!product) return 0;
+  if (product.status === "DECIDED") return 2;
+  return isAwaitingDecision(product.status) ? 1 : 0;
+}
+
+/** Produk bulanan (Modul 4 mekanisme): satu naskah per bulan, dua tahap, lalu pelaksanaan. */
 export default async function ProdukBulananPage({
   searchParams,
 }: {
@@ -40,7 +54,26 @@ export default async function ProdukBulananPage({
   } catch (error) {
     if (!(error instanceof ApiError) || error.status !== 404) throw error;
   }
-  const done = product ? DONE_AT[product.status] : 0;
+  // Lampiran: perkiraan singkat bulan sasaran (sebelumnya layar Rencana Patroli tersendiri
+  // dengan persetujuannya sendiri — 2.ii). Gagal/403 → lampiran tidak tampil, naskah tetap.
+  const outlook: MonthlyOutlook | null = product
+    ? await getMonthlyOutlook(month).catch(() => null)
+    : null;
+  const done = doneAt(product);
+  const awaiting = product ? isAwaitingDecision(product.status) : false;
+  const analystTurn = product?.status === "DRAFT" && can("monthly_product:draft");
+  const leaderTurn = awaiting && can("monthly_product:decide");
+  const attachedNames = new Set(
+    (product?.status === "DECIDED"
+      ? product.items.filter((item) => item.selected)
+      : (product?.items ?? [])
+    ).map((item) => item.kelurahan),
+  );
+  const attachedSlots = (outlook?.threats ?? []).flatMap((threat) =>
+    threat.slots
+      .filter((slot) => attachedNames.has(slot.kelurahan))
+      .map((slot) => ({ ...slot, threat_type: threat.threat_type })),
+  );
 
   return (
     <div className="space-y-3">
@@ -81,9 +114,15 @@ export default async function ProdukBulananPage({
 
         {!product ? (
           can("monthly_product:draft") ? (
-            <DraftForm month={month} />
+            <div className="space-y-2">
+              <p className="text-xs text-ink-muted">
+                Menyusun draf sekaligus membekukan peringkat {month}; yang dibekukan itulah yang
+                dievaluasi setelah bulan berakhir.
+              </p>
+              <DraftForm month={month} />
+            </div>
           ) : (
-            <EmptyState label="Produk bulan ini belum disusun." />
+            <EmptyState label="Produk bulan ini belum disusun Analis." />
           )
         ) : (
           <>
@@ -94,23 +133,13 @@ export default async function ProdukBulananPage({
               {product.priority_count !== null
                 ? ` · ${product.priority_count} kelurahan prioritas`
                 : ""}
+              {awaiting && !leaderTurn ? " · menunggu penetapan Pimpinan" : ""}
             </p>
 
-            {product.status === "DRAFT" && can("monthly_product:draft") ? (
-              <AnalystForm month={month} items={product.items} />
-            ) : null}
-            {product.status === "ANALYST_REVIEWED" && can("monthly_product:review") ? (
-              <OutcomeForm month={month} stage="kbo" label="Mutu analisis baik" />
-            ) : null}
-            {product.status === "KBO_CHECKED" && can("monthly_product:validate") ? (
-              <OutcomeForm month={month} stage="kasat" label="Validasi, teruskan ke Pimpinan" />
-            ) : null}
-            {product.status === "VALIDATED" && can("monthly_product:decide") ? (
-              <DecideForm month={month} items={product.items} />
-            ) : null}
+            {analystTurn ? <AnalystForm month={month} items={product.items} /> : null}
+            {leaderTurn ? <DecideForm month={month} items={product.items} /> : null}
 
-            {!(product.status === "DRAFT" && can("monthly_product:draft")) &&
-            !(product.status === "VALIDATED" && can("monthly_product:decide")) ? (
+            {!analystTurn && !leaderTurn ? (
               <ul className="divide-y divide-base-800">
                 {product.items.map((item) => (
                   <li
@@ -178,6 +207,49 @@ export default async function ProdukBulananPage({
           </>
         )}
       </Panel>
+
+      {product && outlook ? (
+        <Panel
+          title={`Lampiran: perkiraan jam rawan ${outlook.target_label}`}
+          action={
+            <a
+              href={`/api/perkiraan?bulan=${month}`}
+              className="panel-action text-accent"
+              title="Unduh perkiraan lengkap (.docx)"
+            >
+              Unduh .docx
+            </a>
+          }
+        >
+          <p className="mb-2 text-2xs leading-relaxed text-ink-faint">
+            Blok jam per kelurahan {product.status === "DECIDED" ? "prioritas" : "dalam draf"} dari
+            kejadian bulan yang sama tahun-tahun sebelumnya
+            {outlook.basis_labels.length ? ` (${outlook.basis_labels.join(", ")})` : ""}. Ikut
+            penetapan Pimpinan di atas; tidak ada persetujuan tersendiri. {outlook.status}.
+          </p>
+          {attachedSlots.length === 0 ? (
+            <EmptyState label="Tidak ada blok jam yang menonjol untuk kelurahan ini." />
+          ) : (
+            <ul className="divide-y divide-base-800 text-xs">
+              {attachedSlots.map((slot) => (
+                <li
+                  key={`${slot.threat_type}-${slot.kelurahan}-${slot.block_start}`}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1 py-1.5"
+                >
+                  <span className="font-semibold text-ink">{slot.kelurahan}</span>
+                  <span className="text-ink-muted">
+                    {THREAT_LABEL[slot.threat_type] ?? slot.threat_type}
+                  </span>
+                  <span className="font-mono text-ink-muted">{slot.block_label}</span>
+                  <span className="text-ink-faint">
+                    {slot.incidents} kejadian · {slot.function}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+      ) : null}
     </div>
   );
 }

@@ -1086,7 +1086,7 @@ predpol exec api python -m prediksi_presisi_api.cli set-password demo.pimpinan
 Perintah akan meminta password dua kali. **Ketikan tidak terlihat di layar** — itu normal,
 bukan keyboard yang mati. Password minimal 12 karakter.
 
-Ulangi untuk keenam akun:
+Ulangi untuk kelima akun (`demo.kasat` dikunci migrasi 0023, 10 November 2026):
 
 ```bash
 predpol exec api python -m prediksi_presisi_api.cli set-password demo.pimpinan
@@ -1276,7 +1276,7 @@ Kerjakan berurutan pada **H-1**, bukan pada pagi hari paparan.
 - [ ] `https://DOMAIN-ANDA` terbuka dan gembok HTTPS muncul di peramban
 - [ ] `http://DOMAIN-ANDA` otomatis dialihkan ke HTTPS
 - [ ] Password uji `PaparanTaskap#2026` **sudah tidak berlaku** di server ini
-- [ ] Keenam akun demo berstatus `aktif` dengan password baru yang tercatat luring
+- [ ] Kelima akun demo berstatus `aktif` dengan password baru yang tercatat luring (`demo.kasat` terkunci)
 - [ ] `.env.production` berizin `600` dan tidak muncul di `git status`
 - [ ] Halaman `https://DOMAIN-ANDA/docs` **tidak** dapat diakses (dimatikan saat `APP_ENV=production`)
 - [ ] `predpol ps` menunjukkan **tidak ada** port host yang dipublish oleh `db`, `api`, maupun `web`
