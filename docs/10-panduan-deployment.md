@@ -1037,8 +1037,8 @@ mengurangi risiko pemblokiran; kabar perkembangan dikirim ke pelapor yang sudah 
 Grup warga (4 November 2026): masukkan nomor cadangan ke grup WhatsApp kelurahan (anggota:
 perwakilan RT/RW, Babin), lalu dari dalam grup ketik `/daftar <nama kelurahan>` — kelurahan
 itu harus sudah punya kontak di `/ops/babin`. Sejak itu imbauan kehati-hatian bulan berjalan
-dikirim otomatis pada pemeriksaan pertama setiap bulan baru, dan `/rekomendasi` di grup
-membalas imbauan bulan depan. Teks imbauan: `config/recommendation/citizen-advice.yaml`.
+dikirim otomatis pada pemeriksaan pertama setiap bulan baru (tanpa persetujuan — keputusan
+10 November 2026), dan `/info` di grup membalas imbauan bulan depan. Teks imbauan: `config/recommendation/citizen-advice.yaml`.
 
 Mematikan: hapus `WAHA_API_KEY` dari `.env.production`, lalu
 `docker compose … stop waha` dan deploy ulang; sesi di ponsel dicabut lewat *Perangkat tertaut*.

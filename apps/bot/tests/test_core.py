@@ -293,16 +293,16 @@ def test_group_commands_register_then_serve_advisory_and_stay_silent_otherwise()
     assert group_command(backend, "WHATSAPP", group, "halo semua") is None
     intro = group_command(backend, "WHATSAPP", group, "/mulai")
     assert intro is not None and "/daftar" in intro.text  # belum terdaftar → diarahkan
-    need = group_command(backend, "WHATSAPP", group, "/rekomendasi")
+    need = group_command(backend, "WHATSAPP", group, "/info")
     assert need is not None and "/daftar" in need.text
     bad = group_command(backend, "WHATSAPP", group, "/daftar Nirwana")
     assert bad is not None and "tidak dikenal" in bad.text
     ok = group_command(backend, "WHATSAPP", group, "/daftar tebet timur", "628@c.us")
     assert ok is not None and "Tebet Timur" in ok.text and backend.groups[group] == "Tebet Timur"
     assert backend.last_sender == "628@c.us"
-    advisory = group_command(backend, "WHATSAPP", group, "/rekomendasi")
+    advisory = group_command(backend, "WHATSAPP", group, "/info")
     assert advisory is not None and advisory.text == "IMBAUAN Tebet Timur depan"
-    explicit = group_command(backend, "WHATSAPP", group, "/rekomendasi Tebet Timur")
+    explicit = group_command(backend, "WHATSAPP", group, "/info Tebet Timur")
     assert explicit is not None and "IMBAUAN" in explicit.text
     # /mulai, /bantuan, dan perintah tak dikenal → pengenalan: fitur, tautan, kontak Babin.
     backend.contact = {
@@ -316,7 +316,7 @@ def test_group_commands_register_then_serve_advisory_and_stay_silent_otherwise()
     for word in ("/mulai", "/bantuan", "/apaan"):
         info = group_command(backend, "WHATSAPP", group, word)
         assert info is not None
-        assert "/rekomendasi" in info.text and "sigap.awansurya.com" in info.text
+        assert "/info" in info.text and "sigap.awansurya.com" in info.text
         assert "Aipda Budi (dummy)" in info.text and "021-555" in info.text
         assert "Tebet Timur" in info.text
     babin = group_command(backend, "WHATSAPP", group, "/babin")
@@ -328,11 +328,11 @@ def test_group_commands_register_then_serve_advisory_and_stay_silent_otherwise()
 
 def test_private_advisory_command_needs_a_kelurahan() -> None:
     chat, backend = talk()
-    ask = chat.handle(Incoming(text="/rekomendasi"))
+    ask = chat.handle(Incoming(text="/info"))
     assert "Sebutkan kelurahannya" in ask.text
-    got = chat.handle(Incoming(text="/rekomendasi Tebet Timur"))
+    got = chat.handle(Incoming(text="/info Tebet Timur"))
     assert got.text == "IMBAUAN Tebet Timur depan"
-    assert "/rekomendasi" in chat.handle(Incoming(text="/bantuan")).text
+    assert "/info" in chat.handle(Incoming(text="/bantuan")).text
 
 
 def test_monthly_advisories_go_to_registered_groups_once() -> None:

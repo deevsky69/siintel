@@ -2,21 +2,21 @@ import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
-import { getAdvisoryApproval, getBulletins } from "@/lib/babin";
+import { getAdvisoryPreview, getBulletins } from "@/lib/babin";
 import { getProfile } from "@/lib/decisions";
-import { AdvisoryApproveForm, ApproveButton, GenerateForm } from "./bulletin-forms";
+import { ApproveButton, GenerateForm } from "./bulletin-forms";
 
 export const dynamic = "force-dynamic";
 
 const LABEL = { DRAFT: "Draf", APPROVED: "Disetujui, menunggu bot", SENT: "Terkirim" } as const;
 
 /**
- * Persetujuan warga — SATU antrean (10 November 2026, keputusan pemilik proyek 2.iii).
+ * Persetujuan warga — satu antrean (10 November 2026, keputusan pemilik proyek 2.iii).
  *
- * Imbauan bulanan ke grup warga dan buletin mingguan kelurahan sama-sama penerbitan informasi
- * kepada warga yang menunggu persetujuan Pimpinan; sebelumnya keduanya panel terpisah.
- * Kini: satu daftar "menunggu persetujuan" (imbauan bulan berjalan + seluruh buletin draf,
- * lintas minggu), lalu riwayat per minggu. Administrator tetap menyusun draf di sini.
+ * Buletin mingguan kelurahan menunggu persetujuan Pimpinan dalam satu daftar lintas minggu,
+ * lalu riwayat per minggu. Administrator tetap menyusun draf di sini. Imbauan bulanan ke grup
+ * WhatsApp warga **tidak lagi menunggu persetujuan** (keputusan 10 November 2026 mencabut 3A):
+ * di sini hanya pratinjau teks dan jumlah grup yang sudah menerimanya.
  */
 export default async function BuletinPage({
   searchParams,
@@ -32,7 +32,7 @@ export default async function BuletinPage({
   const [history, drafts, advisory] = await Promise.all([
     getBulletins(one("minggu"), ""),
     getBulletins("", "DRAFT"),
-    getAdvisoryApproval().catch(() => null),
+    getAdvisoryPreview().catch(() => null),
   ]);
   const canManage = profile.permissions.includes("bulletin:manage");
   const canApprove = profile.permissions.includes("bulletin:approve");
@@ -40,14 +40,13 @@ export default async function BuletinPage({
   const sent = (week ? history.data.filter((row) => row.week_start === week) : history.data).filter(
     (row) => row.status !== "DRAFT",
   );
-  const advisoryPending = advisory !== null && !advisory.approved;
-  const waiting = (advisoryPending ? 1 : 0) + drafts.data.length;
+  const waiting = drafts.data.length;
 
   return (
     <div className="space-y-3">
       <StatusNotice status="PROPOSED" tone="caution">
-        Penerbitan informasi kepada warga: imbauan bulanan dan buletin mingguan hanya terkirim
-        setelah disetujui Pimpinan. Satu antrean untuk keduanya.
+        Buletin mingguan hanya terkirim setelah disetujui Pimpinan. Imbauan bulanan ke grup warga
+        dikirim bot secara otomatis setiap awal bulan (keputusan 10 November 2026).
       </StatusNotice>
 
       <Panel
@@ -55,38 +54,13 @@ export default async function BuletinPage({
         action={
           <span className="panel-action">
             {waiting === 0 ? "tidak ada" : `${waiting} menunggu`}
-            {advisory ? ` · ${advisory.groups_registered} grup warga terdaftar` : ""}
           </span>
         }
       >
         {waiting === 0 ? (
-          <EmptyState label="Tidak ada imbauan maupun buletin yang menunggu persetujuan." />
+          <EmptyState label="Tidak ada buletin yang menunggu persetujuan." />
         ) : (
           <ul className="divide-y divide-base-800">
-            {advisoryPending && advisory ? (
-              <li className="py-3">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-                  <span className="rounded bg-accent/10 px-1.5 py-0.5 text-2xs font-semibold text-accent">
-                    IMBAUAN BULANAN
-                  </span>
-                  <span className="font-heading font-semibold text-ink">{advisory.month}</span>
-                  <span className="text-ink-faint">
-                    ke {advisory.groups_registered} grup warga terdaftar
-                  </span>
-                  {canApprove ? <AdvisoryApproveForm month={advisory.month} /> : null}
-                </div>
-                {advisory.sample ? (
-                  <details className="mt-1">
-                    <summary className="cursor-pointer text-2xs text-accent">
-                      Contoh teks ({advisory.sample.kelurahan})
-                    </summary>
-                    <pre className="mt-1 whitespace-pre-wrap rounded bg-base-850 p-3 font-sans text-xs leading-relaxed text-ink">
-                      {advisory.sample.text}
-                    </pre>
-                  </details>
-                ) : null}
-              </li>
-            ) : null}
             {drafts.data.map((row) => (
               <li key={row.id} className="py-3">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
@@ -109,6 +83,33 @@ export default async function BuletinPage({
           </ul>
         )}
       </Panel>
+
+      {advisory ? (
+        <Panel
+          title={`Imbauan bulanan ke grup warga · ${advisory.month}`}
+          action={
+            <span className="panel-action">
+              otomatis · {advisory.groups_sent}/{advisory.groups_registered} grup sudah menerima
+            </span>
+          }
+        >
+          <p className="text-2xs leading-relaxed text-ink-faint">
+            Dikirim bot setiap awal bulan ke grup yang terdaftar lewat /daftar; warga dapat
+            memintanya kapan saja dengan /info. Tidak ada persetujuan: isinya imbauan kehati-hatian
+            dari pola bulan yang sama tahun-tahun sebelumnya, tanpa skor maupun taktik kepolisian.
+          </p>
+          {advisory.sample ? (
+            <details className="mt-1">
+              <summary className="cursor-pointer text-2xs text-accent">
+                Contoh teks ({advisory.sample.kelurahan})
+              </summary>
+              <pre className="mt-1 whitespace-pre-wrap rounded bg-base-850 p-3 font-sans text-xs leading-relaxed text-ink">
+                {advisory.sample.text}
+              </pre>
+            </details>
+          ) : null}
+        </Panel>
+      ) : null}
 
       {canManage ? (
         <Panel title="Susun Buletin">

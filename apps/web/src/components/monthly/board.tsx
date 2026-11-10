@@ -15,7 +15,7 @@ export type BoardInput = {
   summary: ProductSummary | null;
   product: MonthlyProduct | null;
   permissions: readonly string[];
-  citizen: { advisoryPending: boolean; advisoryMonth: string | null; draftBulletins: number };
+  citizen: { draftBulletins: number };
 };
 
 type Card = {
@@ -92,20 +92,15 @@ export function buildCards(input: BoardInput): Card[] {
     });
   }
 
-  // 4. Persetujuan warga — satu antrean: imbauan bulanan dan buletin mingguan (2.iii).
+  // 4. Persetujuan warga — buletin mingguan (2.iii). Imbauan bulanan otomatis sejak
+  //    10 November 2026, jadi tidak pernah "menunggu" siapa pun.
   if (can("bulletin:approve") || can("bulletin:manage")) {
-    const waiting = (input.citizen.advisoryPending ? 1 : 0) + input.citizen.draftBulletins;
-    const parts = [
-      input.citizen.advisoryPending
-        ? `imbauan ${input.citizen.advisoryMonth ?? ""} menunggu`
-        : "imbauan bulan ini disetujui",
-      `${input.citizen.draftBulletins} buletin draf`,
-    ];
+    const waiting = input.citizen.draftBulletins;
     const approveTurn = can("bulletin:approve") && waiting > 0;
     cards.push({
       key: "warga",
       title: "Persetujuan warga",
-      state: parts.join(" · "),
+      state: `${waiting} buletin draf · imbauan bulanan otomatis`,
       href: "/ops/buletin",
       cta: approveTurn ? `Setujui (${waiting})` : null,
       mine: approveTurn,

@@ -498,16 +498,16 @@ Tabel `case_files` dan `case_file_stages` (migration 0016). Data dummy berlabel:
 `predpol seed-case-files-dummy` / `scripts/isi-perkara-dummy-produksi.sh` (deterministik,
 idempoten, mencetak LP + PIN contoh).
 
-### 2.11k Persetujuan imbauan bulanan warga (3A, 6 November 2026)
+### 2.11k Imbauan bulanan warga — pratinjau (10 November 2026; menggantikan persetujuan 3A)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
-| GET | `/advisories/approvals?month=` | `bulletin:read` | status persetujuan bulan (bawaan bulan berjalan), jumlah grup terdaftar, contoh teks |
-| POST | `/advisories/approvals {month, note?}` | `bulletin:approve` (Pimpinan) | menyetujui; 409 bila sudah; audit `APPROVE_CITIZEN_ADVISORY` |
+| GET | `/advisories/preview?month=` | `bulletin:read` | `automatic: true`, jumlah grup terdaftar dan yang sudah menerima bulan itu, contoh teks |
+| ~~GET/POST~~ | ~~`/advisories/approvals`~~ | — | **dihapus 10 November 2026**: imbauan tidak lagi menunggu persetujuan Pimpinan (keputusan 3A dicabut). Tabel `advisory_approvals` (0022) dibiarkan, tidak dibaca |
 
-`GET /messaging/advisories/pending` mengembalikan `approved: false` dan `data: []` sampai
-bulan berjalan disetujui; `GET /messaging/advisory` (perintah `/rekomendasi`) menjawab 409
-untuk bulan yang belum disetujui.
+`GET /messaging/advisories/pending` selalu mengembalikan grup terdaftar yang belum menerima
+imbauan bulan berjalan; `GET /messaging/advisory` (perintah bot **`/info`**, alias lama
+`/rekomendasi`) menjawab teks bulan depan tanpa syarat.
 
 ### 2.11j Evaluasi bulanan (Modul 5 mekanisme, 6 November 2026)
 

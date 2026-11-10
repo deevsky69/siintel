@@ -2,7 +2,7 @@ import { MapHero } from "@/components/leadership/map-hero";
 import { toMapLevel } from "@/components/map/area";
 import { type BoardInput, MonthlyBoard } from "@/components/monthly/board";
 import { ApiError } from "@/lib/api";
-import { getAdvisoryApproval, getBulletins } from "@/lib/babin";
+import { getBulletins } from "@/lib/babin";
 import { getProfile, getSummary } from "@/lib/dashboard";
 import {
   getAreaDetail,
@@ -72,16 +72,13 @@ export default async function DashboardPage({
   // Bulan yang dipapankan: produk terbaru bila ada, selain itu bulan yang disarankan API.
   const month = products?.data[0]?.target_month ?? products?.suggested_month ?? null;
   const summaryRow = products?.data.find((row) => row.target_month === month) ?? null;
-  const [product, advisory, drafts] = await Promise.all([
+  const [product, drafts] = await Promise.all([
     summaryRow && month
       ? getProduct(month).catch((error: unknown): MonthlyProduct | null => {
           if (error instanceof ApiError && error.status === 404) return null;
           throw error;
         })
       : Promise.resolve<MonthlyProduct | null>(null),
-    can("bulletin:approve") || can("bulletin:manage")
-      ? getAdvisoryApproval().catch(() => null)
-      : Promise.resolve(null),
     can("bulletin:approve") || can("bulletin:manage")
       ? getBulletins("", "DRAFT")
           .then((list) => list.data.length)
@@ -95,11 +92,7 @@ export default async function DashboardPage({
         summary: summaryRow,
         product,
         permissions: profile.permissions,
-        citizen: {
-          advisoryPending: advisory !== null && !advisory.approved,
-          advisoryMonth: advisory?.month ?? null,
-          draftBulletins: drafts,
-        },
+        citizen: { draftBulletins: drafts },
       }
     : null;
 

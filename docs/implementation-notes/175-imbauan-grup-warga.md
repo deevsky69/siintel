@@ -1,7 +1,9 @@
 # 175 — Imbauan bulanan ke grup WhatsApp warga (4 November 2026)
 
-> **Revisi 6 November 2026 (3A):** pengiriman **menunggu persetujuan Pimpinan** per bulan
-> (`advisory_approvals`, migrasi 0022). Butir 2 di bawah tidak berlaku lagi; lihat catatan 176.
+> **Revisi 6 November 2026 (3A):** pengiriman sempat **menunggu persetujuan Pimpinan** per bulan
+> (`advisory_approvals`, migrasi 0022; catatan 176). **Dicabut 10 November 2026** (catatan 177):
+> butir 2 di bawah berlaku lagi — otomatis penuh — dan perintah botnya menjadi **`/info`**
+> (`/rekomendasi` dan `/imbauan` tetap dikenali sebagai alias).
 
 Pertanyaan pemilik proyek: bila bot WhatsApp (WAHA) dimasukkan ke grup, bisakah ia otomatis
 mengirim "isi rekomendasi satu bulan ke depan"? Keputusan pemilik proyek:

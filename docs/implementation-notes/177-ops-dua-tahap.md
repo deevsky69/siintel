@@ -68,10 +68,18 @@ unduh .docx (`/api/perkiraan?bulan=`). Endpoint keputusan rencana patroli tidak 
 
 ### 2.iii — Satu antrean persetujuan warga
 
-`/ops/buletin`: panel **Menunggu persetujuan** memuat imbauan bulan berjalan (bila belum
-disetujui) dan seluruh buletin `DRAFT` lintas minggu, masing-masing dengan tombol setujui;
-panel **Susun Buletin** (Administrator) tetap; **Riwayat** per minggu hanya yang disetujui/
-terkirim. Tidak ada perubahan API.
+`/ops/buletin`: panel **Menunggu persetujuan** memuat seluruh buletin `DRAFT` lintas minggu,
+masing-masing dengan tombol setujui; panel **Susun Buletin** (Administrator) tetap; **Riwayat**
+per minggu hanya yang disetujui/terkirim.
+
+**Revisi di hari yang sama — imbauan bulanan otomatis, perintah `/info`.** Pemilik proyek
+mencabut 3A: imbauan ke grup WhatsApp warga tidak lagi menunggu persetujuan Pimpinan.
+`GET /messaging/advisory` dan `/messaging/advisories/pending` tidak lagi memeriksa
+`advisory_approvals` (tabel 0022 dibiarkan, tidak dibaca); endpoint `/advisories/approvals`
+dihapus, diganti `GET /advisories/preview` (contoh teks, grup terdaftar, grup yang sudah
+menerima) untuk panel pratinjau di `/ops/buletin`. Bot: `COMMAND_ADVISORY` dipimpin `/info`;
+`/rekomendasi` dan `/imbauan` tetap dikenali supaya pesan pengenalan lama tidak mati. Kartu
+"Persetujuan warga" di beranda hanya menghitung buletin draf.
 
 ## Yang sengaja tidak diubah
 

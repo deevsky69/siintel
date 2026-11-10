@@ -151,8 +151,8 @@ def test_group_messages_only_answer_advisory_commands(monkeypatch: pytest.Monkey
         }
 
     chan.handle(event("halo"))
-    chan.handle(event("/rekomendasi"))
-    assert sent == [("120363@g.us", "grup:/rekomendasi:628@c.us")]
+    chan.handle(event("/info"))
+    assert sent == [("120363@g.us", "grup:/info:628@c.us")]
     assert waha.to_waha_chat("120363@g.us") == "120363@g.us"
 
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { approve, approveAdvisoryAction, type BulletinState, generate } from "./actions";
+import { approve, type BulletinState, generate } from "./actions";
 
 const IDLE: BulletinState = { error: null, done: null };
 
@@ -43,29 +43,6 @@ export function ApproveButton({ id }: { id: string }) {
         className="rounded border border-risk-low/60 bg-risk-low/10 px-3 py-1 text-xs font-semibold text-risk-low disabled:opacity-50"
       >
         Setujui & kirim
-      </button>
-      {state.error ? <span className="text-xs text-risk-critical">{state.error}</span> : null}
-    </form>
-  );
-}
-
-export function AdvisoryApproveForm({ month }: { month: string }) {
-  const [state, submit, pending] = useActionState(approveAdvisoryAction, IDLE);
-  if (state.done) return <span className="text-xs text-risk-low">{state.done}</span>;
-  return (
-    <form action={submit} className="flex flex-wrap items-center gap-2">
-      <input type="hidden" name="month" value={month} />
-      <input
-        name="note"
-        placeholder="Catatan"
-        className="rounded border border-base-700 bg-base-850 px-2 py-1 text-xs text-ink"
-      />
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded border border-risk-low/60 bg-risk-low/10 px-3 py-1 text-xs font-semibold text-risk-low disabled:opacity-50"
-      >
-        Setujui imbauan {month}
       </button>
       {state.error ? <span className="text-xs text-risk-critical">{state.error}</span> : null}
     </form>

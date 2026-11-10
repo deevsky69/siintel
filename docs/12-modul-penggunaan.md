@@ -34,11 +34,12 @@ minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetuju
 bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
 `/dasbor` menautkan ke SIGAP WARGA.
 
-**Imbauan bulanan ke grup warga perlu persetujuan (3A).** Di menu **Warga → Buletin & Imbauan**,
-Pimpinan menyetujui imbauan bulan berjalan setelah melihat contoh teksnya; sebelum itu bot
-tidak mengirim ke grup dan `/rekomendasi` menjawab "belum disetujui". Sejak 10 November 2026
-imbauan bulanan dan buletin mingguan berada dalam **satu antrean "Menunggu persetujuan"** di
-layar itu, disetujui per baris; riwayat buletin per minggu di bawahnya.
+**Imbauan bulanan ke grup warga otomatis (10 November 2026).** Keputusan 3A (6 November 2026,
+perlu persetujuan Pimpinan) **dicabut pemilik proyek**: bot mengirim imbauan bulan berjalan ke
+grup terdaftar setiap awal bulan tanpa persetujuan, dan warga dapat memintanya dengan perintah
+**`/info`** (dahulu `/rekomendasi`; alias lama tetap dikenali). Menu **Warga → Buletin &
+Imbauan** menampilkan pratinjau teks dan berapa grup yang sudah menerimanya; antrean
+"Menunggu persetujuan" di layar itu hanya berisi buletin mingguan, disetujui per baris.
 
 **Alur /ops diringkas (10 November 2026, keputusan pemilik proyek 1B dan 2.i–iii; catatan
 177).** (1) Produk bulanan **dua tahap**: Analis menyusun — tombol *Susun* sekaligus
@@ -49,7 +50,7 @@ kartu posisi naskah, kegiatan prioritas, evaluasi, persetujuan warga — kartu y
 pembaca ditandai; ringkasan harian keluar dari beranda. (3) **Rencana Patroli** keluar dari
 menu: perkiraan jam rawan bulan sasaran menjadi **lampiran** Produk Bulanan dan ikut penetapan
 Pimpinan (tidak ada persetujuan tersendiri); `/ops/rencana-patroli` tetap sebagai bacaan dan
-unduhan .docx. (4) Buletin dan imbauan satu antrean (di atas).
+unduhan .docx. (4) Buletin mingguan satu antrean; imbauan bulanan otomatis (di atas).
 
 **Menu ringkas (6 November 2026).** Lima kelompok: **Wilayah** (beranda, peta, wilayah rawan,
 pola, analitik), **Bulan Ini** (peringkat, produk bulanan, evaluasi), **Data**
@@ -1039,9 +1040,9 @@ aplikasi; kejadian, skor, dan prediksi tetap mengikuti jam acuan.
 **Imbauan bulanan di grup WhatsApp warga (4 November 2026, peragaan lewat WAHA).** Nomor bot
 dimasukkan ke grup kelurahan (RT/RW dan Babin); di dalam grup ketik `/daftar <kelurahan>` sekali.
 Setiap awal bulan bot mengirim **imbauan kehati-hatian** (jenis ancaman, jam rawan menurut pola
-bulan yang sama tahun-tahun sebelumnya, tips) secara otomatis; `/rekomendasi` membalas imbauan
+bulan yang sama tahun-tahun sebelumnya, tips) secara otomatis; `/info` membalas imbauan
 bulan depan. Tanpa skor atau rekomendasi kepolisian — itu tetap di `/ops`. Di grup bot menjawab
-`/daftar`, `/rekomendasi`, `/babin`, dan `/mulai`/`/bantuan` (pengenalan: fitur, tautan SIGAP
+`/daftar`, `/info`, `/babin`, dan `/mulai`/`/bantuan` (pengenalan: fitur, tautan SIGAP
 WARGA, kontak Babin); melapor tetap lewat pesan pribadi.
 
 Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
