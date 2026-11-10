@@ -1037,8 +1037,8 @@ mengurangi risiko pemblokiran; kabar perkembangan dikirim ke pelapor yang sudah 
 Grup warga (4 November 2026): masukkan nomor cadangan ke grup WhatsApp kelurahan (anggota:
 perwakilan RT/RW, Babin), lalu dari dalam grup ketik `/daftar <nama kelurahan>` — kelurahan
 itu harus sudah punya kontak di `/ops/babin`. Sejak itu imbauan kehati-hatian bulan berjalan
-dikirim otomatis pada pemeriksaan pertama setiap bulan baru, dan `/rekomendasi` di grup
-membalas imbauan bulan depan. Teks imbauan: `config/recommendation/citizen-advice.yaml`.
+dikirim otomatis pada pemeriksaan pertama setiap bulan baru (tanpa persetujuan — keputusan
+10 November 2026), dan `/info` di grup membalas imbauan bulan depan. Teks imbauan: `config/recommendation/citizen-advice.yaml`.
 
 Mematikan: hapus `WAHA_API_KEY` dari `.env.production`, lalu
 `docker compose … stop waha` dan deploy ulang; sesi di ponsel dicabut lewat *Perangkat tertaut*.
@@ -1086,7 +1086,7 @@ predpol exec api python -m prediksi_presisi_api.cli set-password demo.pimpinan
 Perintah akan meminta password dua kali. **Ketikan tidak terlihat di layar** — itu normal,
 bukan keyboard yang mati. Password minimal 12 karakter.
 
-Ulangi untuk keenam akun:
+Ulangi untuk kelima akun (`demo.kasat` dikunci migrasi 0023, 10 November 2026):
 
 ```bash
 predpol exec api python -m prediksi_presisi_api.cli set-password demo.pimpinan
@@ -1276,7 +1276,7 @@ Kerjakan berurutan pada **H-1**, bukan pada pagi hari paparan.
 - [ ] `https://DOMAIN-ANDA` terbuka dan gembok HTTPS muncul di peramban
 - [ ] `http://DOMAIN-ANDA` otomatis dialihkan ke HTTPS
 - [ ] Password uji `PaparanTaskap#2026` **sudah tidak berlaku** di server ini
-- [ ] Keenam akun demo berstatus `aktif` dengan password baru yang tercatat luring
+- [ ] Kelima akun demo berstatus `aktif` dengan password baru yang tercatat luring (`demo.kasat` terkunci)
 - [ ] `.env.production` berizin `600` dan tidak muncul di `git status`
 - [ ] Halaman `https://DOMAIN-ANDA/docs` **tidak** dapat diakses (dimatikan saat `APP_ENV=production`)
 - [ ] `predpol ps` menunjukkan **tidak ada** port host yang dipublish oleh `db`, `api`, maupun `web`

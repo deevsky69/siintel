@@ -6,7 +6,6 @@ import {
   analystAction,
   decideAction,
   draftAction,
-  outcomeAction,
   type ProductState,
   recordActionForm,
 } from "./actions";
@@ -15,8 +14,6 @@ const IDLE: ProductState = { error: null, done: null };
 const field = "rounded border border-base-700 bg-base-850 px-2 py-1 text-xs text-ink";
 const primary =
   "rounded border border-accent/60 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent disabled:opacity-50";
-const danger =
-  "rounded border border-risk-high/60 bg-risk-high/10 px-3 py-1 text-xs font-semibold text-risk-high disabled:opacity-50";
 
 function Status({ state }: { state: ProductState }) {
   if (state.error) return <span className="text-xs text-risk-critical">{state.error}</span>;
@@ -30,7 +27,7 @@ export function DraftForm({ month }: { month: string }) {
     <form action={submit} className="flex items-center gap-2">
       <input type="hidden" name="month" value={month} />
       <button type="submit" disabled={pending} className={primary}>
-        {pending ? "Menyusun…" : `Susun draf ${month}`}
+        {pending ? "Menyusun…" : `Susun draf ${month} (membekukan peringkat)`}
       </button>
       <Status state={state} />
     </form>
@@ -72,40 +69,10 @@ export function AnalystForm({ month, items }: { month: string; items: ProductIte
       <div className="flex flex-wrap items-center gap-2">
         <input name="note" placeholder="Catatan analis" className={`${field} flex-1`} />
         <button type="submit" disabled={pending} className={primary}>
-          Teruskan ke KBO
+          Kirim ke Pimpinan
         </button>
         <Status state={state} />
       </div>
-    </form>
-  );
-}
-
-export function OutcomeForm({
-  month,
-  stage,
-  label,
-}: {
-  month: string;
-  stage: "kbo" | "kasat";
-  label: string;
-}) {
-  const [state, submit, pending] = useActionState(outcomeAction, IDLE);
-  return (
-    <form action={submit} className="flex flex-wrap items-center gap-2">
-      <input type="hidden" name="month" value={month} />
-      <input type="hidden" name="stage" value={stage} />
-      <input
-        name="reason"
-        placeholder="Alasan (wajib bila dikembalikan)"
-        className={`${field} flex-1`}
-      />
-      <button type="submit" name="outcome" value="ACCEPTED" disabled={pending} className={primary}>
-        {label}
-      </button>
-      <button type="submit" name="outcome" value="REJECTED" disabled={pending} className={danger}>
-        Kembalikan
-      </button>
-      <Status state={state} />
     </form>
   );
 }

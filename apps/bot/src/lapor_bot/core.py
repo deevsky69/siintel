@@ -35,7 +35,8 @@ COMMAND_CANCEL = ("/batal", "batal")
 COMMAND_HELP = ("/bantuan", "bantuan", "/help", "help")
 COMMAND_BABIN = ("/babin", "babin", "babinkamtibmas")
 COMMAND_DASHBOARD = ("/dasbor", "dasbor", "/web", "web")
-COMMAND_ADVISORY = ("/rekomendasi", "rekomendasi", "/imbauan", "imbauan")
+# 10 November 2026: perintahnya /info; /rekomendasi dan /imbauan tetap dikenali (tautan lama).
+COMMAND_ADVISORY = ("/info", "info", "/rekomendasi", "rekomendasi", "/imbauan", "imbauan")
 COMMAND_REGISTER = ("/daftar", "daftar")
 DASHBOARD_URL = "https://sigap.awansurya.com"
 
@@ -53,7 +54,7 @@ HELP = (
     "/status — melihat status laporan Anda\n"
     "/babin — kontak Babinkamtibmas kelurahan Anda\n"
     "/dasbor — peta kerawanan, lacak laporan, dan survey di SIGAP WARGA\n"
-    "/rekomendasi <kelurahan> — imbauan kehati-hatian bulan depan\n"
+    "/info <kelurahan> — imbauan kehati-hatian bulan depan\n"
     "/batal — membatalkan laporan yang sedang diisi\n\n"
     "Keadaan darurat: hubungi 110."
 )
@@ -431,8 +432,8 @@ def advisory_reply(backend: Backend, kelurahan: str, month: str | None = None) -
     """Teks imbauan bulan depan untuk satu kelurahan; tanpa kelurahan, diminta menyebutkannya."""
     if not kelurahan:
         return Reply(
-            "Sebutkan kelurahannya, misalnya: /rekomendasi Tebet Timur\n"
-            "Di grup warga yang sudah didaftarkan (/daftar), cukup ketik /rekomendasi."
+            "Sebutkan kelurahannya, misalnya: /info Tebet Timur\n"
+            "Di grup warga yang sudah didaftarkan (/daftar), cukup ketik /info."
         )
     try:
         data = backend.advisory(kelurahan, month)
@@ -464,7 +465,7 @@ def group_info(backend: Backend, channel: str, chat_id: str) -> Reply:
         "*SIGAP* — bot kamtibmas Polres Metro Jakarta Selatan.",
         "",
         "Di grup ini saya bisa:",
-        "• /rekomendasi — imbauan kehati-hatian bulan depan: jenis kejadian yang biasa "
+        "• /info — imbauan kehati-hatian bulan depan: jenis kejadian yang biasa "
         "terjadi di kelurahan ini, jam rawannya, dan tips pencegahan. Dikirim otomatis juga "
         "setiap awal bulan.",
         "• /babin — kontak Babinkamtibmas kelurahan ini.",
@@ -512,7 +513,7 @@ def group_command(
             return Reply(error.message)
         return Reply(
             f"Grup ini terdaftar untuk Kelurahan {area['kelurahan']} ({area['kecamatan']}). "
-            "Imbauan kehati-hatian dikirim otomatis setiap awal bulan; ketik /rekomendasi "
+            "Imbauan kehati-hatian dikirim otomatis setiap awal bulan; ketik /info "
             "untuk imbauan bulan depan."
         )
     if command in COMMAND_ADVISORY:
@@ -522,7 +523,7 @@ def group_command(
             if registered is None:
                 return Reply(
                     "Grup ini belum didaftarkan. Ketik /daftar <nama kelurahan>, "
-                    "atau sebutkan kelurahannya: /rekomendasi Tebet Timur"
+                    "atau sebutkan kelurahannya: /info Tebet Timur"
                 )
             kelurahan = str(registered["kelurahan"])
         return advisory_reply(backend, kelurahan)

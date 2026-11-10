@@ -1,5 +1,5 @@
-"""Modul 4 mekanisme: draf dari peringkat beku → analis → KBO → Kasat → Pimpinan → pelaksanaan,
-dengan alasan wajib dan kewenangan per peran (1B)."""
+"""Modul 4 mekanisme, dua tahap (10 November 2026): draf membekukan peringkat → analis memeriksa
+dan mengirim → Pimpinan menetapkan → pelaksanaan; alasan wajib dan kewenangan per peran (1B)."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.main import app
-from prediksi_presisi_api.models import CrimeIncident, Location, Role, User
+from prediksi_presisi_api.models import CrimeIncident, Location, MonthlyProduct, Role, User
 from prediksi_presisi_api.security.passwords import hash_password
 from prediksi_presisi_api.services import clock
 
@@ -99,38 +99,40 @@ def _post(client: TestClient, path: str, body: dict[str, Any], headers: dict[str
     return client.post(f"{BASE}/{MONTH}/{path}", json=body, headers=headers)
 
 
-def test_full_chain_from_frozen_ranking_to_recorded_action(
-    client: TestClient, session: Session
-) -> None:
+def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: Session) -> None:
     area = _seed(session)
     admin = _login(client, session, "Administrator")
     analyst = _login(client, session, "Analis Intelkam")
-    kasat = _login(client, session, "Kasat Intelkam")
     leader = _login(client, session, "Pimpinan")
     polsek_in = _login(client, session, "Polsek", polsek=area.polsek)
 
-    # Tanpa peringkat beku, draf ditolak. Analis boleh membekukan (ranking:manage).
-    assert client.post(BASE, json={"month": MONTH}, headers=analyst).status_code == 400
-    frozen = client.post("/api/v1/rankings/freeze", json={"month": MONTH}, headers=analyst)
-    assert frozen.status_code == 200, frozen.text
+    # Peran Kasat Intelkam tidak ada lagi (0023); Pimpinan tidak menyusun draf.
+    assert session.scalar(select(Role).where(Role.role_name == "Kasat Intelkam")) is None
+    assert client.post(BASE, json={"month": MONTH}, headers=leader).status_code == 403
 
-    # Kasat tidak boleh menyusun draf; Analis boleh; draf kedua 409.
-    assert client.post(BASE, json={"month": MONTH}, headers=kasat).status_code == 403
+    # "Susun" membekukan peringkat bulan itu sekaligus — tidak ada langkah terpisah.
+    assert client.get(f"/api/v1/rankings?month={MONTH}", headers=analyst).json()["frozen"] is False
     created = client.post(BASE, json={"month": MONTH}, headers=analyst)
     assert created.status_code == 201, created.text
     body = created.json()
     assert body["status"] == "DRAFT" and body["next_stage"] == "ANALYST"
+    assert body["facts"]["ranking_frozen_by_draft"] is True
+    assert client.get(f"/api/v1/rankings?month={MONTH}", headers=analyst).json()["frozen"] is True
     assert body["items"][0]["kelurahan"] == area.kelurahan
     assert body["items"][0]["pattern"]["dominant_threat"] == "CURANMOR"
     assert body["items"][0]["pattern"]["peak_block_label"] == "21.00-24.00"
     assert client.post(BASE, json={"month": MONTH}, headers=admin).status_code == 409
 
-    # Analis: tolak tanpa alasan ditolak; dengan alasan diterima.
+    # Analis: tolak tanpa alasan ditolak; dengan alasan diterima → langsung menunggu Pimpinan.
     second = body["items"][1]["kelurahan"]
     bad = _post(
         client, "analyst", {"items": [{"kelurahan": second, "status": "REJECTED"}]}, analyst
     )
     assert bad.status_code == 400
+    assert (
+        _post(client, "decide", {"selected": [{"kelurahan": area.kelurahan}]}, leader).status_code
+        == 409
+    )
     reviewed = _post(
         client,
         "analyst",
@@ -144,26 +146,24 @@ def test_full_chain_from_frozen_ranking_to_recorded_action(
                 },
                 {"kelurahan": second, "status": "REJECTED", "reason": "tidak didukung lapangan"},
             ],
-            "note": "diperiksa 6 Nov",
+            "note": "diperiksa 10 Nov",
         },
         analyst,
     )
     assert reviewed.status_code == 200, reviewed.text
     assert reviewed.json()["status"] == "ANALYST_REVIEWED"
+    assert reviewed.json()["next_stage"] == "PIMPINAN"
+    assert reviewed.json()["awaiting_decision"] is True
     assert reviewed.json()["items"][1]["analyst_status"] == "REJECTED"
 
-    # KBO: Pimpinan tidak boleh; Kasat boleh. Penolakan tanpa alasan ditolak.
-    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, leader).status_code == 403
-    assert _post(client, "kbo", {"outcome": "REJECTED"}, kasat).status_code == 400
-    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, kasat).json()["status"] == "KBO_CHECKED"
+    # Tahap KBO dan Kasat tidak ada lagi.
+    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, analyst).status_code == 404
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, leader).status_code == 404
 
-    # Kasat memvalidasi; Analis tidak boleh.
-    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, analyst).status_code == 403
-    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).json()["status"] == "VALIDATED"
-
-    # Pimpinan menetapkan: yang ditolak analis tidak dapat dipilih; Admin tidak boleh.
+    # Pimpinan menetapkan: yang ditolak analis tidak dapat dipilih; Admin dan Analis tidak boleh.
     pick = {"selected": [{"kelurahan": area.kelurahan}]}
     assert _post(client, "decide", pick, admin).status_code == 403
+    assert _post(client, "decide", pick, analyst).status_code == 403
     assert _post(client, "decide", {"selected": [{"kelurahan": second}]}, leader).status_code == 400
     decided = _post(
         client,
@@ -179,7 +179,7 @@ def test_full_chain_from_frozen_ranking_to_recorded_action(
     chosen = decided.json()["items"][0]
     assert chosen["selected"] is True and chosen["decided_action"].startswith("Patroli")
     stages = [s["stage"] for s in decided.json()["stages"]]
-    assert stages == ["ANALYST", "KBO", "KASAT", "PIMPINAN"]
+    assert stages == ["ANALYST", "PIMPINAN"]
 
     # Pelaksanaan: Polsek wilayah mencatat; Polsek lain 404; bukan prioritas 404.
     action = {
@@ -200,3 +200,22 @@ def test_full_chain_from_frozen_ranking_to_recorded_action(
     assert len(final["items"][0]["actions"]) == 1
     months = [row["target_month"] for row in client.get(BASE, headers=leader).json()["data"]]
     assert MONTH in months
+
+
+def test_product_left_in_a_retired_status_can_still_be_decided(
+    client: TestClient, session: Session
+) -> None:
+    """Produk yang tertahan di KBO_CHECKED/VALIDATED (alur lama) tidak boleh terkunci."""
+    area = _seed(session)
+    analyst = _login(client, session, "Analis Intelkam")
+    leader = _login(client, session, "Pimpinan")
+    assert client.post(BASE, json={"month": MONTH}, headers=analyst).status_code == 201
+    product = session.scalar(select(MonthlyProduct))
+    assert product is not None
+    product.status = "VALIDATED"
+    session.flush()
+    shown = client.get(f"{BASE}/{MONTH}", headers=leader).json()
+    assert shown["awaiting_decision"] is True and shown["next_stage"] == "PIMPINAN"
+    decided = _post(client, "decide", {"selected": [{"kelurahan": area.kelurahan}]}, leader)
+    assert decided.status_code == 200, decided.text
+    assert decided.json()["status"] == "DECIDED"

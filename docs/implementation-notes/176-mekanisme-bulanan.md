@@ -1,5 +1,9 @@
 # 176 — Penyesuaian ke "Mekanisme dan Fungsi SIGAP" (6 November 2026)
 
+> **Revisi 10 November 2026 (catatan 177):** produk bulanan menjadi **dua tahap** (Analis →
+> Pimpinan); tahap KBO/Kasat dan peran Kasat Intelkam dibekukan (0023); beranda menjadi papan
+> bulanan; Rencana Patroli dilebur sebagai lampiran; buletin + imbauan satu antrean.
+
 Dokumen mekanisme (lima modul) menjadi acuan baru. Keputusan pemilik proyek: **1B** enam
 peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator), **2A** peta
 3 bulan dulu, **3A** imbauan bulanan warga perlu persetujuan; menu dan teks diringkas.
@@ -75,6 +79,7 @@ peran (Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator)
 - Lencana sidebar kini menghitung produk bulanan yang menunggu penetapan Pimpinan (status
   VALIDATED), bukan rekomendasi harian.
 - Imbauan bulanan: satu persetujuan per bulan (`advisory_approvals`); bot membaca
-  `approved` dari antrean. Keputusan 4 November (otomatis) direvisi oleh pemilik proyek (3A).
+  `approved` dari antrean. Keputusan 4 November (otomatis) direvisi oleh pemilik proyek (3A) —
+  lalu **3A dicabut 10 November 2026** (catatan 177): kembali otomatis, perintah `/info`.
 - Beranda `/ops` masih memuat ringkasan harian (peringatan, prediksi); penyusunan ulang
   beranda mengikuti siklus bulanan adalah pekerjaan berikutnya.

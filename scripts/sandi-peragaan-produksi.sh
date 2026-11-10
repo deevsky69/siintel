@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Menetapkan SATU kata sandi yang sama untuk keenam akun peragaan di PRODUKSI, lalu
+# Menetapkan SATU kata sandi yang sama untuk kelima akun peragaan di PRODUKSI, lalu
 # menulis ulang ~/siintel-demo-passwords.txt. Kata sandi diberikan lewat variabel
 # lingkungan supaya tidak masuk riwayat perintah sebagai argumen:
 #
@@ -18,7 +18,8 @@ fi
 
 COMPOSE=(docker compose --env-file .env.production -f infra/docker/docker-compose.prod.yml -f infra/docker/docker-compose.coolify.yml)
 PASSFILE="$HOME/siintel-demo-passwords.txt"
-AKUN=(demo.pimpinan demo.polsek demo.fungsi demo.admin demo.kasat demo.analis)
+# demo.kasat dikunci migrasi 0023 (10 November 2026) — tidak lagi diberi kata sandi.
+AKUN=(demo.pimpinan demo.polsek demo.fungsi demo.admin demo.analis)
 
 for akun in "${AKUN[@]}"; do
   echo "== $akun"
@@ -31,10 +32,10 @@ done
 umask 077
 {
   echo "PASSWORD AKUN DEMO — ditetapkan $(date +%F) lewat scripts/sandi-peragaan-produksi.sh"
-  echo "Satu kata sandi untuk keenam akun. Ganti setelah paparan."
+  echo "Satu kata sandi untuk kelima akun. Ganti setelah paparan."
   echo
   for akun in "${AKUN[@]}"; do echo "$akun $SANDI"; done
 } > "$PASSFILE"
 chmod 600 "$PASSFILE"
 echo
-echo "Selesai. Keenam akun memakai kata sandi yang sama; berkas $PASSFILE diperbarui (mode 600)."
+echo "Selesai. Kelima akun memakai kata sandi yang sama; berkas $PASSFILE diperbarui (mode 600)."

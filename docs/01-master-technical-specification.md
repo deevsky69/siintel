@@ -90,20 +90,22 @@ approved development plan rather than added indiscriminately.
 
 # 4. USER ROLES
 
-Enam peran (keputusan pemilik proyek 6 November 2026, 1B — mengikuti "Mekanisme dan Fungsi
-SIGAP"; sumber kebenaran `config/rbac/permissions.yaml`, matriks di docs/03):
+Lima peran (keputusan pemilik proyek 10 November 2026, 1B — catatan 177; sumber kebenaran
+`config/rbac/permissions.yaml`, matriks di docs/03):
 
 ## Level 1 — Pimpinan
 Menetapkan jumlah dan kelurahan prioritas beserta tindak lanjut (Kapolres / pejabat
 berwenang); menyetujui buletin dan imbauan publik.
 
-## Level 2 — Kasat Intelkam
-Memeriksa mutu analisis (tahap KBO) dan memvalidasi produk intelijen bulanan untuk
-disampaikan kepada Pimpinan.
+## Level 2 — (dibekukan) Kasat Intelkam
+Peran 6–10 November 2026 untuk tahap KBO dan validasi produk bulanan. Dibekukan 10 November
+2026: kedua tahap dihapus karena diklik orang yang sama berturut-turut tanpa menambah
+kontrol. Baris peran dihapus (0023) setelah pemegangnya dipindahkan ke Analis Intelkam; akun
+`demo.kasat` dikunci, bukan dihapus (jejak audit).
 
 ## Level 3 — Analis Intelkam
-Membekukan peringkat bulanan, menyusun dan memeriksa draf produk bulanan dengan informasi
-lapangan (terima / perbaiki / tolak, dengan alasan), dapat mencatat tahap KBO.
+Menyusun draf produk bulanan — peringkat bulan itu dibekukan sekaligus — memeriksanya dengan
+informasi lapangan (terima / perbaiki / tolak, dengan alasan), dan mengirimnya ke Pimpinan.
 
 ## Level 4 — Fungsi
 Fungsi pelaksana (Samapta / Binmas / Reskrim / Lantas): membaca produk bulanan dan
@@ -117,7 +119,8 @@ Konfigurasi teknis, pengguna, pembakuan data; menyusun draf produk bulanan bila 
 Tidak memeriksa, memvalidasi, menetapkan, maupun mencatat pelaksanaan.
 
 Sebelum 6 November 2026: Command Center dan Analyst dilebur ke Administrator (1 September
-2026); jenjang 2 dan 3 kini ditempati dua peran Satintelkam.
+2026). 6–10 November 2026 jenjang 2 dan 3 ditempati dua peran Satintelkam; sejak 10 November
+2026 hanya jenjang 3 (Analis Intelkam) yang berlaku.
 
 All important activities must be recorded in audit trail.
 
@@ -779,6 +782,8 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 | Jenis ancaman | 30 September 2026 | Mengikuti klasifikasi Laporan Polisi: **CURANMOR, CURAT, CURAS**. Bobot `pusiknas-2026-10-01` = angka U-02 utuh dengan `applies_to` tiga jenis; tujuh jenis rancangan sintetis dinyatakan `outside_scope` |
 | Jendela waktu | 30 September 2026 | Prediksi tetap **6 jam**; analitik menampilkan jam dalam **blok 3 jam** |
 | Taksonomi v2 (U-16) | 1 Oktober 2026 | `taksonomi-2026-10-01`: domain `data_group` dan `report_source` ditambahkan; nilai lama tidak berubah |
+| **Imbauan bulanan warga kembali otomatis; perintah bot `/info`** | 10 November 2026 | Pemilik proyek **mencabut 3A** (6 November 2026): imbauan ke grup WhatsApp warga dikirim bot setiap awal bulan **tanpa persetujuan Pimpinan**, dan `/info` (alias lama `/rekomendasi`, `/imbauan`) membalas imbauan bulan depan kapan saja. Endpoint `/advisories/approvals` dihapus, diganti `GET /advisories/preview` (pratinjau di Warga → Buletin & Imbauan); tabel `advisory_approvals` (0022) dibiarkan, tidak dibaca |
+| **Alur /ops diringkas** | 10 November 2026 | Keputusan pemilik proyek atas analisis birokrasi /ops (catatan 177): **1B** produk bulanan dua tahap — Analis menyusun (peringkat dibekukan otomatis) & memeriksa → Pimpinan menetapkan; tahap KBO/validasi dan peran **Kasat Intelkam dibekukan** (migrasi 0023: permission `monthly_product:review/validate` dihapus, akun `demo.kasat` dikunci, peran dihapus setelah pemegangnya dipindah ke Analis Intelkam) — kembali **lima peran**. **2.i** beranda menjadi papan "Bulan ini" per peran; **2.ii** Rencana Patroli keluar dari menu, perkiraan bulan sasaran menjadi lampiran Produk Bulanan tanpa persetujuan sendiri; **2.iii** buletin mingguan dan imbauan bulanan satu antrean persetujuan. Endpoint `/monthly-products/{month}/kbo` dan `/kasat` dihapus |
 | **Mekanisme dan Fungsi SIGAP menjadi acuan** | 6 November 2026 | Dokumen "Mekanisme dan Fungsi SIGAP" (lima modul, siklus bulanan, peringkat 65 kelurahan, empat tahap validasi, evaluasi cakupan) **menggantikan** keputusan harian sebelumnya. Keputusan pemilik proyek: (1B) enam peran — Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator; pemeriksaan KBO dicatat sebagai tahap, imbauan publik oleh Pimpinan; (2A) peringkat bulanan dimulai dari peta 3 bulan terakhir, model menyusul setelah diuji; (3A) imbauan bulanan ke grup warga perlu persetujuan sebelum terkirim. Menu dan teks layar diringkas. Tahapan: catatan 176. Modul 1 selesai 6 November 2026 (migrasi 0019) |
 | **Aplikasi berdiri di awal 2026** | 4 Oktober 2026 | Layar hanya memuat kejadian sampai 31 Desember 2025 (`DISPLAY_DATA_UNTIL`, saringan ORM global `services/visibility.py`); jam acuan `2026-01-01T00:00:00+07:00`. Kejadian 2026 tetap tersimpan, hanya dibaca pencocokan rencana patroli dan evaluasi mundur (3 Januari – 28 September 2026) |
 | **Rencana patroli tahunan** | 4 Oktober 2026 | Dari pola 2025 sistem mengusulkan slot kelurahan × blok 3 jam × jenis untuk 2026 (`/patrol-plan`), dicocokkan dengan kejadian nyata 2026 (`/patrol-plan/evaluation`). Parameter penyusunan (`config/patrol/plan-rules.yaml`) dan ukuran kemiripan resmi masih **PROPOSED** |

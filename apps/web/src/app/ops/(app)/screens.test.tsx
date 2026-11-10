@@ -63,6 +63,8 @@ describe("menu dan rutenya", () => {
       "peringatan",
       "prediksi",
       "rekomendasi",
+      // 10 November 2026: persetujuannya dilebur ke Produk Bulanan; layar tetap sebagai bacaan.
+      "rencana-patroli",
       "skoring",
     ];
     expect(onDisk.filter((name) => !inMenu.has(name)).sort()).toEqual(keptOffMenu);

@@ -4,6 +4,11 @@
  * imbauan yang beredar tetap dibaca aplikasi warga, dan dokumen intelijen tetap masuk
  * lewat formulir Input. Yang hilang hanya jalan masuknya dari menu.
  */
+/*
+ * 10 November 2026, keputusan pemilik proyek (2.ii): "Rencana Patroli" keluar dari menu.
+ * Perkiraan bulan depannya kini lampiran pada Produk Bulanan dan ikut penetapan Pimpinan —
+ * satu keputusan, bukan dua. Rute /ops/rencana-patroli dipertahankan sebagai bacaan.
+ */
 /**
  * Menu utama — kelompok dan submenu.
  *
@@ -108,14 +113,14 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: "Peringkat",
         icon: "analytics",
         permissions: ["ranking:read"],
-        hint: "65 kelurahan diurutkan untuk bulan depan",
+        hint: "65 kelurahan diurutkan untuk bulan depan; dibekukan saat draf disusun",
       },
       {
         href: "/ops/produk-bulanan",
         label: "Produk Bulanan",
         icon: "recommendation",
         permissions: ["monthly_product:read"],
-        hint: "Draf, pemeriksaan, penetapan, pelaksanaan",
+        hint: "Analis menyusun & memeriksa, Pimpinan menetapkan, Fungsi/Polsek mencatat",
       },
       {
         href: "/ops/evaluasi-bulanan",
@@ -123,13 +128,6 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         icon: "evaluation",
         permissions: ["evaluation:read"],
         hint: "Cakupan kejadian di kelurahan pilihan",
-      },
-      {
-        href: "/ops/rencana-patroli",
-        label: "Rencana Patroli",
-        icon: "operation",
-        permissions: ["recommendation:read"],
-        hint: "Slot patroli tahun ini dan perkiraan bulan depan",
       },
     ],
   },

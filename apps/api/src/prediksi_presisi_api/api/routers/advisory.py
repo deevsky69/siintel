@@ -3,15 +3,16 @@
 ```text
 POST /messaging/groups                     daftarkan grup (chat id) ke satu kelurahan   kunci bot
 GET  /messaging/groups?channel=&chat_id=   kelurahan yang terdaftar untuk grup itu
-GET  /messaging/advisory?kelurahan=&month= teks imbauan satu kelurahan (untuk /rekomendasi)
+GET  /messaging/advisory?kelurahan=&month= teks imbauan satu kelurahan (untuk /info)
 GET  /messaging/advisories/pending         grup terdaftar yang belum menerima imbauan bulan ini
 POST /messaging/advisories/sent            hasil pengiriman; menandai bulan terkirim
+GET  /advisories/preview?month=            (sesi, bulletin:read) contoh teks + jumlah grup
 ```
 
 Keputusan pemilik proyek 4 November 2026: grup berisi perwakilan RT/RW dan Babin; pengiriman
-awal bulan. DIREVISI 6 November 2026 (3A, dokumen mekanisme): imbauan bulan tertentu hanya
-terkirim — dan hanya dapat diminta lewat /rekomendasi — setelah **disetujui Pimpinan**
-(`advisory_approvals`, `POST /advisories/approvals`, `bulletin:approve`).
+awal bulan, otomatis. 6 November 2026 (3A) sempat menuntut persetujuan Pimpinan per bulan;
+**10 November 2026 pemilik proyek mencabutnya**: imbauan kembali otomatis tanpa persetujuan,
+dan perintah botnya `/info`. Tabel `advisory_approvals` (0022) dibiarkan — tidak dibaca lagi.
 Isinya imbauan warga (`services/citizen_advisory.py`), bukan rekomendasi operasional.
 """
 
@@ -25,7 +26,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ...models import AdvisoryApproval, Babinkamtibmas, Location
+from ...models import Babinkamtibmas, Location
 from ...services import audit, citizen_advisory, clock
 from ..deps import CurrentUser, get_db, require_permission
 from ..errors import ApiError
@@ -161,7 +162,6 @@ def advisory_text(
         raise ApiError(status.HTTP_404_NOT_FOUND, "Kelurahan tidak dikenal pada master lokasi.")
     today = clock.citizen_now().astimezone(clock.JAKARTA).date()
     year, month_number = _parse_month(month, default=citizen_advisory.month_after(today))
-    _require_approved(session, f"{year:04d}-{month_number:02d}")
     advisory = citizen_advisory.build_advisory(session, year, month_number, area[0])
     return {**advisory, "text": citizen_advisory.render_text(advisory)}
 
@@ -174,9 +174,6 @@ def advisory_text(
 def pending_advisories(session: Session = Depends(get_db)) -> dict[str, Any]:
     year, month_number = citizen_advisory.current_month()
     key = f"{year:04d}-{month_number:02d}"
-    if _approval(session, key) is None:
-        # Belum disetujui Pimpinan: tidak ada yang dikirim bulan ini (3A).
-        return {"month": key, "approved": False, "data": []}
     rows = session.scalars(
         select(Babinkamtibmas)
         .where(
@@ -198,7 +195,7 @@ def pending_advisories(session: Session = Depends(get_db)) -> dict[str, Any]:
                 "text": citizen_advisory.render_text(advisory),
             }
         )
-    return {"month": key, "approved": True, "data": data}
+    return {"month": key, "data": data}
 
 
 class SentRequest(BaseModel):
@@ -237,43 +234,31 @@ def advisory_sent(payload: SentRequest, session: Session = Depends(get_db)) -> d
 
 
 # ---------------------------------------------------------------------------------------
-# Persetujuan Pimpinan (keputusan 3A, 6 November 2026) — endpoint berkunci sesi, bukan bot.
+# Pratinjau untuk layar /ops/buletin — berkunci sesi, hanya membaca.
 # ---------------------------------------------------------------------------------------
 
 
-def _approval(session: Session, month: str) -> AdvisoryApproval | None:
-    return session.scalar(select(AdvisoryApproval).where(AdvisoryApproval.month == month))
-
-
-def _require_approved(session: Session, month: str) -> None:
-    if _approval(session, month) is None:
-        raise ApiError(
-            status.HTTP_409_CONFLICT,
-            f"Imbauan bulan {month} belum disetujui Pimpinan; belum dapat dibagikan.",
-        )
-
-
-class ApprovalRequest(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
-    month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
-    note: str | None = Field(default=None, max_length=500)
-
-
-@router.get("/advisories/approvals", summary="Status persetujuan imbauan bulanan + contoh teks")
-def approval_status(
+@router.get("/advisories/preview", summary="Contoh teks imbauan bulanan + jumlah grup terdaftar")
+def advisory_preview(
     session: Session = Depends(get_db),
     _: CurrentUser = require_permission("bulletin:read"),
     month: str | None = Query(default=None, description="YYYY-MM; bawaan bulan berjalan"),
 ) -> dict[str, Any]:
     year, month_number = _parse_month(month, default=citizen_advisory.current_month())
     key = f"{year:04d}-{month_number:02d}"
-    row = _approval(session, key)
     groups = int(
         session.scalar(
             select(func.count())
             .select_from(Babinkamtibmas)
             .where(Babinkamtibmas.whatsapp_group_chat_id.is_not(None))
+        )
+        or 0
+    )
+    sent = int(
+        session.scalar(
+            select(func.count())
+            .select_from(Babinkamtibmas)
+            .where(Babinkamtibmas.advisory_sent_month == key)
         )
         or 0
     )
@@ -292,41 +277,8 @@ def approval_status(
         sample = {"kelurahan": sample_area, "text": citizen_advisory.render_text(advisory)}
     return {
         "month": key,
-        "approved": row is not None,
-        "approved_at": row.approved_at if row else None,
-        "note": row.note if row else None,
+        "automatic": True,
         "groups_registered": groups,
+        "groups_sent": sent,
         "sample": sample,
     }
-
-
-@router.post(
-    "/advisories/approvals",
-    status_code=status.HTTP_201_CREATED,
-    summary="Menyetujui imbauan bulanan untuk dibagikan ke grup warga",
-)
-def approve_advisory(
-    payload: ApprovalRequest,
-    session: Session = Depends(get_db),
-    current: CurrentUser = require_permission("bulletin:approve"),
-) -> dict[str, Any]:
-    if _approval(session, payload.month) is not None:
-        raise ApiError(status.HTTP_409_CONFLICT, f"Imbauan {payload.month} sudah disetujui.")
-    row = AdvisoryApproval(
-        month=payload.month,
-        approved_by=current.user.user_id,
-        note=(payload.note or "").strip() or None,
-    )
-    session.add(row)
-    audit.record(
-        session,
-        action="APPROVE_CITIZEN_ADVISORY",
-        resource_type="advisory",
-        result=audit.RESULT_SUCCESS,
-        user_id=current.user.user_id,
-        resource_id=payload.month,
-        detail={"note": row.note},
-    )
-    session.commit()
-    session.refresh(row)
-    return {"month": row.month, "approved": True, "approved_at": row.approved_at, "note": row.note}
