@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Panel } from "@/components/panel";
+import { ScreenTabs } from "@/components/shell/screen-tabs";
 import { areaOf, getCitizenReports, labelOf, REPORT_STATUS_LABELS } from "@/lib/community";
 import {
   byPolsek,
@@ -15,6 +16,12 @@ import type { LocationGroup, TriageReport } from "./options";
 import { TriageForm } from "./triage-form";
 
 export const dynamic = "force-dynamic";
+
+const SCREEN_TABS = [
+  { href: "/ops/laporan-petugas", label: "Daftar kejadian" },
+  { href: "/ops/input?formulir=kejadian", label: "+ Catat kejadian", permission: "crime:write" },
+  { href: "/ops/pembakuan", label: "Pembakuan", permission: "crime:triage" },
+] as const;
 
 /**
  * Input Data (TASK 132) — pintu masuk data ke sistem.
@@ -127,81 +134,84 @@ export default async function DataEntryPage({
   const current = TABS.find((tab) => tab.key === active) ?? TABS[0];
 
   return (
-    <Panel title={`Input Data — ${current.label}`}>
-      <nav aria-label="Formulir pemasukan data" className="flex flex-wrap gap-2">
-        {TABS.map((tab) => (
-          <Link
-            key={tab.key}
-            href={`/ops/input?formulir=${tab.key}`}
-            aria-current={tab.key === active ? "page" : undefined}
-            className={`rounded border px-3 py-1.5 font-heading text-xs font-semibold uppercase tracking-wider transition ${
-              tab.key === active ? TAB_ACTIVE : TAB_IDLE
-            }`}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </nav>
+    <div className="space-y-3">
+      <ScreenTabs tabs={SCREEN_TABS} current="/ops/input" permissions={profile.permissions} />
+      <Panel title={`Input Data — ${current.label}`}>
+        <nav aria-label="Formulir pemasukan data" className="flex flex-wrap gap-2">
+          {TABS.map((tab) => (
+            <Link
+              key={tab.key}
+              href={`/ops/input?formulir=${tab.key}`}
+              aria-current={tab.key === active ? "page" : undefined}
+              className={`rounded border px-3 py-1.5 font-heading text-xs font-semibold uppercase tracking-wider transition ${
+                tab.key === active ? TAB_ACTIVE : TAB_IDLE
+              }`}
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </nav>
 
-      <p className="mt-3 border-b border-base-800 pb-3 text-2xs leading-relaxed text-ink-muted">
-        Nilai taksonomi mengikuti <code>config/taxonomy/mappings.yaml</code> versi{" "}
-        <span className="font-mono">{options.taxonomy_version}</span>, berstatus{" "}
-        <span className="font-mono">{options.taxonomy_status}</span> (U-16)
-        {options.taxonomy_status === "FINAL"
-          ? " — ditetapkan pemilik proyek; nilai baru menuntut versi baru."
-          : " — belum ditetapkan."}{" "}
-        {options.demo_clock
-          ? `Waktu acuan aplikasi beku pada ${maxDate}; tanggal setelah itu ditolak backend.`
-          : "Aplikasi memakai waktu sebenarnya."}
-      </p>
+        <p className="mt-3 border-b border-base-800 pb-3 text-2xs leading-relaxed text-ink-muted">
+          Nilai taksonomi mengikuti <code>config/taxonomy/mappings.yaml</code> versi{" "}
+          <span className="font-mono">{options.taxonomy_version}</span>, berstatus{" "}
+          <span className="font-mono">{options.taxonomy_status}</span> (U-16)
+          {options.taxonomy_status === "FINAL"
+            ? " — ditetapkan pemilik proyek; nilai baru menuntut versi baru."
+            : " — belum ditetapkan."}{" "}
+          {options.demo_clock
+            ? `Waktu acuan aplikasi beku pada ${maxDate}; tanggal setelah itu ditolak backend.`
+            : "Aplikasi memakai waktu sebenarnya."}
+        </p>
 
-      <div className="mt-4">
-        {active === "kejadian" ? (
-          allows("crime:write") ? (
-            <CrimeForm
-              incidentTypes={options.incident_type}
-              statuses={options.crime_status}
-              locations={locationGroups}
-              locationTypes={options.suggestions.location_type ?? []}
-              modusOptions={options.suggestions.modus ?? []}
-              targetTypes={options.suggestions.target_type ?? []}
-              maxDate={maxDate}
-              demoClock={options.demo_clock}
-            />
-          ) : (
-            <Unauthorized noun={current.noun} />
-          )
-        ) : null}
+        <div className="mt-4">
+          {active === "kejadian" ? (
+            allows("crime:write") ? (
+              <CrimeForm
+                incidentTypes={options.incident_type}
+                statuses={options.crime_status}
+                locations={locationGroups}
+                locationTypes={options.suggestions.location_type ?? []}
+                modusOptions={options.suggestions.modus ?? []}
+                targetTypes={options.suggestions.target_type ?? []}
+                maxDate={maxDate}
+                demoClock={options.demo_clock}
+              />
+            ) : (
+              <Unauthorized noun={current.noun} />
+            )
+          ) : null}
 
-        {active === "intelijen" ? (
-          allows("intelligence:write") ? (
-            <IntelligenceForm
-              statuses={options.intelligence_status}
-              impacts={options.impact}
-              locations={locationGroups}
-              categories={options.suggestions.intelligence_category ?? []}
-              reliabilities={options.suggestions.reliability ?? []}
-              maxDate={maxDate}
-              demoClock={options.demo_clock}
-            />
-          ) : (
-            <Unauthorized noun={current.noun} extra={INTELLIGENCE_NOTE} />
-          )
-        ) : null}
+          {active === "intelijen" ? (
+            allows("intelligence:write") ? (
+              <IntelligenceForm
+                statuses={options.intelligence_status}
+                impacts={options.impact}
+                locations={locationGroups}
+                categories={options.suggestions.intelligence_category ?? []}
+                reliabilities={options.suggestions.reliability ?? []}
+                maxDate={maxDate}
+                demoClock={options.demo_clock}
+              />
+            ) : (
+              <Unauthorized noun={current.noun} extra={INTELLIGENCE_NOTE} />
+            )
+          ) : null}
 
-        {active === "triase" ? (
-          allows("citizen_report:write") ? (
-            <TriageForm
-              reports={triageReports}
-              statuses={options.citizen_report_status}
-              verificationBasis={options.verification_basis}
-              transitionBasis={options.transition_basis}
-            />
-          ) : (
-            <Unauthorized noun={current.noun} />
-          )
-        ) : null}
-      </div>
-    </Panel>
+          {active === "triase" ? (
+            allows("citizen_report:write") ? (
+              <TriageForm
+                reports={triageReports}
+                statuses={options.citizen_report_status}
+                verificationBasis={options.verification_basis}
+                transitionBasis={options.transition_basis}
+              />
+            ) : (
+              <Unauthorized noun={current.noun} />
+            )
+          ) : null}
+        </div>
+      </Panel>
+    </div>
   );
 }

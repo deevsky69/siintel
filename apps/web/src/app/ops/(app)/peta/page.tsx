@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { toHistoricalMonths, toMapLayer, toMapLevel } from "@/components/map/area";
 import { RiskMap } from "@/components/map/risk-map";
@@ -8,6 +9,7 @@ import {
   getMapData,
   resolveSelectedDistrict,
 } from "@/lib/map-data";
+import { getPriorityKelurahan } from "@/lib/monthly-products";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +48,12 @@ export default async function PetaPage({
   const selectedKelurahan =
     level === "kelurahan" && typeof params.kelurahan === "string" ? params.kelurahan : null;
 
-  const data = await getMapData(undefined, months);
+  const [data, priority] = await Promise.all([
+    getMapData(undefined, months),
+    // Kelurahan prioritas bulan ini (produk bulanan terakhir yang ditetapkan Pimpinan);
+    // kegagalan memuatnya tidak menjatuhkan peta.
+    getPriorityKelurahan().catch(() => null),
+  ]);
   const hasData = data.districts.some(
     (district) =>
       district.historical !== null || district.current !== null || district.predictive !== null,
@@ -70,15 +77,46 @@ export default async function PetaPage({
   ]);
 
   return (
-    <RiskMap
-      data={data}
-      selected={selected}
-      detail={detail}
-      layer={layer}
-      months={months}
-      level={level}
-      overlay={overlay}
-      selectedKelurahan={selectedKelurahan}
-    />
+    <div className="space-y-3">
+      {priority && priority.items.length > 0 ? (
+        <Panel
+          title={`Kelurahan prioritas ${priority.month}`}
+          action={
+            <Link href={`/ops/produk-bulanan?bulan=${priority.month}`} className="panel-action">
+              Produk bulanan →
+            </Link>
+          }
+        >
+          <ul className="flex flex-wrap gap-2 text-xs">
+            {priority.items.map((item) => (
+              <li key={item.kelurahan}>
+                <Link
+                  href={`/ops/peta?wilayah=${encodeURIComponent(item.kecamatan)}&tingkat=kelurahan&kelurahan=${encodeURIComponent(item.kelurahan)}`}
+                  className="inline-flex items-center gap-1.5 rounded border border-[#C1801E]/60 bg-[#C1801E]/10 px-2 py-1 text-ink"
+                >
+                  <span className="h-2 w-2 bg-[#C1801E]" aria-hidden="true" />
+                  {item.kelurahan}
+                  <span className="text-ink-faint">· {item.kecamatan}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-2xs text-ink-faint">
+            Ditetapkan Pimpinan pada produk bulanan; digarisi emas pada peta tingkat kelurahan.
+          </p>
+        </Panel>
+      ) : null}
+      <RiskMap
+        data={data}
+        selected={selected}
+        detail={detail}
+        layer={layer}
+        months={months}
+        level={level}
+        overlay={overlay}
+        selectedKelurahan={selectedKelurahan}
+        priority={priority?.items.map((item) => item.kelurahan) ?? []}
+      />
+    </div>
   );
 }

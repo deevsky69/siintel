@@ -21,11 +21,17 @@ bukan dia.
 Hasilnya berbeda-beda menurut peran, dan itu memang yang diminta:
 
 ```text
-Pimpinan       rekomendasi menunggu keputusan
-Polsek         peringatan belum diterima · laporan warga belum diverifikasi
-Fungsi         (tidak ada antrean; kewenangannya menulis kejadian dan patroli)
-Administrator  peringatan · laporan warga · prediksi draf · keputusan belum ditindaklanjuti
+Pimpinan       produk bulanan menunggu penetapan · buletin menunggu persetujuan
+Analis         draf produk bulanan belum dikirim
+Polsek         permintaan bantuan darurat (panic)
+Fungsi         (tidak ada antrean selain darurat)
+Administrator  darurat · laporan warga belum diverifikasi · ulasan menunggu moderasi · draf produk
 ```
+
+12 November 2026 (catatan 179): kelompok rantai harian — peringatan, rekomendasi harian,
+prediksi draf, keputusan belum ditindaklanjuti, rencana patroli — dihapus dari antrean.
+Layarnya sudah keluar dari menu sejak 6 November, dan lonceng yang masih menunjuk ke sana
+menyeret pengguna ke rantai yang tidak lagi dipaparkan.
 
 ## Yang sengaja TIDAK dikerjakan di sini
 
@@ -46,19 +52,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session
 
-from ...models import (
-    AreaReview,
-    CitizenReport,
-    CommanderDecision,
-    EarlyWarning,
-    Location,
-    OperationalAction,
-    PanicEvent,
-    Prediction,
-    Recommendation,
-)
+from ...models import AreaReview, Bulletin, CitizenReport, Location, MonthlyProduct, PanicEvent
 from ...services import clock
-from ...services import patrol_plan as planning
+from ...services import monthly_product as products
 from ..deps import CurrentUser, get_db, jurisdiction_filter, require_permission
 from .public_intake import load_urgent_categories
 
@@ -143,114 +139,93 @@ def notifications(
             }
         )
 
-    # --- Peringatan yang belum diterima siapa pun -------------------------------------
-    if _holds(current, "warning:acknowledge"):
-        polsek = jurisdiction_filter(current, "warning:read")
-        rows = session.execute(
-            _scoped(
-                select(EarlyWarning, Location.kecamatan)
-                .join(Location, Location.location_id == EarlyWarning.location_id)
-                .where(EarlyWarning.status == "ACTIVE")
-                .order_by(EarlyWarning.risk_score.desc()),
-                polsek,
-            ).limit(SAMPLE_LIMIT)
+    # --- Produk bulanan (Modul 4 mekanisme; dua tahap sejak 10 November 2026) -----------
+    # Pimpinan: produk yang menunggu penetapan. Analis/Administrator: draf yang belum
+    # diperiksa dan dikirim. Keduanya permission tindakan, bukan permission baca.
+    if _holds(current, "monthly_product:decide"):
+        rows = session.scalars(
+            select(MonthlyProduct)
+            .where(MonthlyProduct.status.in_(products.AWAITING_DECISION))
+            .order_by(MonthlyProduct.target_month.desc())
+            .limit(SAMPLE_LIMIT)
         ).all()
         total = session.scalar(
-            _scoped(
-                select(func.count())
-                .select_from(EarlyWarning)
-                .join(Location, Location.location_id == EarlyWarning.location_id)
-                .where(EarlyWarning.status == "ACTIVE"),
-                polsek,
-            )
+            select(func.count())
+            .select_from(MonthlyProduct)
+            .where(MonthlyProduct.status.in_(products.AWAITING_DECISION))
         )
         groups.append(
             {
-                "kind": "WARNING",
-                "title": "Peringatan belum diterima",
-                "action": "Terima atau selesaikan",
-                "href": "/ops/peringatan",
+                "kind": "MONTHLY_PRODUCT",
+                "title": "Produk bulanan menunggu penetapan Anda",
+                "action": "Tetapkan jumlah dan kelurahan prioritas",
+                "href": "/ops/produk-bulanan",
                 "total": int(total or 0),
                 "items": [
                     {
-                        "code": warning.code,
-                        "headline": f"{warning.severity} — {warning.threat_type}",
-                        "detail": f"{kecamatan} · skor {warning.risk_score}",
+                        "code": product.target_month.isoformat()[:7],
+                        "headline": f"Produk bulan {product.target_month.isoformat()[:7]}",
+                        "detail": "Sudah diperiksa Analis; menunggu penetapan",
                     }
-                    for warning, kecamatan in rows
+                    for product in rows
+                ],
+            }
+        )
+    elif _holds(current, "monthly_product:draft"):
+        rows = session.scalars(
+            select(MonthlyProduct)
+            .where(MonthlyProduct.status == "DRAFT")
+            .order_by(MonthlyProduct.target_month.desc())
+            .limit(SAMPLE_LIMIT)
+        ).all()
+        total = session.scalar(
+            select(func.count()).select_from(MonthlyProduct).where(MonthlyProduct.status == "DRAFT")
+        )
+        groups.append(
+            {
+                "kind": "MONTHLY_PRODUCT",
+                "title": "Draf produk bulanan belum dikirim",
+                "action": "Periksa usulan lalu kirim ke Pimpinan",
+                "href": "/ops/produk-bulanan",
+                "total": int(total or 0),
+                "items": [
+                    {
+                        "code": product.target_month.isoformat()[:7],
+                        "headline": f"Draf bulan {product.target_month.isoformat()[:7]}",
+                        "detail": "Terima, perbaiki, atau tolak tiap usulan dengan alasan",
+                    }
+                    for product in rows
                 ],
             }
         )
 
-    # --- Rencana patroli tahunan yang belum diputus (5 Oktober 2026) -------------------
-    if _holds(current, "commander_decision:approve"):
-        polsek = jurisdiction_filter(current, "commander_decision:approve")
-        try:
-            plan = planning.build_plan(session, polsek)
-        except planning.PatrolPlanError:
-            plan = None
-        if plan is not None and any(threat.slots for threat in plan.threats):
-            decision = planning.latest_decision(session, plan.target_year, polsek)
-            if decision is None:
-                proposed = sum(len(threat.slots) for threat in plan.threats)
-                groups.append(
-                    {
-                        "kind": "PATROL_PLAN",
-                        "title": f"Rencana patroli {plan.target_year} belum diputus",
-                        "action": "Setujui, setujui sebagian, atau tolak",
-                        "href": "/ops/rencana-patroli",
-                        "total": 1,
-                        "items": [
-                            {
-                                "code": f"RENCANA-{plan.target_year}",
-                                "headline": (
-                                    f"{proposed} slot usulan dari pola {plan.basis_from.year}"
-                                ),
-                                "detail": (
-                                    "Usulan belum menjadi rencana yang berlaku sampai diputus"
-                                ),
-                            }
-                        ],
-                    }
-                )
-
-    # --- Rekomendasi yang menunggu keputusan komandan ---------------------------------
-    if _holds(current, "commander_decision:approve"):
-        polsek = jurisdiction_filter(current, "recommendation:read")
-        rows = session.execute(
-            _scoped(
-                select(Recommendation, Location.kecamatan)
-                .join(Prediction, Prediction.prediction_id == Recommendation.prediction_id)
-                .join(Location, Location.location_id == Prediction.location_id)
-                .where(Recommendation.status == "PENDING_REVIEW")
-                .order_by(Prediction.risk_score.desc()),
-                polsek,
-            ).limit(SAMPLE_LIMIT)
+    # --- Buletin mingguan menunggu persetujuan Pimpinan ----------------------------------
+    if _holds(current, "bulletin:approve"):
+        rows = session.scalars(
+            select(Bulletin)
+            .where(Bulletin.status == "DRAFT")
+            .order_by(Bulletin.week_start.desc(), Bulletin.kelurahan)
+            .limit(SAMPLE_LIMIT)
         ).all()
         total = session.scalar(
-            _scoped(
-                select(func.count())
-                .select_from(Recommendation)
-                .join(Prediction, Prediction.prediction_id == Recommendation.prediction_id)
-                .join(Location, Location.location_id == Prediction.location_id)
-                .where(Recommendation.status == "PENDING_REVIEW"),
-                polsek,
-            )
+            select(func.count()).select_from(Bulletin).where(Bulletin.status == "DRAFT")
         )
         groups.append(
             {
-                "kind": "DECISION",
-                "title": "Menunggu keputusan Anda",
-                "action": "Setujui, modifikasi, atau tolak",
-                "href": "/ops/rekomendasi",
+                "kind": "BULLETIN",
+                "title": "Buletin kelurahan menunggu persetujuan",
+                "action": "Setujui agar bot mengirimnya",
+                "href": "/ops/buletin",
                 "total": int(total or 0),
                 "items": [
                     {
-                        "code": recommendation.code,
-                        "headline": f"Untuk {recommendation.recommended_function}",
-                        "detail": f"{kecamatan} · {recommendation.recommendation_text[:70]}",
+                        "code": str(bulletin.bulletin_id),
+                        "headline": (
+                            f"{bulletin.kelurahan} · minggu {bulletin.week_start.isoformat()}"
+                        ),
+                        "detail": "Disusun sistem dari kejadian minggu lalu",
                     }
-                    for recommendation, kecamatan in rows
+                    for bulletin in rows
                 ],
             }
         )
@@ -334,89 +309,6 @@ def notifications(
                         "detail": (review.comment or "")[:70] or "Tanpa komentar.",
                     }
                     for review in pending_reviews
-                ],
-            }
-        )
-
-    # --- Prediksi yang belum dipublikasikan -------------------------------------------
-    if _holds(current, "prediction:publish"):
-        polsek = jurisdiction_filter(current, "prediction:read")
-        total = session.scalar(
-            _scoped(
-                select(func.count())
-                .select_from(Prediction)
-                .join(Location, Location.location_id == Prediction.location_id)
-                .where(Prediction.status == "DRAFT"),
-                polsek,
-            )
-        )
-        rows = session.execute(
-            _scoped(
-                select(Prediction, Location.kecamatan)
-                .join(Location, Location.location_id == Prediction.location_id)
-                .where(Prediction.status == "DRAFT")
-                .order_by(Prediction.risk_score.desc()),
-                polsek,
-            ).limit(SAMPLE_LIMIT)
-        ).all()
-        groups.append(
-            {
-                "kind": "PREDICTION",
-                "title": "Prediksi belum dipublikasikan",
-                "action": "Tinjau lalu publikasikan",
-                "href": "/ops/prediksi",
-                "total": int(total or 0),
-                "items": [
-                    {
-                        "code": prediction.code,
-                        "headline": prediction.threat_type,
-                        "detail": f"{kecamatan} · skor {prediction.risk_score}",
-                    }
-                    for prediction, kecamatan in rows
-                ],
-            }
-        )
-
-    # --- Keputusan yang belum berubah menjadi tindakan --------------------------------
-    if _holds(current, "operation:write"):
-        polsek = jurisdiction_filter(current, "operation:read")
-        pending = (
-            select(CommanderDecision, Location.kecamatan)
-            .join(
-                Recommendation,
-                Recommendation.recommendation_id == CommanderDecision.recommendation_id,
-            )
-            .join(Prediction, Prediction.prediction_id == Recommendation.prediction_id)
-            .join(Location, Location.location_id == Prediction.location_id)
-            .where(
-                CommanderDecision.decision.in_(("APPROVED", "MODIFIED")),
-                ~select(OperationalAction.action_id)
-                .where(OperationalAction.decision_id == CommanderDecision.decision_id)
-                .exists(),
-            )
-        )
-        rows = session.execute(
-            _scoped(pending.order_by(CommanderDecision.decision_at.desc()), polsek).limit(
-                SAMPLE_LIMIT
-            )
-        ).all()
-        total = session.scalar(
-            select(func.count()).select_from(_scoped(pending, polsek).subquery())
-        )
-        groups.append(
-            {
-                "kind": "OPERATION",
-                "title": "Keputusan belum ditindaklanjuti",
-                "action": "Catat tindakan operasional",
-                "href": "/ops/operasi",
-                "total": int(total or 0),
-                "items": [
-                    {
-                        "code": decision.code,
-                        "headline": f"Keputusan {decision.decision}",
-                        "detail": f"{kecamatan} · belum ada tindakan tercatat",
-                    }
-                    for decision, kecamatan in rows
                 ],
             }
         )

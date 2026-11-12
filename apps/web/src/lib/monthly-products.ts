@@ -104,3 +104,28 @@ export const recordAction = (
 /** Produk bulanan yang menunggu penetapan Pimpinan — lencana sidebar. */
 export const countAwaitingDecision = async (): Promise<number> =>
   (await listProducts()).data.filter((row) => isAwaitingDecision(row.status)).length;
+
+/**
+ * Kelurahan prioritas bulan ini: dari produk bulanan terakhir yang DITETAPKAN Pimpinan.
+ * Dipakai peta (/ops/peta, beranda) untuk menggarisi kelurahan itu — pengganti lapisan skor
+ * harian (12 November 2026, catatan 179). `null` bila belum ada produk yang ditetapkan.
+ */
+export async function getPriorityKelurahan(): Promise<{
+  month: string;
+  items: { kelurahan: string; kecamatan: string; polsek: string }[];
+} | null> {
+  const list = await listProducts();
+  const decided = list.data.find((row) => row.status === "DECIDED");
+  if (!decided) return null;
+  const product = await getProduct(decided.target_month);
+  return {
+    month: product.target_month,
+    items: product.items
+      .filter((item) => item.selected)
+      .map((item) => ({
+        kelurahan: item.kelurahan,
+        kecamatan: item.kecamatan,
+        polsek: item.polsek,
+      })),
+  };
+}

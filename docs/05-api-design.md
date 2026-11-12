@@ -611,7 +611,7 @@ mencatat `channel` tanpa `chat_id`.
 | GET | `/dashboard/trends` | `dashboard:read` |
 | GET | `/dashboard/active-warnings` | `dashboard:read`, `warning:read` |
 | GET | `/dashboard/leadership` | `dashboard:read` — ✅ **ADA** |
-| GET | `/notifications` | `dashboard:read` — ✅ **ADA** |
+| GET | `/notifications` | `dashboard:read` — ✅ **ADA**; sejak 12 November 2026 kelompoknya: `PANIC`, `MONTHLY_PRODUCT` (decide: menunggu penetapan; draft: draf belum dikirim), `BULLETIN` (`bulletin:approve`), `CITIZEN_REPORT`, `REVIEW` — kelompok rantai harian `WARNING`/`DECISION`/`PREDICTION`/`OPERATION`/`PATROL_PLAN` dihapus (catatan 179) |
 
 **`/dashboard/leadership` (TASK 150).** Permintaan pemilik proyek, 2 September 2026: layar
 beranda yang tersusun mengikuti urutan pertanyaan seorang pimpinan, bukan urutan

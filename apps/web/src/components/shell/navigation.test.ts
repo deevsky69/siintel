@@ -65,14 +65,12 @@ describe("susunan menu", () => {
     // evaluasi. Tanpa evaluasi tidak ada yang menunjukkan peringkatnya pernah diuji.
     const routes = NAV_ITEMS.map((item) => item.href);
 
-    for (const href of [
-      "/ops/peringkat",
-      "/ops/produk-bulanan",
-      "/ops/evaluasi-bulanan",
-      "/ops/pembakuan",
-    ]) {
+    for (const href of ["/ops/produk-bulanan", "/ops/evaluasi-bulanan"]) {
       expect(routes, `${href} hilang dari menu`).toContain(href);
     }
+    // 12 November 2026: Peringkat dan Pembakuan menjadi tab, kelompoknya tetap dikenali.
+    expect(groupOf("/ops/peringkat")).toBe("bulanan");
+    expect(groupOf("/ops/pembakuan")).toBe("laporan");
     // Layar harian keluar dari menu (rutenya tetap ada).
     for (const href of ["/ops/prediksi", "/ops/peringatan", "/ops/skoring", "/ops/rekomendasi"]) {
       expect(routes, `${href} masih di menu`).not.toContain(href);
@@ -81,14 +79,20 @@ describe("susunan menu", () => {
 });
 
 describe("penyaringan menu menurut kewenangan", () => {
-  it("menyembunyikan Input Data dari peran tanpa satu pun izin tulis", () => {
-    const readerOnly = ["dashboard:read", "crime:read", "citizen_report:read"];
-
-    expect(visibleNavItems(readerOnly).map((item) => item.href)).not.toContain("/ops/input");
-  });
-
-  it("menampilkan Input Data begitu satu izin tulis dipegang", () => {
-    expect(visibleNavItems(["crime:write"]).map((item) => item.href)).toContain("/ops/input");
+  it("tidak lagi memuat Input Data, Pembakuan, Peringkat, Pola, Wilayah Rawan, dan Pengaturan (12 November 2026)", () => {
+    // Semuanya dicapai lewat tab di layar induknya atau alamat langsung — catatan 179.
+    const routes = NAV_ITEMS.map((item) => item.href);
+    for (const gone of [
+      "/ops/input",
+      "/ops/pembakuan",
+      "/ops/peringkat",
+      "/ops/pola",
+      "/ops/wilayah",
+      "/ops/pengaturan",
+    ]) {
+      expect(routes).not.toContain(gone);
+    }
+    expect(NAV_ITEMS).toHaveLength(14);
   });
 
   it("membuang kelompok yang tidak menyisakan satu pun submenu", () => {
@@ -109,9 +113,8 @@ describe("penyaringan menu menurut kewenangan", () => {
     const routes = visibleNavItems(PIMPINAN).map((item) => item.href);
 
     expect(routes).not.toContain("/ops/admin");
-    expect(routes).not.toContain("/ops/input");
     expect(routes).toContain("/ops/audit");
-    expect(routes).toContain("/ops/pengaturan");
+    expect(routes).toContain("/ops/evaluasi-bulanan");
   });
 });
 

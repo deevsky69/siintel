@@ -25,6 +25,7 @@ export function RiskMap({
   level,
   overlay = null,
   selectedKelurahan = null,
+  priority = [],
 }: {
   data: MapData;
   selected: string | null;
@@ -36,6 +37,8 @@ export function RiskMap({
   overlay?: KelurahanOverlay | null;
   /** Kelurahan yang rinciannya sedang dibuka; hanya berarti pada tingkat `kelurahan`. */
   selectedKelurahan?: string | null;
+  /** Kelurahan prioritas bulan ini (produk bulanan yang ditetapkan) — digarisi emas. */
+  priority?: readonly string[];
 }) {
   // Pada tingkat kelurahan kanvas menggambar baris kelurahan, dan skala kepekatan historis
   // mengikuti puncak antar-kelurahan — bukan puncak antar-kecamatan, yang akan membuat
@@ -92,21 +95,26 @@ export function RiskMap({
           </nav>
 
           <nav aria-label="Layer peta" className="flex flex-wrap items-center gap-2">
-            {MAP_LAYERS.map((option) => (
-              <Link
-                key={option.id}
-                href={mapHref(selected, option.id, months)}
-                scroll={false}
-                aria-current={layer === option.id ? "true" : undefined}
-                className={`rounded border px-2.5 py-1 text-xs uppercase tracking-wider transition-colors ${
-                  layer === option.id
-                    ? "border-accent/60 bg-accent/10 text-accent"
-                    : "border-base-800 text-ink-muted hover:text-ink"
-                }`}
-              >
-                {option.label}
-              </Link>
-            ))}
+            {/* 12 November 2026: lapisan skor harian keluar dari pemilih; yang tampil
+                hanya historis, ditambah lapisan harian bila memang sedang dibuka lewat
+                alamat lama — supaya tautan lama tidak kehilangan konteksnya. */}
+            {MAP_LAYERS.filter((option) => option.id === "historical" || option.id === layer).map(
+              (option) => (
+                <Link
+                  key={option.id}
+                  href={mapHref(selected, option.id, months)}
+                  scroll={false}
+                  aria-current={layer === option.id ? "true" : undefined}
+                  className={`rounded border px-2.5 py-1 text-xs uppercase tracking-wider transition-colors ${
+                    layer === option.id
+                      ? "border-accent/60 bg-accent/10 text-accent"
+                      : "border-base-800 text-ink-muted hover:text-ink"
+                  }`}
+                >
+                  {option.label}
+                </Link>
+              ),
+            )}
             <span className="text-2xs text-ink-faint">
               {layer === "historical"
                 ? `${data.historical.windowFrom} s.d. ${data.historical.windowTo}`
@@ -163,6 +171,7 @@ export function RiskMap({
             months={months}
             level={level}
             focus={selected}
+            priority={priority}
           />
 
           <RiskLegend

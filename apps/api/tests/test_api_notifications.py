@@ -27,15 +27,9 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.main import app
-from prediksi_presisi_api.models import (
-    CitizenReport,
-    EarlyWarning,
-    Location,
-    Recommendation,
-    Role,
-    User,
-)
+from prediksi_presisi_api.models import CitizenReport, Location, MonthlyProduct, Role, User
 from prediksi_presisi_api.security.passwords import hash_password
+from prediksi_presisi_api.services.monthly_product import AWAITING_DECISION
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 PASSWORD = "KataSandiUji#2026"  # noqa: S105
@@ -117,7 +111,8 @@ def test_a_leader_is_told_about_decisions_only_they_can_make(
 
     kinds = _kinds(_feed(client, leader))
 
-    assert "DECISION" in kinds, "Pimpinan memegang commander_decision:approve"
+    assert "MONTHLY_PRODUCT" in kinds, "Pimpinan memegang monthly_product:decide"
+    assert "BULLETIN" in kinds, "Pimpinan memegang bulletin:approve"
 
 
 def test_a_leader_is_not_told_about_work_they_cannot_do(
@@ -125,8 +120,8 @@ def test_a_leader_is_not_told_about_work_they_cannot_do(
 ) -> None:
     """Inilah pembeda antara antrean tugas dan umpan berita.
 
-    Pimpinan **dapat membaca** laporan masyarakat dan peringatan, tetapi tidak dapat
-    memverifikasi maupun menerimanya. Memberitahunya hanya menambah kecemasan tanpa jalan
+    Pimpinan **dapat membaca** laporan masyarakat dan ulasan warga, tetapi tidak dapat
+    memverifikasi maupun memoderasinya. Memberitahunya hanya menambah kecemasan tanpa jalan
     keluar — dan lencana yang selalu merah berhenti dilihat orang.
     """
     leader = _make_user(session, "Pimpinan")
@@ -134,8 +129,21 @@ def test_a_leader_is_not_told_about_work_they_cannot_do(
     kinds = _kinds(_feed(client, leader))
 
     assert "CITIZEN_REPORT" not in kinds, "Pimpinan tidak memegang citizen_report:triage"
-    assert "WARNING" not in kinds, "Pimpinan tidak memegang warning:acknowledge"
-    assert "PREDICTION" not in kinds, "Pimpinan tidak memegang prediction:publish"
+    assert "REVIEW" not in kinds, "Pimpinan tidak memegang review:moderate"
+
+
+def test_the_daily_chain_is_gone_from_the_queue(client: TestClient, session: Session) -> None:
+    """12 November 2026 (catatan 179): peringatan, rekomendasi harian, prediksi draf,
+    operasi, dan rencana patroli tidak lagi menjadi antrean — layarnya sudah keluar dari
+    menu, dan lonceng tidak boleh menyeret pengguna ke sana."""
+    polsek = session.scalar(
+        select(Location.polsek).where(Location.polsek.is_not(None)).order_by(Location.polsek)
+    )
+    for role in ("Pimpinan", "Administrator", "Polsek"):
+        user = _make_user(session, role, polsek=polsek if role == "Polsek" else None)
+        kinds = _kinds(_feed(client, user))
+        for gone in ("WARNING", "DECISION", "PREDICTION", "OPERATION", "PATROL_PLAN"):
+            assert gone not in kinds, f"{role} masih menerima {gone}"
 
 
 def test_a_polsek_officer_is_told_about_the_work_they_do(
@@ -149,10 +157,24 @@ def test_a_polsek_officer_is_told_about_the_work_they_do(
 
     kinds = _kinds(_feed(client, officer))
 
-    assert "WARNING" in kinds, "Polsek memegang warning:acknowledge"
+    assert "PANIC" in kinds, "Polsek memegang panic:read"
     # 9 Oktober 2026: triase hanya Administrator; Polsek tidak lagi menerima antrean ini.
     assert "CITIZEN_REPORT" not in kinds, "Polsek tidak memegang citizen_report:triage"
-    assert "DECISION" not in kinds, "yang memutuskan rekomendasi bukan Polsek"
+    assert "MONTHLY_PRODUCT" not in kinds, "yang menetapkan produk bulanan bukan Polsek"
+
+
+def test_an_analyst_is_told_about_drafts_not_decisions(
+    client: TestClient, session: Session
+) -> None:
+    analyst = _make_user(session, "Analis Intelkam")
+    groups = _feed(client, analyst)["groups"]
+    assert isinstance(groups, list)
+    product = next(group for group in groups if group["kind"] == "MONTHLY_PRODUCT")
+    assert "Draf" in str(product["title"])
+    drafts = session.scalar(
+        select(func.count()).select_from(MonthlyProduct).where(MonthlyProduct.status == "DRAFT")
+    )
+    assert product["total"] == int(drafts or 0)
 
 
 def test_two_roles_receive_different_queues(client: TestClient, session: Session) -> None:
@@ -176,45 +198,15 @@ def test_the_counts_match_the_database(client: TestClient, session: Session) -> 
     groups = body["groups"]
     assert isinstance(groups, list)
 
-    pending = session.scalar(
+    awaiting = session.scalar(
         select(func.count())
-        .select_from(Recommendation)
-        .where(Recommendation.status == "PENDING_REVIEW")
+        .select_from(MonthlyProduct)
+        .where(MonthlyProduct.status.in_(AWAITING_DECISION))
     )
-    decisions = next(group for group in groups if group["kind"] == "DECISION")
+    product = next(group for group in groups if group["kind"] == "MONTHLY_PRODUCT")
 
-    assert decisions["total"] == int(pending or 0)
+    assert product["total"] == int(awaiting or 0)
     assert body["total"] == sum(int(group["total"]) for group in groups)
-
-
-def test_a_scoped_officer_only_counts_their_own_jurisdiction(
-    client: TestClient, session: Session
-) -> None:
-    polsek = session.scalar(
-        select(Location.polsek).where(Location.polsek.is_not(None)).order_by(Location.polsek)
-    )
-    assert polsek is not None
-    officer = _make_user(session, "Polsek", polsek=polsek)
-
-    groups = _feed(client, officer)["groups"]
-    assert isinstance(groups, list)
-    warnings = next(group for group in groups if group["kind"] == "WARNING")
-
-    expected = session.scalar(
-        select(func.count())
-        .select_from(EarlyWarning)
-        .join(Location, Location.location_id == EarlyWarning.location_id)
-        .where(EarlyWarning.status == "ACTIVE", Location.polsek == polsek)
-    )
-    everywhere = session.scalar(
-        select(func.count()).select_from(EarlyWarning).where(EarlyWarning.status == "ACTIVE")
-    )
-
-    assert warnings["total"] == int(expected or 0)
-    assert int(expected or 0) < int(everywhere or 0), (
-        "data dummy tidak memuat peringatan di luar wilayah ini — "
-        "pemeriksaan cakupan tidak menguji apa pun"
-    )
 
 
 def test_the_triage_queue_belongs_to_the_administrator_only(

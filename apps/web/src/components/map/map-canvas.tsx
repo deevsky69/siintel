@@ -76,6 +76,8 @@ const EDGE = "rgb(var(--text) / 0.45)";
 /** Saat disorot, garisnya menebal DAN menghitam — dua isyarat, bukan satu. */
 const EDGE_HOVER = "rgb(var(--text) / 0.9)";
 const EDGE_SELECTED = "rgb(var(--accent))";
+/** Garis kelurahan prioritas bulan ini — emas, berbeda dari aksen pilihan. */
+const EDGE_PRIORITY = "#C1801E";
 
 /**
  * Angka besar di tengah wilayah pada layer yang sedang tampil; `null` bila tidak ada data.
@@ -253,11 +255,14 @@ export function MapCanvas({
   linkTo = "map",
   level = "kecamatan",
   focus = null,
+  priority = [],
 }: {
   districts: MapDistrict[];
   layer: MapLayer;
   selected: string | null;
   maxHeight?: string;
+  /** Nama wilayah (kelurahan) prioritas bulan ini: digarisi emas tebal (catatan 179). */
+  priority?: readonly string[];
   /** Angka besar di tengah wilayah; dapat dimatikan bila ruangnya sempit. */
   showScores?: boolean;
   /**
@@ -424,6 +429,7 @@ export function MapCanvas({
           // satu skor untuk seluruh Jakarta Selatan, dan memberinya warna dari tangga
           // risiko akan menyatakan penilaian yang tidak pernah dihitung.
           const home = level === "polda" && shape.name === HOME_AREA;
+          const prioritized = priority.includes(shape.name);
 
           const polygons = shape.rings.map((ring) => (
             // Kunci diambil dari simpul pertama cincin, bukan dari indeksnya: dua cincin
@@ -452,11 +458,21 @@ export function MapCanvas({
                         historical?.peakIncidents ?? 0,
                       )
               }
-              stroke={isSelected || home ? EDGE_SELECTED : isActive ? EDGE_HOVER : EDGE}
+              stroke={
+                isSelected || home
+                  ? EDGE_SELECTED
+                  : prioritized
+                    ? EDGE_PRIORITY
+                    : isActive
+                      ? EDGE_HOVER
+                      : EDGE
+              }
               // Tebalnya bertingkat: tipis saat diam, dua kali lipat saat disorot, dan
               // paling tebal saat terpilih. Perubahan tebal saja tidak cukup terlihat pada
               // peta sepadat ini; warnanya ikut berubah pada baris di atas.
-              strokeWidth={strokeWidth * (isSelected || home ? 2.5 : isActive ? 2 : 1)}
+              strokeWidth={
+                strokeWidth * (isSelected || home ? 2.5 : prioritized ? 2.5 : isActive ? 2 : 1)
+              }
               strokeLinejoin="round"
             />
           ));

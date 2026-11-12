@@ -1,10 +1,17 @@
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
+import { ScreenTabs } from "@/components/shell/screen-tabs";
 import { getProfile } from "@/lib/decisions";
 import { getStandardQueue } from "@/lib/standardization";
 import { AreaForm, DuplicateForm } from "./forms";
 
 export const dynamic = "force-dynamic";
+
+const TABS = [
+  { href: "/ops/laporan-petugas", label: "Daftar kejadian" },
+  { href: "/ops/input?formulir=kejadian", label: "+ Catat kejadian", permission: "crime:write" },
+  { href: "/ops/pembakuan", label: "Pembakuan", permission: "crime:triage" },
+] as const;
 
 /** Pembakuan laporan (Modul 1 mekanisme): kelurahan tertunda dan dugaan laporan ganda. */
 export default async function PembakuanPage() {
@@ -15,6 +22,7 @@ export default async function PembakuanPage() {
   const queue = await getStandardQueue();
   return (
     <div className="space-y-3">
+      <ScreenTabs tabs={TABS} current="/ops/pembakuan" permissions={profile.permissions} />
       <Panel
         title="Kelurahan belum pasti"
         action={<span className="panel-action">{queue.area_pending.total} menunggu</span>}
