@@ -142,9 +142,7 @@ function AreaLabel({
   return (
     <span
       aria-hidden="true"
-      className={`pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-sm bg-base-950/85 px-1.5 py-0.5 text-[10px] font-semibold text-ink transition-opacity duration-300 sm:text-[11px] ${
-        muted ? "opacity-30" : "opacity-100"
-      }`}
+      className={`warga-map-label ${muted ? "opacity-30" : "opacity-100"}`}
       style={{ left, top }}
     >
       {shape.name}

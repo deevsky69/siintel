@@ -23,6 +23,14 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP WARGA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Rupa baru SIGAP WARGA (10 November 2026).** Sisi warga memakai desain yang diserahkan
+pemilik proyek (mockup "SIGAP WARGA Redesign", catatan 178): kanvas terang, kepala putih
+bergaris emas ganda, hero navy berisi peta kecamatan dan angka ringkas, strip Imbauan Polres,
+empat kartu layanan; Peta menjadi panggung tiga kolom (panel cari/saring, peta, kartu rincian);
+Survey, Lacak, dan Lapor berspanduk merah untuk keadaan darurat; halaman **Masuk petugas** ikut
+rupa yang sama. Isi dan batas data tidak berubah. Dua bagian mockup sengaja belum dibangun
+karena menyangkut kebijakan: blok *Kontak pelapor* (nama, HP) pada Lapor dan peta 3D.
+
 Yang sengaja **tidak** ada di sisi warga: skor, prediksi, titik kejadian, peringkat halus.
 Tingkat RENDAH/SEDANG/TINGGI adalah pembagian tertil jumlah kejadian historis (PROPOSED).
 Moderasi Survey Rasa Aman ada di menu **Laporan → Survey Rasa Aman** (Administrator).

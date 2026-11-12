@@ -1,20 +1,18 @@
-import { type AreaLevel, LEVEL_CLASS, LEVEL_LABEL, monthLabel } from "@/lib/warga";
+import { type AreaLevel, LEVEL_LABEL, monthLabel } from "@/lib/warga";
 
-/** Tiga kata, tiga warna. */
+/** Lencana tingkat: kotak warna kecil + "Kerawanan <tingkat>", warna mengikuti mockup. */
 export function LevelBadge({ level, size = "sm" }: { level: AreaLevel; size?: "sm" | "lg" }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-sm border font-semibold ${LEVEL_CLASS[level]} ${
-        size === "lg" ? "px-3 py-1 text-sm" : "px-2 py-0.5 text-xs"
-      }`}
+      className={`warga-level is-${level.toLowerCase()}${size === "lg" ? " warga-level-lg" : ""}`}
     >
-      <span className="h-1.5 w-1.5 rounded-[1px] bg-current" aria-hidden="true" />
+      <i aria-hidden="true" />
       Kerawanan {LEVEL_LABEL[level]}
     </span>
   );
 }
 
-/** Batang per bulan, dua belas batang, tanpa sumbu yang membuat pusing. */
+/** Batang per bulan, dua belas batang navy, tanpa sumbu yang membuat pusing. */
 export function MonthBars({ months, values }: { months: string[]; values: number[] }) {
   const peak = Math.max(1, ...values);
   return (
@@ -23,7 +21,7 @@ export function MonthBars({ months, values }: { months: string[]; values: number
         <div key={months[index]} className="flex flex-1 flex-col items-center gap-1">
           <span className="text-[10px] font-semibold tabular-nums text-ink-muted">{value}</span>
           <div
-            className="w-full rounded-t-md bg-accent/70"
+            className="w-full bg-accent/80"
             style={{ height: `${Math.max(4, (value / peak) * 64)}px` }}
           />
           <span className="text-[10px] text-ink-faint">{monthLabel(months[index])}</span>
@@ -39,7 +37,7 @@ export function Stars({ value, size = "text-base" }: { value: number | null; siz
   return (
     <span
       role="img"
-      className={`inline-flex ${size} leading-none`}
+      className={`inline-flex ${size} leading-none tracking-[2px]`}
       aria-label={value === null ? "belum ada nilai" : `${value} dari 5`}
     >
       {[1, 2, 3, 4, 5].map((n) => (

@@ -4,11 +4,9 @@ import { TrackForm, VehicleForm } from "./forms";
 export const metadata = { title: "Lacak Laporan — SIGAP WARGA" };
 
 /**
- * Lacak laporan dan cek kendaraan (tahap 2, 2 November 2026).
- *
- * Dua hal yang sering ditanyakan warga ke Polsek, dijawab tanpa harus datang: sampai mana
- * laporan saya (nomor LP + PIN), dan apakah kendaraan yang akan saya beli pernah dilaporkan
- * hilang (plat atau nomor rangka). Keduanya hanya menjawab yang menjadi hak penanya.
+ * Lacak laporan dan cek kendaraan (mockup 10 November 2026): hero navy berjudul "Lacak &
+ * cek", kartu putih menumpang di tepinya dengan dua tab lebar, lalu dua kartu tautan
+ * (buat laporan, hubungi 110). Keduanya hanya menjawab yang menjadi hak penanya.
  */
 export default async function LacakPage({
   searchParams,
@@ -18,49 +16,44 @@ export default async function LacakPage({
   const params = await searchParams;
   const tab = params.tab === "kendaraan" ? "kendaraan" : "laporan";
   return (
-    <div className="mx-auto w-full max-w-lg space-y-4">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-accent-soft">
-          SIGAP WARGA
-        </p>
-        <h1 className="mt-1 text-2xl font-bold text-ink">Lacak laporan dan cek kendaraan</h1>
-      </div>
-      <div className="grid grid-cols-2 gap-2 rounded-full bg-base-850 p-1" role="tablist">
-        <Link
-          href="/lacak"
-          role="tab"
-          aria-selected={tab === "laporan"}
-          className={`rounded-full py-2 text-center text-sm font-semibold ${tab === "laporan" ? "bg-base-900 text-ink shadow-sm" : "text-ink-muted"}`}
-        >
-          Lacak laporan
-        </Link>
-        <Link
-          href="/lacak?tab=kendaraan"
-          role="tab"
-          aria-selected={tab === "kendaraan"}
-          className={`rounded-full py-2 text-center text-sm font-semibold ${tab === "kendaraan" ? "bg-base-900 text-ink shadow-sm" : "text-ink-muted"}`}
-        >
-          Cek kendaraan
-        </Link>
-      </div>
-      <section className="warga-card p-5">
-        {tab === "laporan" ? (
-          <>
-            <p className="mb-4 text-sm text-ink-muted">
-              Masukkan nomor LP dan PIN yang diberikan petugas saat melapor. Hasilnya menampilkan
-              tahap penanganan perkara Anda.
-            </p>
-            <TrackForm />
-          </>
-        ) : (
-          <>
-            <p className="mb-4 text-sm text-ink-muted">
-              Sebelum membeli kendaraan bekas, periksa apakah plat atau nomor rangkanya tercatat
-              dalam laporan kehilangan. Jawabannya hanya tercatat atau tidak.
-            </p>
-            <VehicleForm />
-          </>
-        )}
+    <div>
+      <section className="warga-hero">
+        <div className="mx-auto max-w-[960px] px-6 pb-24 pt-12 text-center">
+          <h1 className="text-4xl text-white sm:text-[44px]">Lacak &amp; cek</h1>
+          <p className="mx-auto mt-3 text-[17px] leading-relaxed text-[rgb(var(--warga-soft))]">
+            Pantau tahap penanganan laporan Anda atau periksa kendaraan bekas sebelum membeli.
+          </p>
+        </div>
+      </section>
+
+      <section className="mx-auto -mt-16 max-w-[960px] px-4 pb-16 sm:px-6">
+        <div className="warga-card-raised overflow-hidden">
+          <div role="tablist" aria-label="Jenis pencarian" className="warga-tabs">
+            <Link href="/lacak" role="tab" aria-selected={tab === "laporan"}>
+              Lacak laporan
+            </Link>
+            <Link href="/lacak?tab=kendaraan" role="tab" aria-selected={tab === "kendaraan"}>
+              Cek kendaraan
+            </Link>
+          </div>
+          <div className="p-5 sm:p-8">{tab === "laporan" ? <TrackForm /> : <VehicleForm />}</div>
+        </div>
+        <div className="mt-5 flex flex-wrap gap-4">
+          <Link
+            href="/lapor"
+            className="warga-card flex flex-[1_1_260px] items-center gap-3.5 px-5 py-4 text-[rgb(var(--warga-navy))]"
+          >
+            <span className="flex-1 font-bold">Belum memiliki laporan? Buat laporan kejadian</span>
+            <span aria-hidden="true">→</span>
+          </Link>
+          <a
+            href="tel:110"
+            className="flex flex-[1_1_260px] items-center gap-3.5 bg-[#FEF2F2] px-5 py-4 text-[#7F1D1D]"
+          >
+            <span className="flex-1 font-bold">Kejadian sedang berlangsung? Hubungi 110</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
       </section>
     </div>
   );

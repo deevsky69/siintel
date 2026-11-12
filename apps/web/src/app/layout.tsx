@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, Chakra_Petch, Inter, JetBrains_Mono } from "next/font/google";
+import { Chakra_Petch, Inter, JetBrains_Mono, Manrope } from "next/font/google";
 import { THEME_BOOTSTRAP, THEME_STORAGE_KEY } from "@/lib/theme";
 import "./globals.css";
 
@@ -11,11 +11,11 @@ const heading = Chakra_Petch({
   variable: "--font-heading",
 });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
-// Wajah huruf judul sisi warga: Barlow Condensed — condensed tebal kapital, suara papan
-// pengumuman yang tegas (rupa gelap 3 November 2026); badan tetap Inter.
-const display = Barlow_Condensed({
+// Wajah huruf judul sisi warga: Manrope tebal (mockup SIGAP WARGA, 10 November 2026);
+// badan tetap Inter. Dimuat lewat next/font supaya tidak mengambil apa pun dari internet.
+const display = Manrope({
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["600", "700", "800"],
   variable: "--font-display",
 });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
