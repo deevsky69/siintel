@@ -3,34 +3,31 @@
  * dihapus dari navigasi. Halamannya (/imbauan, /intelijen) dan API-nya tidak dihapus —
  * imbauan yang beredar tetap dibaca aplikasi warga, dan dokumen intelijen tetap masuk
  * lewat formulir Input. Yang hilang hanya jalan masuknya dari menu.
- */
-/*
- * 10 November 2026, keputusan pemilik proyek (2.ii): "Rencana Patroli" keluar dari menu.
- * Perkiraan bulan depannya kini lampiran pada Produk Bulanan dan ikut penetapan Pimpinan —
- * satu keputusan, bukan dua. Rute /ops/rencana-patroli dipertahankan sebagai bacaan.
+ *
+ * 10 November 2026 (2.ii): "Rencana Patroli" keluar dari menu; perkiraan bulan depannya
+ * lampiran pada Produk Bulanan dan ikut penetapan Pimpinan.
+ *
+ * 12 November 2026, keputusan pemilik proyek (A, catatan 179): menu diringkas dari 20 ke
+ * 12 submenu. Yang keluar dari menu tetap dapat dicapai sebagai TAB di layar induknya:
+ *   Wilayah Rawan → (isinya = Peringkat)      Pola Gangguan → tab di Analitik
+ *   Peringkat → tab di Produk Bulanan          Input Data, Pembakuan → tab di Laporan Petugas
+ *   Pengaturan Sistem → hanya alamat (/ops/pengaturan), membaca bobot skor harian
  */
 /**
  * Menu utama — kelompok dan submenu.
  *
  * Susunannya ditetapkan pemilik proyek, 2 September 2026: lima kelompok yang masing-masing
  * membuka submenu, menggantikan deret enam belas ikon setara yang sebelumnya memaksa mata
- * membaca seluruhnya untuk menemukan satu.
- *
- * Kelompoknya disusun mengikuti **alur kerja**, bukan jenis data:
+ * membaca seluruhnya untuk menemukan satu. Sejak 6 November 2026 kelompoknya mengikuti
+ * **siklus bulanan**:
  *
  * ```text
- * Pemantauan  →  apa yang sedang terjadi
- * Laporan     →  apa yang masuk
- * Analisis    →  apa artinya
- * Operasi     →  apa yang dikerjakan
- * Sistem      →  siapa melakukan apa
+ * Wilayah     →  keadaan wilayah: beranda, peta, analitik
+ * Bulan Ini   →  produk bulanan (dengan peringkat dan lampiran), evaluasi cakupan
+ * Data        →  apa yang masuk: laporan petugas, laporan masyarakat, perkara, darurat
+ * Warga       →  Babinkamtibmas, buletin & imbauan, survey
+ * Sistem      →  pengguna, audit
  * ```
- *
- * Beberapa layar yang tidak disebut dalam permintaan tetap dimasukkan ke kelompok yang
- * paling sesuai — Prediksi, Penilaian Risiko, Evaluasi, Peringatan, Rekomendasi, Brief.
- * Menghilangkannya dari menu akan memutus rantai tertutup yang menjadi inti sistem ini
- * (CLAUDE.md §9): tanpa Prediksi dan Evaluasi, tidak ada yang dapat menunjukkan bahwa
- * ramalannya pernah diuji terhadap kenyataan.
  *
  * **Menyembunyikan menu bukan otorisasi.** Backend memeriksa setiap permintaan, dan
  * membuka alamat yang tersembunyi tetap dijawab sebagaimana mestinya (CLAUDE.md §15).
@@ -45,8 +42,7 @@ export type NavItem = {
    * Submenu tampil bila pengguna memegang **salah satu** permission ini.
    *
    * Berisi permission yang membuat layarnya bermakna — bukan seluruh yang mungkin dipakai
-   * di dalamnya. `Input Data` menuntut salah satu izin **tulis**: tanpa satu pun, seluruh
-   * formulirnya tersembunyi dan yang tersisa hanya penjelasan mengapa layar itu kosong.
+   * di dalamnya.
    */
   permissions: readonly string[];
   /** Keterangan satu baris, ditampilkan sebagai `title` pada tautannya. */
@@ -71,35 +67,21 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: "Beranda",
         icon: "dashboard",
         permissions: ["dashboard:read"],
-        hint: "Ringkasan keadaan",
+        hint: "Papan bulan ini dan peta",
       },
       {
         href: "/ops/peta",
         label: "Peta",
         icon: "map",
         permissions: ["map:read"],
-        hint: "Peta wilayah",
-      },
-      {
-        href: "/ops/wilayah",
-        label: "Wilayah Rawan",
-        icon: "area",
-        permissions: ["risk_score:read"],
-        hint: "Peringkat wilayah dan rinciannya",
-      },
-      {
-        href: "/ops/pola",
-        label: "Pola Gangguan",
-        icon: "pattern",
-        permissions: ["analytics:read"],
-        hint: "Pola per jenis gangguan",
+        hint: "Peta historis dan kelurahan prioritas bulan ini",
       },
       {
         href: "/ops/analitik",
         label: "Analitik",
         icon: "analytics",
         permissions: ["analytics:read"],
-        hint: "Tren bulanan, pola waktu, perbandingan wilayah",
+        hint: "Tren, pola waktu, perbandingan wilayah; tab Pola Gangguan",
       },
     ],
   },
@@ -109,18 +91,11 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     icon: "recommendation",
     items: [
       {
-        href: "/ops/peringkat",
-        label: "Peringkat",
-        icon: "analytics",
-        permissions: ["ranking:read"],
-        hint: "65 kelurahan diurutkan untuk bulan depan; dibekukan saat draf disusun",
-      },
-      {
         href: "/ops/produk-bulanan",
         label: "Produk Bulanan",
         icon: "recommendation",
         permissions: ["monthly_product:read"],
-        hint: "Analis menyusun & memeriksa, Pimpinan menetapkan, Fungsi/Polsek mencatat",
+        hint: "Analis menyusun & memeriksa, Pimpinan menetapkan, Fungsi/Polsek mencatat; tab Peringkat",
       },
       {
         href: "/ops/evaluasi-bulanan",
@@ -141,28 +116,14 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: "Laporan Petugas",
         icon: "entry",
         permissions: ["crime:read"],
-        hint: "Kejadian yang dicatat petugas",
+        hint: "Kejadian yang dicatat petugas; tab Catat kejadian dan Pembakuan",
       },
       {
         href: "/ops/masyarakat",
         label: "Laporan Masyarakat",
         icon: "community",
         permissions: ["citizen_report:read"],
-        hint: "Laporan dari kanal publik",
-      },
-      {
-        href: "/ops/pembakuan",
-        label: "Pembakuan",
-        icon: "entry",
-        permissions: ["crime:triage"],
-        hint: "Kelurahan belum pasti dan dugaan ganda",
-      },
-      {
-        href: "/ops/input",
-        label: "Input Data",
-        icon: "write",
-        permissions: ["crime:write", "intelligence:write", "citizen_report:write"],
-        hint: "Mencatat kejadian dan triase",
+        hint: "Laporan dari kanal publik, triase di tempat",
       },
       {
         href: "/ops/perkara",
@@ -197,7 +158,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: "Buletin & Imbauan",
         icon: "brief",
         permissions: ["bulletin:read"],
-        hint: "Buletin mingguan dan imbauan bulanan, disetujui Pimpinan",
+        hint: "Buletin mingguan menunggu persetujuan Pimpinan; imbauan bulanan otomatis",
       },
       {
         href: "/ops/survey",
@@ -227,13 +188,6 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         permissions: ["audit:read"],
         hint: "Jejak siapa melakukan apa",
       },
-      {
-        href: "/ops/pengaturan",
-        label: "Pengaturan Sistem",
-        icon: "settings",
-        permissions: ["config:read", "config:manage"],
-        hint: "Bobot, ambang, taksonomi",
-      },
     ],
   },
 ] as const;
@@ -259,23 +213,42 @@ export function visibleNavGroups(held: readonly string[]): NavGroup[] {
   })).filter((group) => group.items.length > 0);
 }
 
-/** Submenu yang terlihat, tanpa kelompoknya. */
+/** Submenu saja, rata — untuk pencarian rute dan pengujian. */
 export function visibleNavItems(held: readonly string[]): NavItem[] {
   return visibleNavGroups(held).flatMap((group) => group.items);
 }
 
 /**
- * Kelompok yang memuat rute tertentu — dipakai membuka kelompok yang sedang aktif.
+ * Kelompok yang memuat rute aktif; `null` bila rutenya tidak ada di menu.
  *
- * Beranda (`/`) dicocokkan persis; sisanya dengan awalan, supaya rute turunan seperti
- * `/wilayah/Tebet` tetap dikenali sebagai bagian dari submenunya.
+ * Beranda (`/ops`) dicocokkan persis: setiap rute lain diawali `/ops`, dan pencocokan
+ * awalan akan membuat kelompok pertama selalu terbuka.
  */
+/**
+ * Layar yang keluar dari menu tetapi tetap milik sebuah kelompok (dicapai lewat tab atau
+ * alamat): kelompoknya tetap terbuka supaya pengguna tahu posisinya.
+ */
+const OFF_MENU_GROUP: ReadonlyArray<readonly [string, string]> = [
+  ["/ops/wilayah", "pemantauan"],
+  ["/ops/pola", "pemantauan"],
+  ["/ops/peringkat", "bulanan"],
+  ["/ops/rencana-patroli", "bulanan"],
+  ["/ops/input", "laporan"],
+  ["/ops/pembakuan", "laporan"],
+  ["/ops/pengaturan", "sistem"],
+];
+
 export function groupOf(pathname: string): string | null {
+  const path = pathname.split("?")[0];
   for (const group of NAV_GROUPS) {
     for (const item of group.items) {
-      const active = item.href === "/ops" ? pathname === "/ops" : pathname.startsWith(item.href);
-      if (active) return group.id;
+      if (item.href === "/ops" ? path === "/ops" : path.startsWith(item.href)) {
+        return group.id;
+      }
     }
+  }
+  for (const [prefix, id] of OFF_MENU_GROUP) {
+    if (path.startsWith(prefix)) return id;
   }
   return null;
 }

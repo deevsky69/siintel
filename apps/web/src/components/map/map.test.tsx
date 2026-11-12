@@ -359,8 +359,9 @@ describe("peta risiko", () => {
 
     const areas = screen.getAllByRole("link", { name: /—/ });
     expect(areas).toHaveLength(shapesAt("kecamatan").length);
+    // 12 November 2026: lapisan bawaan historis, jadi `layer=current` ditulis eksplisit.
     expect(screen.getByRole("link", { name: /^Tebet —/ }).getAttribute("href")).toBe(
-      "/ops/peta?wilayah=Tebet&tingkat=kelurahan",
+      "/ops/peta?wilayah=Tebet&tingkat=kelurahan&layer=current",
     );
   });
 
@@ -459,11 +460,14 @@ describe("peta risiko", () => {
   it("menautkan pemilih layer ke alamat, bukan menyimpannya di komponen", () => {
     render(<RiskMap {...mapProps} />);
 
-    expect(screen.getByRole("link", { name: "Prediktif" }).getAttribute("href")).toBe(
-      "/ops/peta?wilayah=Kebayoran+Baru&layer=predictive",
+    // 12 November 2026 (catatan 179): pemilih hanya memuat Historis dan lapisan harian
+    // yang sedang terbuka; Prediktif tidak ditawarkan lagi dari lapisan risiko berjalan.
+    expect(screen.queryByRole("link", { name: "Prediktif" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Historis" }).getAttribute("href")).toBe(
+      "/ops/peta?wilayah=Kebayoran+Baru",
     );
     expect(screen.getByRole("link", { name: "Risiko Berjalan" }).getAttribute("href")).toBe(
-      "/ops/peta?wilayah=Kebayoran+Baru",
+      "/ops/peta?wilayah=Kebayoran+Baru&layer=current",
     );
   });
 
@@ -804,10 +808,10 @@ describe("layer historis", () => {
 
     const jendela = screen.getByRole("navigation", { name: "Jendela waktu historis" });
     expect(within(jendela).getByRole("link", { name: "Seluruh data" }).getAttribute("href")).toBe(
-      "/ops/peta?wilayah=Kebayoran+Baru&layer=historical&bulan=36",
+      "/ops/peta?wilayah=Kebayoran+Baru&bulan=36",
     );
     expect(within(jendela).getByRole("link", { name: "12 bulan" }).getAttribute("href")).toBe(
-      "/ops/peta?wilayah=Kebayoran+Baru&layer=historical",
+      "/ops/peta?wilayah=Kebayoran+Baru",
     );
   });
 });

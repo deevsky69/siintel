@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
+import { ScreenTabs } from "@/components/shell/screen-tabs";
 import { getProfile } from "@/lib/decisions";
 import { getRanking, getRankingOptions } from "@/lib/rankings";
 import { FreezeForm } from "./freeze-form";
 
 export const dynamic = "force-dynamic";
+
+const TABS = [
+  { href: "/ops/produk-bulanan", label: "Produk Bulanan" },
+  { href: "/ops/peringkat", label: "Peringkat 65 Kelurahan" },
+] as const;
 
 const CATEGORY: Record<string, string> = {
   RENDAH: "bg-risk-low/15 text-risk-low",
@@ -37,6 +43,7 @@ export default async function PeringkatPage({
 
   return (
     <div className="space-y-3">
+      <ScreenTabs tabs={TABS} current="/ops/peringkat" />
       <Panel
         title={`Peringkat ${ranking.target_month}`}
         action={

@@ -1,8 +1,14 @@
+import { ScreenTabs } from "@/components/shell/screen-tabs";
 import { getPatternDna } from "@/lib/patterns";
 import { resolveThreatType } from "./dna";
 import { PatternDna } from "./pattern-dna";
 
 export const dynamic = "force-dynamic";
+
+const TABS = [
+  { href: "/ops/analitik", label: "Analitik" },
+  { href: "/ops/pola", label: "Pola Gangguan" },
+] as const;
 
 /**
  * Halaman Crime Pattern DNA (TASK 094).
@@ -32,13 +38,16 @@ export default async function PolaPage({
   const detail = selected === null ? listing : await getPatternDna(selected);
 
   return (
-    <PatternDna
-      available={detail.threat_types}
-      selected={detail.threat_type}
-      profile={detail.profile}
-      source={detail.source}
-      scopeBasis={detail.scope_basis}
-      analysisBasis={detail.analysis_basis}
-    />
+    <div className="space-y-3">
+      <ScreenTabs tabs={TABS} current="/ops/pola" />
+      <PatternDna
+        available={detail.threat_types}
+        selected={detail.threat_type}
+        profile={detail.profile}
+        source={detail.source}
+        scopeBasis={detail.scope_basis}
+        analysisBasis={detail.analysis_basis}
+      />
+    </div>
   );
 }

@@ -60,12 +60,19 @@ menu: perkiraan jam rawan bulan sasaran menjadi **lampiran** Produk Bulanan dan 
 Pimpinan (tidak ada persetujuan tersendiri); `/ops/rencana-patroli` tetap sebagai bacaan dan
 unduhan .docx. (4) Buletin mingguan satu antrean; imbauan bulanan otomatis (di atas).
 
-**Menu ringkas (6 November 2026).** Lima kelompok: **Wilayah** (beranda, peta, wilayah rawan,
-pola, analitik), **Bulan Ini** (peringkat, produk bulanan, evaluasi), **Data**
-(laporan petugas dan masyarakat, pembakuan, input, berkas perkara, panic button), **Warga**
-(Babinkamtibmas, buletin & imbauan, survey), **Sistem**. Layar harian (peringatan dini,
-prediksi, penilaian risiko, rekomendasi harian, operasi, brief) keluar dari menu; alamatnya
-tetap dapat dibuka langsung.
+**Menu ringkas (6 November 2026; diringkas lagi 12 November 2026, keputusan A — catatan
+179).** Lima kelompok, **14 submenu**: **Wilayah** (Beranda, Peta, Analitik — Pola Gangguan
+menjadi tab di Analitik), **Bulan Ini** (Produk Bulanan — Peringkat 65 kelurahan menjadi tab
+di dalamnya — dan Evaluasi), **Data** (Laporan Petugas — dengan tab *+ Catat kejadian* dan
+*Pembakuan* — Laporan Masyarakat, Berkas Perkara, Panic Button), **Warga** (Babinkamtibmas,
+Buletin & Imbauan, Survey Rasa Aman), **Sistem** (Manajemen Pengguna, Audit Log). Keluar dari
+menu tetapi alamatnya tetap: Wilayah Rawan, Pengaturan Sistem, Input Data, dan seluruh layar
+harian (peringatan dini, prediksi, penilaian risiko, rekomendasi harian, operasi, brief).
+**Peta** kini membuka lapisan **historis** dan menggarisi emas **kelurahan prioritas bulan
+ini** (produk bulanan yang ditetapkan Pimpinan); lapisan risiko berjalan/prediktif hanya
+lewat alamat lama. **Lonceng notifikasi** hanya memuat pekerjaan siklus bulanan dan warga:
+darurat, produk bulanan (penetapan / draf), buletin menunggu persetujuan, laporan warga belum
+diverifikasi, ulasan menunggu moderasi.
 
 **Evaluasi bulanan (Modul 5 mekanisme).** Menu **Evaluasi → Cakupan Bulanan**: setelah bulan
 berakhir, berapa persen kejadian jatuh di kelurahan pilihan (peringkat beku dan keputusan

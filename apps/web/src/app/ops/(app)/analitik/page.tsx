@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { Panel } from "@/components/panel";
+import { ScreenTabs } from "@/components/shell/screen-tabs";
 import { getSpatialPattern, getTimePattern, getTrend } from "@/lib/analytics";
 import { AnalyticsView } from "./analytics-view";
 import { analyticsHref, isReversedRange, readSelection } from "./display";
 
 export const dynamic = "force-dynamic";
+
+const TABS = [
+  { href: "/ops/analitik", label: "Analitik" },
+  { href: "/ops/pola", label: "Pola Gangguan" },
+] as const;
 
 /**
  * Layar Crime Analytics (TASK 035).
@@ -63,5 +69,10 @@ export default async function AnalyticsPage({
     getSpatialPattern(query),
   ]);
 
-  return <AnalyticsView selection={selection} trend={trend} pattern={pattern} spatial={spatial} />;
+  return (
+    <div className="space-y-3">
+      <ScreenTabs tabs={TABS} current="/ops/analitik" />
+      <AnalyticsView selection={selection} trend={trend} pattern={pattern} spatial={spatial} />
+    </div>
+  );
 }

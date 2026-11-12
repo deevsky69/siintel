@@ -42,8 +42,11 @@ export function MapHero({
   level,
   kelurahan = null,
   overlay = null,
+  priority = [],
 }: {
   data: MapData;
+  /** Kelurahan prioritas bulan ini — digarisi emas pada peta. */
+  priority?: readonly string[];
   selected: string | null;
   detail: AreaDetail | null;
   /** Kelurahan yang rinciannya dibuka; hanya berarti pada tingkat `kelurahan`. */
@@ -129,8 +132,9 @@ export function MapHero({
 
               <MapCanvas
                 districts={zoomed ? overlay.districts : data.districts}
-                layer="current"
+                layer="historical"
                 selected={zoomed ? kelurahan : selected}
+                priority={priority}
                 maxHeight="54vh"
                 level={zoomed ? "kelurahan" : level === "kelurahan" ? "kecamatan" : level}
                 focus={zoomed ? selected : null}
@@ -290,7 +294,7 @@ function AreaSummary({
         <Link
           href={mapHref(
             kecamatan,
-            "current",
+            "historical",
             undefined,
             kelurahan ? "kelurahan" : "kecamatan",
             kelurahan,

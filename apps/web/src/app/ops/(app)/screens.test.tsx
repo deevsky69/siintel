@@ -59,13 +59,22 @@ describe("menu dan rutenya", () => {
       "brief",
       "evaluasi",
       "informasi",
+      // 12 November 2026 (catatan 179): tab di Laporan Petugas, bukan submenu.
+      "input",
       "operasi",
+      // 12 November 2026: dibaca lewat tab di Produk Bulanan / Analitik / Laporan Petugas,
+      // atau hanya lewat alamat (pengaturan, wilayah rawan).
+      "pembakuan",
+      "pengaturan",
       "peringatan",
+      "peringkat",
+      "pola",
       "prediksi",
       "rekomendasi",
       // 10 November 2026: persetujuannya dilebur ke Produk Bulanan; layar tetap sebagai bacaan.
       "rencana-patroli",
       "skoring",
+      "wilayah",
     ];
     expect(onDisk.filter((name) => !inMenu.has(name)).sort()).toEqual(keptOffMenu);
   });

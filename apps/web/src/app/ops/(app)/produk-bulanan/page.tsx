@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
+import { ScreenTabs } from "@/components/shell/screen-tabs";
 import { ApiError } from "@/lib/api";
 import { getProfile } from "@/lib/decisions";
 import {
@@ -13,6 +14,11 @@ import { getMonthlyOutlook, type MonthlyOutlook } from "@/lib/patrol-plan-api";
 import { ActionForm, AnalystForm, DecideForm, DraftForm } from "./forms";
 
 export const dynamic = "force-dynamic";
+
+const TABS = [
+  { href: "/ops/produk-bulanan", label: "Produk Bulanan" },
+  { href: "/ops/peringkat", label: "Peringkat 65 Kelurahan" },
+] as const;
 
 /**
  * Dua tahap sejak 10 November 2026 (keputusan pemilik proyek 1B, catatan 177):
@@ -77,6 +83,7 @@ export default async function ProdukBulananPage({
 
   return (
     <div className="space-y-3">
+      <ScreenTabs tabs={TABS} current="/ops/produk-bulanan" />
       <Panel
         title={`Produk Bulanan ${month}`}
         action={
