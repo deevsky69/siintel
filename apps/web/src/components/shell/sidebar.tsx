@@ -2,7 +2,7 @@
 
 import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavIcon } from "./icons";
 import type { NavItem } from "./navigation";
 import { groupOf, visibleNavGroups } from "./navigation";
@@ -32,11 +32,11 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   // Sorotan optimistik: item yang baru diklik langsung menyala, tidak menunggu halaman baru
-  // tiba (audit 15 November 2026: tanpa ini klik menu tidak memberi tanda apa pun).
-  const [clicked, setClicked] = useState<string | null>(null);
-  useEffect(() => {
-    setClicked(null);
-  }, [pathname]);
+  // tiba (audit 15 November 2026: tanpa ini klik menu tidak memberi tanda apa pun). Disimpan
+  // bersama pathname saat diklik, sehingga otomatis tidak berlaku lagi begitu alamat berubah
+  // — pola yang sama dengan `toggled`, tanpa effect.
+  const [clicked, setClicked] = useState<{ href: string; path: string } | null>(null);
+  const optimistic = clicked !== null && clicked.path === pathname ? clicked.href : null;
   const groups = visibleNavGroups(permissions);
   const activeGroup = groupOf(pathname);
 
@@ -53,8 +53,8 @@ export function Sidebar({
   const opened = toggled.path === pathname ? toggled.ids : new Set<string>();
 
   const isActive = (href: string) =>
-    clicked !== null
-      ? clicked === href
+    optimistic !== null
+      ? optimistic === href
       : href === "/ops"
         ? pathname === "/ops"
         : pathname.startsWith(href);
@@ -120,7 +120,7 @@ export function Sidebar({
                       item={item}
                       active={isActive(item.href)}
                       badge={item.href === "/ops/produk-bulanan" ? pendingDecisions : 0}
-                      onNavigate={() => setClicked(item.href)}
+                      onNavigate={() => setClicked({ href: item.href, path: pathname })}
                     />
                   </li>
                 ))}

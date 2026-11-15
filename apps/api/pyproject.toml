@@ -87,6 +87,9 @@ extend-immutable-calls = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]  # assert diperbolehkan di test
+# Migrasi 0012+ memuat baris panjang (DDL/komentar); CI memeriksanya dari direktori ini dan
+# merah sejak 6 November 2026. Panjang baris bukan ukuran kebenaran migrasi.
+"**/database/migrations/*.py" = ["E501"]
 
 # ---------------------------------------------------------------------------
 # mypy — typecheck (padanan `tsc --noEmit` di sisi web)
