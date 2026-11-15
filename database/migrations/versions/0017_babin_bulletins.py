@@ -40,7 +40,12 @@ TS = sa.DateTime(timezone=True)
 def upgrade() -> None:
     op.create_table(
         "babinkamtibmas",
-        sa.Column("babin_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "babin_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("kelurahan", sa.String(100), nullable=False),
         sa.Column("kecamatan", sa.String(100), nullable=False),
         sa.Column("polsek", sa.String(100), nullable=False),
@@ -58,43 +63,69 @@ def upgrade() -> None:
     )
     op.create_index("ix_babinkamtibmas_kecamatan", "babinkamtibmas", ["kecamatan"])
     op.create_index("ix_babinkamtibmas_polsek", "babinkamtibmas", ["polsek"])
-    op.execute("CREATE TRIGGER trg_babinkamtibmas_set_updated_at BEFORE UPDATE ON babinkamtibmas FOR EACH ROW EXECUTE FUNCTION set_updated_at()")
+    op.execute(
+        "CREATE TRIGGER trg_babinkamtibmas_set_updated_at BEFORE UPDATE ON babinkamtibmas FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    )
 
     op.create_table(
         "bulletins",
-        sa.Column("bulletin_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "bulletin_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("week_start", sa.Date(), nullable=False),
         sa.Column("kelurahan", sa.String(100), nullable=False),
         sa.Column("kecamatan", sa.String(100), nullable=False),
         sa.Column("polsek", sa.String(100), nullable=False),
         sa.Column("content", sa.Text(), nullable=False),
-        sa.Column("figures", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False),
+        sa.Column(
+            "figures", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False
+        ),
         sa.Column("status", sa.String(20), server_default="DRAFT", nullable=False),
         sa.Column("generated_at", TS, nullable=False),
         sa.Column("approved_by", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("approved_at", TS, nullable=True),
         sa.Column("sent_at", TS, nullable=True),
-        sa.Column("delivery", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False),
+        sa.Column(
+            "delivery", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False
+        ),
         sa.Column("created_at", TS, server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", TS, server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("bulletin_id", name="pk_bulletins"),
         sa.UniqueConstraint("week_start", "kelurahan", name="uq_bulletins_week_kelurahan"),
-        sa.ForeignKeyConstraint(["approved_by"], ["users.user_id"], name="fk_bulletins_approved_by", ondelete="RESTRICT"),
-        sa.CheckConstraint("status IN ('DRAFT', 'APPROVED', 'SENT')", name="bulletin_status_allowed"),
+        sa.ForeignKeyConstraint(
+            ["approved_by"], ["users.user_id"], name="fk_bulletins_approved_by", ondelete="RESTRICT"
+        ),
+        sa.CheckConstraint(
+            "status IN ('DRAFT', 'APPROVED', 'SENT')", name="bulletin_status_allowed"
+        ),
     )
     op.create_index("ix_bulletins_status", "bulletins", ["status"])
     op.create_index("ix_bulletins_approved_by", "bulletins", ["approved_by"])
-    op.execute("CREATE TRIGGER trg_bulletins_set_updated_at BEFORE UPDATE ON bulletins FOR EACH ROW EXECUTE FUNCTION set_updated_at()")
+    op.execute(
+        "CREATE TRIGGER trg_bulletins_set_updated_at BEFORE UPDATE ON bulletins FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    )
 
     if context.is_offline_mode():
         return
     bind = op.get_bind()
     for (resource, action), description in NEW_PERMISSIONS.items():
-        if bind.execute(sa.text("SELECT 1 FROM permissions WHERE resource = :r AND action = :a"), {"r": resource, "a": action}).first():
+        if bind.execute(
+            sa.text("SELECT 1 FROM permissions WHERE resource = :r AND action = :a"),
+            {"r": resource, "a": action},
+        ).first():
             continue
-        nxt = bind.execute(sa.text("SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 6) AS INTEGER)), 0) + 1 FROM permissions WHERE code LIKE 'PERM-%'")).scalar_one()
+        nxt = bind.execute(
+            sa.text(
+                "SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 6) AS INTEGER)), 0) + 1 FROM permissions WHERE code LIKE 'PERM-%'"
+            )
+        ).scalar_one()
         bind.execute(
-            sa.text("INSERT INTO permissions (permission_id, code, resource, action, description, created_at, updated_at) VALUES (gen_random_uuid(), :code, :r, :a, :d, now(), now())"),
+            sa.text(
+                "INSERT INTO permissions (permission_id, code, resource, action, description, created_at, updated_at) VALUES (gen_random_uuid(), :code, :r, :a, :d, now(), now())"
+            ),
             {"code": f"PERM-{int(nxt):03d}", "r": resource, "a": action, "d": description},
         )
     for role_name, scopes in GRANTS.items():
@@ -114,7 +145,11 @@ def upgrade() -> None:
 def downgrade() -> None:
     if not context.is_offline_mode():
         bind = op.get_bind()
-        bind.execute(sa.text("DELETE FROM role_permissions rp USING permissions p WHERE rp.permission_id = p.permission_id AND p.resource IN ('babin', 'bulletin')"))
+        bind.execute(
+            sa.text(
+                "DELETE FROM role_permissions rp USING permissions p WHERE rp.permission_id = p.permission_id AND p.resource IN ('babin', 'bulletin')"
+            )
+        )
         bind.execute(sa.text("DELETE FROM permissions WHERE resource IN ('babin', 'bulletin')"))
     op.execute("DROP TRIGGER IF EXISTS trg_bulletins_set_updated_at ON bulletins")
     op.execute("DROP INDEX IF EXISTS ix_bulletins_approved_by")

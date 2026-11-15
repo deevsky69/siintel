@@ -44,10 +44,16 @@ def upgrade() -> None:
         ),
         sa.Column("last_notified_status", sa.String(50), nullable=False),
         sa.Column(
-            "created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.Column(
-            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.PrimaryKeyConstraint("contact_id", name="pk_citizen_report_contacts"),
         sa.UniqueConstraint("report_id", name="uq_citizen_report_contacts_report_id"),
@@ -69,6 +75,8 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.execute("DROP TRIGGER IF EXISTS trg_citizen_report_contacts_set_updated_at ON citizen_report_contacts")
+    op.execute(
+        "DROP TRIGGER IF EXISTS trg_citizen_report_contacts_set_updated_at ON citizen_report_contacts"
+    )
     op.execute("DROP INDEX IF EXISTS ix_citizen_report_contacts_chat")
     op.drop_table("citizen_report_contacts")

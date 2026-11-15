@@ -1,0 +1,9 @@
+# Konfigurasi ruff untuk berkas migrasi (ruff memakai konfigurasi terdekat per berkas).
+#
+# Aturannya sama dengan apps/api (extend), kecuali panjang baris: migrasi 0012+ memuat DDL
+# dan komentar panjang, dan CI (`ruff check . ../../database/migrations` dari apps/api)
+# merah karenanya sejak 6 November 2026. Panjang baris bukan ukuran kebenaran migrasi.
+extend = "../../apps/api/pyproject.toml"
+
+[lint]
+extend-ignore = ["E501"]

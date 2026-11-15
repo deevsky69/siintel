@@ -45,7 +45,9 @@ READS = [
 GRANTS = {
     "Pimpinan": {"ALL": ["monthly_product:read", "monthly_product:decide"]},
     "Kasat Intelkam": {"ALL": [*READS, "monthly_product:review", "monthly_product:validate"]},
-    "Analis Intelkam": {"ALL": [*READS, "ranking:manage", "monthly_product:draft", "monthly_product:review"]},
+    "Analis Intelkam": {
+        "ALL": [*READS, "ranking:manage", "monthly_product:draft", "monthly_product:review"]
+    },
     "Fungsi": {"ALL": ["monthly_product:read", "monthly_product:execute"]},
     "Polsek": {"ALL": ["monthly_product:read", "monthly_product:execute"]},
     "Administrator": {"ALL": ["monthly_product:read", "monthly_product:draft"]},
@@ -55,11 +57,18 @@ GRANTS = {
 def upgrade() -> None:
     op.create_table(
         "monthly_products",
-        sa.Column("product_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "product_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("target_month", sa.Date(), nullable=False),
         sa.Column("ranking_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("status", sa.String(20), server_default="DRAFT", nullable=False),
-        sa.Column("facts", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False),
+        sa.Column(
+            "facts", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False
+        ),
         sa.Column("priority_count", sa.Integer(), nullable=True),
         sa.Column("created_by", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("decided_at", TS, nullable=True),
@@ -67,24 +76,46 @@ def upgrade() -> None:
         sa.Column("updated_at", TS, server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("product_id", name="pk_monthly_products"),
         sa.UniqueConstraint("target_month", name="uq_monthly_products_target_month"),
-        sa.ForeignKeyConstraint(["ranking_id"], ["monthly_rankings.ranking_id"], name="fk_monthly_products_ranking_id", ondelete="RESTRICT"),
-        sa.ForeignKeyConstraint(["created_by"], ["users.user_id"], name="fk_monthly_products_created_by", ondelete="SET NULL"),
-        sa.CheckConstraint("status IN ('DRAFT', 'ANALYST_REVIEWED', 'KBO_CHECKED', 'VALIDATED', 'DECIDED')", name="monthly_product_status_allowed"),
+        sa.ForeignKeyConstraint(
+            ["ranking_id"],
+            ["monthly_rankings.ranking_id"],
+            name="fk_monthly_products_ranking_id",
+            ondelete="RESTRICT",
+        ),
+        sa.ForeignKeyConstraint(
+            ["created_by"],
+            ["users.user_id"],
+            name="fk_monthly_products_created_by",
+            ondelete="SET NULL",
+        ),
+        sa.CheckConstraint(
+            "status IN ('DRAFT', 'ANALYST_REVIEWED', 'KBO_CHECKED', 'VALIDATED', 'DECIDED')",
+            name="monthly_product_status_allowed",
+        ),
     )
     op.create_index("ix_monthly_products_ranking_id", "monthly_products", ["ranking_id"])
     op.create_index("ix_monthly_products_created_by", "monthly_products", ["created_by"])
-    op.execute("CREATE TRIGGER trg_monthly_products_set_updated_at BEFORE UPDATE ON monthly_products FOR EACH ROW EXECUTE FUNCTION set_updated_at()")
+    op.execute(
+        "CREATE TRIGGER trg_monthly_products_set_updated_at BEFORE UPDATE ON monthly_products FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    )
 
     op.create_table(
         "monthly_product_items",
-        sa.Column("item_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "item_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("product_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("rank", sa.Integer(), nullable=False),
         sa.Column("kelurahan", sa.String(100), nullable=False),
         sa.Column("kecamatan", sa.String(100), nullable=False),
         sa.Column("polsek", sa.String(100), nullable=False),
         sa.Column("predicted_count", sa.Numeric(8, 2), nullable=False),
-        sa.Column("pattern", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False),
+        sa.Column(
+            "pattern", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False
+        ),
         sa.Column("proposal_text", sa.Text(), nullable=False),
         sa.Column("proposed_function", sa.String(30), nullable=False),
         sa.Column("analyst_status", sa.String(10), nullable=True),
@@ -94,34 +125,73 @@ def upgrade() -> None:
         sa.Column("decided_action", sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint("item_id", name="pk_monthly_product_items"),
         sa.UniqueConstraint("product_id", "kelurahan", name="uq_monthly_product_items_kelurahan"),
-        sa.ForeignKeyConstraint(["product_id"], ["monthly_products.product_id"], name="fk_monthly_product_items_product_id", ondelete="CASCADE"),
-        sa.CheckConstraint("analyst_status IS NULL OR analyst_status IN ('ACCEPTED', 'REVISED', 'REJECTED')", name="monthly_item_analyst_status_allowed"),
+        sa.ForeignKeyConstraint(
+            ["product_id"],
+            ["monthly_products.product_id"],
+            name="fk_monthly_product_items_product_id",
+            ondelete="CASCADE",
+        ),
+        sa.CheckConstraint(
+            "analyst_status IS NULL OR analyst_status IN ('ACCEPTED', 'REVISED', 'REJECTED')",
+            name="monthly_item_analyst_status_allowed",
+        ),
     )
-    op.create_index("ix_monthly_product_items_product", "monthly_product_items", ["product_id", "rank"])
+    op.create_index(
+        "ix_monthly_product_items_product", "monthly_product_items", ["product_id", "rank"]
+    )
 
     op.create_table(
         "monthly_product_stages",
-        sa.Column("stage_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "stage_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("product_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("stage", sa.String(10), nullable=False),
         sa.Column("outcome", sa.String(10), nullable=False),
         sa.Column("reason", sa.Text(), nullable=True),
         sa.Column("note", sa.Text(), nullable=True),
-        sa.Column("payload", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False),
+        sa.Column(
+            "payload", postgresql.JSONB(), server_default=sa.text("'{}'::jsonb"), nullable=False
+        ),
         sa.Column("acted_by", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("acted_at", TS, server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("stage_id", name="pk_monthly_product_stages"),
-        sa.ForeignKeyConstraint(["product_id"], ["monthly_products.product_id"], name="fk_monthly_product_stages_product_id", ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["acted_by"], ["users.user_id"], name="fk_monthly_product_stages_acted_by", ondelete="SET NULL"),
-        sa.CheckConstraint("stage IN ('ANALYST', 'KBO', 'KASAT', 'PIMPINAN')", name="monthly_stage_allowed"),
-        sa.CheckConstraint("outcome IN ('ACCEPTED', 'REVISED', 'REJECTED', 'DECIDED')", name="monthly_stage_outcome_allowed"),
+        sa.ForeignKeyConstraint(
+            ["product_id"],
+            ["monthly_products.product_id"],
+            name="fk_monthly_product_stages_product_id",
+            ondelete="CASCADE",
+        ),
+        sa.ForeignKeyConstraint(
+            ["acted_by"],
+            ["users.user_id"],
+            name="fk_monthly_product_stages_acted_by",
+            ondelete="SET NULL",
+        ),
+        sa.CheckConstraint(
+            "stage IN ('ANALYST', 'KBO', 'KASAT', 'PIMPINAN')", name="monthly_stage_allowed"
+        ),
+        sa.CheckConstraint(
+            "outcome IN ('ACCEPTED', 'REVISED', 'REJECTED', 'DECIDED')",
+            name="monthly_stage_outcome_allowed",
+        ),
     )
-    op.create_index("ix_monthly_product_stages_product", "monthly_product_stages", ["product_id", "acted_at"])
+    op.create_index(
+        "ix_monthly_product_stages_product", "monthly_product_stages", ["product_id", "acted_at"]
+    )
     op.create_index("ix_monthly_product_stages_acted_by", "monthly_product_stages", ["acted_by"])
 
     op.create_table(
         "monthly_actions",
-        sa.Column("action_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "action_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("item_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("recorded_by", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("unit", sa.String(100), nullable=False),
@@ -131,8 +201,18 @@ def upgrade() -> None:
         sa.Column("result", sa.Text(), nullable=True),
         sa.Column("created_at", TS, server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("action_id", name="pk_monthly_actions"),
-        sa.ForeignKeyConstraint(["item_id"], ["monthly_product_items.item_id"], name="fk_monthly_actions_item_id", ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["recorded_by"], ["users.user_id"], name="fk_monthly_actions_recorded_by", ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["item_id"],
+            ["monthly_product_items.item_id"],
+            name="fk_monthly_actions_item_id",
+            ondelete="CASCADE",
+        ),
+        sa.ForeignKeyConstraint(
+            ["recorded_by"],
+            ["users.user_id"],
+            name="fk_monthly_actions_recorded_by",
+            ondelete="SET NULL",
+        ),
     )
     op.create_index("ix_monthly_actions_item", "monthly_actions", ["item_id", "acted_at"])
     op.create_index("ix_monthly_actions_recorded_by", "monthly_actions", ["recorded_by"])
@@ -159,11 +239,20 @@ def upgrade() -> None:
             {"code": code, "username": username, "role_code": role_code},
         )
     for (resource, action), description in NEW_PERMISSIONS.items():
-        if bind.execute(sa.text("SELECT 1 FROM permissions WHERE resource = :r AND action = :a"), {"r": resource, "a": action}).first():
+        if bind.execute(
+            sa.text("SELECT 1 FROM permissions WHERE resource = :r AND action = :a"),
+            {"r": resource, "a": action},
+        ).first():
             continue
-        nxt = bind.execute(sa.text("SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 6) AS INTEGER)), 0) + 1 FROM permissions WHERE code LIKE 'PERM-%'")).scalar_one()
+        nxt = bind.execute(
+            sa.text(
+                "SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 6) AS INTEGER)), 0) + 1 FROM permissions WHERE code LIKE 'PERM-%'"
+            )
+        ).scalar_one()
         bind.execute(
-            sa.text("INSERT INTO permissions (permission_id, code, resource, action, description, created_at, updated_at) VALUES (gen_random_uuid(), :code, :r, :a, :d, now(), now())"),
+            sa.text(
+                "INSERT INTO permissions (permission_id, code, resource, action, description, created_at, updated_at) VALUES (gen_random_uuid(), :code, :r, :a, :d, now(), now())"
+            ),
             {"code": f"PERM-{int(nxt):03d}", "r": resource, "a": action, "d": description},
         )
     for role_name, scopes in GRANTS.items():
@@ -183,11 +272,18 @@ def upgrade() -> None:
 def downgrade() -> None:
     if not context.is_offline_mode():
         bind = op.get_bind()
-        bind.execute(sa.text("DELETE FROM role_permissions rp USING permissions p WHERE rp.permission_id = p.permission_id AND p.resource = 'monthly_product'"))
+        bind.execute(
+            sa.text(
+                "DELETE FROM role_permissions rp USING permissions p WHERE rp.permission_id = p.permission_id AND p.resource = 'monthly_product'"
+            )
+        )
         bind.execute(sa.text("DELETE FROM permissions WHERE resource = 'monthly_product'"))
     for table, indexes in (
         ("monthly_actions", ("ix_monthly_actions_recorded_by", "ix_monthly_actions_item")),
-        ("monthly_product_stages", ("ix_monthly_product_stages_acted_by", "ix_monthly_product_stages_product")),
+        (
+            "monthly_product_stages",
+            ("ix_monthly_product_stages_acted_by", "ix_monthly_product_stages_product"),
+        ),
         ("monthly_product_items", ("ix_monthly_product_items_product",)),
     ):
         for index in indexes:

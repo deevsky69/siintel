@@ -41,10 +41,16 @@ def upgrade() -> None:
         sa.Column("moderated_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("moderation_note", sa.String(300), nullable=True),
         sa.Column(
-            "created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.Column(
-            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.PrimaryKeyConstraint("review_id", name="pk_area_reviews"),
         sa.UniqueConstraint("code", name="uq_area_reviews_code"),
