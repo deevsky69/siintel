@@ -11,8 +11,11 @@ from __future__ import annotations
 
 import os
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 from sqlalchemy import Connection, Engine, create_engine, text
 from sqlalchemy.exc import DatabaseError
 
@@ -133,7 +136,13 @@ def test_migrations_are_applied(engine: Engine) -> None:
     # Angkanya sengaja dipatok, bukan dibaca dari berkas migrasi. Membacanya dari sana
     # membuat test ini selalu lulus — ia akan membandingkan migrasi dengan dirinya sendiri
     # alih-alih dengan basis data yang benar-benar dipakai.
-    assert revision == "0022", "database belum di-migrate: jalankan `pnpm db:migrate`"
+    # Dibandingkan dengan head yang tercatat di skrip migrasi, bukan angka yang ditulis
+    # tangan: angka tetap tertinggal setiap kali migrasi baru ditambahkan (0023 lolos dari
+    # "0022" dan membuat CI merah).
+    head = ScriptDirectory.from_config(
+        Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
+    ).get_current_head()
+    assert revision == head, "database belum di-migrate: jalankan `pnpm db:migrate`"
 
 
 def test_postgis_and_pgcrypto_are_installed(engine: Engine) -> None:
