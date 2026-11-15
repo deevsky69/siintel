@@ -23,11 +23,10 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
-import yaml
 from sqlalchemy.orm import Session
 
 from ..seeding.paths import REPO_ROOT
-from . import clock, outlook
+from . import clock, config_cache, outlook
 
 ADVICE_FILE = REPO_ROOT / "config" / "recommendation" / "citizen-advice.yaml"
 #: Imbauan hanya memuat beberapa jenis teratas supaya terbaca di ponsel.
@@ -50,7 +49,7 @@ class Advice:
 
 
 def load_advice() -> Advice:
-    raw: dict[str, Any] = yaml.safe_load(ADVICE_FILE.read_text(encoding="utf-8")) or {}
+    raw: dict[str, Any] = config_cache.load_yaml(ADVICE_FILE) or {}
     return Advice(
         status=str(raw.get("status", "PROPOSED")),
         intro=str(raw.get("intro", "")),

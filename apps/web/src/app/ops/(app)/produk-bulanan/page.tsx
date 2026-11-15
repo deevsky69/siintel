@@ -54,17 +54,17 @@ export default async function ProdukBulananPage({
   const month =
     (Array.isArray(raw) ? raw[0] : raw) || list.data[0]?.target_month || list.suggested_month;
   const can = (p: string) => profile.permissions.includes(p);
-  let product: MonthlyProduct | null = null;
-  try {
-    product = await getProduct(month);
-  } catch (error) {
-    if (!(error instanceof ApiError) || error.status !== 404) throw error;
-  }
+  // Produk dan lampirannya diminta bersamaan begitu bulan diketahui (audit 15 November 2026).
   // Lampiran: perkiraan singkat bulan sasaran (sebelumnya layar Rencana Patroli tersendiri
   // dengan persetujuannya sendiri — 2.ii). Gagal/403 → lampiran tidak tampil, naskah tetap.
-  const outlook: MonthlyOutlook | null = product
-    ? await getMonthlyOutlook(month).catch(() => null)
-    : null;
+  const [product, outlookResult] = await Promise.all([
+    getProduct(month).catch((error: unknown): MonthlyProduct | null => {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }),
+    getMonthlyOutlook(month).catch((): MonthlyOutlook | null => null),
+  ]);
+  const outlook: MonthlyOutlook | null = product ? outlookResult : null;
   const done = doneAt(product);
   const awaiting = product ? isAwaitingDecision(product.status) : false;
   const analystTurn = product?.status === "DRAFT" && can("monthly_product:draft");

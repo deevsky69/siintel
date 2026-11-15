@@ -44,13 +44,12 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from typing import Any
 
-import yaml
 from sqlalchemy import Select, func, select, true
 from sqlalchemy.orm import Session
 
 from ..models import CitizenReport, CrimeIncident, IntelligenceReport, Location
 from ..seeding.paths import REPO_ROOT
-from . import clock
+from . import clock, config_cache
 
 RISK_WEIGHTS_FILE = REPO_ROOT / "config" / "risk" / "risk-weights.yaml"
 THRESHOLDS_FILE = REPO_ROOT / "config" / "risk" / "warning-thresholds.yaml"
@@ -278,7 +277,7 @@ def load_weights() -> WeightsCatalogue:
         message = "config/risk/risk-weights.yaml tidak ditemukan"
         raise RiskEngineError(message)
 
-    raw: dict[str, Any] = yaml.safe_load(RISK_WEIGHTS_FILE.read_text(encoding="utf-8"))
+    raw: dict[str, Any] = config_cache.load_yaml(RISK_WEIGHTS_FILE)
     active = str(raw["active_version"])
     versions: dict[str, WeightsVersion] = {}
 
@@ -319,7 +318,7 @@ def load_thresholds() -> Thresholds:
         message = "config/risk/warning-thresholds.yaml tidak ditemukan"
         raise RiskEngineError(message)
 
-    catalogue: dict[str, Any] = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
+    catalogue: dict[str, Any] = config_cache.load_yaml(THRESHOLDS_FILE)
     # Ambang berversi sejak 1 September 2026: kelas risiko diambil dari versi yang
     # sedang berlaku, bukan dari tingkat atas berkas.
     raw: dict[str, Any] = catalogue["versions"][str(catalogue["active_version"])]
@@ -363,7 +362,7 @@ def threshold_status_of(version: str | None) -> str | None:
     if not version or not THRESHOLDS_FILE.exists():
         return None
 
-    catalogue: dict[str, Any] = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
+    catalogue: dict[str, Any] = config_cache.load_yaml(THRESHOLDS_FILE)
     body = catalogue.get("versions", {}).get(version)
     return None if body is None else str(body.get("status", "UNKNOWN"))
 
@@ -465,7 +464,7 @@ def load_leadership_display() -> LeadershipDisplay:
         message = "config/risk/warning-thresholds.yaml tidak ditemukan"
         raise RiskEngineError(message)
 
-    catalogue: dict[str, Any] = yaml.safe_load(THRESHOLDS_FILE.read_text(encoding="utf-8"))
+    catalogue: dict[str, Any] = config_cache.load_yaml(THRESHOLDS_FILE)
     raw = catalogue.get("leadership_display")
     if not raw:
         message = "config/risk/warning-thresholds.yaml tidak memuat blok leadership_display"

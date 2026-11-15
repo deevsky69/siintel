@@ -112,11 +112,15 @@ export default async function DataEntryPage({
   // Profil dibaca lebih dulu: daftar laporan masyarakat hanya boleh diminta bila perannya
   // memang berwenang membacanya. Memintanya tanpa syarat akan membuat seluruh halaman
   // gagal bagi peran Fungsi, yang tidak memegang `citizen_report:read`.
+  // Opsi dan lokasi tidak bergantung pada profil: dimulai bersamaan (audit 15 November 2026).
+  const referencePromise = Promise.all([getEntryOptions(), getLocations()]);
   const profile = await getProfile();
   const allows = (permission: string) => profile.permissions.includes(permission);
 
-  const [options, locations] = await Promise.all([getEntryOptions(), getLocations()]);
-  const reports = allows("citizen_report:read") ? await getCitizenReports({ pageSize: 200 }) : null;
+  const [[options, locations], reports] = await Promise.all([
+    referencePromise,
+    allows("citizen_report:read") ? getCitizenReports({ pageSize: 200 }) : Promise.resolve(null),
+  ]);
 
   const locationGroups: LocationGroup[] = byPolsek(locations.data).map((group) => ({
     polsek: group.polsek,

@@ -38,7 +38,7 @@ from ..models import (
     MonthlyRanking,
     User,
 )
-from . import clock
+from . import clock, config_cache
 from . import monthly_ranking as ranking
 from .bulletin import THREAT_LABEL
 from .risk_engine import _known_by
@@ -71,9 +71,8 @@ BASIS = (
 
 
 def _draft_top_n() -> int:
-    import yaml
 
-    raw: dict[str, Any] = yaml.safe_load(ranking.CONFIG_FILE.read_text(encoding="utf-8"))
+    raw: dict[str, Any] = config_cache.load_yaml(ranking.CONFIG_FILE)
     return int((raw.get("product") or {}).get("draft_top_n", 10))
 
 

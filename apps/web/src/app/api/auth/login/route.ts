@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { BASE_URL } from "@/lib/api";
 import { ACCESS_COOKIE, cookieOptions, REFRESH_COOKIE } from "@/lib/session";
+import { tokenMaxAge } from "@/lib/token";
 
 /**
  * Meneruskan permintaan masuk ke backend, lalu menyimpan token pada cookie httpOnly.
@@ -27,7 +28,13 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(ACCESS_COOKIE, body.access_token, cookieOptions(60 * 60));
+  // Umur cookie = umur token (15 menit di API). Cookie yang hidup lebih lama dari tokennya
+  // membuat setiap permintaan ditolak 401 dulu (audit 15 November 2026).
+  response.cookies.set(
+    ACCESS_COOKIE,
+    body.access_token,
+    cookieOptions(tokenMaxAge(body.access_token, 15 * 60)),
+  );
 
   // Refresh token milik backend diteruskan apa adanya agar sesi dapat diperpanjang.
   const upstreamCookie = upstream.headers.getSetCookie?.() ?? [];

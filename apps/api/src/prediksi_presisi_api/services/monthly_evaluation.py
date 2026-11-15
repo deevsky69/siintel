@@ -22,13 +22,12 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Any
 
-import yaml
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..models import CrimeIncident, Location, MonthlyProduct, MonthlyRanking
+from . import config_cache, visibility
 from . import monthly_ranking as ranking
-from . import visibility
 
 BASIS = (
     "Cakupan = kejadian aktual bulan sasaran di N kelurahan teratas / seluruh kejadian aktual "
@@ -39,7 +38,7 @@ BASIS = (
 
 
 def _default_top_n() -> int:
-    raw: dict[str, Any] = yaml.safe_load(ranking.CONFIG_FILE.read_text(encoding="utf-8"))
+    raw: dict[str, Any] = config_cache.load_yaml(ranking.CONFIG_FILE)
     return int((raw.get("evaluation") or {}).get("default_top_n", 6))
 
 

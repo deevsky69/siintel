@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { apiGet, apiPatch } from "./api";
 
 /**
@@ -114,7 +115,7 @@ export type SessionProfile = {
   permissions: string[];
 };
 
-export const getSessionProfile = () => apiGet<SessionProfile>("/auth/me");
+export const getSessionProfile = cache(() => apiGet<SessionProfile>("/auth/me"));
 
 export const getUsers = () => apiGet<UserDirectory>("/users");
 

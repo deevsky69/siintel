@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { ACCESS_COOKIE, cookieOptions, REFRESH_COOKIE, readSession } from "./session";
+import { tokenMaxAge } from "./token";
 
 /**
  * Klien API sisi server.
@@ -26,19 +28,36 @@ export class ApiError extends Error {
   }
 }
 
-async function refreshAccessToken(refreshToken: string): Promise<string | null> {
+/**
+ * Penyegaran token dari dalam render — jalur CADANGAN. Jalur utamanya middleware
+ * (`src/middleware.ts`), yang menyegarkan sebelum token habis dan boleh memasang cookie.
+ *
+ * Di komponen server `cookies().set` dilarang Next dan melempar; di server action/route
+ * handler boleh. Maka penyimpanan dicoba lalu diabaikan bila ditolak, dan token baru tetap
+ * dipakai untuk permintaan ini. `cache()` membuat beberapa panggilan paralel dalam satu
+ * render berbagi SATU penyegaran, bukan satu per panggilan.
+ */
+const refreshAccessToken = cache(async (refreshToken: string): Promise<string | null> => {
   const response = await fetch(`${BASE_URL}/api/v1/auth/refresh`, {
     method: "POST",
-    headers: { Cookie: `predpol_refresh=${refreshToken}` },
+    headers: { Cookie: `${REFRESH_COOKIE}=${refreshToken}` },
     cache: "no-store",
   });
   if (!response.ok) return null;
-
   const body = (await response.json()) as { access_token: string };
-  const store = await cookies();
-  store.set(ACCESS_COOKIE, body.access_token, cookieOptions(60 * 60));
+  try {
+    const store = await cookies();
+    store.set(
+      ACCESS_COOKIE,
+      body.access_token,
+      cookieOptions(tokenMaxAge(body.access_token, 15 * 60)),
+    );
+  } catch {
+    // Komponen server: cookie tidak dapat dipasang di sini; middleware yang akan memasangnya
+    // pada permintaan berikutnya.
+  }
   return body.access_token;
-}
+});
 
 type Payload = { method: string; body?: unknown };
 

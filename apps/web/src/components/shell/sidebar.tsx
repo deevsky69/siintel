@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavIcon } from "./icons";
 import type { NavItem } from "./navigation";
 import { groupOf, visibleNavGroups } from "./navigation";
@@ -31,6 +31,12 @@ export function Sidebar({
   pendingDecisions?: number;
 }) {
   const pathname = usePathname();
+  // Sorotan optimistik: item yang baru diklik langsung menyala, tidak menunggu halaman baru
+  // tiba (audit 15 November 2026: tanpa ini klik menu tidak memberi tanda apa pun).
+  const [clicked, setClicked] = useState<string | null>(null);
+  useEffect(() => {
+    setClicked(null);
+  }, [pathname]);
   const groups = visibleNavGroups(permissions);
   const activeGroup = groupOf(pathname);
 
@@ -47,7 +53,11 @@ export function Sidebar({
   const opened = toggled.path === pathname ? toggled.ids : new Set<string>();
 
   const isActive = (href: string) =>
-    href === "/ops" ? pathname === "/ops" : pathname.startsWith(href);
+    clicked !== null
+      ? clicked === href
+      : href === "/ops"
+        ? pathname === "/ops"
+        : pathname.startsWith(href);
 
   const toggle = (id: string) =>
     setToggled((previous) => {
@@ -110,6 +120,7 @@ export function Sidebar({
                       item={item}
                       active={isActive(item.href)}
                       badge={item.href === "/ops/produk-bulanan" ? pendingDecisions : 0}
+                      onNavigate={() => setClicked(item.href)}
                     />
                   </li>
                 ))}
@@ -122,12 +133,23 @@ export function Sidebar({
   );
 }
 
-function SubmenuLink({ item, active, badge }: { item: NavItem; active: boolean; badge: number }) {
+function SubmenuLink({
+  item,
+  active,
+  badge,
+  onNavigate,
+}: {
+  item: NavItem;
+  active: boolean;
+  badge: number;
+  onNavigate: () => void;
+}) {
   return (
     <Link
       href={item.href}
       title={item.hint}
       aria-current={active ? "page" : undefined}
+      onClick={onNavigate}
       className={`flex items-center gap-2 rounded px-2 py-2 text-xs leading-tight transition-colors ${
         active
           ? "bg-accent/10 font-semibold text-accent"
@@ -135,6 +157,7 @@ function SubmenuLink({ item, active, badge }: { item: NavItem; active: boolean; 
       }`}
     >
       <span className="flex-1">{item.label}</span>
+      <PendingDot />
       {badge > 0 ? (
         <>
           <span
@@ -147,5 +170,18 @@ function SubmenuLink({ item, active, badge }: { item: NavItem; active: boolean; 
         </>
       ) : null}
     </Link>
+  );
+}
+
+/** Titik berdenyut selama halaman tujuan masih dimuat (`useLinkStatus`, Next 15.3+). */
+function PendingDot() {
+  const { pending } = useLinkStatus();
+  if (!pending) return null;
+  return (
+    <span
+      role="status"
+      aria-label="Memuat halaman"
+      className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent"
+    />
   );
 }

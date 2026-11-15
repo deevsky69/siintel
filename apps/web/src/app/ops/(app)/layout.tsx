@@ -16,6 +16,10 @@ import { getNotifications } from "@/lib/notifications";
  * bukan otorisasi**: backend tetap memeriksa setiap permintaan (CLAUDE.md §15).
  */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  // Notifikasi tidak bergantung pada profil: dimulai bersamaan supaya tidak ada gelombang
+  // tambahan (audit 15 November 2026). Lencana keputusan tetap menunggu profil karena hanya
+  // bermakna bagi yang dapat memutuskan.
+  const feedPromise = getNotifications().catch(() => null);
   const profile = await getProfile();
 
   // Lencana hanya bermakna bagi yang dapat memutuskan. Bagi peran lain, rekomendasi yang
@@ -27,7 +31,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     // Kegagalan memuat antrean tidak boleh menjatuhkan seluruh shell: lonceng adalah
     // penanda tambahan, dan halaman yang gagal seluruhnya karena satu angka jauh lebih
     // merugikan daripada lonceng yang tidak muncul.
-    getNotifications().catch(() => null),
+    feedPromise,
   ]);
 
   return (

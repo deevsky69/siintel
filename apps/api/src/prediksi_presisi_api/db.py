@@ -51,7 +51,14 @@ def get_engine() -> Engine:
     settings = get_settings()
     if not settings.database_url:
         raise DatabaseNotConfiguredError
-    return create_engine(settings.database_url, pool_pre_ping=True, future=True)
+    # statement_timeout: satu kueri yang tersangkut tidak boleh menahan koneksi pool tanpa
+    # batas (audit 15 November 2026); 30 detik jauh di atas kueri terlama yang sah.
+    return create_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        future=True,
+        connect_args={"options": "-c statement_timeout=30000"},
+    )
 
 
 @lru_cache

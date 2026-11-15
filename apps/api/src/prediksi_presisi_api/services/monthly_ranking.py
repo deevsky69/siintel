@@ -27,13 +27,12 @@ from datetime import date, timedelta
 from functools import lru_cache
 from typing import Any
 
-import yaml
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..models import CrimeIncident, Location, MonthlyRanking, MonthlyRankingRow
 from ..seeding.paths import REPO_ROOT
-from . import clock, visibility
+from . import clock, config_cache, visibility
 from .risk_engine import _known_by
 
 CONFIG_FILE = REPO_ROOT / "config" / "ranking" / "monthly.yaml"
@@ -68,7 +67,7 @@ class RankingConfig:
 def load_config() -> RankingConfig:
     if not CONFIG_FILE.exists():
         raise RankingError("config/ranking/monthly.yaml tidak ditemukan")
-    raw: dict[str, Any] = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))
+    raw: dict[str, Any] = config_cache.load_yaml(CONFIG_FILE)
     return RankingConfig(
         version=str(raw["version"]),
         status=str(raw.get("status", "UNKNOWN")),

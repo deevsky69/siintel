@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { apiGet, apiPost } from "./api";
 
 /**
@@ -76,7 +77,7 @@ export const AWAITING_DECISION: readonly ProductStatus[] = [
 ];
 export const isAwaitingDecision = (status: ProductStatus) => AWAITING_DECISION.includes(status);
 
-export const listProducts = () => apiGet<ProductList>("/monthly-products");
+export const listProducts = cache(() => apiGet<ProductList>("/monthly-products"));
 export const getProduct = (month: string) => apiGet<MonthlyProduct>(`/monthly-products/${month}`);
 export const draftProduct = (month: string) =>
   apiPost<MonthlyProduct>("/monthly-products", { month });
