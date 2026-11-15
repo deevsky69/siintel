@@ -203,7 +203,7 @@ def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_b
         "/api/v1/bulletins", params={"week": week.isoformat()}, headers=leader
     ).json()
     mine = next(row for row in listing["data"] if row["kelurahan"] == area.kelurahan)
-    assert mine["status"] == "DRAFT" and area.kelurahan.upper() in mine["content"]
+    assert mine["status"] == "DRAFT" and str(area.kelurahan).upper() in mine["content"]
     assert "SIGAP WARGA" in mine["content"] and mine["figures"]["week_start"] == week.isoformat()
 
     # Hanya Pimpinan yang menyetujui; Administrator ditolak.
@@ -232,7 +232,8 @@ def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_b
         )
     )
     assert entry is not None
-    assert session.get(Bulletin, uuid.UUID(mine["id"])).sent_at is not None
+    sent_row = session.get(Bulletin, uuid.UUID(mine["id"]))
+    assert sent_row is not None and sent_row.sent_at is not None
 
 
 def test_citizen_group_registration_and_monthly_advisory_for_bot(

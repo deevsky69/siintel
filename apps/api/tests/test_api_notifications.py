@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 import uuid
 from collections.abc import Iterator
+from typing import Any, cast
 
 import pytest
 from fastapi.testclient import TestClient
@@ -223,7 +224,7 @@ def test_the_triage_queue_belongs_to_the_administrator_only(
     assert "CITIZEN_REPORT" not in _kinds(_feed(client, officer))
 
     admin = _make_user(session, "Administrator")
-    groups = _feed(client, admin)["groups"]
+    groups = cast(list[dict[str, Any]], _feed(client, admin)["groups"])
     reports = next(group for group in groups if group["kind"] == "CITIZEN_REPORT")
     received = session.scalar(
         select(func.count()).select_from(CitizenReport).where(CitizenReport.status == "RECEIVED")

@@ -201,7 +201,7 @@ def notifications(
 
     # --- Buletin mingguan menunggu persetujuan Pimpinan ----------------------------------
     if _holds(current, "bulletin:approve"):
-        rows = session.scalars(
+        bulletins = session.scalars(
             select(Bulletin)
             .where(Bulletin.status == "DRAFT")
             .order_by(Bulletin.week_start.desc(), Bulletin.kelurahan)
@@ -225,7 +225,7 @@ def notifications(
                         ),
                         "detail": "Disusun sistem dari kejadian minggu lalu",
                     }
-                    for bulletin in rows
+                    for bulletin in bulletins
                 ],
             }
         )

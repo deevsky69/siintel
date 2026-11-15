@@ -6,6 +6,7 @@ import os
 import uuid
 from collections.abc import Iterator
 from datetime import date
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -96,10 +97,11 @@ def _kecamatan_location(session: Session, kecamatan: str) -> Location:
     return row
 
 
-def _create(client: TestClient, headers: dict[str, str], body: dict[str, object]) -> dict:  # type: ignore[type-arg]
+def _create(client: TestClient, headers: dict[str, str], body: dict[str, object]) -> dict[str, Any]:
     response = client.post("/api/v1/crimes", json=body, headers=headers)
     assert response.status_code == 201, response.text
-    return response.json()
+    created: dict[str, Any] = response.json()
+    return created
 
 
 def _area(
@@ -108,7 +110,8 @@ def _area(
     body: dict[str, str] = {"location_code": location}
     if note:
         body["note"] = note
-    return client.post(f"/api/v1/crimes/{code}/area", json=body, headers=headers)
+    response: Response = client.post(f"/api/v1/crimes/{code}/area", json=body, headers=headers)
+    return response
 
 
 def _entry(target: str, location_code: str, day: str = "2025-12-20") -> dict[str, object]:

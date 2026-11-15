@@ -190,7 +190,8 @@ def test_moderation_publishes_and_only_published_count(
             AuditLog.action == "MODERATE_AREA_REVIEW", AuditLog.resource_id == code
         )
     )
-    assert entry is not None and entry.detail["to"] == "PUBLISHED"
+    assert entry is not None and entry.detail is not None
+    assert entry.detail["to"] == "PUBLISHED"
 
 
 def test_moderation_queue_appears_in_the_administrator_notifications(
