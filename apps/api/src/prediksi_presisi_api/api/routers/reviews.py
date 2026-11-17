@@ -3,6 +3,8 @@
 ```text
 POST /public/reviews                 kirim ulasan (anonim, dibatasi laju)       —
 GET  /public/reviews?kelurahan=      ulasan yang tayang + rata-rata             —
+GET  /public/survey/quarterly        hasil per triwulan + cakupan responden     —
+GET  /reviews/quarterly              sama, ditambah rincian per kecamatan       review:moderate
 GET  /reviews?status=PENDING         antrean moderasi                            review:moderate
 POST /reviews/{code}/moderate        PUBLISH / REJECT                            review:moderate
 ```
@@ -11,7 +13,7 @@ Batas dan alasannya ada di `models/area_review.py`.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, Path, Query, Request, status
@@ -97,7 +99,9 @@ def submit_review(
         location_id=location.location_id,
         rating=payload.rating,
         comment=comment,
-        submitted_at=clock.reference_now(),
+        # Waktu sebenarnya, seperti laporan warga (keputusan 4 November 2026): ulasan adalah
+        # interaksi langsung, dan hasil triwulanan hanya bermakna bila cap waktunya nyata.
+        submitted_at=clock.citizen_now(),
         status=STATUS_PENDING,
     )
     session.add(review)
@@ -154,6 +158,115 @@ def published_reviews(
         "data": [_public_row(row) for row in rows],
         "basis": REVIEW_BASIS,
     }
+
+
+# ---------------------------------------------------------------------------
+# Hasil triwulanan (naskah Taskap 4.7 h: "survei rasa aman triwulanan disertai cakupan
+# responden"). Warga tetap dapat mengisi kapan saja; HASILNYA disajikan per triwulan
+# kalender, dengan jumlah responden dan berapa kelurahan yang terwakili.
+# ---------------------------------------------------------------------------
+
+QUARTERS_SHOWN = 4
+ROMAN = ("I", "II", "III", "IV")
+
+QUARTERLY_BASIS = (
+    "Hasil Survey Rasa Aman per triwulan kalender. Responden = ulasan yang tayang pada "
+    "triwulan itu; cakupan = kelurahan yang punya sekurangnya satu responden dibanding seluruh "
+    "kelurahan. Pengisian sukarela dan anonim, jadi angka ini persepsi mereka yang mengisi — "
+    "bukan sampel acak penduduk — dan dibaca bersama jumlah respondennya."
+)
+
+
+def _quarter_start(day: date) -> date:
+    return date(day.year, 3 * ((day.month - 1) // 3) + 1, 1)
+
+
+def _previous_quarter(start: date) -> date:
+    return _quarter_start(start - timedelta(days=1))
+
+
+def quarterly_results(session: Session, *, by_kecamatan: bool = False) -> dict[str, Any]:
+    today = clock.citizen_now().astimezone(clock.JAKARTA).date()
+    kelurahan_total = int(
+        session.scalar(
+            select(func.count(func.distinct(Location.kelurahan))).where(
+                Location.kelurahan.is_not(None)
+            )
+        )
+        or 0
+    )
+    quarters: list[dict[str, Any]] = []
+    start = _quarter_start(today)
+    for _ in range(QUARTERS_SHOWN):
+        following = _quarter_start(start + timedelta(days=95))
+        window = (
+            AreaReview.submitted_at >= datetime.combine(start, time(0), tzinfo=clock.JAKARTA),
+            AreaReview.submitted_at < datetime.combine(following, time(0), tzinfo=clock.JAKARTA),
+        )
+        published = session.execute(
+            select(
+                func.count(),
+                func.avg(AreaReview.rating),
+                func.count(func.distinct(Location.kelurahan)),
+            )
+            .select_from(AreaReview)
+            .join(Location, Location.location_id == AreaReview.location_id)
+            .where(*window, AreaReview.status == STATUS_PUBLISHED)
+        ).one()
+        entry: dict[str, Any] = {
+            "label": f"Triwulan {ROMAN[(start.month - 1) // 3]} {start.year}",
+            "from": start,
+            "to": following - timedelta(days=1),
+            "running": start <= today < following,
+            "respondents": int(published[0] or 0),
+            "average": round(float(published[1]), 1) if published[1] is not None else None,
+            "kelurahan_covered": int(published[2] or 0),
+            "kelurahan_total": kelurahan_total,
+            "coverage_pct": round(int(published[2] or 0) / kelurahan_total * 100, 1)
+            if kelurahan_total
+            else None,
+        }
+        if by_kecamatan:
+            entry["submitted"] = int(
+                session.scalar(select(func.count()).select_from(AreaReview).where(*window)) or 0
+            )
+            entry["kecamatan"] = [
+                {
+                    "kecamatan": str(name),
+                    "respondents": int(count),
+                    "average": round(float(mean), 1) if mean is not None else None,
+                    "kelurahan_covered": int(covered),
+                }
+                for name, count, mean, covered in session.execute(
+                    select(
+                        Location.kecamatan,
+                        func.count(),
+                        func.avg(AreaReview.rating),
+                        func.count(func.distinct(Location.kelurahan)),
+                    )
+                    .select_from(AreaReview)
+                    .join(Location, Location.location_id == AreaReview.location_id)
+                    .where(*window, AreaReview.status == STATUS_PUBLISHED)
+                    .group_by(Location.kecamatan)
+                    .order_by(Location.kecamatan)
+                ).all()
+            ]
+        quarters.append(entry)
+        start = _previous_quarter(start)
+    return {"quarters": quarters, "basis": QUARTERLY_BASIS}
+
+
+@router.get("/public/survey/quarterly", summary="Hasil Survey Rasa Aman per triwulan")
+def public_quarterly(session: Session = Depends(get_db)) -> dict[str, Any]:
+    return quarterly_results(session)
+
+
+@router.get("/reviews/quarterly", summary="Hasil triwulanan dengan rincian per kecamatan")
+def moderation_quarterly(
+    session: Session = Depends(get_db),
+    _: CurrentUser = require_permission("review:moderate"),
+) -> dict[str, Any]:
+    return quarterly_results(session, by_kecamatan=True)
 
 
 # ---------------------------------------------------------------------------

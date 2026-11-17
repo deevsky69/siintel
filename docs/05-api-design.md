@@ -477,8 +477,15 @@ tidak terjadi.
 | GET | `/public/areas/summary` | — | per kelurahan: jumlah 3C 12 bulan terakhir, per jenis, per bulan, tingkat RENDAH/SEDANG/TINGGI (tertil, PROPOSED), rata-rata ulasan tayang; agregat per kecamatan. Tanpa prediksi/skor/titik |
 | POST | `/public/reviews` | — | ulasan anonim (kecamatan, kelurahan, rating 1–5, komentar ≤300); kuota 3/jam per alamat; masuk PENDING; audit `SUBMIT_AREA_REVIEW` |
 | GET | `/public/reviews?kelurahan=` | — | ulasan PUBLISHED + rata-rata + jumlah |
+| GET | `/public/survey/quarterly` | — | **17 November 2026 (naskah Taskap 4.7 h):** empat triwulan kalender terakhir — responden (ulasan tayang), nilai rata-rata, kelurahan terwakili dari seluruh kelurahan, `coverage_pct`; triwulan berjalan ditandai `running` |
+| GET | `/reviews/quarterly` | `review:moderate` | sama, ditambah `submitted` (seluruh ulasan masuk) dan rincian per kecamatan |
+| GET | `/public/guides` | — | **17 November 2026 (naskah 4.7 f):** panduan pengamanan kos, parkir, gedung, RT/RW dari `config/recommendation/security-guides.yaml` (PROPOSED); tiap panduan membawa `pattern` — agregat 3C 12 bulan terakhir pada jenis tempat itu (jumlah, porsi, modus terbanyak, blok jam terbanyak) — dan `text` siap kirim untuk bot |
 | GET | `/reviews?status=` | `review:moderate` | antrean moderasi |
 | POST | `/reviews/{code}/moderate` | `review:moderate` | `PUBLISH` / `REJECT` + catatan; audit `MODERATE_AREA_REVIEW` |
+
+Sejak 17 November 2026 `area_reviews.submitted_at` memakai waktu sebenarnya
+(`clock.citizen_now`), seperti laporan warga — hasil triwulanan hanya bermakna bila cap
+waktunya nyata.
 
 Tabel `area_reviews` (migration 0015). `GET /notifications` memuat kelompok `REVIEW` bagi
 pemegang `review:moderate`. Tautan `href` pada `/notifications` kini berawalan `/ops`
@@ -509,14 +516,38 @@ idempoten, mencetak LP + PIN contoh).
 imbauan bulan berjalan; `GET /messaging/advisory` (perintah bot **`/info`**, alias lama
 `/rekomendasi`) menjawab teks bulan depan tanpa syarat.
 
-### 2.11j Evaluasi bulanan (Modul 5 mekanisme, 6 November 2026)
+**Langganan warga (17 November 2026, naskah Taskap 4.7 b "Pemberitahuan wilayah")** — kunci
+bot `X-Messaging-Key`:
+
+| Method | Path | Keterangan |
+|---|---|---|
+| POST | `/messaging/subscriptions {channel, chat_id, kelurahan}` | warga berlangganan dari percakapan PRIBADI (`/langganan <kelurahan>`); kanal `WHATSAPP`/`TELEGRAM`; chat grup (`@g.us`) ditolak 400; satu percakapan satu kelurahan (berlangganan lagi = pindah); audit `SUBSCRIBE_AREA_ADVISORY` tanpa pengenal percakapan |
+| GET | `/messaging/subscriptions?channel=&chat_id=` | langganan percakapan itu; 404 bila tidak ada |
+| DELETE | `/messaging/subscriptions?channel=&chat_id=` | berhenti (`/berhenti`): baris **dihapus**; audit `UNSUBSCRIBE_AREA_ADVISORY` |
+| GET | `/messaging/subscriptions/pending` | pelanggan yang belum menerima imbauan bulan berjalan, dengan teksnya |
+| POST | `/messaging/subscriptions/sent {subscription_id, month, delivery}` | menandai bulan itu — juga saat gagal, supaya tidak diulang tiap putaran; audit `SEND_SUBSCRIBER_ADVISORY` |
+
+Tabel `area_subscriptions` (0025): kanal, pengenal percakapan, kelurahan, bulan imbauan
+terakhir. Pengenal percakapan WhatsApp memuat nomor telepon — data pribadi yang diminimalkan
+(`models/area_subscription.py`). `GET /advisories/preview` kini juga memuat `subscribers`
+dan `subscribers_sent`.
+
+### 2.11j Evaluasi bulanan (Modul 5 mekanisme, 6 November 2026; PAI dan uji historis 17 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
 | GET | `/evaluation/monthly?month=YYYY-MM` | `evaluation:read` | per peringkat beku: **cakupan** = kejadian aktual bulan itu di N kelurahan teratas / seluruh yang dapat dipetakan (N = jumlah yang ditetapkan Pimpinan, atau `evaluation.default_top_n` = 6); pembanding peta 3/12 bulan pada N dan batas data yang sama; `decision` (kelurahan pilihan: aktual, jumlah kegiatan); `quality` (diterima/direvisi/ditolak + alasan, tahap yang dikembalikan). PAI `null` — luas kelurahan belum ada di API |
 
+| GET | `/evaluation/monthly/backtest?scope=&first=&last=&top_n=` | `evaluation:read` | **17 November 2026 (Tabel 12 naskah):** uji historis bulan demi bulan di luar masa latih model — per periode (tiap tahun, dan seluruh masa uji) tiap metode: `covered`/`total`, `coverage_pct`, `area_pct`, `pai`; `sign_tests` = uji tanda satu arah model terhadap tiap pembanding (`wins`, `losses`, `ties`, `p_value`); `model` (versi, masa latih, parameter, bobot masukan). Bawaan: cakupan `VEHICLE`, enam kelurahan, sampai bulan utuh terakhir |
+
 Kejadian bulan sasaran dibaca melewati batas tampilan (`visibility.all_incidents`) — hanya
 untuk pencocokan.
+
+Sejak 17 November 2026 `GET /evaluation/monthly` juga menilai MODEL, bulan sebelumnya, dan
+peta tahunan tetap pada N dan batas data yang sama; setiap baris membawa `method_label`,
+`area_pct`, dan `pai` (tidak lagi `null`). PAI = porsi kejadian tercakup / porsi luas
+kelurahan pilihan; luas dari `config/ranking/kelurahan-area.yaml` (perkiraan dari poligon
+peta, PROPOSED).
 
 ### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; dua tahap sejak 10 November 2026)
 
@@ -535,16 +566,23 @@ Tabel `monthly_products`, `monthly_product_items`, `monthly_product_stages`, `mo
 Peringkat awal (tabel 0020) dan keputusan Pimpinan (item `selected`/`decided_action`,
 tahap PIMPINAN) tersimpan terpisah.
 
-### 2.11h Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026)
+### 2.11h Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026; model 17 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
-| GET | `/rankings/options` | `ranking:read` | metode (HISTORY_3M bawaan — keputusan 2A; HISTORY_12M; MODEL belum tersedia), cakupan (ALL_3C/VEHICLE), bulan yang disarankan, daftar yang sudah dibekukan |
+| GET | `/rankings/options` | `ranking:read` | metode: **MODEL** (gradient boosting; metode utama sejak 17 November 2026, menggantikan keputusan 2A), pembanding HISTORY_3M, HISTORY_12M, HISTORY_1M, ANNUAL — masing-masing dengan `kind` dan `available`; `default_method` = metode dasar usulan hasil penjaga, `configured_method`, `method_choice` (`reason`, `evidence`), `model` (kartu model); cakupan (ALL_3C/VEHICLE, bawaan VEHICLE), bulan yang disarankan, daftar yang sudah dibekukan |
 | GET | `/rankings?month=YYYY-MM&method=&scope=` | `ranking:read` | peringkat 65 kelurahan; `frozen: true` bila sudah dibekukan, selain itu hitungan saat ini |
 | POST | `/rankings/freeze {month, method?, scope?, data_cutoff?}` | `ranking:manage` (Administrator) | membekukan beserta batas data, versi metode, jumlah laporan menunggu konfirmasi; 409 bila sudah ada; audit `FREEZE_RANKING` |
 
-Tabel `monthly_rankings` + `monthly_ranking_rows` (0020). Perkiraan = rata-rata bulanan
-pada bulan dasar, hanya kejadian yang **dilaporkan** sampai batas data; seri menurut nama.
+Tanpa `method`, `GET /rankings` dan `POST /rankings/freeze` memakai metode dasar usulan
+bulan itu (`ranking.operational`): MODEL bila cakupannya pada bulan-bulan uji terakhir lebih
+tinggi daripada pembanding terbaik, selain itu peta historis. Baris MODEL membawa
+`basis.factors` — kontribusi tiap masukan, dihitung dari pohon model. CHECK `method`
+diperluas pada 0024. Rancangan, parameter, dan hasil uji: catatan 181.
+
+Tabel `monthly_rankings` + `monthly_ranking_rows` (0020). Perkiraan = keluaran model, atau
+rata-rata bulanan pada bulan dasar untuk peta historis; hanya kejadian yang **dilaporkan**
+sampai batas data; seri menurut nama.
 IKW (frekuensi 12 bulan, tren, konsistensi; `config/ranking/monthly.yaml`, PROPOSED)
 tampil di samping, tidak menentukan urutan.
 

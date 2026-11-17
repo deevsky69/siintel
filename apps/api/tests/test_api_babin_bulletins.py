@@ -392,3 +392,90 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
     listing = client.get("/api/v1/babin", headers=admin).json()
     row = next(r for r in listing["data"] if r["kelurahan"] == area.kelurahan)
     assert row["whatsapp_group_chat_id"] == "120363@g.us"
+
+
+def test_citizen_subscribes_to_area_advisory_and_can_leave(
+    client: TestClient, session: Session
+) -> None:
+    """Pemberitahuan wilayah per warga (naskah 4.7 b): berlangganan dari percakapan pribadi,
+    menerima imbauan bulan berjalan sekali, pindah kelurahan, dan berhenti (baris dihapus)."""
+    from prediksi_presisi_api.models import AreaSubscription, AuditLog
+
+    areas = session.scalars(
+        select(Location).where(Location.kelurahan.is_not(None)).order_by(Location.kelurahan)
+    ).all()
+    first, second = areas[0], next(a for a in areas if a.kelurahan != areas[0].kelurahan)
+    chat = f"62812{uuid.uuid4().int % 10**8:08d}@c.us"
+    body = {"channel": "WHATSAPP", "chat_id": chat, "kelurahan": str(first.kelurahan).upper()}
+
+    assert client.post("/api/v1/messaging/subscriptions", json=body).status_code == 401
+    assert (
+        client.post(
+            "/api/v1/messaging/subscriptions", json={**body, "chat_id": "1203@g.us"}, headers=BOT
+        ).status_code
+        == 400
+    )
+    assert (
+        client.post(
+            "/api/v1/messaging/subscriptions", json={**body, "kelurahan": "Nirwana"}, headers=BOT
+        ).status_code
+        == 404
+    )
+    assert (
+        client.post(
+            "/api/v1/messaging/subscriptions", json={**body, "channel": "SMS"}, headers=BOT
+        ).status_code
+        == 400
+    )
+    created = client.post("/api/v1/messaging/subscriptions", json=body, headers=BOT)
+    assert created.status_code == 200, created.text
+    assert created.json()["kelurahan"] == first.kelurahan  # nama baku, bukan ketikan warga
+
+    query = {"channel": "WHATSAPP", "chat_id": chat}
+    mine = client.get("/api/v1/messaging/subscriptions", params=query, headers=BOT)
+    assert mine.status_code == 200 and mine.json()["kelurahan"] == first.kelurahan
+
+    pending = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
+    row = next(item for item in pending["data"] if item["chat_id"] == chat)
+    assert row["kelurahan"] == first.kelurahan and row["text"]
+    sent = client.post(
+        "/api/v1/messaging/subscriptions/sent",
+        json={
+            "subscription_id": row["subscription_id"],
+            "month": pending["month"],
+            "delivery": {"whatsapp": "ok"},
+        },
+        headers=BOT,
+    )
+    assert sent.status_code == 200
+    again = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
+    assert chat not in [item["chat_id"] for item in again["data"]]  # sekali per bulan
+
+    # Pindah kelurahan: satu percakapan satu kelurahan, dan imbauan kelurahan baru menyusul.
+    moved = client.post(
+        "/api/v1/messaging/subscriptions",
+        json={**body, "kelurahan": second.kelurahan},
+        headers=BOT,
+    )
+    assert moved.status_code == 200 and moved.json()["kelurahan"] == second.kelurahan
+    after_move = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
+    assert [i["kelurahan"] for i in after_move["data"] if i["chat_id"] == chat] == [
+        second.kelurahan
+    ]
+
+    # Jejak audit tidak memuat pengenal percakapan.
+    trail = session.scalars(
+        select(AuditLog).where(AuditLog.action == "SUBSCRIBE_AREA_ADVISORY")
+    ).all()
+    assert trail and all(chat not in str(entry.detail) + str(entry.resource_id) for entry in trail)
+
+    gone = client.delete("/api/v1/messaging/subscriptions", params=query, headers=BOT)
+    assert gone.status_code == 200 and gone.json()["unsubscribed"] is True
+    assert session.scalar(select(AreaSubscription).where(AreaSubscription.chat_id == chat)) is None
+    assert (
+        client.get("/api/v1/messaging/subscriptions", params=query, headers=BOT).status_code == 404
+    )
+    assert (
+        client.delete("/api/v1/messaging/subscriptions", params=query, headers=BOT).status_code
+        == 404
+    )

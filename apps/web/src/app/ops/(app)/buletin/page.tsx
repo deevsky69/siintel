@@ -89,7 +89,8 @@ export default async function BuletinPage({
           title={`Imbauan bulanan ke grup warga · ${advisory.month}`}
           action={
             <span className="panel-action">
-              otomatis · {advisory.groups_sent}/{advisory.groups_registered} grup sudah menerima
+              otomatis · {advisory.groups_sent}/{advisory.groups_registered} grup ·{" "}
+              {advisory.subscribers_sent}/{advisory.subscribers} pelanggan sudah menerima
             </span>
           }
         >

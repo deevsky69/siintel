@@ -117,6 +117,7 @@ def create_app() -> FastAPI:
     api.include_router(panic.router)
     api.include_router(messaging.router)
     api.include_router(public_areas.router)
+    api.include_router(public_areas.guides_router)
     api.include_router(reviews.router)
     api.include_router(public_cases.router)
     api.include_router(case_files.router)

@@ -33,6 +33,18 @@ const SERVICES = [
     text: "Data bulanan tiga jenis kejahatan serta kontak Babinkamtibmas setiap kelurahan.",
     cta: "Buka peta →",
   },
+  {
+    href: "/panduan",
+    title: "Panduan pengamanan",
+    text: "Langkah pengamanan kos, tempat parkir, gedung, dan lingkungan RT/RW dari pola kejadian.",
+    cta: "Baca panduan →",
+  },
+  {
+    href: "/panduan#langganan",
+    title: "Imbauan bulanan",
+    text: "Terima imbauan kehati-hatian kelurahan Anda setiap awal bulan lewat WhatsApp atau Telegram.",
+    cta: "Cara berlangganan →",
+  },
 ] as const;
 
 /**
@@ -67,7 +79,7 @@ export default async function BerandaWarga() {
           <h2 id="layanan" className="mt-1.5 text-3xl text-[rgb(var(--warga-navy))] sm:text-[34px]">
             Layanan untuk warga
           </h2>
-          <nav aria-label="Jalan pintas" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <nav aria-label="Jalan pintas" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {SERVICES.map((item) => (
               <Link key={item.href} href={item.href} className="warga-card-link">
                 <span className="text-[19px] font-bold text-[rgb(var(--warga-navy))]">

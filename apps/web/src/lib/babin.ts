@@ -107,6 +107,9 @@ export type AdvisoryPreview = {
   groups_sent: number;
   note: string | null;
   groups_registered: number;
+  /** Warga yang berlangganan dari percakapan pribadi (17 November 2026). */
+  subscribers: number;
+  subscribers_sent: number;
   sample: { kelurahan: string; text: string } | null;
 };
 

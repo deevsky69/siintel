@@ -7,7 +7,17 @@ GET  /messaging/advisory?kelurahan=&month= teks imbauan satu kelurahan (untuk /i
 GET  /messaging/advisories/pending         grup terdaftar yang belum menerima imbauan bulan ini
 POST /messaging/advisories/sent            hasil pengiriman; menandai bulan terkirim
 GET  /advisories/preview?month=            (sesi, bulletin:read) contoh teks + jumlah grup
+
+POST   /messaging/subscriptions            warga berlangganan imbauan satu kelurahan
+GET    /messaging/subscriptions?channel=&chat_id=   langganan percakapan itu
+DELETE /messaging/subscriptions?channel=&chat_id=   berhenti; barisnya DIHAPUS
+GET    /messaging/subscriptions/pending    pelanggan yang belum menerima imbauan bulan ini
+POST   /messaging/subscriptions/sent       hasil pengiriman ke satu pelanggan
 ```
+
+17 November 2026 (naskah Taskap 4.7 b): selain grup, WARGA dapat berlangganan sendiri dari
+percakapan pribadinya (`/langganan <kelurahan>`, berhenti dengan `/berhenti`). Yang disimpan
+hanya kanal, pengenal percakapan, dan kelurahan (`models/area_subscription.py`).
 
 Keputusan pemilik proyek 4 November 2026: grup berisi perwakilan RT/RW dan Babin; pengiriman
 awal bulan, otomatis. 6 November 2026 (3A) sempat menuntut persetujuan Pimpinan per bulan;
@@ -19,6 +29,7 @@ Isinya imbauan warga (`services/citizen_advisory.py`), bukan rekomendasi operasi
 from __future__ import annotations
 
 import re
+import uuid
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query, status
@@ -26,7 +37,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ...models import Babinkamtibmas, Location
+from ...models import AreaSubscription, Babinkamtibmas, Location
+from ...models.area_subscription import CHANNELS
 from ...services import audit, citizen_advisory, clock
 from ..deps import CurrentUser, get_db, require_permission
 from ..errors import ApiError
@@ -234,6 +246,205 @@ def advisory_sent(payload: SentRequest, session: Session = Depends(get_db)) -> d
 
 
 # ---------------------------------------------------------------------------------------
+# Langganan warga (percakapan pribadi) — naskah Taskap 4.7 b "Pemberitahuan wilayah".
+# ---------------------------------------------------------------------------------------
+
+
+class SubscriptionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    channel: str = Field(description="WHATSAPP atau TELEGRAM")
+    chat_id: str = Field(min_length=3, max_length=64)
+    kelurahan: str = Field(min_length=2, max_length=100)
+
+
+def _channel(value: str) -> str:
+    channel = value.upper()
+    if channel not in CHANNELS:
+        raise ApiError(status.HTTP_400_BAD_REQUEST, "Kanal harus WHATSAPP atau TELEGRAM.")
+    return channel
+
+
+def _subscription(session: Session, channel: str, chat_id: str) -> AreaSubscription | None:
+    return session.scalar(
+        select(AreaSubscription).where(
+            AreaSubscription.channel == channel, AreaSubscription.chat_id == chat_id
+        )
+    )
+
+
+def _subscription_row(row: AreaSubscription, area: tuple[str, str, str] | None) -> dict[str, Any]:
+    return {
+        "kelurahan": row.kelurahan,
+        "kecamatan": area[1] if area else None,
+        "polsek": area[2] if area else None,
+        "subscribed_at": row.subscribed_at,
+    }
+
+
+@router.post(
+    "/messaging/subscriptions",
+    summary="Warga berlangganan imbauan satu kelurahan",
+    dependencies=[Depends(require_messaging_key)],
+)
+def subscribe(payload: SubscriptionRequest, session: Session = Depends(get_db)) -> dict[str, Any]:
+    channel = _channel(payload.channel)
+    if payload.chat_id.endswith("@g.us"):
+        raise ApiError(
+            status.HTTP_400_BAD_REQUEST,
+            "Langganan ini untuk percakapan pribadi. Di grup, pakai /daftar <kelurahan>.",
+        )
+    area = _kelurahan_row(session, payload.kelurahan)
+    if area is None:
+        raise ApiError(status.HTTP_404_NOT_FOUND, "Kelurahan tidak dikenal pada master lokasi.")
+    row = _subscription(session, channel, payload.chat_id)
+    changed = row is not None and row.kelurahan != area[0]
+    if row is None:
+        row = AreaSubscription(
+            channel=channel,
+            chat_id=payload.chat_id,
+            kelurahan=area[0],
+            subscribed_at=clock.citizen_now(),
+        )
+        session.add(row)
+    elif changed:
+        # Pindah kelurahan: imbauan kelurahan baru bulan ini belum pernah diterima.
+        row.kelurahan = area[0]
+        row.subscribed_at = clock.citizen_now()
+        row.advisory_sent_month = None
+    # Jejak tanpa pengenal percakapan: yang perlu diketahui adalah berapa dan di mana.
+    audit.record(
+        session,
+        action="SUBSCRIBE_AREA_ADVISORY",
+        resource_type="area_subscription",
+        result=audit.RESULT_SUCCESS,
+        user_id=None,
+        resource_id=area[0],
+        detail={"channel": channel, "moved": changed},
+    )
+    session.commit()
+    return _subscription_row(row, area)
+
+
+@router.get(
+    "/messaging/subscriptions",
+    summary="Langganan satu percakapan",
+    dependencies=[Depends(require_messaging_key)],
+)
+def subscription_of(
+    channel: str = Query(),
+    chat_id: str = Query(min_length=3, max_length=64),
+    session: Session = Depends(get_db),
+) -> dict[str, Any]:
+    row = _subscription(session, _channel(channel), chat_id)
+    if row is None:
+        raise ApiError(status.HTTP_404_NOT_FOUND, "Percakapan ini belum berlangganan.")
+    return _subscription_row(row, _kelurahan_row(session, row.kelurahan))
+
+
+@router.delete(
+    "/messaging/subscriptions",
+    summary="Berhenti berlangganan; barisnya dihapus",
+    dependencies=[Depends(require_messaging_key)],
+)
+def unsubscribe(
+    channel: str = Query(),
+    chat_id: str = Query(min_length=3, max_length=64),
+    session: Session = Depends(get_db),
+) -> dict[str, Any]:
+    channel = _channel(channel)
+    row = _subscription(session, channel, chat_id)
+    if row is None:
+        raise ApiError(status.HTTP_404_NOT_FOUND, "Percakapan ini belum berlangganan.")
+    kelurahan = row.kelurahan
+    session.delete(row)
+    audit.record(
+        session,
+        action="UNSUBSCRIBE_AREA_ADVISORY",
+        resource_type="area_subscription",
+        result=audit.RESULT_SUCCESS,
+        user_id=None,
+        resource_id=kelurahan,
+        detail={"channel": channel},
+    )
+    session.commit()
+    return {"kelurahan": kelurahan, "unsubscribed": True}
+
+
+@router.get(
+    "/messaging/subscriptions/pending",
+    summary="Pelanggan yang belum menerima imbauan bulan berjalan",
+    dependencies=[Depends(require_messaging_key)],
+)
+def pending_subscriptions(session: Session = Depends(get_db)) -> dict[str, Any]:
+    year, month_number = citizen_advisory.current_month()
+    key = f"{year:04d}-{month_number:02d}"
+    rows = session.scalars(
+        select(AreaSubscription)
+        .where(
+            (AreaSubscription.advisory_sent_month.is_(None))
+            | (AreaSubscription.advisory_sent_month != key)
+        )
+        .order_by(AreaSubscription.kelurahan, AreaSubscription.subscribed_at)
+        .limit(200)
+    ).all()
+    texts: dict[str, str] = {}
+    data = []
+    for row in rows:
+        if row.kelurahan not in texts:
+            advisory = citizen_advisory.build_advisory(session, year, month_number, row.kelurahan)
+            texts[row.kelurahan] = citizen_advisory.render_text(advisory)
+        data.append(
+            {
+                "subscription_id": str(row.subscription_id),
+                "channel": row.channel,
+                "chat_id": row.chat_id,
+                "kelurahan": row.kelurahan,
+                "month": key,
+                "text": texts[row.kelurahan],
+            }
+        )
+    return {"month": key, "data": data}
+
+
+class SubscriptionSentRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    subscription_id: uuid.UUID
+    month: str = Field(pattern=r"^\d{4}-\d{2}$")
+    delivery: dict[str, str] = Field(description='mis. {"whatsapp": "ok"}')
+
+
+@router.post(
+    "/messaging/subscriptions/sent",
+    summary="Imbauan bulanan sudah dikirim ke satu pelanggan",
+    dependencies=[Depends(require_messaging_key)],
+)
+def subscription_sent(
+    payload: SubscriptionSentRequest, session: Session = Depends(get_db)
+) -> dict[str, Any]:
+    row = session.get(AreaSubscription, payload.subscription_id)
+    if row is None:
+        # Pelanggan berhenti di antara pengambilan dan pengiriman: tidak ada yang ditandai.
+        raise ApiError(status.HTTP_404_NOT_FOUND, "Langganan tidak ditemukan.")
+    ok = any(value == "ok" for value in payload.delivery.values())
+    # Ditandai juga saat gagal: kegagalan dicatat dan TIDAK diulang-ulang tiap dua menit
+    # (nomor yang memblokir bot akan gagal selamanya); bulan berikutnya dicoba lagi.
+    row.advisory_sent_month = payload.month
+    audit.record(
+        session,
+        action="SEND_SUBSCRIBER_ADVISORY",
+        resource_type="area_subscription",
+        result=audit.RESULT_SUCCESS if ok else audit.RESULT_FAILED,
+        user_id=None,
+        resource_id=row.kelurahan,
+        detail={"month": payload.month, "channel": row.channel, "delivery": payload.delivery},
+    )
+    session.commit()
+    return {"kelurahan": row.kelurahan, "advisory_sent_month": row.advisory_sent_month}
+
+
+# ---------------------------------------------------------------------------------------
 # Pratinjau untuk layar /ops/buletin — berkunci sesi, hanya membaca.
 # ---------------------------------------------------------------------------------------
 
@@ -275,10 +486,21 @@ def advisory_preview(
     if sample_area:
         advisory = citizen_advisory.build_advisory(session, year, month_number, str(sample_area))
         sample = {"kelurahan": sample_area, "text": citizen_advisory.render_text(advisory)}
+    subscribers = int(session.scalar(select(func.count()).select_from(AreaSubscription)) or 0)
+    subscribers_sent = int(
+        session.scalar(
+            select(func.count())
+            .select_from(AreaSubscription)
+            .where(AreaSubscription.advisory_sent_month == key)
+        )
+        or 0
+    )
     return {
         "month": key,
         "automatic": True,
         "groups_registered": groups,
         "groups_sent": sent,
+        "subscribers": subscribers,
+        "subscribers_sent": subscribers_sent,
         "sample": sample,
     }

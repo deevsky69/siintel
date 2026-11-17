@@ -38,6 +38,10 @@ COMMAND_DASHBOARD = ("/dasbor", "dasbor", "/web", "web")
 # 10 November 2026: perintahnya /info; /rekomendasi dan /imbauan tetap dikenali (tautan lama).
 COMMAND_ADVISORY = ("/info", "info", "/rekomendasi", "rekomendasi", "/imbauan", "imbauan")
 COMMAND_REGISTER = ("/daftar", "daftar")
+# 17 November 2026 (naskah Taskap 4.7 b, f): langganan imbauan per warga dan panduan pengamanan.
+COMMAND_SUBSCRIBE = ("/langganan", "langganan")
+COMMAND_UNSUBSCRIBE = ("/berhenti", "berhenti")
+COMMAND_GUIDE = ("/panduan", "panduan")
 DASHBOARD_URL = "https://sigap.awansurya.com"
 
 MIN_DESCRIPTION = 10
@@ -55,6 +59,9 @@ HELP = (
     "/babin — kontak Babinkamtibmas kelurahan Anda\n"
     "/dasbor — peta kerawanan, lacak laporan, dan survey di SIGAP BERSAMA\n"
     "/info <kelurahan> — imbauan kehati-hatian bulan depan\n"
+    "/langganan <kelurahan> — menerima imbauan kelurahan itu setiap awal bulan\n"
+    "/berhenti — berhenti berlangganan\n"
+    "/panduan — panduan pengamanan kos, parkir, gedung, dan RT/RW\n"
     "/batal — membatalkan laporan yang sedang diisi\n\n"
     "Keadaan darurat: hubungi 110."
 )
@@ -190,6 +197,12 @@ class Conversation:
                 )
             if first_word(lowered) in COMMAND_ADVISORY:
                 return advisory_reply(self._backend, rest_of(text))
+            if first_word(lowered) in COMMAND_SUBSCRIBE:
+                return subscribe_reply(self._backend, self._channel, self._chat_id, rest_of(text))
+            if lowered in COMMAND_UNSUBSCRIBE:
+                return unsubscribe_reply(self._backend, self._channel, self._chat_id)
+            if first_word(lowered) in COMMAND_GUIDE:
+                return guide_reply(self._backend, rest_of(text))
             if lowered in COMMAND_BABIN:
                 self._reset()
                 self.step = Step.BABIN_KECAMATAN
@@ -442,6 +455,58 @@ def advisory_reply(backend: Backend, kelurahan: str, month: str | None = None) -
             return Reply(f'Kelurahan "{kelurahan}" tidak dikenal. Periksa ejaannya.')
         return Reply(f"Imbauan belum dapat disusun: {error.message}")
     return Reply(str(data["text"]))
+
+
+def subscribe_reply(backend: Backend, channel: str, chat_id: str, kelurahan: str) -> Reply:
+    """Berlangganan imbauan bulanan satu kelurahan dari percakapan pribadi (opt-in)."""
+    if not kelurahan:
+        current = backend.subscription_of(channel, chat_id)
+        if current:
+            return Reply(
+                f"Anda berlangganan imbauan Kelurahan {current['kelurahan']}. Untuk pindah, "
+                "ketik /langganan <kelurahan lain>; untuk berhenti, ketik /berhenti."
+            )
+        return Reply(
+            "Sebutkan kelurahannya, misalnya: /langganan Tebet Timur\n"
+            "Anda akan menerima imbauan kehati-hatian kelurahan itu setiap awal bulan."
+        )
+    try:
+        area = backend.subscribe(channel, chat_id, kelurahan)
+    except BackendError as error:
+        if error.status == 404:
+            return Reply(f'Kelurahan "{kelurahan}" tidak dikenal. Periksa ejaannya.')
+        return Reply(f"Langganan belum dapat dicatat: {error.message}")
+    return Reply(
+        f"Anda berlangganan imbauan Kelurahan {area['kelurahan']} ({area['kecamatan']}). "
+        "Imbauan dikirim ke percakapan ini setiap awal bulan.\n\n"
+        "Yang disimpan hanya pengenal percakapan ini dan nama kelurahan — tanpa nama dan "
+        "tanpa alamat. Ketik /berhenti kapan saja; data langganan Anda langsung dihapus."
+    )
+
+
+def unsubscribe_reply(backend: Backend, channel: str, chat_id: str) -> Reply:
+    if backend.unsubscribe(channel, chat_id):
+        return Reply("Langganan dihentikan dan datanya sudah dihapus. Terima kasih.")
+    return Reply("Percakapan ini tidak sedang berlangganan imbauan.")
+
+
+def guide_reply(backend: Backend, topic: str) -> Reply:
+    """Panduan pengamanan; tanpa topik, daftar topiknya."""
+    try:
+        guides = backend.guides()
+    except BackendError as error:
+        return Reply(f"Panduan belum dapat dibuka: {error.message}")
+    wanted = topic.casefold().strip()
+    for guide in guides:
+        if wanted and (wanted == str(guide["id"]) or wanted in str(guide["title"]).casefold()):
+            return Reply(str(guide["text"]))
+    lines = ["Panduan pengamanan. Ketik salah satu:"]
+    lines += [f"/panduan {guide['id']} — {guide['title']}" for guide in guides]
+    return Reply("\n".join(lines))
+
+
+def subscriber_message(row: dict[str, Any]) -> str:
+    return f"{row['text']}\n\nAnda menerima pesan ini karena berlangganan. Berhenti: /berhenti"
 
 
 def babin_lines(contact: dict[str, Any]) -> list[str]:

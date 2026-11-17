@@ -104,7 +104,8 @@ MODEL UPDATE
 ```text
 crime_incidents.location_id        → locations
 crime_incident_revisions.incident_id → crime_incidents   (0019; riwayat koreksi: field, before, after, by, note)
-monthly_rankings.generated_by      → users              (0020; peringkat bulanan: target_month, method, scope, data_cutoff, model_version, basis_from/to, pending_count)
+monthly_rankings.generated_by      → users              (0020; peringkat bulanan: target_month, method, scope, data_cutoff, model_version, basis_from/to, pending_count; 0024: method menerima MODEL, HISTORY_3M, HISTORY_12M, HISTORY_1M, ANNUAL)
+area_subscriptions                 (tanpa FK)           (0025; langganan imbauan warga: channel WHATSAPP/TELEGRAM, chat_id, kelurahan, subscribed_at, advisory_sent_month; unik (channel, chat_id); baris dihapus saat berhenti)
 monthly_ranking_rows.ranking_id    → monthly_rankings   (0020; rank, kelurahan, predicted_count, ikw, ikw_category, basis JSONB)
 monthly_products.ranking_id        → monthly_rankings   (0021; target_month unik, status DRAFT→ANALYST_REVIEWED→DECIDED sejak 0023 — KBO_CHECKED/VALIDATED tinggalan, facts, priority_count)
 monthly_product_items.product_id   → monthly_products   (0021; rank, kelurahan, pattern, proposal_text, proposed_function, analyst_status/text/reason, selected, decided_action)

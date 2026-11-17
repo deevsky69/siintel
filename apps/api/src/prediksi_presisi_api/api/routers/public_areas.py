@@ -27,7 +27,7 @@ from sqlalchemy.orm import Session
 
 from ...models import AreaReview, CrimeIncident, Location
 from ...models.area_review import STATUS_PUBLISHED
-from ...services import clock, visibility
+from ...services import clock, security_guides, visibility
 from ...services import patrol_plan as planning
 from ..deps import get_db
 
@@ -171,3 +171,14 @@ def build_summary(session: Session) -> dict[str, Any]:
 @router.get("/summary", summary="Ringkasan historis per wilayah untuk masyarakat")
 def area_summary(session: Session = Depends(get_db)) -> dict[str, Any]:
     return build_summary(session)
+
+
+#: Router terpisah: panduan bukan bagian `/public/areas`.
+guides_router = APIRouter(tags=["kanal publik"])
+
+
+@guides_router.get("/public/guides", summary="Panduan pengamanan kos, parkir, gedung, dan RT/RW")
+def public_guides(session: Session = Depends(get_db)) -> dict[str, Any]:
+    """Naskah Taskap 4.7 f. Teks panduan dari konfigurasi (PROPOSED); pola di sampingnya
+    agregat se-Polres 12 bulan terakhir — tanpa alamat, tanggal, maupun identitas."""
+    return security_guides.guides(session)

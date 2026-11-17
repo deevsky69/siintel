@@ -33,6 +33,8 @@ class FakeBackend:
         self.last_sender: str | None = None
         self.advisory_acks: dict[str, str] = {}
         self.advisory_deliveries: dict[str, dict[str, str]] = {}
+        self.subscriptions: dict[tuple[str, str], str] = {}
+        self.subscription_acks: dict[str, dict[str, str]] = {}
 
     def options(self) -> Options:
         return Options(
@@ -119,6 +121,42 @@ class FakeBackend:
         self.advisory_deliveries[kelurahan] = delivery
         if "ok" in delivery.values():
             self.advisory_acks[kelurahan] = month
+
+    def subscribe(self, channel: str, chat_id: str, kelurahan: str) -> dict[str, Any]:
+        if kelurahan.casefold() not in ("tebet timur", "manggarai"):
+            raise BackendError(404, "Kelurahan tidak dikenal pada master lokasi.")
+        self.subscriptions[(channel, chat_id)] = kelurahan.title()
+        return {"kelurahan": kelurahan.title(), "kecamatan": "Tebet"}
+
+    def subscription_of(self, channel: str, chat_id: str) -> dict[str, Any] | None:
+        name = self.subscriptions.get((channel, chat_id))
+        return {"kelurahan": name, "kecamatan": "Tebet"} if name else None
+
+    def unsubscribe(self, channel: str, chat_id: str) -> bool:
+        return self.subscriptions.pop((channel, chat_id), None) is not None
+
+    def pending_subscriptions(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "subscription_id": f"{channel}:{chat}",
+                "channel": channel,
+                "chat_id": chat,
+                "kelurahan": name,
+                "month": "2026-11",
+                "text": f"IMBAUAN {name}",
+            }
+            for (channel, chat), name in self.subscriptions.items()
+            if f"{channel}:{chat}" not in self.subscription_acks
+        ]
+
+    def subscription_sent(self, subscription_id: str, month: str, delivery: dict[str, str]) -> None:
+        self.subscription_acks[subscription_id] = delivery
+
+    def guides(self) -> list[dict[str, Any]]:
+        return [
+            {"id": "kos", "title": "Kos, kontrakan, dan asrama", "text": "PANDUAN KOS"},
+            {"id": "parkir", "title": "Jalan dan tempat parkir", "text": "PANDUAN PARKIR"},
+        ]
 
 
 def talk() -> tuple[Conversation, FakeBackend]:
@@ -353,3 +391,57 @@ def test_monthly_advisories_go_to_registered_groups_once() -> None:
     assert backend.advisory_deliveries["Manggarai"]["whatsapp"].startswith("gagal")
     # Bulan yang sama tidak dikirim dua kali ke grup yang sudah menerima.
     assert deliver_advisories(backend, whatsapp_send=wa) == 0
+
+
+def test_citizen_subscribes_from_private_chat_and_leaves() -> None:
+    chat, backend = talk()
+    ask = chat.handle(Incoming(text="/langganan"))
+    assert "Sebutkan kelurahannya" in ask.text
+    bad = chat.handle(Incoming(text="/langganan Nirwana"))
+    assert "tidak dikenal" in bad.text and not backend.subscriptions
+    ok = chat.handle(Incoming(text="/langganan tebet timur"))
+    assert "Tebet Timur" in ok.text and "/berhenti" in ok.text
+    # Warga diberi tahu apa yang disimpan (CLAUDE.md §16).
+    assert "tanpa nama" in ok.text
+    assert backend.subscriptions[("TELEGRAM", "42")] == "Tebet Timur"
+    assert "Tebet Timur" in chat.handle(Incoming(text="/langganan")).text
+    assert "dihapus" in chat.handle(Incoming(text="/berhenti")).text
+    assert not backend.subscriptions
+    assert "tidak sedang berlangganan" in chat.handle(Incoming(text="/berhenti")).text
+    assert "/langganan" in chat.handle(Incoming(text="/bantuan")).text
+
+
+def test_guide_command_lists_topics_then_shows_one() -> None:
+    chat, _ = talk()
+    listing = chat.handle(Incoming(text="/panduan"))
+    assert "/panduan kos" in listing.text and "/panduan parkir" in listing.text
+    assert chat.handle(Incoming(text="/panduan kos")).text == "PANDUAN KOS"
+    assert chat.handle(Incoming(text="/panduan Parkir")).text == "PANDUAN PARKIR"
+    assert "/panduan kos" in chat.handle(Incoming(text="/panduan gunung")).text
+
+
+def test_monthly_advisory_reaches_subscribers_once_per_channel() -> None:
+    from lapor_bot.telegram import deliver_subscriptions
+
+    backend = FakeBackend()
+    backend.subscriptions = {
+        ("WHATSAPP", "62811@c.us"): "Tebet Timur",
+        ("WHATSAPP", "62822@c.us"): "Manggarai",
+        ("TELEGRAM", "42"): "Manggarai",
+    }
+    sent: list[tuple[str, str]] = []
+
+    def wa(chat_id: str, reply: Reply) -> None:
+        if chat_id == "62822@c.us":
+            raise RuntimeError("nomor memblokir bot")
+        sent.append((chat_id, reply.text))
+
+    # Tanpa pengirim Telegram: pelanggan Telegram dilewati, bukan ditandai gagal.
+    assert deliver_subscriptions(backend, telegram=None, whatsapp_send=wa) == 1
+    assert sent[0][0] == "62811@c.us" and "/berhenti" in sent[0][1]
+    assert backend.subscription_acks["WHATSAPP:62811@c.us"] == {"whatsapp": "ok"}
+    assert backend.subscription_acks["WHATSAPP:62822@c.us"]["whatsapp"].startswith("gagal")
+    assert "TELEGRAM:42" not in backend.subscription_acks
+    # Putaran berikutnya tidak mengirim ulang ke yang sudah ditandai.
+    assert deliver_subscriptions(backend, telegram=None, whatsapp_send=wa) == 0
+    assert len(sent) == 1

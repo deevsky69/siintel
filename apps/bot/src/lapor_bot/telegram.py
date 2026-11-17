@@ -15,7 +15,15 @@ from typing import Any
 import httpx
 
 from .backend import Backend, BackendError
-from .core import Attachment, Conversation, Incoming, Reply, bulletin_message, progress_message
+from .core import (
+    Attachment,
+    Conversation,
+    Incoming,
+    Reply,
+    bulletin_message,
+    progress_message,
+    subscriber_message,
+)
 
 log = logging.getLogger("lapor_bot.telegram")
 CHANNEL = "TELEGRAM"
@@ -216,6 +224,36 @@ def deliver_advisories(backend: Backend, *, whatsapp_send: Any) -> int:
     return sent
 
 
+def deliver_subscriptions(
+    backend: Backend, *, telegram: TelegramChannel | None, whatsapp_send: Any
+) -> int:
+    """Imbauan bulan berjalan ke WARGA yang berlangganan (percakapan pribadi, 17 November
+    2026). Setiap pelanggan ditandai sekali per bulan — berhasil atau gagal — supaya nomor
+    yang tidak dapat dihubungi tidak dicoba terus-menerus."""
+    senders: dict[str, Any] = {
+        "TELEGRAM": telegram.send if telegram is not None else None,
+        "WHATSAPP": whatsapp_send,
+    }
+    sent = 0
+    for row in backend.pending_subscriptions():
+        channel = str(row["channel"])
+        send = senders.get(channel)
+        if send is None:
+            continue  # kanal itu sedang tidak dijalankan; dicoba lagi pada putaran berikutnya
+        key = channel.lower()
+        delivery: dict[str, str] = {}
+        try:
+            send(str(row["chat_id"]), Reply(subscriber_message(row)))
+            delivery[key] = "ok"
+            sent += 1
+        except Exception as error:  # noqa: BLE001
+            # Hanya jenis galat: pesan galat dapat memuat nomor atau token.
+            log.warning("Imbauan pelanggan gagal: %s", type(error).__name__)
+            delivery[key] = f"gagal: {type(error).__name__}"
+        backend.subscription_sent(str(row["subscription_id"]), str(row["month"]), delivery)
+    return sent
+
+
 def bulletins_forever(
     backend: Backend,
     *,
@@ -229,6 +267,7 @@ def bulletins_forever(
         try:
             deliver_bulletins(backend, telegram=telegram, whatsapp_send=whatsapp_send)
             deliver_advisories(backend, whatsapp_send=group_send)
+            deliver_subscriptions(backend, telegram=telegram, whatsapp_send=whatsapp_send)
         except BackendError as error:
             log.warning("Buletin: ditunda, API menjawab %s (%s)", error.status, error.message)
         except Exception:  # noqa: BLE001

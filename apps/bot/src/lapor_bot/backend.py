@@ -56,6 +56,14 @@ class Backend(Protocol):
     def advisory(self, kelurahan: str, month: str | None = None) -> dict[str, Any]: ...
     def pending_advisories(self) -> list[dict[str, Any]]: ...
     def advisory_sent(self, kelurahan: str, month: str, delivery: dict[str, str]) -> None: ...
+    def subscribe(self, channel: str, chat_id: str, kelurahan: str) -> dict[str, Any]: ...
+    def subscription_of(self, channel: str, chat_id: str) -> dict[str, Any] | None: ...
+    def unsubscribe(self, channel: str, chat_id: str) -> bool: ...
+    def pending_subscriptions(self) -> list[dict[str, Any]]: ...
+    def subscription_sent(
+        self, subscription_id: str, month: str, delivery: dict[str, str]
+    ) -> None: ...
+    def guides(self) -> list[dict[str, Any]]: ...
 
 
 def _message(response: httpx.Response) -> str:
@@ -203,3 +211,52 @@ class ApiBackend:
             json={"kelurahan": kelurahan, "month": month, "delivery": delivery},
         )
         self._raise(response)
+
+    def subscribe(self, channel: str, chat_id: str, kelurahan: str) -> dict[str, Any]:
+        response = self._client.post(
+            "/messaging/subscriptions",
+            json={"channel": channel, "chat_id": chat_id, "kelurahan": kelurahan},
+        )
+        self._raise(response)
+        data: dict[str, Any] = response.json()
+        return data
+
+    def subscription_of(self, channel: str, chat_id: str) -> dict[str, Any] | None:
+        response = self._client.get(
+            "/messaging/subscriptions", params={"channel": channel, "chat_id": chat_id}
+        )
+        if response.status_code == 404:
+            return None
+        self._raise(response)
+        data: dict[str, Any] = response.json()
+        return data
+
+    def unsubscribe(self, channel: str, chat_id: str) -> bool:
+        response = self._client.delete(
+            "/messaging/subscriptions", params={"channel": channel, "chat_id": chat_id}
+        )
+        if response.status_code == 404:
+            return False
+        self._raise(response)
+        return True
+
+    def pending_subscriptions(self) -> list[dict[str, Any]]:
+        response = self._client.get("/messaging/subscriptions/pending")
+        self._raise(response)
+        rows: list[dict[str, Any]] = response.json()["data"]
+        return rows
+
+    def subscription_sent(self, subscription_id: str, month: str, delivery: dict[str, str]) -> None:
+        response = self._client.post(
+            "/messaging/subscriptions/sent",
+            json={"subscription_id": subscription_id, "month": month, "delivery": delivery},
+        )
+        if response.status_code == 404:
+            return  # pelanggan berhenti di antara pengambilan dan pengiriman
+        self._raise(response)
+
+    def guides(self) -> list[dict[str, Any]]:
+        response = self._client.get("/public/guides")
+        self._raise(response)
+        rows: list[dict[str, Any]] = response.json()["data"]
+        return rows

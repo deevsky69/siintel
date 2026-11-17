@@ -128,6 +128,45 @@ export const getPublicSummary = () => publicGet<PublicSummary>("/public/areas/su
 export const getPublicReviews = (kelurahan: string) =>
   publicGet<ReviewPage>(`/public/reviews?kelurahan=${encodeURIComponent(kelurahan)}`);
 
+/** Hasil Survey Rasa Aman per triwulan, dengan cakupan responden (naskah 4.7 h). */
+export type SurveyQuarter = {
+  label: string;
+  from: string;
+  to: string;
+  running: boolean;
+  respondents: number;
+  average: number | null;
+  kelurahan_covered: number;
+  kelurahan_total: number;
+  coverage_pct: number | null;
+};
+
+export const getQuarterlySurvey = () =>
+  publicGet<{ quarters: SurveyQuarter[]; basis: string }>("/public/survey/quarterly");
+
+/** Panduan pengamanan kos, parkir, gedung, dan RT/RW (naskah 4.7 f). */
+export type SecurityGuide = {
+  id: string;
+  title: string;
+  audience: string;
+  steps: string[];
+  pattern: {
+    incidents: number;
+    share_pct: number | null;
+    top_modus: { modus: string; count: number }[];
+    peak_block: string | null;
+    peak_block_count: number;
+    with_time: number;
+    from: string;
+    to: string;
+  };
+};
+
+export const getSecurityGuides = () =>
+  publicGet<{ status: string; closing: string; data: SecurityGuide[]; basis: string }>(
+    "/public/guides",
+  );
+
 /** Kelurahan dengan ulasan terbanyak dan terbaik — untuk sorotan beranda. */
 export function highlightAreas(summary: PublicSummary, limit = 3): AreaSummary[] {
   return [...summary.areas]

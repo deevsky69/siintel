@@ -76,6 +76,7 @@ export default function WargaLayout({ children }: { children: React.ReactNode })
               Darurat 110
             </a>
             <Link href="/lapor">Lapor kejadian</Link>
+            <Link href="/panduan">Panduan pengamanan</Link>
             <Link href="/ops/masuk">Masuk petugas</Link>
           </nav>
         </div>
