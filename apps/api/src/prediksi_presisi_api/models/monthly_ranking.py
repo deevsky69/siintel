@@ -28,7 +28,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..db import Base
 from .base import TimestampMixin, uuid_pk
 
-METHODS = ("HISTORY_3M", "HISTORY_12M", "MODEL")
+METHODS = ("HISTORY_3M", "HISTORY_12M", "MODEL", "HISTORY_1M", "ANNUAL")
 SCOPES = ("ALL_3C", "VEHICLE")
 
 
@@ -80,7 +80,8 @@ class MonthlyRankingRow(Base):
     kelurahan: Mapped[str] = mapped_column(String(100), nullable=False)
     kecamatan: Mapped[str] = mapped_column(String(100), nullable=False)
     polsek: Mapped[str] = mapped_column(String(100), nullable=False)
-    #: Perkiraan jumlah kejadian pada bulan sasaran (rata-rata bulanan pada peta historis).
+    #: Perkiraan jumlah kejadian pada bulan sasaran (keluaran model, atau rata-rata bulanan
+    #: pada peta historis).
     predicted_count: Mapped[float] = mapped_column(Numeric(8, 2), nullable=False)
     ikw: Mapped[float | None] = mapped_column(Numeric(5, 1))
     ikw_category: Mapped[str | None] = mapped_column(String(10))

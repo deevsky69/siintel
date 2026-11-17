@@ -9,7 +9,29 @@ export type RankedArea = {
   predicted_count: number;
   ikw: number | null;
   ikw_category: "RENDAH" | "SEDANG" | "TINGGI" | null;
-  basis: { basis_total?: number; total_12m?: number; trend?: number; consistency_months?: number };
+  basis: {
+    basis_total?: number;
+    total_12m?: number;
+    trend?: number;
+    consistency_months?: number;
+    /** Hanya pada metode MODEL: kontribusi tiap masukan, dihitung dari pohon model. */
+    factors?: { label: string; contribution: number }[];
+  };
+};
+
+/** Metode yang menjadi dasar usulan, dan bukti penjaga di baliknya. */
+export type MethodChoice = { method: string; reason: string; evidence: Record<string, unknown> };
+
+export type ModelCard = {
+  available: boolean;
+  reason?: string;
+  model_version?: string;
+  algorithm?: string;
+  train_until?: string;
+  training_targets?: string;
+  training_rows?: number;
+  training_incidents?: number;
+  features?: { name: string; label: string; importance: number }[];
 };
 
 export type Ranking = {
@@ -32,8 +54,12 @@ export type Ranking = {
 export type RankingOptions = {
   version: string;
   status: string;
+  /** Metode dasar usulan bulan yang disarankan (hasil penjaga). */
   default_method: string;
-  methods: { value: string; label: string; available: boolean }[];
+  configured_method: string;
+  method_choice: MethodChoice;
+  methods: { value: string; label: string; kind: string; available: boolean }[];
+  model: ModelCard | null;
   scopes: string[];
   default_scope: string;
   suggested_month: string;

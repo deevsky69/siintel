@@ -1,0 +1,154 @@
+"""Model prediksi bulanan (gradient boosting) dan penjaga pemakaiannya — hitungan murni,
+tanpa basis data: batas informasi, pelatihan deterministik, alasan, uji tanda, PAI."""
+
+from __future__ import annotations
+
+from datetime import date, timedelta
+
+import pytest
+
+from prediksi_presisi_api.services import monthly_evaluation as evaluation
+from prediksi_presisi_api.services import monthly_model as model
+from prediksi_presisi_api.services import monthly_ranking as ranking
+
+AREAS = {
+    "Ramai": "Utara",
+    "Sedang": "Utara",
+    "Sepi": "Utara",
+    "Naik": "Selatan",
+    "Turun": "Selatan",
+    "Kosong": "Selatan",
+}
+PARAMS = model.ModelParams(
+    version="uji",
+    train_until=date(2024, 12, 31),
+    data_from=date(2023, 1, 1),
+    n_estimators=60,
+    learning_rate=0.1,
+    max_depth=2,
+    min_samples_leaf=3,
+    min_training_rows=60,
+)
+
+
+def _monthly_count(name: str, index: int) -> int:
+    step = index - model.month_index(date(2023, 1, 1))
+    return {
+        "Ramai": 8 + step % 3,
+        "Sedang": 4 + step % 2,
+        "Sepi": 1,
+        "Naik": step // 4,
+        "Turun": max(0, 9 - step // 4),
+        "Kosong": 0,
+    }[name]
+
+
+def _history(until: date = date(2025, 12, 31)) -> model.IncidentHistory:
+    incidents: list[tuple[str, date, date]] = []
+    for index in range(model.month_index(date(2023, 1, 1)), model.month_index(until) + 1):
+        first = model.month_from_index(index)
+        for name in AREAS:
+            for n in range(_monthly_count(name, index)):
+                day = first + timedelta(days=n * 2)
+                incidents.append((name, day, day + timedelta(days=1)))
+    return model.IncidentHistory(incidents, AREAS, PARAMS.data_from)
+
+
+def test_history_counts_only_what_was_reported_by_the_cutoff() -> None:
+    late = (date(2024, 3, 30), date(2024, 4, 5))  # terjadi Maret, baru dilaporkan April
+    history = model.IncidentHistory(
+        [("Ramai", date(2024, 3, 2), date(2024, 3, 2)), ("Ramai", *late)], AREAS
+    )
+    march = model.month_index(date(2024, 3, 1))
+    assert history.count("Ramai", march, date(2024, 3, 31)) == 1
+    assert history.count("Ramai", march, date(2024, 4, 5)) == 2
+    # Riwayat bulan sasaran April hanya memuat yang sudah diketahui sebelum April.
+    features = dict(
+        zip(model.FEATURES, history.features("Ramai", march + 1, date(2024, 3, 31)), strict=True)
+    )
+    assert features["lag_1"] == 1.0
+
+
+def test_rows_before_data_from_are_ignored_and_windows_shorten() -> None:
+    history = model.IncidentHistory(
+        [
+            ("Ramai", date(2021, 5, 1), date(2021, 5, 1)),
+            ("Ramai", date(2023, 1, 9), date(2023, 1, 9)),
+        ],
+        AREAS,
+        date(2023, 1, 1),
+    )
+    assert history.first_month == model.month_index(date(2023, 1, 1))
+    february = model.month_index(date(2023, 2, 1))
+    assert history.series("Ramai", february, date(2023, 1, 31)) == [1]
+
+
+def test_training_is_deterministic_and_never_sees_the_test_period() -> None:
+    history = _history()
+    first = model.train(history, PARAMS)
+    model._CACHE.clear()
+    second = model.train(_history(), PARAMS)
+    assert first.version == second.version and first.version.startswith("gbr-uji#")
+    assert first.last_target == date(2024, 12, 1)
+    assert first.training_rows == len(AREAS) * 21  # April 2023 s.d. Desember 2024
+    # Mengubah kejadian SETELAH masa latih tidak mengubah model.
+    assert model.train(_history(date(2025, 6, 30)), PARAMS).version == first.version
+    with pytest.raises(model.ModelUnavailable):
+        model.predict_month(history, first, model.month_index(date(2024, 12, 1)))
+
+
+def test_prediction_ranks_busy_areas_first_and_explains_itself() -> None:
+    history = _history()
+    trained = model.train(history, PARAMS)
+    target = model.month_index(date(2025, 6, 1))
+    predictions = {p.kelurahan: p for p in model.predict_month(history, trained, target)}
+    assert predictions["Ramai"].predicted > predictions["Sedang"].predicted
+    assert predictions["Sedang"].predicted > predictions["Kosong"].predicted
+    for prediction in predictions.values():
+        explained = prediction.base + sum(prediction.contributions.values())
+        # Kontribusi berasal dari pohon model: jumlahnya = perkiraan (sebelum dibatasi >= 0).
+        assert max(0.0, explained) == pytest.approx(prediction.predicted, abs=1e-6)
+
+
+def test_model_is_unavailable_without_enough_history() -> None:
+    short = model.IncidentHistory([("Ramai", date(2024, 11, 3), date(2024, 11, 3))], AREAS)
+    with pytest.raises(model.ModelUnavailable):
+        model.train(short, PARAMS)
+
+
+def test_sign_test_and_pai() -> None:
+    assert evaluation.sign_test(0, 0) is None
+    assert evaluation.sign_test(5, 5) == pytest.approx(0.623, abs=1e-3)
+    assert evaluation.sign_test(12, 0) == pytest.approx(0.0002, abs=1e-4)
+    assert evaluation.sign_test(10, 2) == pytest.approx(0.0193, abs=1e-4)
+    assert evaluation.pai(30, 100, 0.10) == 3.0
+    assert evaluation.pai(30, 0, 0.10) is None and evaluation.pai(30, 100, None) is None
+
+
+def test_area_file_covers_every_kelurahan_once() -> None:
+    areas = evaluation.kelurahan_areas()
+    assert len(areas) == 65 and all(value > 0 for value in areas.values())
+    assert 140 < sum(areas.values()) < 150  # Jakarta Selatan sekitar 145 km²
+
+
+def test_guard_falls_back_until_the_model_is_tested_and_reports_evidence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = ranking.load_config()
+    assert config.kind(config.default_method) == "model"
+    history = _history()
+    monkeypatch.setattr(model, "train", lambda h, _params: model_train(h, PARAMS))
+    # Bulan sasaran tepat setelah masa latih: belum ada bulan uji → peta historis.
+    early = ranking.operational(None, date(2025, 2, 1), "VEHICLE", history)  # type: ignore[arg-type]
+    assert early.method == config.guard_fallback and "belum dapat dinilai" in early.reason
+
+    later = ranking.operational(None, date(2026, 1, 1), "VEHICLE", history)  # type: ignore[arg-type]
+    covered = later.evidence["covered"]
+    assert set(covered) == set(config.methods)
+    best = max(v for k, v in covered.items() if k != "MODEL")
+    # Aturan naskah: model hanya dipakai bila LEBIH tepat daripada pembanding terbaik.
+    assert (later.method == "MODEL") == (covered["MODEL"] > best)
+    assert len(later.evidence["months"]) == 12
+
+
+model_train = model.train

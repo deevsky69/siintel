@@ -1,32 +1,79 @@
 # Peringkat bulanan 65 kelurahan — Modul 2–3 "Mekanisme dan Fungsi SIGAP".
 #
-# Keputusan pemilik proyek 6 November 2026 (2A): metode yang dipakai sebagai dasar usulan
-# SEKARANG adalah peta 3 bulan terakhir; model menyusul setelah diuji di dalam aplikasi.
-# Dokumen mekanisme sendiri: "Jika hasil evaluasi lebih mendukung peta historis, gunakan
-# peta tersebut sebagai dasar usulan sampai model berikutnya selesai diuji."
+# 17 November 2026 — disesuaikan ke naskah Taskap Bab IV (keputusan pemilik proyek):
+#   - metode utama adalah MODEL, gradient boosting per kelurahan untuk kelompok berobjek
+#     kendaraan bermotor (services/monthly_model.py);
+#   - peta historis tetap dihitung sebagai PEMBANDING: 3 bulan, 12 bulan, bulan sebelumnya,
+#     dan peta tahunan tetap;
+#   - naskah: "model hanya dipakai bila lebih tepat daripada peta titik rawan". Aturan itu
+#     dijalankan oleh `guard` di bawah, bukan oleh ingatan orang: bila pada bulan-bulan uji
+#     terakhir model tidak mengungguli pembanding terbaik, usulan kembali memakai peta.
+# Menggantikan keputusan 2A (6 November 2026): "peta 3 bulan dulu, model menyusul".
 #
 # IKW (Indeks Kerawanan Wilayah) — rancangan: frekuensi 12 bulan, tren, konsistensi.
 # Bobot dan ambang kategori di bawah ini BELUM diuji: status PROPOSED (dokumen: "diuji
 # sebelum dipakai"). IKW ditampilkan di samping peringkat, tidak menentukan urutan.
-version: peringkat-2026-11-06
+version: peringkat-2026-11-17
 status: PROPOSED
 
-default_method: HISTORY_3M
+default_method: MODEL
 methods:
+  MODEL:
+    label: Model AI (gradient boosting)
+    kind: model
+    basis_months: 12
   HISTORY_3M:
     label: Peta 3 bulan terakhir
+    kind: history
     basis_months: 3
   HISTORY_12M:
     label: Peta 12 bulan terakhir
+    kind: history
     basis_months: 12
-  MODEL:
-    label: Model (belum tersedia)
+  HISTORY_1M:
+    label: Bulan sebelumnya
+    kind: history
+    basis_months: 1
+  ANNUAL:
+    # Peta "lama" yang tidak diperbarui: seluruh kejadian satu tahun kalender, sebagaimana
+    # diketahui pada akhir tahun itu. Tahunnya = tahun terakhir masa latih model.
+    label: Peta tahunan tetap
+    kind: annual
     basis_months: 12
 
-# Cakupan kejadian yang dihitung: seluruh 3C, atau hanya berobjek kendaraan bermotor
-# (saringan yang dipakai Uji Prediksi 2025).
+# Model gradient boosting. DIBEKUKAN: parameter dan masa latih tidak diubah tanpa pengujian
+# tersendiri (naskah Modul 3). Parameter dipilih pada validasi Juli–Desember 2024 dengan
+# model yang dilatih sampai Juni 2024 — bukan pada masa uji 2025/2026
+# (docs/implementation-notes/181-model-gradient-boosting.md).
+model:
+  version: "2026-11-17"
+  data_from: "2023-01-01"     # awal data Pusiknas yang utuh
+  train_until: "2024-12-31"   # kejadian yang dilaporkan sesudahnya tidak pernah dilihat model
+  min_history_months: 3
+  min_training_rows: 300
+  n_estimators: 300
+  learning_rate: 0.03
+  max_depth: 2
+  min_samples_leaf: 20
+  subsample: 1.0
+  random_state: 20250101
+
+# Penjaga pemakaian model. Dinilai pada `months` bulan terakhir sebelum bulan sasaran yang
+# berada DI LUAR masa latih, pada `evaluation.default_top_n` kelurahan, dengan batas data
+# yang sama untuk semua metode. Model dipakai hanya bila cakupannya LEBIH TINGGI daripada
+# pembanding terbaik; bila bulan ujinya kurang dari `min_months`, atau model belum dapat
+# dilatih, usulan memakai `fallback`.
+guard:
+  months: 12
+  min_months: 3
+  fallback: HISTORY_3M
+
+# Cakupan kejadian yang dihitung: seluruh 3C, atau hanya berobjek kendaraan bermotor.
+# Naskah menguji model pada kelompok berobjek kendaraan dan tidak menggeneralisasinya ke
+# seluruh 3C, jadi kelompok itulah yang menjadi dasar peringkat. ALL_3C tetap tersedia;
+# penjaga di atas berlaku per cakupan.
 scopes: [ALL_3C, VEHICLE]
-default_scope: ALL_3C
+default_scope: VEHICLE
 
 ikw:
   weights:

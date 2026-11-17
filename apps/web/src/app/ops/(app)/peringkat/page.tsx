@@ -32,9 +32,12 @@ export default async function PeringkatPage({
   };
   const [profile, options] = await Promise.all([getProfile(), getRankingOptions()]);
   const month = one("bulan") || options.suggested_month;
-  const method = one("metode") || options.default_method;
   const scope = one("cakupan") || options.default_scope;
-  const ranking = await getRanking(month, method, scope);
+  // Tanpa pilihan, API memakai metode dasar usulan bulan itu (model bila terbukti lebih
+  // tepat, selain itu peta historis) — halaman tidak menebaknya sendiri.
+  const ranking = await getRanking(month, one("metode"), scope);
+  const method = ranking.method;
+  const explained = ranking.data.some((row) => row.basis.factors?.length);
   const canManage = profile.permissions.includes("ranking:manage");
   const link = (next: Partial<{ bulan: string; metode: string; cakupan: string }>) => {
     const query = new URLSearchParams({ bulan: month, metode: method, cakupan: scope, ...next });
@@ -99,6 +102,7 @@ export default async function PeringkatPage({
                 <th className="py-1 pr-2">Kecamatan</th>
                 <th className="py-1 pr-2 text-right">Perkiraan/bulan</th>
                 <th className="py-1 pr-2 text-right">Dasar</th>
+                {explained ? <th className="py-1 pr-2">Alasan model</th> : null}
                 <th className="py-1 pr-2 text-right">IKW</th>
               </tr>
             </thead>
@@ -114,6 +118,20 @@ export default async function PeringkatPage({
                   <td className="py-1.5 pr-2 text-right tabular-nums text-ink-faint">
                     {row.basis.basis_total ?? 0}
                   </td>
+                  {explained ? (
+                    <td className="py-1.5 pr-2 text-2xs text-ink-faint">
+                      {(row.basis.factors ?? [])
+                        .filter((factor) => Math.abs(factor.contribution) >= 0.05)
+                        .slice(0, 2)
+                        .map(
+                          (factor) =>
+                            `${factor.label} ${factor.contribution > 0 ? "+" : "−"}${Math.abs(
+                              factor.contribution,
+                            ).toFixed(1)}`,
+                        )
+                        .join(" · ")}
+                    </td>
+                  ) : null}
                   <td className="py-1.5 pr-2 text-right">
                     {row.ikw !== null && row.ikw_category ? (
                       <span
@@ -130,6 +148,12 @@ export default async function PeringkatPage({
         )}
         <p className="mt-3 text-2xs text-ink-faint">
           {ranking.method_label} · {ranking.model_version} · IKW {ranking.ikw_status}
+        </p>
+        <p className="mt-1 text-2xs text-ink-faint">
+          Dasar usulan{" "}
+          {options.methods.find((item) => item.value === options.default_method)?.label ??
+            options.default_method}
+          : {options.method_choice.reason}
         </p>
       </Panel>
     </div>

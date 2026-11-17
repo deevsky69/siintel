@@ -2,6 +2,9 @@
 
 `GET /rankings` mengembalikan peringkat yang sudah dibekukan bila ada; bila belum, hasil
 hitungan saat ini ditandai `frozen: false`. Membekukan hanya `ranking:manage`.
+
+Tanpa `method`, yang dipakai adalah metode dasar usulan bulan itu: model bila terbukti lebih
+tepat daripada peta historis, selain itu peta historis (`ranking.operational`).
 """
 
 from __future__ import annotations
@@ -44,17 +47,28 @@ def options(
     _: CurrentUser = require_permission("ranking:read"),
 ) -> dict[str, Any]:
     config = ranking.load_config()
+    suggested = ranking.suggested_target_month(session)
+    card = ranking.model_card(session, config.default_scope)
+    choice = ranking.operational(session, suggested, config.default_scope)
     return {
         "version": config.version,
         "status": config.status,
-        "default_method": config.default_method,
+        "default_method": choice.method,
+        "configured_method": config.default_method,
+        "method_choice": choice.as_dict(),
         "methods": [
-            {"value": key, "label": value["label"], "available": key != "MODEL"}
+            {
+                "value": key,
+                "label": value["label"],
+                "kind": config.kind(key),
+                "available": config.kind(key) != "model" or bool(card and card["available"]),
+            }
             for key, value in config.methods.items()
         ],
+        "model": card,
         "scopes": list(config.scopes),
         "default_scope": config.default_scope,
-        "suggested_month": ranking.suggested_target_month(session).isoformat()[:7],
+        "suggested_month": suggested.isoformat()[:7],
         "frozen": ranking.frozen_months(session),
         "basis": ranking.BASIS,
     }
@@ -70,8 +84,10 @@ def get_ranking(
 ) -> dict[str, Any]:
     config = ranking.load_config()
     target = _month(month, session)
-    method = method or config.default_method
     scope = scope or config.default_scope
+    if scope not in config.scopes:
+        raise ApiError(status.HTTP_400_BAD_REQUEST, f"Cakupan {scope} tidak dikenal.")
+    method = method or ranking.operational(session, target, scope).method
     saved = ranking.stored(session, target, method, scope)
     if saved is not None:
         return {"frozen": True, **ranking.stored_as_dict(saved)}
@@ -90,9 +106,8 @@ def freeze(
 ) -> dict[str, Any]:
     target = _month(payload.month, session)
     try:
-        computed = ranking.compute(
-            session, target, payload.method, payload.scope, payload.data_cutoff
-        )
+        method = payload.method or ranking.operational(session, target, payload.scope).method
+        computed = ranking.compute(session, target, method, payload.scope, payload.data_cutoff)
         saved = ranking.freeze(session, computed, current.user.user_id)
     except ranking.RankingError as error:
         code = (

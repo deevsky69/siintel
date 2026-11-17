@@ -1,17 +1,11 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
-import { getMonthlyEvaluation } from "@/lib/monthly-evaluation";
+import { getBacktest, getMonthlyEvaluation } from "@/lib/monthly-evaluation";
 import { listProducts } from "@/lib/monthly-products";
 import { getRankingOptions } from "@/lib/rankings";
 
 export const dynamic = "force-dynamic";
-
-const METHOD_LABEL: Record<string, string> = {
-  HISTORY_3M: "Peta 3 bulan",
-  HISTORY_12M: "Peta 12 bulan",
-  MODEL: "Model",
-};
 
 /** Evaluasi bulanan (Modul 5 mekanisme): cakupan, pembanding, mutu usulan, pelaksanaan. */
 export default async function EvaluasiBulananPage({
@@ -31,8 +25,15 @@ export default async function EvaluasiBulananPage({
     .sort()
     .reverse();
   const month = (Array.isArray(raw) ? raw[0] : raw) || months[0] || options.suggested_month;
-  const result = await getMonthlyEvaluation(month);
+  const rawScope = params.cakupan;
+  const scope = (Array.isArray(rawScope) ? rawScope[0] : rawScope) || options.default_scope;
+  // Uji historis berdiri sendiri: bila gagal, evaluasi bulan tetap tampil.
+  const [result, backtest] = await Promise.all([
+    getMonthlyEvaluation(month),
+    getBacktest(scope).catch(() => null),
+  ]);
   const pct = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}%`);
+  const num = (value: number | null) => (value === null ? "—" : value.toFixed(2));
 
   return (
     <div className="space-y-3">
@@ -62,6 +63,7 @@ export default async function EvaluasiBulananPage({
                 <th className="py-1 pr-2">Cakupan data</th>
                 <th className="py-1 pr-2 text-right">Tercakup</th>
                 <th className="py-1 pr-2 text-right">Cakupan</th>
+                <th className="py-1 pr-2 text-right">PAI</th>
                 <th className="py-1 pr-2">Kelurahan ({result.top_n})</th>
               </tr>
             </thead>
@@ -69,7 +71,7 @@ export default async function EvaluasiBulananPage({
               {result.methods.map((row) => (
                 <tr key={`${row.method}-${row.scope}`} className={row.frozen ? "bg-accent/5" : ""}>
                   <td className="py-1.5 pr-2 font-semibold text-ink">
-                    {METHOD_LABEL[row.method] ?? row.method}
+                    {row.method_label}
                     {row.frozen ? (
                       <span className="ml-1 rounded bg-risk-low/15 px-1 text-2xs text-risk-low">
                         beku
@@ -84,6 +86,9 @@ export default async function EvaluasiBulananPage({
                   </td>
                   <td className="py-1.5 pr-2 text-right tabular-nums font-semibold text-ink">
                     {pct(row.coverage_pct)}
+                  </td>
+                  <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                    {num(row.pai)}
                   </td>
                   <td className="py-1.5 pr-2 text-ink-faint">{row.selected.join(", ")}</td>
                 </tr>
@@ -138,6 +143,89 @@ export default async function EvaluasiBulananPage({
         </Panel>
       ) : null}
       <p className="text-2xs text-ink-faint">{result.basis}</p>
+
+      {backtest ? (
+        <Panel
+          title="Uji historis model"
+          action={
+            <span className="panel-action">
+              {options.scopes.map((item) => (
+                <Link
+                  key={item}
+                  href={`/ops/evaluasi-bulanan?bulan=${month}&cakupan=${item}`}
+                  className={`mr-2 ${item === backtest.scope ? "text-accent" : ""}`}
+                >
+                  {item === "VEHICLE" ? "Kendaraan" : "Semua 3C"}
+                </Link>
+              ))}
+            </span>
+          }
+        >
+          {!backtest.model.available ? (
+            <p className="mb-2 text-xs text-ink-muted">
+              Model belum tersedia: {backtest.model.reason}
+            </p>
+          ) : null}
+          {backtest.periods.length === 0 ? (
+            <EmptyState label="Belum ada bulan uji di luar masa latih model." />
+          ) : (
+            <div className="space-y-4">
+              {backtest.periods.map((period) => (
+                <table key={period.label} className="w-full text-xs">
+                  <caption className="pb-1 text-left text-2xs uppercase tracking-wide text-ink-faint">
+                    {period.label} · {period.span} · {period.months} bulan · {backtest.top_n}{" "}
+                    kelurahan
+                  </caption>
+                  <thead className="text-left text-2xs uppercase tracking-wide text-ink-faint">
+                    <tr>
+                      <th className="py-1 pr-2">Metode</th>
+                      <th className="py-1 pr-2 text-right">Tercakup</th>
+                      <th className="py-1 pr-2 text-right">Cakupan</th>
+                      <th className="py-1 pr-2 text-right">PAI</th>
+                      <th className="py-1 pr-2 text-right">Model unggul–kalah–seri</th>
+                      <th className="py-1 pr-2 text-right">Uji tanda (p)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-base-800">
+                    {period.methods.map((row) => {
+                      const test = period.sign_tests.find((item) => item.against === row.method);
+                      return (
+                        <tr key={row.method} className={row.kind === "model" ? "bg-accent/5" : ""}>
+                          <td className="py-1.5 pr-2 font-semibold text-ink">
+                            {row.method_label}
+                            {row.kind === "annual" ? ` ${backtest.annual_year}` : ""}
+                          </td>
+                          <td className="py-1.5 pr-2 text-right tabular-nums text-ink">
+                            {row.covered} / {row.total}
+                          </td>
+                          <td className="py-1.5 pr-2 text-right tabular-nums font-semibold text-ink">
+                            {pct(row.coverage_pct)}
+                          </td>
+                          <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                            {num(row.pai)}
+                          </td>
+                          <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                            {test ? `${test.wins}–${test.losses}–${test.ties}` : ""}
+                          </td>
+                          <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                            {test ? (test.p_value === null ? "—" : test.p_value.toFixed(3)) : ""}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ))}
+            </div>
+          )}
+          <p className="mt-3 text-2xs text-ink-faint">
+            {backtest.model.model_version
+              ? `${backtest.model.model_version} · dilatih sampai ${backtest.model.train_until} · `
+              : ""}
+            {backtest.basis}
+          </p>
+        </Panel>
+      ) : null}
     </div>
   );
 }

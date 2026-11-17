@@ -18,13 +18,24 @@ from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.main import app
 from prediksi_presisi_api.models import CrimeIncident, Location, MonthlyProduct, Role, User
 from prediksi_presisi_api.security.passwords import hash_password
-from prediksi_presisi_api.services import clock
+from prediksi_presisi_api.services import clock, monthly_ranking
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 PASSWORD = "KataSandiUji#2026"  # noqa: S105
 pytestmark = pytest.mark.skipif(not DATABASE_URL, reason="DATABASE_URL tidak diisi")
 MONTH = "2032-03"
 BASE = "/api/v1/monthly-products"
+
+
+@pytest.fixture(autouse=True)
+def _peta_tiga_bulan(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Dasar usulan dipatok ke peta 3 bulan: pilihan penjaga (model atau peta) bergantung
+    pada isi basis data, sedangkan test ini memeriksa alur, bukan pemilihan metode."""
+    monkeypatch.setattr(
+        monthly_ranking,
+        "operational",
+        lambda *args, **kwargs: monthly_ranking.MethodChoice("HISTORY_3M", "uji", {}),
+    )
 
 
 @pytest.fixture

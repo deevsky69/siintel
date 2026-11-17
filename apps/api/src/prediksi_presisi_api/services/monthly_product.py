@@ -124,13 +124,16 @@ def draft(session: Session, target_month: Any, user_id: Any) -> MonthlyProduct:
     month = ranking.month_start(target_month)
     if session.scalar(select(MonthlyProduct).where(MonthlyProduct.target_month == month)):
         raise ProductError("Produk bulan ini sudah ada.", 409)
-    frozen = ranking.stored(session, month, config.default_method, config.default_scope)
+    # Dasar usulan: model bila terbukti lebih tepat daripada peta historis pada bulan-bulan
+    # uji terakhir, selain itu peta historis terbaik (naskah Modul 3; `ranking.operational`).
+    choice = ranking.operational(session, month, config.default_scope)
+    frozen = ranking.stored(session, month, choice.method, config.default_scope)
     frozen_now = False
     if frozen is None:
         # Pembekuan ikut tombol "Susun" (10 November 2026): satu langkah lebih sedikit, dan
         # yang dibekukan tetap peringkat yang dievaluasi setelah bulan berakhir.
         try:
-            computed = ranking.compute(session, month, config.default_method, config.default_scope)
+            computed = ranking.compute(session, month, choice.method, config.default_scope)
             frozen = ranking.freeze(session, computed, user_id)
         except ranking.RankingError as error:
             raise ProductError(str(error)) from error
@@ -148,8 +151,9 @@ def draft(session: Session, target_month: Any, user_id: Any) -> MonthlyProduct:
         where = f"Kelurahan {row.kelurahan} ({row.kecamatan})"
         focus = f" fokus {THREAT_LABEL.get(threat, threat.lower())}" if threat else ""
         when = f" pada blok {pattern['peak_block_label']}" if pattern["peak_block_label"] else ""
+        source = "model AI" if config.kind(frozen.method) == "model" else "peta historis"
         text = (
-            f"{action} di {where}{focus}{when}. Dasar: peringkat {row.rank}, perkiraan "
+            f"{action} di {where}{focus}{when}. Dasar: peringkat {row.rank} ({source}), perkiraan "
             f"{float(row.predicted_count):.1f} kejadian/bulan, {sum(pattern['counts'].values())} "
             f"kejadian pada {frozen.basis_from.isoformat()[:7]}-{frozen.basis_to.isoformat()[:7]} "
             f"(sumber Pusiknas, batas data {frozen.data_cutoff.isoformat()})."
@@ -172,6 +176,10 @@ def draft(session: Session, target_month: Any, user_id: Any) -> MonthlyProduct:
         status="DRAFT",
         facts={
             "method": frozen.method,
+            "method_label": config.methods.get(frozen.method, {}).get("label", frozen.method),
+            "method_reason": choice.reason,
+            "method_evidence": choice.evidence,
+            "model_version": frozen.model_version,
             "scope": frozen.scope,
             "data_cutoff": frozen.data_cutoff.isoformat(),
             "basis_from": frozen.basis_from.isoformat(),
