@@ -53,7 +53,7 @@ HELP = (
     "/mulai — membuat laporan baru\n"
     "/status — melihat status laporan Anda\n"
     "/babin — kontak Babinkamtibmas kelurahan Anda\n"
-    "/dasbor — peta kerawanan, lacak laporan, dan survey di SIGAP WARGA\n"
+    "/dasbor — peta kerawanan, lacak laporan, dan survey di SIGAP BERSAMA\n"
     "/info <kelurahan> — imbauan kehati-hatian bulan depan\n"
     "/batal — membatalkan laporan yang sedang diisi\n\n"
     "Keadaan darurat: hubungi 110."
@@ -185,7 +185,7 @@ class Conversation:
                 return Reply(HELP)
             if lowered in COMMAND_DASHBOARD:
                 return Reply(
-                    "SIGAP WARGA — peta kerawanan wilayah, lacak laporan, cek kendaraan, dan "
+                    "SIGAP BERSAMA — peta kerawanan wilayah, lacak laporan, cek kendaraan, dan "
                     f"Survey Rasa Aman:\n{DASHBOARD_URL}"
                 )
             if first_word(lowered) in COMMAND_ADVISORY:
@@ -459,7 +459,7 @@ def babin_lines(contact: dict[str, Any]) -> list[str]:
 
 def group_info(backend: Backend, channel: str, chat_id: str) -> Reply:
     """Pesan pengenalan di grup (permintaan pemilik proyek 4 November 2026): fitur bot,
-    tautan SIGAP WARGA, dan kontak Babin kelurahan grup ini."""
+    tautan SIGAP BERSAMA, dan kontak Babin kelurahan grup ini."""
     area = backend.group_of(channel, chat_id)
     lines = [
         "*SIGAP* — bot kamtibmas Polres Metro Jakarta Selatan.",

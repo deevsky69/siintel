@@ -120,7 +120,7 @@ def seed_case_files_dummy() -> int:
     with get_session_factory()() as session, session.begin():
         made = seed_dummy_case_files(session)
     print(f"{len(made)} berkas perkara dummy tersedia (yang sudah ada dilewati).")
-    print("Contoh untuk dicoba di SIGAP WARGA (nomor LP + PIN):")
+    print("Contoh untuk dicoba di SIGAP BERSAMA (nomor LP + PIN):")
     for row in made[:6]:
         print(
             f"  {row.lp_number}  PIN {row.pin}  [{row.crime_type}, {row.stage}"

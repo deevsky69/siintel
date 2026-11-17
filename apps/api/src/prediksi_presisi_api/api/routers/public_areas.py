@@ -1,6 +1,6 @@
-"""SIGAP WARGA — ringkasan wilayah untuk publik. **Tanpa autentikasi.**
+"""SIGAP BERSAMA — ringkasan wilayah untuk publik. **Tanpa autentikasi.**
 
-Keputusan pemilik proyek 2 November 2026 (docs/01 §19.2, "SIGAP WARGA" butir 1): yang boleh
+Keputusan pemilik proyek 2 November 2026 (docs/01 §19.2, "SIGAP BERSAMA" butir 1): yang boleh
 dilihat masyarakat hanya **angka historis per wilayah dan tingkat kerawanan kasar** — tanpa
 prediksi, tanpa skor, tanpa titik kejadian, tanpa peringkat halus. Sederhana.
 

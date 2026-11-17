@@ -1,5 +1,5 @@
 /**
- * SIGAP WARGA — data publik (tanpa akun). Dipanggil dari Server Component; tidak membawa
+ * SIGAP BERSAMA — data publik (tanpa akun). Dipanggil dari Server Component; tidak membawa
  * sesi apa pun. Bentuk respons mengikuti `routers/public_areas.py` dan `routers/reviews.py`.
  */
 
@@ -69,7 +69,7 @@ export const LEVEL_CLASS: Record<AreaLevel, string> = {
   TINGGI: "bg-risk-high/12 text-risk-high border-risk-high/30",
 };
 
-/** Warna isian peta — mengikuti mockup SIGAP WARGA (10 November 2026): biru muda, kuning, jingga. */
+/** Warna isian peta — mengikuti mockup SIGAP BERSAMA (10 November 2026): biru muda, kuning, jingga. */
 export const LEVEL_FILL: Record<AreaLevel, string> = {
   RENDAH: "#BFD7EA",
   SEDANG: "#F2B45A",

@@ -1,10 +1,10 @@
 # SIGAP
 
-*Sistem Inteligensi Geospasial dan Analitik Prediktif* — sebelumnya PREDIKSI PRESISI (nama diganti 13 Oktober 2026, ditetapkan SIGAP 19 Oktober 2026).
+*Sistem Intelijen Geospasial dan Analitik Prediktif* — sebelumnya PREDIKSI PRESISI (nama diganti 13 Oktober 2026, ditetapkan SIGAP 19 Oktober 2026).
 
 Repository: `siintel`
 
-Dua wajah satu domain (2 November 2026): `/` = **SIGAP WARGA** (masyarakat, tanpa akun), `/ops/…` = **SIGAP** (petugas; masuk di `/ops/masuk`).
+Dua wajah satu domain (2 November 2026): `/` = **SIGAP BERSAMA** (masyarakat, tanpa akun), `/ops/…` = **SIGAP** (petugas; masuk di `/ops/masuk`).
 
 Sistem pendukung keputusan Kamtibmas berbasis predictive policing & spatial intelligence.
 

@@ -10,7 +10,7 @@ import {
   threatLabel,
 } from "@/lib/warga";
 
-export const metadata = { title: "Peta Wilayah — SIGAP WARGA" };
+export const metadata = { title: "Peta Wilayah — SIGAP BERSAMA" };
 export const dynamic = "force-dynamic";
 
 const LEVELS: AreaLevel[] = ["TINGGI", "SEDANG", "RENDAH"];

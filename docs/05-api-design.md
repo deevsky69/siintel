@@ -470,7 +470,7 @@ tidak terjadi.
 > tangan pemilik proyek. Aplikasi Android LAPOR PRESISI (PHASE 17) tetap direncanakan
 > terpisah.
 
-### 2.11d SIGAP WARGA — ringkasan wilayah publik dan Survey Rasa Aman (2 November 2026)
+### 2.11d SIGAP BERSAMA — ringkasan wilayah publik dan Survey Rasa Aman (2 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|

@@ -9,9 +9,11 @@
 
 # 0. IDENTITAS PROYEK
 
-Nama: **SIGAP** — Sistem Inteligensi Geospasial dan Analitik Prediktif
+Nama: **SIGAP** — Sistem Intelijen Geospasial dan Analitik Prediktif
 
 (Sebelum 13 Oktober 2026 bernama PREDIKSI PRESISI, sempat KRESNA SIGAP, ditetapkan **SIGAP** 19 Oktober 2026; nama paket, repositori, dan pengenal internal tidak diubah.)
+
+(17 November 2026, penyesuaian ke naskah Taskap: kepanjangan memakai kata **Intelijen** — sebelumnya "Inteligensi" — dan kanal masyarakat bernama **SIGAP BERSAMA**, sebelumnya SIGAP WARGA.)
 
 Tema:
 

@@ -21,7 +21,7 @@ const STAT_COLOR: Record<AreaLevel, string> = {
 };
 
 /**
- * Hero beranda SIGAP WARGA (mockup 10 November 2026): bidang navy selebar layar. Kiri —
+ * Hero beranda SIGAP BERSAMA (mockup 10 November 2026): bidang navy selebar layar. Kiri —
  * pil periode, judul, penjelasan, kotak cari wilayah, tiga angka jumlah kecamatan per
  * tingkat. Kanan — kartu putih berisi peta kecamatan dengan chip saring, periode, legenda,
  * dan tautan ke peta lengkap. Di bawahnya strip **Imbauan Polres** yang menumpang di tepi

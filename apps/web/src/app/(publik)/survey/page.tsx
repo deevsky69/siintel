@@ -3,7 +3,7 @@ import { LevelBadge, Stars } from "@/components/warga/bits";
 import { getPublicReviews, getPublicSummary } from "@/lib/warga";
 import { ReviewForm } from "./review-form";
 
-export const metadata = { title: "Survey Rasa Aman — SIGAP WARGA" };
+export const metadata = { title: "Survey Rasa Aman — SIGAP BERSAMA" };
 export const dynamic = "force-dynamic";
 
 const PROTECTIONS = [

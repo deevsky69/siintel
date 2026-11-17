@@ -1,4 +1,4 @@
-"""SIGAP WARGA: ringkasan wilayah publik dan Survey Rasa Aman."""
+"""SIGAP BERSAMA: ringkasan wilayah publik dan Survey Rasa Aman."""
 
 from __future__ import annotations
 

@@ -841,7 +841,7 @@ describe("jendela historis dari alamat", () => {
 });
 
 /**
- * Sejak 2 November 2026 akar situs adalah SIGAP WARGA; beranda kepolisian di `/ops`.
+ * Sejak 2 November 2026 akar situs adalah SIGAP BERSAMA; beranda kepolisian di `/ops`.
  * Tautan tingkat wilayah pada peta beranda harus tetap di dalam `/ops` — regresi
  * 4 November 2026: klik wilayah di beranda petugas berpindah ke peta warga.
  */

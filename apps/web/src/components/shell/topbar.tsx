@@ -66,7 +66,7 @@ export function Topbar({
             SIGAP
           </div>
           <div className="hidden whitespace-nowrap text-2xs uppercase tracking-[0.12em] text-ink-muted xl:block">
-            Sistem Inteligensi Geospasial dan Analitik Prediktif
+            Sistem Intelijen Geospasial dan Analitik Prediktif
           </div>
         </div>
       </div>

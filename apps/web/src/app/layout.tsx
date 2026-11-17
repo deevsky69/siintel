@@ -11,7 +11,7 @@ const heading = Chakra_Petch({
   variable: "--font-heading",
 });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
-// Wajah huruf judul sisi warga: Manrope tebal (mockup SIGAP WARGA, 10 November 2026);
+// Wajah huruf judul sisi warga: Manrope tebal (mockup SIGAP BERSAMA, 10 November 2026);
 // badan tetap Inter. Dimuat lewat next/font supaya tidak mengambil apa pun dari internet.
 const display = Manrope({
   subsets: ["latin"],

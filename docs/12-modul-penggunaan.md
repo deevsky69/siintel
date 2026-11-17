@@ -16,15 +16,15 @@ Polres Metro Jakarta Selatan
 
 ---
 
-## 0. DUA WAJAH SATU DOMAIN — SIGAP WARGA DAN SIGAP (2 November 2026)
+## 0. DUA WAJAH SATU DOMAIN — SIGAP BERSAMA DAN SIGAP (2 November 2026)
 
 | Alamat | Untuk siapa | Isi |
 |---|---|---|
-| `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP WARGA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
+| `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
-**Rupa baru SIGAP WARGA (10 November 2026).** Sisi warga memakai desain yang diserahkan
-pemilik proyek (mockup "SIGAP WARGA Redesign", catatan 178): kanvas terang, kepala putih
+**Rupa baru SIGAP BERSAMA (10 November 2026).** Sisi warga memakai desain yang diserahkan
+pemilik proyek (mockup "SIGAP BERSAMA Redesign", catatan 178): kanvas terang, kepala putih
 bergaris emas ganda, hero navy berisi peta kecamatan dan angka ringkas, strip Imbauan Polres,
 empat kartu layanan; Peta menjadi panggung tiga kolom (panel cari/saring, peta, kartu rincian);
 Survey, Lacak, dan Lapor berspanduk merah untuk keadaan darurat; halaman **Masuk petugas** ikut
@@ -40,7 +40,7 @@ tampil di panel kelurahan pada peta warga dan lewat perintah bot `/babin`; dikel
 di **Laporan → Babinkamtibmas** (dummy berlabel dulu) — sejak 4 November 2026 berupa tabel per kelurahan: cari, centang *Belum terisi*, **+ Tambah**, **Ubah/Isi**, dan **Hapus** di panel samping. **Buletin mingguan** disusun sistem dari
 minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetujui Pimpinan**, lalu
 bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
-`/dasbor` menautkan ke SIGAP WARGA.
+`/dasbor` menautkan ke SIGAP BERSAMA.
 
 **Imbauan bulanan ke grup warga otomatis (10 November 2026).** Keputusan 3A (6 November 2026,
 perlu persetujuan Pimpinan) **dicabut pemilik proyek**: bot mengirim imbauan bulan berjalan ke

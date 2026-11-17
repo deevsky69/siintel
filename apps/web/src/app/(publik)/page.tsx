@@ -5,7 +5,7 @@ import { Reveal } from "@/components/warga/reveal";
 import { getPublicSummary, highlightAreas, longMonth } from "@/lib/warga";
 import { getImbauanPublik } from "./lapor/actions";
 
-export const metadata = { title: "SIGAP WARGA — Polres Metro Jakarta Selatan" };
+export const metadata = { title: "SIGAP BERSAMA — Polres Metro Jakarta Selatan" };
 export const dynamic = "force-dynamic";
 
 const SERVICES = [
@@ -36,7 +36,7 @@ const SERVICES = [
 ] as const;
 
 /**
- * Beranda SIGAP WARGA (mockup 10 November 2026).
+ * Beranda SIGAP BERSAMA (mockup 10 November 2026).
  *
  * Hero navy berisi peta kecamatan dan angka ringkas; strip Imbauan Polres; empat kartu
  * layanan; lalu dua kolom — daftar kelurahan berkerawanan tinggi dan kartu navy Survey Rasa

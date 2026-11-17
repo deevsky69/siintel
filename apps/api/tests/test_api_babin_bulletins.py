@@ -204,7 +204,7 @@ def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_b
     ).json()
     mine = next(row for row in listing["data"] if row["kelurahan"] == area.kelurahan)
     assert mine["status"] == "DRAFT" and str(area.kelurahan).upper() in mine["content"]
-    assert "SIGAP WARGA" in mine["content"] and mine["figures"]["week_start"] == week.isoformat()
+    assert "SIGAP BERSAMA" in mine["content"] and mine["figures"]["week_start"] == week.isoformat()
 
     # Hanya Pimpinan yang menyetujui; Administrator ditolak.
     assert client.post(f"/api/v1/bulletins/{mine['id']}/approve", headers=admin).status_code == 403

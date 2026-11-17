@@ -16,7 +16,7 @@ import { tokenExpiringSoon, tokenMaxAge } from "@/lib/token";
  * token disegarkan dari komponen server, dan penyimpanannya gagal ("Cookies can only be
  * modified in a Server Action or Route Handler") — siklus itu berulang pada setiap klik.
  *
- * Sejak 2 November 2026 (SIGAP WARGA): seluruh jalur di luar `/ops` adalah halaman warga
+ * Sejak 2 November 2026 (SIGAP BERSAMA): seluruh jalur di luar `/ops` adalah halaman warga
  * tanpa akun; `/ops/...` adalah aplikasi kepolisian yang menuntut sesi, kecuali `/ops/masuk`.
  */
 
