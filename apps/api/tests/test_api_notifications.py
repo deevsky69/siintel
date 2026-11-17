@@ -167,7 +167,7 @@ def test_a_polsek_officer_is_told_about_the_work_they_do(
 def test_an_analyst_is_told_about_drafts_not_decisions(
     client: TestClient, session: Session
 ) -> None:
-    analyst = _make_user(session, "Analis Intelkam")
+    analyst = _make_user(session, "Staf Intelkam")
     groups = _feed(client, analyst)["groups"]
     assert isinstance(groups, list)
     product = next(group for group in groups if group["kind"] == "MONTHLY_PRODUCT")
@@ -176,6 +176,25 @@ def test_an_analyst_is_told_about_drafts_not_decisions(
         select(func.count()).select_from(MonthlyProduct).where(MonthlyProduct.status == "DRAFT")
     )
     assert product["total"] == int(drafts or 0)
+
+
+def test_kasat_is_told_about_products_awaiting_review(client: TestClient, session: Session) -> None:
+    """Tiga tahap (17 November 2026): antrean Kasat = produk yang sudah diperiksa staf."""
+    kasat = _make_user(session, "Kasat Intelkam")
+    groups = _feed(client, kasat)["groups"]
+    assert isinstance(groups, list)
+    product = next(group for group in groups if group["kind"] == "MONTHLY_PRODUCT")
+    assert "telaah" in str(product["title"])
+    waiting = session.scalar(
+        select(func.count())
+        .select_from(MonthlyProduct)
+        .where(MonthlyProduct.status.in_(("ANALYST_REVIEWED", "KBO_CHECKED")))
+    )
+    assert product["total"] == int(waiting or 0)
+    # Administrator tidak lagi menerima antrean draf: ia di luar rantai persetujuan.
+    admin_groups = _feed(client, _make_user(session, "Administrator"))["groups"]
+    assert isinstance(admin_groups, list)
+    assert "MONTHLY_PRODUCT" not in [group["kind"] for group in admin_groups]
 
 
 def test_two_roles_receive_different_queues(client: TestClient, session: Session) -> None:

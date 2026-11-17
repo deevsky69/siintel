@@ -2,7 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api";
-import { analystReview, decideProduct, draftProduct, recordAction } from "@/lib/monthly-products";
+import {
+  analystReview,
+  decideProduct,
+  draftProduct,
+  kasatReview,
+  recordAction,
+} from "@/lib/monthly-products";
 
 export type ProductState = { error: string | null; done: string | null };
 const IDLE_OK = (done: string): ProductState => ({ error: null, done });
@@ -37,7 +43,27 @@ export async function analystAction(_p: ProductState, form: FormData): Promise<P
   }));
   return guard(async () => {
     await analystReview(month, { items, note: String(form.get("note") ?? "") || undefined });
-    return IDLE_OK("Pemeriksaan tersimpan; produk dikirim ke Pimpinan.");
+    return IDLE_OK("Pemeriksaan tersimpan; produk dikirim ke Kasat Intelkam.");
+  });
+}
+
+/** Telaah Kasat Intelkam: meneruskan ke Pimpinan, atau mengembalikan ke staf dengan alasan. */
+export async function kasatAction(_p: ProductState, form: FormData): Promise<ProductState> {
+  const month = String(form.get("month") ?? "");
+  const raw = String(form.get("outcome") ?? "");
+  if (raw !== "ACCEPTED" && raw !== "REJECTED") {
+    return { error: "Pilih meneruskan atau mengembalikan.", done: null };
+  }
+  const outcome: "ACCEPTED" | "REJECTED" = raw;
+  const reason = String(form.get("reason") ?? "").trim();
+  if (outcome === "REJECTED" && !reason) {
+    return { error: "Alasan wajib diisi bila dikembalikan ke staf.", done: null };
+  }
+  return guard(async () => {
+    await kasatReview(month, { outcome, reason: reason || undefined });
+    return IDLE_OK(
+      outcome === "ACCEPTED" ? "Produk diteruskan ke Pimpinan." : "Produk dikembalikan ke staf.",
+    );
   });
 }
 

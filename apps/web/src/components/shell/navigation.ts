@@ -95,7 +95,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: "Produk Bulanan",
         icon: "recommendation",
         permissions: ["monthly_product:read"],
-        hint: "Analis menyusun & memeriksa, Pimpinan menetapkan, Fungsi/Polsek mencatat; tab Peringkat",
+        hint: "Staf menyusun, Kasat menelaah, Pimpinan menetapkan, Fungsi/Polsek mencatat; tab Peringkat",
       },
       {
         href: "/ops/evaluasi-bulanan",

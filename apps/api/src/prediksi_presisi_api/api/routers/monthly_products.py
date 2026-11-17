@@ -1,7 +1,6 @@
-"""Produk bulanan (Modul 4 mekanisme), dua tahap sejak 10 November 2026:
-Analis menyusun & memeriksa (peringkat dibekukan otomatis) → Pimpinan menetapkan → pelaksanaan.
-
-Endpoint `/kbo` dan `/kasat` (6–10 November 2026) dihapus bersama tahapnya — catatan 177."""
+"""Produk bulanan (Modul 4 mekanisme), tiga tahap sejak 17 November 2026 (catatan 183):
+Staf Intelkam menyusun & memeriksa (peringkat dibekukan otomatis) → Kasat Intelkam menelaah
+→ Pimpinan menetapkan → pelaksanaan. Endpoint `/kbo` tidak dihidupkan lagi."""
 
 from __future__ import annotations
 
@@ -38,6 +37,12 @@ class AnalystRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
     items: list[ItemDecision] = Field(default_factory=list)
     note: str | None = Field(default=None, max_length=2000)
+
+
+class OutcomeRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    outcome: str = Field(description="ACCEPTED (teruskan ke Pimpinan) atau REJECTED (kembalikan)")
+    reason: str | None = Field(default=None, max_length=2000)
 
 
 class Selection(BaseModel):
@@ -174,6 +179,27 @@ def analyst(
         current,
         product,
         {"stage": "ANALYST", "items": len(decisions)},
+    )
+    session.commit()
+    return products.as_dict(_load(session, month))
+
+
+@router.post("/monthly-products/{month}/kasat", summary="Telaah Kasat Intelkam")
+def kasat(
+    month: str,
+    payload: OutcomeRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("monthly_product:validate"),
+) -> dict[str, Any]:
+    product = _load(session, month)
+    _run(
+        session,
+        lambda: products.validate(
+            session, product, payload.outcome, payload.reason, current.user.user_id
+        ),
+    )
+    _audit(
+        session, "VALIDATE_MONTHLY_PRODUCT", current, product, {"outcome": payload.outcome.upper()}
     )
     session.commit()
     return products.as_dict(_load(session, month))

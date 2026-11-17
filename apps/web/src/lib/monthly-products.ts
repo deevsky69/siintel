@@ -3,9 +3,10 @@ import { apiGet, apiPost } from "./api";
 
 /**
  * Produk bulanan (Modul 4 mekanisme), dua tahap sejak 10 November 2026 (catatan 177):
- * Analis menyusun & memeriksa (peringkat dibekukan otomatis) → Pimpinan menetapkan →
- * Fungsi/Polsek mencatat. `KBO_CHECKED` / `VALIDATED` hanya tinggalan alur empat tahap dan
- * diperlakukan sama dengan `ANALYST_REVIEWED`: menunggu Pimpinan.
+ * Tiga tahap sejak 17 November 2026: Staf Intelkam menyusun & memeriksa (peringkat dibekukan
+ * otomatis) → Kasat Intelkam menelaah → Pimpinan menetapkan → Fungsi/Polsek mencatat.
+ * `KBO_CHECKED` adalah tinggalan alur empat tahap dan diperlakukan sama dengan
+ * `ANALYST_REVIEWED`: menunggu telaah Kasat.
  */
 export type ProductItem = {
   rank: number;
@@ -48,7 +49,8 @@ export type MonthlyProduct = {
   product_id: string;
   target_month: string;
   status: ProductStatus;
-  next_stage: "ANALYST" | "PIMPINAN" | null;
+  next_stage: "ANALYST" | "KASAT" | "PIMPINAN" | null;
+  awaiting_review: boolean;
   awaiting_decision: boolean;
   facts: Record<string, string | number | boolean>;
   priority_count: number | null;
@@ -69,12 +71,12 @@ export type ProductList = {
   basis: string;
 };
 
+/** Status yang menunggu telaah Kasat Intelkam. */
+export const AWAITING_REVIEW: readonly ProductStatus[] = ["ANALYST_REVIEWED", "KBO_CHECKED"];
+export const isAwaitingReview = (status: ProductStatus) => AWAITING_REVIEW.includes(status);
+
 /** Status yang menunggu penetapan Pimpinan — satu tempat, dipakai lencana dan beranda. */
-export const AWAITING_DECISION: readonly ProductStatus[] = [
-  "ANALYST_REVIEWED",
-  "KBO_CHECKED",
-  "VALIDATED",
-];
+export const AWAITING_DECISION: readonly ProductStatus[] = ["VALIDATED"];
 export const isAwaitingDecision = (status: ProductStatus) => AWAITING_DECISION.includes(status);
 
 export const listProducts = cache(() => apiGet<ProductList>("/monthly-products"));
@@ -88,6 +90,10 @@ export const analystReview = (
     note?: string;
   },
 ) => apiPost<MonthlyProduct>(`/monthly-products/${month}/analyst`, body);
+export const kasatReview = (
+  month: string,
+  body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },
+) => apiPost<MonthlyProduct>(`/monthly-products/${month}/kasat`, body);
 export const decideProduct = (
   month: string,
   body: { selected: { kelurahan: string; action?: string }[]; reason?: string },

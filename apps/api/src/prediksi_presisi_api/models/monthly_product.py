@@ -33,9 +33,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..db import Base
 from .base import TimestampMixin, uuid_pk
 
-# KBO_CHECKED / VALIDATED dan tahap KBO / KASAT adalah tinggalan alur empat tahap
-# (6–10 November 2026); dipertahankan agar baris lama tetap sah dan tertelusur. Alur yang
-# berjalan: DRAFT → ANALYST_REVIEWED → DECIDED (catatan 177).
+# Alur yang berjalan sejak 17 November 2026 (catatan 183):
+# DRAFT → ANALYST_REVIEWED → VALIDATED (telaah Kasat) → DECIDED. KBO_CHECKED dan tahap KBO
+# adalah tinggalan alur empat tahap (6–10 November 2026); dipertahankan agar baris lama
+# tetap sah dan tertelusur.
 STATUSES = ("DRAFT", "ANALYST_REVIEWED", "KBO_CHECKED", "VALIDATED", "DECIDED")
 STAGES = ("ANALYST", "KBO", "KASAT", "PIMPINAN")
 OUTCOMES = ("ACCEPTED", "REVISED", "REJECTED", "DECIDED")

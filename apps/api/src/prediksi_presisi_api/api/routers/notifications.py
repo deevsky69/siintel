@@ -139,9 +139,10 @@ def notifications(
             }
         )
 
-    # --- Produk bulanan (Modul 4 mekanisme; dua tahap sejak 10 November 2026) -----------
-    # Pimpinan: produk yang menunggu penetapan. Analis/Administrator: draf yang belum
-    # diperiksa dan dikirim. Keduanya permission tindakan, bukan permission baca.
+    # --- Produk bulanan (Modul 4 mekanisme; tiga tahap sejak 17 November 2026) ----------
+    # Pimpinan: produk yang menunggu penetapan. Kasat Intelkam: produk yang menunggu
+    # telaah. Staf Intelkam: draf yang belum diperiksa dan dikirim (termasuk yang
+    # dikembalikan Kasat). Ketiganya permission tindakan, bukan permission baca.
     if _holds(current, "monthly_product:decide"):
         rows = session.scalars(
             select(MonthlyProduct)
@@ -165,7 +166,36 @@ def notifications(
                     {
                         "code": product.target_month.isoformat()[:7],
                         "headline": f"Produk bulan {product.target_month.isoformat()[:7]}",
-                        "detail": "Sudah diperiksa Analis; menunggu penetapan",
+                        "detail": "Sudah ditelaah Kasat Intelkam; menunggu penetapan",
+                    }
+                    for product in rows
+                ],
+            }
+        )
+    elif _holds(current, "monthly_product:validate"):
+        rows = session.scalars(
+            select(MonthlyProduct)
+            .where(MonthlyProduct.status.in_(products.AWAITING_REVIEW))
+            .order_by(MonthlyProduct.target_month.desc())
+            .limit(SAMPLE_LIMIT)
+        ).all()
+        total = session.scalar(
+            select(func.count())
+            .select_from(MonthlyProduct)
+            .where(MonthlyProduct.status.in_(products.AWAITING_REVIEW))
+        )
+        groups.append(
+            {
+                "kind": "MONTHLY_PRODUCT",
+                "title": "Produk bulanan menunggu telaah Anda",
+                "action": "Teruskan ke Pimpinan atau kembalikan ke staf dengan alasan",
+                "href": "/ops/produk-bulanan",
+                "total": int(total or 0),
+                "items": [
+                    {
+                        "code": product.target_month.isoformat()[:7],
+                        "headline": f"Produk bulan {product.target_month.isoformat()[:7]}",
+                        "detail": "Sudah diperiksa staf; menunggu telaah",
                     }
                     for product in rows
                 ],
@@ -185,7 +215,7 @@ def notifications(
             {
                 "kind": "MONTHLY_PRODUCT",
                 "title": "Draf produk bulanan belum dikirim",
-                "action": "Periksa usulan lalu kirim ke Pimpinan",
+                "action": "Periksa usulan lalu kirim ke Kasat Intelkam",
                 "href": "/ops/produk-bulanan",
                 "total": int(total or 0),
                 "items": [

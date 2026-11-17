@@ -1,20 +1,24 @@
 """Produk bulanan — Modul 4 "Menyusun dan memvalidasi rekomendasi".
 
-Dua tahap sejak 10 November 2026 (keputusan pemilik proyek 1B, catatan 177):
+Tiga tahap sejak 17 November 2026 (catatan 183; naskah Taskap Bab IV dan saran Kasat
+Intelkam "Staf – Kasat – Pimpinan"):
 
-    Analis menyusun draf — peringkat bulan itu DIBEKUKAN otomatis bila belum —
+    Staf Intelkam menyusun draf — peringkat bulan itu DIBEKUKAN otomatis bila belum —
       lalu memeriksanya dengan informasi lapangan: terima / perbaiki / tolak, dengan alasan,
-      dan mengirimkannya ke Pimpinan
+      dan mengirimkannya ke Kasat Intelkam
+      → Kasat Intelkam MENELAAH: meneruskan ke Pimpinan, atau mengembalikan ke staf dengan
+        alasan. Ia tidak mengubah isi usulan — yang menulis tetap staf
       → Pimpinan menetapkan JUMLAH dan KELURAHAN prioritas beserta tindak lanjutnya
       → Fungsi pelaksana / Polsek mencatat waktu, tempat, tindakan, hasil.
 
-Tahap KBO dan validasi Kasat Intelkam (6–10 November 2026) dihapus: keduanya diklik orang
-yang sama berturut-turut dan tidak menambah kontrol. Produk yang sudah terlanjur berstatus
-KBO_CHECKED / VALIDATED tetap terbaca dan langsung dapat ditetapkan Pimpinan.
+Riwayat: empat tahap (Analis → KBO → Kasat → Pimpinan) pada 6–10 November 2026; dua tahap
+(Analis → Pimpinan) pada 10–17 November 2026 karena KBO dan Kasat diklik orang yang sama
+berturut-turut. Tahap KBO tidak dihidupkan lagi — staf dan KBO dianggap satu. Produk lama
+berstatus KBO_CHECKED diperlakukan seperti ANALYST_REVIEWED: menunggu telaah Kasat.
 
 Draf tetap disusun dari peringkat yang dibekukan, supaya "peringkat awal model dan daftar
-keputusan pimpinan disimpan terpisah" (dokumen mekanisme) — pembekuan kini bagian dari
-tombol "Susun", bukan langkah tersendiri. Usulan langkah mengikuti
+keputusan pimpinan disimpan terpisah" (dokumen mekanisme) — pembekuan bagian dari tombol
+"Susun", bukan langkah tersendiri. Usulan langkah mengikuti
 config/recommendation/function-rules.yaml (PROPOSED) — bukan model bahasa.
 """
 
@@ -51,15 +55,16 @@ class ProductError(ValueError):
         self.status = status
 
 
-#: Status yang menunggu penetapan Pimpinan. KBO_CHECKED dan VALIDATED hanya tinggalan alur
-#: empat tahap (6–10 November 2026); produk lama di status itu tetap dapat ditetapkan.
-AWAITING_DECISION = ("ANALYST_REVIEWED", "KBO_CHECKED", "VALIDATED")
+#: Status yang menunggu telaah Kasat Intelkam. KBO_CHECKED adalah tinggalan alur empat
+#: tahap (6–10 November 2026); produk lama di status itu ikut ditelaah Kasat.
+AWAITING_REVIEW = ("ANALYST_REVIEWED", "KBO_CHECKED")
+#: Status yang menunggu penetapan Pimpinan: hanya yang sudah ditelaah Kasat Intelkam.
+AWAITING_DECISION = ("VALIDATED",)
 STAGE_FOR_STATUS = {
     "DRAFT": "ANALYST",
-    "ANALYST_REVIEWED": "PIMPINAN",
-    "KBO_CHECKED": "PIMPINAN",
+    "ANALYST_REVIEWED": "KASAT",
+    "KBO_CHECKED": "KASAT",
     "VALIDATED": "PIMPINAN",
-    "DECIDED": None,
 }
 BASIS = (
     "Draf disusun sistem dari peringkat bulan sasaran — dibekukan saat draf disusun — dan pola "
@@ -287,6 +292,21 @@ def analyst_review(
     return product
 
 
+def validate(
+    session: Session, product: MonthlyProduct, outcome: str, reason: str | None, user_id: Any
+) -> MonthlyProduct:
+    """Telaah Kasat Intelkam: ACCEPTED meneruskan ke Pimpinan; REJECTED mengembalikan ke
+    staf (alasan wajib). Isi usulan tidak diubah di tahap ini."""
+    _require(product, *AWAITING_REVIEW)
+    outcome = outcome.upper()
+    if outcome not in ("ACCEPTED", "REJECTED"):
+        raise ProductError("Hasil telaah harus ACCEPTED atau REJECTED.")
+    _stage(product, "KASAT", outcome, user_id, reason)
+    product.status = "VALIDATED" if outcome == "ACCEPTED" else "DRAFT"
+    session.flush()
+    return product
+
+
 def decide(
     session: Session,
     product: MonthlyProduct,
@@ -358,6 +378,7 @@ def as_dict(product: MonthlyProduct) -> dict[str, Any]:
         "target_month": product.target_month.isoformat()[:7],
         "status": product.status,
         "next_stage": STAGE_FOR_STATUS.get(product.status),
+        "awaiting_review": product.status in AWAITING_REVIEW,
         "awaiting_decision": product.status in AWAITING_DECISION,
         "facts": product.facts,
         "priority_count": product.priority_count,

@@ -549,20 +549,24 @@ peta tahunan tetap pada N dan batas data yang sama; setiap baris membawa `method
 kelurahan pilihan; luas dari `config/ranking/kelurahan-area.yaml` (perkiraan dari poligon
 peta, PROPOSED).
 
-### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; dua tahap sejak 10 November 2026)
+### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; tiga tahap sejak 17 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
 | GET | `/monthly-products` | `monthly_product:read` | daftar bulan + status, bulan yang disarankan |
-| POST | `/monthly-products {month}` | `monthly_product:draft` (Analis Intelkam, Administrator) | draf dari peringkat bulan itu — **dibekukan otomatis** bila belum (`facts.ranking_frozen_by_draft`, audit `FREEZE_RANKING` detail `by: draft`); item = `draft_top_n` kelurahan teratas dengan pola (jenis dominan, blok jam puncak) dan usulan dari function-rules; 409 bila sudah ada |
+| POST | `/monthly-products {month}` | `monthly_product:draft` (Staf Intelkam; Administrator tidak lagi sejak 17 November 2026) | draf dari peringkat bulan itu — **dibekukan otomatis** bila belum (`facts.ranking_frozen_by_draft`, audit `FREEZE_RANKING` detail `by: draft`); item = `draft_top_n` kelurahan teratas dengan pola (jenis dominan, blok jam puncak) dan usulan dari function-rules; 409 bila sudah ada |
 | GET | `/monthly-products/{month}` | `monthly_product:read` | item, tahap, kegiatan |
-| POST | `/monthly-products/{month}/analyst {items[{kelurahan,status,text?,reason?}], note?}` | `monthly_product:draft` | ACCEPTED / REVISED (teks + alasan wajib) / REJECTED (alasan wajib); status → ANALYST_REVIEWED = **menunggu Pimpinan** (`awaiting_decision: true`, `next_stage: PIMPINAN`) |
-| ~~POST~~ | ~~`/monthly-products/{month}/kbo`~~, ~~`/kasat`~~ | — | **dihapus 10 November 2026** (404) bersama permission `review`/`validate`; status KBO_CHECKED/VALIDATED yang sudah tersimpan diperlakukan sama dengan ANALYST_REVIEWED |
-| POST | `/monthly-products/{month}/decide {selected[{kelurahan,action?}], reason?}` | `monthly_product:decide` (Pimpinan) | dari ANALYST_REVIEWED (atau KBO_CHECKED/VALIDATED tinggalan); menetapkan jumlah dan kelurahan prioritas; yang ditolak analis tidak dapat dipilih; → DECIDED |
+| POST | `/monthly-products/{month}/analyst {items[{kelurahan,status,text?,reason?}], note?}` | `monthly_product:draft` | ACCEPTED / REVISED (teks + alasan wajib) / REJECTED (alasan wajib); status → ANALYST_REVIEWED = **menunggu telaah Kasat Intelkam** (`awaiting_review`); sebelum 17 November 2026: menunggu Pimpinan (`awaiting_decision: true`, `next_stage: PIMPINAN`) |
+| POST | `/monthly-products/{month}/kasat {outcome, reason?}` | `monthly_product:validate` (Kasat Intelkam) | **dihidupkan lagi 17 November 2026 (0026):** telaah atas produk berstatus ANALYST_REVIEWED (atau KBO_CHECKED tinggalan). `ACCEPTED` → VALIDATED = menunggu Pimpinan (`awaiting_decision`); `REJECTED` → kembali DRAFT, **alasan wajib** (400 bila kosong). Tidak mengubah isi usulan. Audit `VALIDATE_MONTHLY_PRODUCT` |
+| ~~POST~~ | ~~`/monthly-products/{month}/kbo`~~ | — | dihapus 10 November 2026 (404) dan tidak dihidupkan lagi: staf dan KBO dianggap satu |
+| POST | `/monthly-products/{month}/decide {selected[{kelurahan,action?}], reason?}` | `monthly_product:decide` (Pimpinan) | hanya dari VALIDATED (sudah ditelaah Kasat; 409 bila belum); menetapkan jumlah dan kelurahan prioritas; yang ditolak analis tidak dapat dipilih; → DECIDED |
 | POST | `/monthly-products/{month}/items/{kelurahan}/actions {unit?, acted_at, place, action, result?}` | `monthly_product:execute` (Fungsi, Polsek) | kegiatan nyata; Polsek hanya kelurahan di polseknya (404) |
 
 Tabel `monthly_products`, `monthly_product_items`, `monthly_product_stages`, `monthly_actions`
-(0021). Audit: `DRAFT_/REVIEW_/DECIDE_MONTHLY_PRODUCT`, `RECORD_MONTHLY_ACTION` (`VALIDATE_` hanya pada baris lama).
+(0021). Audit: `DRAFT_/REVIEW_/VALIDATE_/DECIDE_MONTHLY_PRODUCT`, `RECORD_MONTHLY_ACTION`.
+`GET /monthly-products/{month}` memuat `next_stage` (`ANALYST` / `KASAT` / `PIMPINAN`),
+`awaiting_review`, dan `awaiting_decision`. `GET /notifications` memberi Kasat Intelkam
+antrean produk yang menunggu telaahnya.
 Peringkat awal (tabel 0020) dan keputusan Pimpinan (item `selected`/`decided_action`,
 tahap PIMPINAN) tersimpan terpisah.
 

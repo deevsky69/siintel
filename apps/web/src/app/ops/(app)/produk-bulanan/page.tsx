@@ -7,11 +7,12 @@ import { getProfile } from "@/lib/decisions";
 import {
   getProduct,
   isAwaitingDecision,
+  isAwaitingReview,
   listProducts,
   type MonthlyProduct,
 } from "@/lib/monthly-products";
 import { getMonthlyOutlook, type MonthlyOutlook } from "@/lib/patrol-plan-api";
-import { ActionForm, AnalystForm, DecideForm, DraftForm } from "./forms";
+import { ActionForm, AnalystForm, DecideForm, DraftForm, KasatForm } from "./forms";
 
 export const dynamic = "force-dynamic";
 
@@ -21,12 +22,14 @@ const TABS = [
 ] as const;
 
 /**
- * Dua tahap sejak 10 November 2026 (keputusan pemilik proyek 1B, catatan 177):
- * Analis menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa dan
- * mengirim; Pimpinan menetapkan; Fungsi/Polsek mencatat. Tahap KBO dan Kasat dihapus.
+ * Tiga tahap sejak 17 November 2026 (catatan 183; naskah Taskap dan saran Kasat Intelkam):
+ * Staf Intelkam menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa dan
+ * mengirim; Kasat Intelkam menelaah (meneruskan atau mengembalikan dengan alasan); Pimpinan
+ * menetapkan; Fungsi/Polsek mencatat.
  */
 const STEPS = [
-  { key: "ANALYST", label: "Analis menyusun & memeriksa" },
+  { key: "ANALYST", label: "Staf menyusun & memeriksa" },
+  { key: "KASAT", label: "Kasat menelaah" },
   { key: "PIMPINAN", label: "Pimpinan menetapkan" },
   { key: "EXECUTE", label: "Pelaksanaan dicatat" },
 ] as const;
@@ -38,11 +41,12 @@ const THREAT_LABEL: Record<string, string> = {
 
 function doneAt(product: MonthlyProduct | null): number {
   if (!product) return 0;
-  if (product.status === "DECIDED") return 2;
-  return isAwaitingDecision(product.status) ? 1 : 0;
+  if (product.status === "DECIDED") return 3;
+  if (isAwaitingDecision(product.status)) return 2;
+  return isAwaitingReview(product.status) ? 1 : 0;
 }
 
-/** Produk bulanan (Modul 4 mekanisme): satu naskah per bulan, dua tahap, lalu pelaksanaan. */
+/** Produk bulanan (Modul 4 mekanisme): satu naskah per bulan, tiga tahap, lalu pelaksanaan. */
 export default async function ProdukBulananPage({
   searchParams,
 }: {
@@ -67,8 +71,16 @@ export default async function ProdukBulananPage({
   const outlook: MonthlyOutlook | null = product ? outlookResult : null;
   const done = doneAt(product);
   const awaiting = product ? isAwaitingDecision(product.status) : false;
+  const reviewing = product ? isAwaitingReview(product.status) : false;
   const analystTurn = product?.status === "DRAFT" && can("monthly_product:draft");
+  const kasatTurn = reviewing && can("monthly_product:validate");
   const leaderTurn = awaiting && can("monthly_product:decide");
+  // Draf yang dikembalikan Kasat: alasannya harus terlihat oleh staf yang memperbaikinya.
+  const lastStage = product?.stages.at(-1);
+  const returned =
+    product?.status === "DRAFT" && lastStage?.stage === "KASAT" && lastStage.outcome === "REJECTED"
+      ? lastStage.reason
+      : null;
   const attachedNames = new Set(
     (product?.status === "DECIDED"
       ? product.items.filter((item) => item.selected)
@@ -129,7 +141,7 @@ export default async function ProdukBulananPage({
               <DraftForm month={month} />
             </div>
           ) : (
-            <EmptyState label="Produk bulan ini belum disusun Analis." />
+            <EmptyState label="Produk bulan ini belum disusun Staf Intelkam." />
           )
         ) : (
           <>
@@ -140,9 +152,20 @@ export default async function ProdukBulananPage({
               {product.priority_count !== null
                 ? ` · ${product.priority_count} kelurahan prioritas`
                 : ""}
+              {reviewing && !kasatTurn ? " · menunggu telaah Kasat Intelkam" : ""}
               {awaiting && !leaderTurn ? " · menunggu penetapan Pimpinan" : ""}
             </p>
+            {returned ? (
+              <p className="mb-3 rounded border border-risk-moderate/40 bg-risk-moderate/10 px-2.5 py-1.5 text-xs text-ink">
+                Dikembalikan Kasat Intelkam: {returned}
+              </p>
+            ) : null}
 
+            {kasatTurn ? (
+              <div className="mb-3">
+                <KasatForm month={month} />
+              </div>
+            ) : null}
             {analystTurn ? <AnalystForm month={month} items={product.items} /> : null}
             {leaderTurn ? <DecideForm month={month} items={product.items} /> : null}
 
@@ -175,9 +198,7 @@ export default async function ProdukBulananPage({
                       {item.decided_action ?? item.analyst_text ?? item.proposal_text}
                     </p>
                     {item.analyst_reason ? (
-                      <p className="text-2xs text-ink-faint">
-                        Alasan analis: {item.analyst_reason}
-                      </p>
+                      <p className="text-2xs text-ink-faint">Alasan staf: {item.analyst_reason}</p>
                     ) : null}
                     {item.actions.length > 0 ? (
                       <ul className="mt-1 text-2xs text-ink-faint">

@@ -544,13 +544,18 @@ Role baseline:
 
 ```text
 Pimpinan
+Kasat Intelkam
+Staf Intelkam
 Fungsi
 Polsek
 Administrator
 ```
 
 Command Center dan Analyst **dilebur ke dalam Administrator** — keputusan pemilik proyek
-1 September 2026, ditegaskan kembali 9 September 2026. Sumber kebenaran pemberian
+1 September 2026, ditegaskan kembali 9 September 2026. **Staf Intelkam** (6 November 2026,
+bernama Analis Intelkam sampai 17 November 2026) dan **Kasat Intelkam** (dihidupkan lagi
+17 November 2026) memegang rantai produk bulanan: Staf menyusun → Kasat menelaah → Pimpinan
+menetapkan. Administrator berada di luar rantai itu. Sumber kebenaran pemberian
 permission adalah `config/rbac/permissions.yaml`; matriks `docs/03` §3 dibangkitkan
 darinya oleh `scripts/matriks-rbac.py`.
 

@@ -23,6 +23,25 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Produk bulanan tiga tahap (17 November 2026, catatan 183).** Atas saran Kasat Intelkam dan
+sejalan dengan naskah Taskap, rantainya menjadi **Staf → Kasat → Pimpinan**:
+
+1. **Staf Intelkam** (nama baru peran Analis Intelkam; staf dan KBO dianggap satu) menyusun
+   draf, memeriksa tiap usulan, lalu menekan *Kirim ke Kasat Intelkam*.
+2. **Kasat Intelkam** menelaah: *Teruskan ke Pimpinan*, atau *Kembalikan ke staf* dengan alasan
+   (wajib). Ia tidak mengubah isi usulan; bila dikembalikan, alasannya tampil di atas draf
+   staf, dan staf mengirim ulang.
+3. **Pimpinan** menetapkan jumlah dan kelurahan prioritas — hanya atas produk yang sudah
+   diteruskan Kasat.
+
+**Administrator tidak lagi dapat menyusun draf**: selama ia bisa, rantai ini dapat dilewati
+lewat akun admin. Peran menjadi **enam** (Pimpinan, Kasat Intelkam, Staf Intelkam, Fungsi,
+Polsek, Administrator). Akun peragaan: `demo.analis` (Staf Intelkam) dan `demo.kasat` (Kasat
+Intelkam — baru dapat dipakai setelah kata sandinya ditetapkan lewat
+`scripts/sandi-peragaan-produksi.sh`). Tiga hak — menyusun, menelaah, menetapkan — dipegang
+tiga peran yang berbeda dan dijaga test; supaya kontrolnya nyata, ketiganya juga perlu
+dipegang orang yang berbeda.
+
 **Penyesuaian ke naskah Taskap (17 November 2026).** Empat hal berubah supaya aplikasi
 sejalan dengan Bab IV naskah:
 
@@ -109,13 +128,14 @@ Pimpinan), dibanding model dan seluruh peta pembanding pada jumlah kelurahan dan
 yang sama, beserta PAI; rekap usulan diterima/direvisi/ditolak beserta alasan; kegiatan yang
 tercatat per kelurahan prioritas; dan panel uji historis model (17 November 2026).
 
-**Produk bulanan (Modul 4 mekanisme).** Menu **Bulan Ini → Produk Bulanan**. Analis Intelkam
+**Produk bulanan (Modul 4 mekanisme).** Menu **Bulan Ini → Produk Bulanan**. Staf Intelkam
 menyusun draf (peringkat bulan itu dibekukan sekaligus), lalu memeriksanya: terima, perbaiki,
-atau tolak tiap usulan dengan alasan, dan mengirimnya ke Pimpinan. Pimpinan menetapkan berapa
+atau tolak tiap usulan dengan alasan, dan mengirimnya ke Kasat Intelkam, yang menelaah lalu
+meneruskannya ke Pimpinan (atau mengembalikannya dengan alasan). Pimpinan menetapkan berapa
 dan kelurahan mana yang diprioritaskan; lampiran perkiraan jam rawan ikut ditetapkan. Fungsi
 dan Polsek mencatat kegiatan (waktu, tempat, tindakan, hasil) di kelurahan prioritas. Akun
-peragaan: `demo.analis`. (Tahap KBO/Kasat 6–10 November 2026 dihapus; produk lama yang
-tertahan di tahap itu langsung dapat ditetapkan Pimpinan.)
+peragaan: `demo.analis` dan `demo.kasat`. (Riwayat: empat tahap 6–10 November 2026, dua tahap
+10–17 November 2026, tiga tahap sejak 17 November 2026. Tahap KBO tidak dihidupkan lagi.)
 
 **Peringkat bulanan (Modul 2–3 mekanisme).** Menu **Analisis → Peringkat Bulanan**: 65
 kelurahan diurutkan untuk bulan depan oleh model AI (gradient boosting) — atau oleh peta
@@ -178,7 +198,7 @@ menolak setiap tindakan yang tidak berasal dari keputusan berstatus **DISETUJUI*
 
 ---
 
-## 3. EMPAT PERAN DAN FUNGSINYA
+## 3. PERAN DAN FUNGSINYA
 
 Pemisahan peran di sini bukan sekadar pengelompokan menu. Ia menjalankan **pemisahan
 kewenangan**: tidak ada satu akun pun yang dapat mengusulkan, menyetujui, dan
@@ -193,7 +213,11 @@ melaksanakan sekaligus.
 | **Fungsi** | Menindaklanjuti sesuai fungsi masing-masing | **Hanya fungsinya sendiri** | Menulis laporan intelijen dan kegiatan fungsinya |
 | **Polsek** | Bertindak di wilayah hukumnya | **Hanya polseknya sendiri** | Menerima peringatan di wilayahnya; mencatat laporan masyarakat |
 
-> **Empat peran, empat akun peragaan.** Command Center dan Analyst dilebur ke Administrator
+> **Sejak 17 November 2026 ada enam peran.** Dua di antaranya khusus rantai produk bulanan:
+> **Staf Intelkam** menyusun dan memeriksa draf, **Kasat Intelkam** menelaahnya sebelum
+> sampai ke Pimpinan (lihat §0). Tabel di atas memuat empat peran yang lebih lama.
+>
+> **Empat peran, empat akun peragaan (keadaan Oktober 2026).** Command Center dan Analyst dilebur ke Administrator
 > pada 1 September 2026 atas keputusan pemilik proyek. Pada 7 Oktober 2026 pemilik proyek
 > menetapkan akun peragaan cukup empat — `demo.pimpinan`, `demo.polsek`, `demo.fungsi`,
 > `demo.admin` — dan dua akun tinggalan (`demo.commandcenter`, `demo.analyst`) dikunci
