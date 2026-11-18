@@ -108,10 +108,10 @@ def proposal(session: Session) -> list[dict[str, object]]:
     first, second = rows[0], rows[1]
     _plant(session, first, date(2098, 3, 3), 19, rules.minimum_incidents + 2)
     _plant(session, second, date(2098, 4, 4), 19, rules.minimum_incidents)
-    _plant(session, first, date(2099, 5, 5), 20, 3)
+    _plant(session, first, date(2099, 5, 5), 18, 3)
     return [
-        {"threat_type": "CURANMOR", "kelurahan": first.kelurahan, "block_start": 18},
-        {"threat_type": "CURANMOR", "kelurahan": second.kelurahan, "block_start": 18},
+        {"threat_type": "CURANMOR", "kelurahan": first.kelurahan, "block_start": 16},
+        {"threat_type": "CURANMOR", "kelurahan": second.kelurahan, "block_start": 16},
     ]
 
 

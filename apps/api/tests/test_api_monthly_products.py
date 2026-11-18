@@ -99,6 +99,8 @@ def _seed(session: Session) -> Location:
                 location_id=area.location_id,
                 reported_at=datetime.combine(day, time(23, 0), tzinfo=clock.JAKARTA),
                 vehicle_object=True,
+                # Empat di kos, satu tanpa tempat tercatat → tempat terbanyak: kos.
+                location_type="Kost" if i < 4 else None,
                 status="REPORTED",
             )
         )
@@ -134,7 +136,29 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     assert client.get(f"/api/v1/rankings?month={MONTH}", headers=analyst).json()["frozen"] is True
     assert body["items"][0]["kelurahan"] == area.kelurahan
     assert body["items"][0]["pattern"]["dominant_threat"] == "CURANMOR"
-    assert body["items"][0]["pattern"]["peak_block_label"] == "21.00-24.00"
+    assert body["items"][0]["pattern"]["peak_block_label"] == "20.00-24.00"
+    # Rentang jam per jenis, dengan jumlah laporan berjam dan tanpa jam (naskah Bab IV).
+    first = body["items"][0]
+    assert first["pattern"]["peaks_by_threat"]["CURANMOR"] == {
+        "block_start": 20,
+        "block_label": "20.00-24.00",
+        "count": 5,
+        "with_time": 5,
+        "unknown_time": 0,
+    }
+    # Rekomendasi menurut tempat kejadian (naskah Tabel 13): kos → Binmas, pengelola.
+    assert first["pattern"]["dominant_place"] == "kos" and first["pattern"]["places"] == {"kos": 4}
+    assert first["proposed_function"] == "BINMAS"
+    assert "pengelola atau pemilik" in first["proposal_text"]
+    assert "4 dari 5 laporan" in first["proposal_text"]
+    assert "Pelaksana: Binmas, Polsek" in first["proposal_text"]
+    assert "5 dari 5 laporan berjam; 0 tanpa jam" in first["proposal_text"]
+    # Kelurahan tanpa tempat tercatat memakai aturan per jenis ancaman, bukan mengarang tempat.
+    plain = body["items"][-1]
+    assert (
+        plain["pattern"]["dominant_place"] is None
+        and "Tempat terbanyak" not in plain["proposal_text"]
+    )
     assert client.post(BASE, json={"month": MONTH}, headers=analyst).status_code == 409
     # Kasat belum dapat menelaah draf yang belum dikirim staf.
     assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409

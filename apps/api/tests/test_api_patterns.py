@@ -185,12 +185,12 @@ def test_when_dimension_matches_direct_sql(client: TestClient, session: Session)
     hours = _distribution(profile, "when", "hour")
     # Kedelapan blok 3 jam selalu dikirim, termasuk yang kosong: blok bernilai nol memang
     # nol. Blok, bukan jam tunggal — keputusan pemilik proyek 30 September 2026.
-    assert [row["key"] for row in hours["buckets"]] == [str(index) for index in range(0, 24, 3)]
-    assert hours["block_hours"] == 3
+    assert [row["key"] for row in hours["buckets"]] == [str(index) for index in range(0, 24, 4)]
+    assert hours["block_hours"] == 4
     from_db = _counts(
         session,
         """
-        select (extract(hour from incident_time)::int / 3) * 3, count(*)
+        select (extract(hour from incident_time)::int / 4) * 4, count(*)
         from crime_incidents where incident_type = :jenis and time_known group by 1
         """,
         jenis="CURANMOR",
@@ -235,10 +235,10 @@ def test_when_dimension_uses_local_time_not_utc(client: TestClient, session: Ses
         text(
             """
             select
-              (select (extract(hour from incident_time)::int / 3) * 3 from crime_incidents
+              (select (extract(hour from incident_time)::int / 4) * 4 from crime_incidents
                 where incident_type = :jenis and time_known
                 group by 1 order by count(*) desc limit 1),
-              (select (extract(hour from occurred_at)::int / 3) * 3 from crime_incidents
+              (select (extract(hour from occurred_at)::int / 4) * 4 from crime_incidents
                 where incident_type = :jenis and time_known
                 group by 1 order by count(*) desc limit 1)
             """
@@ -246,7 +246,7 @@ def test_when_dimension_uses_local_time_not_utc(client: TestClient, session: Ses
         {"jenis": "CURANMOR"},
     ).one()
 
-    # Blok tersibuk (3 jam), bukan jam tunggal — satuan analitik sejak 30 September 2026.
+    # Rentang tersibuk (4 jam), bukan jam tunggal — satuan analitik sejak 18 November 2026.
     assert int(busiest) == local_peak
     assert local_peak != utc_peak, "dataset tidak lagi membedakan WIB dan UTC — uji ini tumpul"
 

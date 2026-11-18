@@ -81,12 +81,26 @@ def _draft_top_n() -> int:
     return int((raw.get("product") or {}).get("draft_top_n", 10))
 
 
+def place_rules() -> list[dict[str, Any]]:
+    """Alternatif rekomendasi menurut tempat kejadian (naskah Tabel 13) — dari konfigurasi."""
+    from .warning_issuance import FUNCTION_RULES_FILE
+
+    raw: dict[str, Any] = config_cache.load_yaml(FUNCTION_RULES_FILE) or {}
+    return [dict(rule) for rule in raw.get("place_rules") or []]
+
+
 def _patterns(
     session: Session, frozen: MonthlyRanking, names: list[str]
 ) -> dict[str, dict[str, Any]]:
-    """Pola per kelurahan pada bulan dasar peringkat: jumlah per jenis dan blok jam puncak."""
+    """Pola per kelurahan pada bulan dasar peringkat: jumlah per jenis, rentang jam terbanyak
+    PER JENIS (dengan jumlah laporan berjam dan tanpa jam), dan jenis tempat terbanyak."""
     query = (
-        select(Location.kelurahan, CrimeIncident.incident_type, CrimeIncident.incident_time)
+        select(
+            Location.kelurahan,
+            CrimeIncident.incident_type,
+            CrimeIncident.incident_time,
+            CrimeIncident.location_type,
+        )
         .join(Location, Location.location_id == CrimeIncident.location_id)
         .where(
             Location.kelurahan.in_(names),
@@ -99,27 +113,70 @@ def _patterns(
     )
     if frozen.scope == "VEHICLE":
         query = query.where(CrimeIncident.vehicle_object.is_(True))
+    group_of = {
+        str(kind): str(rule["id"]) for rule in place_rules() for kind in rule["location_types"]
+    }
     by_threat: dict[str, Counter[str]] = defaultdict(Counter)
-    by_block: dict[str, Counter[int]] = defaultdict(Counter)
-    unknown: Counter[str] = Counter()
-    for kelurahan, threat, at in session.execute(query).all():
-        by_threat[str(kelurahan)][str(threat)] += 1
+    blocks: dict[str, dict[str, Counter[int]]] = defaultdict(lambda: defaultdict(Counter))
+    unknown: dict[str, Counter[str]] = defaultdict(Counter)
+    places: dict[str, Counter[str]] = defaultdict(Counter)
+    for kelurahan, threat, at, place in session.execute(query).all():
+        name, kind = str(kelurahan), str(threat)
+        by_threat[name][kind] += 1
         if at is None:
-            unknown[str(kelurahan)] += 1
+            unknown[name][kind] += 1
         else:
-            by_block[str(kelurahan)][hour_block_of(at.hour)] += 1
+            blocks[name][kind][hour_block_of(at.hour)] += 1
+        if place and str(place) in group_of:
+            places[name][group_of[str(place)]] += 1
     out: dict[str, dict[str, Any]] = {}
     for name in names:
         threats = by_threat.get(name, Counter())
-        blocks = by_block.get(name, Counter())
         dominant = threats.most_common(1)[0][0] if threats else None
-        peak = blocks.most_common(1)[0][0] if blocks else None
+        overall: Counter[int] = Counter()
+        peaks: dict[str, dict[str, Any]] = {}
+        for kind, counter in blocks.get(name, {}).items():
+            overall.update(counter)
+            start, count = min(counter.items(), key=lambda item: (-item[1], item[0]))
+            peaks[kind] = {
+                "block_start": start,
+                "block_label": hour_block_label(start),
+                "count": count,
+                "with_time": sum(counter.values()),
+                "unknown_time": unknown[name].get(kind, 0),
+            }
+        # Rentang untuk usulan: milik jenis yang dominan (naskah: rentang jam per jenis);
+        # bila jenis itu tanpa satu pun laporan berjam, rentang gabungan seluruh jenis.
+        chosen = peaks.get(dominant) if dominant else None
+        if chosen is None and overall:
+            start, count = min(overall.items(), key=lambda item: (-item[1], item[0]))
+            chosen = {
+                "block_start": start,
+                "block_label": hour_block_label(start),
+                "count": count,
+                "with_time": sum(overall.values()),
+                "unknown_time": sum(unknown[name].values()),
+            }
+        place_counts = places.get(name, Counter())
+        top_place = (
+            min(place_counts.items(), key=lambda item: (-item[1], item[0]))[0]
+            if place_counts
+            else None
+        )
         out[name] = {
             "counts": dict(threats),
             "dominant_threat": dominant,
-            "peak_block_start": peak,
-            "peak_block_label": hour_block_label(peak) if peak is not None else None,
-            "unknown_time": unknown.get(name, 0),
+            "peak_block_start": chosen["block_start"] if chosen else None,
+            "peak_block_label": chosen["block_label"] if chosen else None,
+            "peak_block_count": chosen["count"] if chosen else 0,
+            "with_time": chosen["with_time"] if chosen else 0,
+            # Laporan tanpa jam pada kelompok yang SAMA dengan rentang di atas (jenis dominan),
+            # supaya "x dari y berjam; z tanpa jam" berbicara tentang laporan yang sama.
+            "peak_unknown_time": chosen["unknown_time"] if chosen else 0,
+            "unknown_time": sum(unknown[name].values()),
+            "peaks_by_threat": peaks,
+            "places": dict(place_counts),
+            "dominant_place": top_place,
         }
     return out
 
@@ -144,25 +201,49 @@ def draft(session: Session, target_month: Any, user_id: Any) -> MonthlyProduct:
             raise ProductError(str(error)) from error
         frozen_now = True
     rules = load_function_rules()
+    by_place = {str(rule["id"]): rule for rule in place_rules()}
     top = frozen.rows[: _draft_top_n()]
     patterns = _patterns(session, frozen, [row.kelurahan for row in top])
+    source = "model AI" if config.kind(frozen.method) == "model" else "peta historis"
     items: list[MonthlyProductItem] = []
     for row in top:
         pattern = patterns[row.kelurahan]
         threat = pattern["dominant_threat"]
+        place = by_place.get(str(pattern["dominant_place"])) if pattern["dominant_place"] else None
         rule = rules.rules.get(threat) if threat else None
-        function = rule.function if rule else rules.default_function
-        action = rule.action if rule else "Tingkatkan kegiatan preventif"
+        # Tempat kejadian terbanyak menentukan alternatif dan pelaksananya (naskah Tabel 13);
+        # tanpa tempat yang tercatat, dipakai aturan per jenis ancaman.
+        if place is not None:
+            function, action = str(place["function"]), str(place["action"])
+            pattern["dominant_place_label"] = str(place["label"])
+            pattern["executors"] = str(place["executors"])
+        else:
+            function = rule.function if rule else rules.default_function
+            action = rule.action if rule else "Tingkatkan kegiatan preventif"
         where = f"Kelurahan {row.kelurahan} ({row.kecamatan})"
-        focus = f" fokus {THREAT_LABEL.get(threat, threat.lower())}" if threat else ""
-        when = f" pada blok {pattern['peak_block_label']}" if pattern["peak_block_label"] else ""
-        source = "model AI" if config.kind(frozen.method) == "model" else "peta historis"
-        text = (
-            f"{action} di {where}{focus}{when}. Dasar: peringkat {row.rank} ({source}), perkiraan "
-            f"{float(row.predicted_count):.1f} kejadian/bulan, {sum(pattern['counts'].values())} "
-            f"kejadian pada {frozen.basis_from.isoformat()[:7]}-{frozen.basis_to.isoformat()[:7]} "
+        total = sum(pattern["counts"].values())
+        parts = [f"{action} di {where}."]
+        if threat:
+            parts.append(f"Jenis ancaman: {THREAT_LABEL.get(threat, threat.lower())}.")
+        if pattern["peak_block_label"]:
+            parts.append(
+                f"Rentang jam yang perlu diwaspadai: {pattern['peak_block_label']} WIB "
+                f"({pattern['peak_block_count']} dari {pattern['with_time']} laporan berjam; "
+                f"{pattern['peak_unknown_time']} tanpa jam)."
+            )
+        if place is not None:
+            parts.append(
+                f"Tempat terbanyak: {str(place['label']).lower()} "
+                f"({pattern['places'][str(place['id'])]} dari {total} laporan). "
+                f"Pelaksana: {place['executors']}."
+            )
+        parts.append(
+            f"Dasar: peringkat {row.rank} ({source}), perkiraan "
+            f"{float(row.predicted_count):.1f} kejadian/bulan, {total} laporan pendukung pada "
+            f"{frozen.basis_from.isoformat()[:7]}-{frozen.basis_to.isoformat()[:7]} "
             f"(sumber Pusiknas, batas data {frozen.data_cutoff.isoformat()})."
         )
+        text = " ".join(parts)
         items.append(
             MonthlyProductItem(
                 rank=row.rank,
@@ -193,6 +274,7 @@ def draft(session: Session, target_month: Any, user_id: Any) -> MonthlyProduct:
             "total_basis": int(sum(float(r.basis.get("basis_total", 0)) for r in frozen.rows)),
             "draft_top_n": len(items),
             "function_rules_status": rules.status,
+            "place_rules": "Rekomendasi menurut tempat kejadian (naskah Tabel 13)",
             "ranking_frozen_by_draft": frozen_now,
         },
         created_by=user_id,

@@ -159,7 +159,7 @@ def test_slots_are_ranked_by_basis_year_incidents_and_carry_their_numbers(
     # Seluruh kejadian tahun dasar dihitung sebagai dasar — termasuk yang di bawah batas slot.
     assert curanmor.basis_total == 3 * rules.minimum_incidents + 1
     assert [slot.unit.kelurahan for slot in curanmor.slots] == [strong.kelurahan, weak.kelurahan]
-    assert curanmor.slots[0].unit.block == 18
+    assert curanmor.slots[0].unit.block == 16
     assert curanmor.slots[0].incidents == rules.minimum_incidents + 2
     assert curanmor.slots[0].rank == 1
     assert "kejadian CURANMOR" in curanmor.slots[0].as_dict()["why"]
@@ -188,7 +188,7 @@ def test_evaluation_reads_the_target_year_beyond_the_display_cutoff(session: Ses
     miss = _kelurahan_location(session, 1)
     _plant(session, hit, date(2098, 3, 3), 19, count=rules.minimum_incidents + 1)
     _plant(session, miss, date(2098, 4, 4), 19, count=rules.minimum_incidents)
-    _plant(session, hit, date(2099, 6, 6), 20, count=3)  # jatuh di slot usulan
+    _plant(session, hit, date(2099, 6, 6), 18, count=3)  # jatuh di slot usulan (16-20)
     _plant(session, hit, date(2099, 6, 7), 2, count=1)  # kelurahan sama, blok lain
     _plant(session, hit, date(2099, 6, 8), None, count=2)  # tanpa jam: tak terevaluasi
 

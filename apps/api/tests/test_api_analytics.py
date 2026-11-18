@@ -408,12 +408,12 @@ def test_time_pattern_matrix_matches_direct_sql(client: TestClient, session: Ses
         session,
         """
         select extract(isodow from incident_date)::int || '-' ||
-               (extract(hour from incident_time)::int / 3) * 3, count(*)
+               (extract(hour from incident_time)::int / 4) * 4, count(*)
         from crime_incidents where time_known group by 1
         """,
     )
-    assert body["cells"] == 7 * 8
-    assert body["block_hours"] == 3
+    assert body["cells"] == 7 * 6
+    assert body["block_hours"] == 4
     assert (
         sum(cell["incidents"] for row in body["days"] for cell in row["cells"]) == body["incidents"]
     )
@@ -431,7 +431,7 @@ def test_time_pattern_marginals_match_direct_sql(client: TestClient, session: Se
         str(row["hour"]): row["incidents"] for row in body["hours"] if row["incidents"]
     } == _counts(
         session,
-        "select (extract(hour from incident_time)::int / 3) * 3, count(*) "
+        "select (extract(hour from incident_time)::int / 4) * 4, count(*) "
         "from crime_incidents where time_known group by 1",
     )
     assert [row["label"] for row in body["days"]] == [
@@ -466,18 +466,18 @@ def test_time_pattern_uses_local_time_not_utc(client: TestClient, session: Sessi
             """
             select
               (select array_agg(hour order by hour) from (
-                 select extract(hour from incident_time)::int as hour, count(*) as total
+                 select (extract(hour from incident_time)::int / 4) * 4 as hour, count(*) as total
                  from crime_incidents group by 1
                  having count(*) = (select max(total) from (
                    select count(*) as total from crime_incidents
-                   group by extract(hour from incident_time)) as counted)
+                   group by (extract(hour from incident_time)::int / 4) * 4) as counted)
                ) as peaks),
               (select array_agg(hour order by hour) from (
-                 select extract(hour from occurred_at)::int as hour, count(*) as total
+                 select (extract(hour from occurred_at)::int / 4) * 4 as hour, count(*) as total
                  from crime_incidents group by 1
                  having count(*) = (select max(total) from (
                    select count(*) as total from crime_incidents
-                   group by extract(hour from occurred_at)) as counted)
+                   group by (extract(hour from occurred_at)::int / 4) * 4) as counted)
                ) as peaks)
             """
         )
