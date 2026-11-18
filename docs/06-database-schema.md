@@ -115,6 +115,7 @@ intelligence_reports.location_id   → locations
 patrol_activity.location_id        → locations
 patrol_activity.unit_id            → police_units
 citizen_reports.location_id        → locations            (nullable)
+citizen_reports.matched_incident_id → crime_incidents     (0027; nullable, SET NULL — pencocokan antarkanal: match_decision MATCHED/NOT_MATCHED, match_reason, matched_by → users, matched_at)
 community_feedback.report_id       → citizen_reports
 risk_scores.location_id            → locations
 predictions.location_id            → locations

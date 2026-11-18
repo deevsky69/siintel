@@ -604,6 +604,18 @@ tampil di samping, tidak menentukan urutan.
 `receiving_unit`, `vehicle_object`, `area_pending`, dan menandai dugaan ganda
 (sejenis, lokasi sama, ±1 hari — PROPOSED). Perubahan status juga menulis revisi.
 
+**Mutu data (18 November 2026, naskah Taskap 4.1; catatan 184)** — semuanya `crime:triage`:
+
+| Method | Path | Keterangan |
+|---|---|---|
+| GET | `/data-quality` | `completeness` (kelurahan, jam, koordinat, objek sasaran, tempat kejadian: terisi dan %), `flags` (jumlah per tanda), `counting` (`official`, `linked_reports`, `additional_verified`, `awaiting_match`, `awaiting_verification`) |
+| GET | `/data-quality/flags?kind=&limit=` | kejadian bertanda `NO_TIME`, `NO_TARGET`, `NO_PLACE`, `LABEL_OBJECT`, `REPORT_BEFORE_INCIDENT`; aturan tertulis, bukan model |
+| GET | `/data-quality/matches` | laporan warga terverifikasi yang belum diputuskan, masing-masing dengan paling banyak 5 usulan kejadian resmi (wilayah sama, ±3 hari) |
+| POST | `/citizen-reports/{code}/match {decision, incident_code?, reason}` | `MATCHED` (wajib `incident_code`) / `NOT_MATCHED`; `reason` wajib; 409 bila laporan masih RECEIVED; audit `MATCH_CITIZEN_REPORT` |
+
+`POST /crimes/{code}/duplicate` kini mewajibkan `note` (alasan). Kolom `citizen_reports`
+`matched_incident_id`, `match_decision`, `match_reason`, `matched_by`, `matched_at` (0027).
+
 ### 2.11f Babinkamtibmas dan buletin kelurahan (tahap 3, 2 November 2026)
 
 | Method | Path | Permission | Keterangan |

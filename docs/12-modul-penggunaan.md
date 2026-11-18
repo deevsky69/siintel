@@ -23,6 +23,28 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Rentang jam, rekomendasi menurut tempat, dan Mutu Data (18 November 2026, catatan 184).**
+
+- **Jam disajikan dalam enam rentang empat jam** mulai 00.00 WIB (00–04, 04–08, 08–12, 12–16,
+  16–20, 20–24), sesuai naskah — menggantikan blok 3 jam. Berlaku di Analitik, Pola, lampiran
+  jam rawan, produk bulanan, dan panduan warga.
+- **Usulan produk bulanan mengikuti tempat kejadian.** Untuk tiap kelurahan, sistem melihat
+  jenis tempat yang paling banyak tercatat lalu mengusulkan langkah dan pelaksananya: rumah
+  tinggal → siskamling dan kunci ganda lewat Bhabinkamtibmas; kos/kontrakan → koordinasi
+  parkir penghuni (Binmas, Polsek); jalan dan perparkiran → kewaspadaan dan pengamanan parkir
+  (Samapta, Polsek); niaga dan perkantoran → koordinasi dengan pengelola gedung (Binmas,
+  Polsek). Usulan menyebut jenis ancaman, rentang jam beserta jumlah laporan berjam dan tanpa
+  jam, tempat terbanyak, dan dasar datanya. Usulan disusun aturan, bukan model bahasa; staf,
+  Kasat, dan Pimpinan tetap yang menilai.
+- **Menu Data → Mutu Data** (Administrator). Empat bagian: (1) *Kelengkapan dan hitungan* —
+  persen isian yang terisi, isian yang ditandai untuk diperiksa, dan hitungan kejadian resmi,
+  laporan warga tertaut, kejadian tambahan terverifikasi, serta yang masih menunggu; (2)
+  *Laporan warga dan kejadian resmi* — untuk tiap laporan warga yang sudah diverifikasi,
+  pilih kejadian padanannya atau "tidak ada padanan resmi", **isi alasan**, lalu simpan; yang
+  ditautkan tidak menambah hitungan, yang tanpa padanan menjadi kejadian tambahan; (3)
+  *Kelurahan belum pasti*; (4) *Dugaan laporan ganda* — kini **alasan wajib**. Sistem hanya
+  menandai dan mengusulkan dengan aturan tertulis; tidak ada isian yang diubah otomatis.
+
 **Produk bulanan tiga tahap (17 November 2026, catatan 183).** Atas saran Kasat Intelkam dan
 sejalan dengan naskah Taskap, rantainya menjadi **Staf → Kasat → Pimpinan**:
 

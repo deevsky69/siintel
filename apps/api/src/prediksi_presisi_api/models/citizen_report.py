@@ -115,6 +115,21 @@ class CitizenReport(TimestampMixin, Base):
     #: baliknya. Laporan tanpa token dijawab sama dengan laporan yang tidak ada.
     claim_token_hash: Mapped[str | None] = mapped_column(String(64))
 
+    # --- Pencocokan antarkanal (migration 0027, 18 November 2026; naskah Taskap 4.1) ---
+    #: Kejadian resmi yang dinyatakan merujuk peristiwa yang sama. Laporan yang ditautkan
+    #: tidak dihitung sebagai kejadian tersendiri — satu peristiwa terhitung sekali.
+    matched_incident_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("crime_incidents.incident_id", ondelete="SET NULL")
+    )
+    #: MATCHED / NOT_MATCHED; NULL = belum diputuskan.
+    match_decision: Mapped[str | None] = mapped_column(String(20))
+    #: Alasan keputusan — diwajibkan endpoint, supaya keputusan dapat ditelusuri.
+    match_reason: Mapped[str | None] = mapped_column(Text)
+    matched_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="SET NULL")
+    )
+    matched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
     location: Mapped[Location | None] = relationship(back_populates="citizen_reports")
     feedback: Mapped[list[CommunityFeedback]] = relationship(back_populates="report")
     attachments: Mapped[list[CitizenReportAttachment]] = relationship(
@@ -144,6 +159,16 @@ class CitizenReport(TimestampMixin, Base):
             "gps_accuracy_m IS NULL OR coordinate_source = 'REPORTER_GPS'",
             name="gps_accuracy_only_for_gps",
         ),
+        CheckConstraint(
+            "match_decision IS NULL OR match_decision IN ('MATCHED', 'NOT_MATCHED')",
+            name="match_decision_allowed",
+        ),
+        CheckConstraint(
+            "match_decision IS DISTINCT FROM 'MATCHED' OR matched_incident_id IS NOT NULL",
+            name="matched_needs_incident",
+        ),
+        Index("ix_citizen_reports_matched_incident_id", "matched_incident_id"),
+        Index("ix_citizen_reports_matched_by", "matched_by"),
         Index("ix_citizen_reports_reported_at", "reported_at"),
         Index("ix_citizen_reports_status", "status"),
         Index("ix_citizen_reports_location", "location_id"),

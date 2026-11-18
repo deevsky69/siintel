@@ -64,7 +64,6 @@ describe("menu dan rutenya", () => {
       "operasi",
       // 12 November 2026: dibaca lewat tab di Produk Bulanan / Analitik / Laporan Petugas,
       // atau hanya lewat alamat (pengaturan, wilayah rawan).
-      "pembakuan",
       "pengaturan",
       "peringatan",
       "peringkat",

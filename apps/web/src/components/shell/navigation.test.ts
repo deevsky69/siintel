@@ -79,12 +79,14 @@ describe("susunan menu", () => {
 });
 
 describe("penyaringan menu menurut kewenangan", () => {
-  it("tidak lagi memuat Input Data, Pembakuan, Peringkat, Pola, Wilayah Rawan, dan Pengaturan (12 November 2026)", () => {
+  it("tidak lagi memuat Input Data, Peringkat, Pola, Wilayah Rawan, dan Pengaturan (12 November 2026)", () => {
     // Semuanya dicapai lewat tab di layar induknya atau alamat langsung — catatan 179.
+    // Pembakuan kembali ke menu sebagai "Mutu Data" pada 18 November 2026: naskah Taskap
+    // Tabel 22 menyebutnya sebagai menu tersendiri (catatan 184).
     const routes = NAV_ITEMS.map((item) => item.href);
+    expect(routes).toContain("/ops/pembakuan");
     for (const gone of [
       "/ops/input",
-      "/ops/pembakuan",
       "/ops/peringkat",
       "/ops/pola",
       "/ops/wilayah",
@@ -92,7 +94,7 @@ describe("penyaringan menu menurut kewenangan", () => {
     ]) {
       expect(routes).not.toContain(gone);
     }
-    expect(NAV_ITEMS).toHaveLength(14);
+    expect(NAV_ITEMS).toHaveLength(15);
   });
 
   it("membuang kelompok yang tidak menyisakan satu pun submenu", () => {

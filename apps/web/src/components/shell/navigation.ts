@@ -116,7 +116,14 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: "Laporan Petugas",
         icon: "entry",
         permissions: ["crime:read"],
-        hint: "Kejadian yang dicatat petugas; tab Catat kejadian dan Pembakuan",
+        hint: "Kejadian yang dicatat petugas; tab Catat kejadian",
+      },
+      {
+        href: "/ops/pembakuan",
+        label: "Mutu Data",
+        icon: "entry",
+        permissions: ["crime:triage"],
+        hint: "Kelengkapan, isian yang ditandai, pencocokan laporan warga, dugaan ganda",
       },
       {
         href: "/ops/masyarakat",
@@ -234,7 +241,6 @@ const OFF_MENU_GROUP: ReadonlyArray<readonly [string, string]> = [
   ["/ops/peringkat", "bulanan"],
   ["/ops/rencana-patroli", "bulanan"],
   ["/ops/input", "laporan"],
-  ["/ops/pembakuan", "laporan"],
   ["/ops/pengaturan", "sistem"],
 ];
 

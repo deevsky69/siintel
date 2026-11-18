@@ -31,5 +31,51 @@ export const confirmArea = (code: string, body: { location_code: string; note?: 
 
 export const resolveDuplicate = (
   code: string,
-  body: { status: "CONFIRMED" | "CLEARED"; duplicate_of?: string; note?: string },
+  body: { status: "CONFIRMED" | "CLEARED"; duplicate_of?: string; note: string },
 ) => apiPost<StandardRow>(`/crimes/${encodeURIComponent(code)}/duplicate`, body);
+
+/** Mutu data (naskah Taskap 4.1, Tabel 22): kelengkapan, tanda, hitungan, pencocokan. */
+export type DataQuality = {
+  incidents: number;
+  completeness: { field: string; label: string; filled: number; pct: number | null }[];
+  flags: { kind: string; label: string; total: number }[];
+  counting: {
+    official: number;
+    linked_reports: number;
+    additional_verified: number;
+    awaiting_match: number;
+    awaiting_verification: number;
+  };
+  basis: string;
+};
+
+export type MatchCandidate = {
+  code: string;
+  incident_type: string;
+  incident_date: string;
+  kelurahan: string | null;
+  kecamatan: string;
+  location_type: string | null;
+  target_type: string | null;
+  days_apart: number;
+  same_kelurahan: boolean;
+};
+
+export type MatchRow = {
+  code: string;
+  category: string;
+  status: string;
+  reported_at: string;
+  kecamatan: string | null;
+  kelurahan: string | null;
+  description: string | null;
+  candidates: MatchCandidate[];
+};
+
+export const getDataQuality = () => apiGet<DataQuality>("/data-quality");
+export const getMatchQueue = () =>
+  apiGet<{ total: number; data: MatchRow[]; window_days: number }>("/data-quality/matches");
+export const decideMatch = (
+  code: string,
+  body: { decision: "MATCHED" | "NOT_MATCHED"; incident_code?: string; reason: string },
+) => apiPost<unknown>(`/citizen-reports/${encodeURIComponent(code)}/match`, body);
