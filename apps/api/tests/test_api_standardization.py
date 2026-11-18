@@ -393,3 +393,31 @@ def test_duplicate_decision_requires_a_reason(client: TestClient, session: Sessi
         ).status_code
         == 200
     )
+
+
+def test_match_cannot_link_an_incident_outside_the_deciders_jurisdiction(
+    session: Session,
+) -> None:
+    """Hak mencocokkan kini hanya pada Administrator (seluruh Polres), tetapi layanan tetap
+    menolak kejadian di luar wilayah bila kelak dipegang peran berbatas wilayah."""
+    from prediksi_presisi_api.models import CitizenReport
+    from prediksi_presisi_api.services import data_quality
+
+    area = _kelurahan(session)
+    incident = session.scalar(
+        select(CrimeIncident).where(CrimeIncident.location_id == area.location_id).limit(1)
+    )
+    assert incident is not None
+    code = _citizen_report(session, area, "VERIFIED", date(2025, 12, 30))
+    report = session.scalar(select(CitizenReport).where(CitizenReport.code == code))
+    actor = session.scalar(select(User).limit(1))
+    assert report is not None and actor is not None
+    with pytest.raises(data_quality.QualityError, match="tidak dikenal"):
+        data_quality.decide_match(
+            session, report, "MATCHED", incident.code, "uji", actor, "Polsek Lain Uji"
+        )
+    assert report.match_decision is None
+    linked = data_quality.decide_match(
+        session, report, "MATCHED", incident.code, "uji", actor, area.polsek
+    )
+    assert linked["matched_incident"] == incident.code

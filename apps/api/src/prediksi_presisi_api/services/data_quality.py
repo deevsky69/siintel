@@ -310,7 +310,10 @@ def decide_match(
     incident_code: str | None,
     reason: str | None,
     user: User,
+    polsek: str | None = None,
 ) -> dict[str, Any]:
+    """`polsek` adalah cakupan wilayah pemutus: kejadian di luar wilayahnya tidak dapat
+    ditautkan, dan dijawab sama seperti kejadian yang tidak ada."""
     decision = decision.upper()
     if decision not in ("MATCHED", "NOT_MATCHED"):
         raise QualityError("Keputusan harus MATCHED atau NOT_MATCHED.")
@@ -324,9 +327,14 @@ def decide_match(
     if decision == "MATCHED":
         if not incident_code:
             raise QualityError("Sebutkan kode kejadian resmi yang cocok.")
-        incident = session.scalar(
-            select(CrimeIncident).where(CrimeIncident.code == incident_code.strip())
+        lookup = (
+            select(CrimeIncident)
+            .join(Location, Location.location_id == CrimeIncident.location_id)
+            .where(CrimeIncident.code == incident_code.strip())
         )
+        if polsek is not None:
+            lookup = lookup.where(Location.polsek == polsek)
+        incident = session.scalar(lookup)
         if incident is None:
             raise QualityError(f"Kejadian {incident_code} tidak dikenal.")
         incident_id = incident.incident_id

@@ -303,7 +303,13 @@ def decide_match(
         raise not_found()
     try:
         result = data_quality.decide_match(
-            session, report, payload.decision, payload.incident_code, payload.reason, current.user
+            session,
+            report,
+            payload.decision,
+            payload.incident_code,
+            payload.reason,
+            current.user,
+            polsek,
         )
     except data_quality.QualityError as error:
         raise ApiError(error.status, str(error)) from error
