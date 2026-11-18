@@ -72,10 +72,12 @@ membalik sebagian keputusan menu ringkas 12 November 2026):
    dan waktu, yang dapat diperiksa tanpa membaca teks bebas.
 5. Jendela ±3 hari berstatus PROPOSED.
 
-## Belum dikerjakan
+## Butir 8 — persetujuan Humas: DIPUTUSKAN tidak ada peran baru
 
-**Butir 8 — persetujuan Humas** atas informasi publik. Menunggu satu keputusan: siapa yang
-menyetujui (peran Humas baru, atau tetap Pimpinan) dan apa saja yang wajib disetujui.
+Keputusan pemilik proyek 18 November 2026: **peran Humas tidak dibuat**. Informasi publik
+tetap seperti sekarang — buletin dan imbauan publik disetujui Pimpinan, ringkasan wilayah dan
+imbauan bulanan terbit otomatis. Naskah Taskap yang menyebut "disetujui Humas" disesuaikan ke
+keadaan ini. Tidak ada perubahan kode.
 
 ## Verifikasi
 

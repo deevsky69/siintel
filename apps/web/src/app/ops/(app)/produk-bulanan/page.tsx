@@ -39,6 +39,21 @@ const THREAT_LABEL: Record<string, string> = {
   CURAS: "curas",
 };
 
+/**
+ * Waktu kegiatan dalam WIB. API mengirim UTC; memotong teksnya begitu saja menampilkan
+ * kegiatan pukul 05.30 WIB sebagai "22:30" hari sebelumnya.
+ */
+function waktuWib(iso: string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    timeZone: "Asia/Jakarta",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
+}
+
 function doneAt(product: MonthlyProduct | null): number {
   if (!product) return 0;
   if (product.status === "DECIDED") return 3;
@@ -204,8 +219,7 @@ export default async function ProdukBulananPage({
                       <ul className="mt-1 text-2xs text-ink-faint">
                         {item.actions.map((a) => (
                           <li key={`${a.acted_at}-${a.place}`}>
-                            {a.acted_at.slice(0, 16).replace("T", " ")} · {a.unit} · {a.place} ·{" "}
-                            {a.action}
+                            {waktuWib(a.acted_at)} · {a.unit} · {a.place} · {a.action}
                             {a.result ? ` · ${a.result}` : ""}
                           </li>
                         ))}
