@@ -46,8 +46,8 @@ export default async function BuletinPage({
   return (
     <div className="space-y-3">
       <StatusNotice status="PROPOSED" tone="caution">
-        Buletin mingguan hanya terkirim setelah disetujui Pimpinan. Imbauan bulanan ke grup warga
-        dikirim bot secara otomatis setiap awal bulan (keputusan 10 November 2026).
+        Buletin mingguan hanya terkirim setelah disetujui Pimpinan. Imbauan bulanan ke grup dan
+        pelanggan dikirim bot setelah disetujui Humas (19 November 2026).
       </StatusNotice>
 
       <Panel
