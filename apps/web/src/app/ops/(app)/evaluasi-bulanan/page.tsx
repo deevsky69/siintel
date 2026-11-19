@@ -27,10 +27,14 @@ export default async function EvaluasiBulananPage({
   const month = (Array.isArray(raw) ? raw[0] : raw) || months[0] || options.suggested_month;
   const rawScope = params.cakupan;
   const scope = (Array.isArray(rawScope) ? rawScope[0] : rawScope) || options.default_scope;
+  // Jumlah kelurahan uji: naskah Lampiran 8 K membandingkan 4, 6, dan 8.
+  const rawN = params.n;
+  const wantedN = Number((Array.isArray(rawN) ? rawN[0] : rawN) ?? "");
+  const topN = [4, 6, 8].includes(wantedN) ? wantedN : undefined;
   // Uji historis berdiri sendiri: bila gagal, evaluasi bulan tetap tampil.
   const [result, backtest] = await Promise.all([
     getMonthlyEvaluation(month),
-    getBacktest(scope).catch(() => null),
+    getBacktest(scope, topN).catch(() => null),
   ]);
   const pct = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}%`);
   const num = (value: number | null) => (value === null ? "—" : value.toFixed(2));
@@ -152,10 +156,20 @@ export default async function EvaluasiBulananPage({
               {options.scopes.map((item) => (
                 <Link
                   key={item}
-                  href={`/ops/evaluasi-bulanan?bulan=${month}&cakupan=${item}`}
+                  href={`/ops/evaluasi-bulanan?bulan=${month}&cakupan=${item}&n=${backtest.top_n}`}
                   className={`mr-2 ${item === backtest.scope ? "text-accent" : ""}`}
                 >
                   {item === "VEHICLE" ? "Kendaraan" : "Semua 3C"}
+                </Link>
+              ))}
+              <span className="mr-2 text-ink-faint">·</span>
+              {[4, 6, 8].map((count) => (
+                <Link
+                  key={count}
+                  href={`/ops/evaluasi-bulanan?bulan=${month}&cakupan=${backtest.scope}&n=${count}`}
+                  className={`mr-2 ${count === backtest.top_n ? "text-accent" : ""}`}
+                >
+                  {count} kelurahan
                 </Link>
               ))}
             </span>
@@ -218,6 +232,26 @@ export default async function EvaluasiBulananPage({
               ))}
             </div>
           )}
+          {backtest.fixed.methods.length > 0 ? (
+            <table className="mt-4 w-full text-xs">
+              <caption className="pb-1 text-left text-2xs uppercase tracking-wide text-ink-faint">
+                Skenario tetap · {backtest.fixed.span} · informasi berhenti pada akhir masa latih
+              </caption>
+              <tbody className="divide-y divide-base-800">
+                {backtest.fixed.methods.map((row) => (
+                  <tr key={row.method}>
+                    <td className="py-1.5 pr-2 font-semibold text-ink">{row.method_label}</td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums text-ink">
+                      {row.covered} / {row.total}
+                    </td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums font-semibold text-ink">
+                      {pct(row.coverage_pct)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : null}
           <p className="mt-3 text-2xs text-ink-faint">
             {backtest.model.model_version
               ? `${backtest.model.model_version} · dilatih sampai ${backtest.model.train_until} · `

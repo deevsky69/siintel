@@ -121,14 +121,12 @@ export default async function PeringkatPage({
                   {explained ? (
                     <td className="py-1.5 pr-2 text-2xs text-ink-faint">
                       {(row.basis.factors ?? [])
-                        .filter((factor) => Math.abs(factor.contribution) >= 0.05)
+                        .filter((factor) => Math.abs(factor.effect_pct ?? 0) >= 5)
                         .slice(0, 2)
-                        .map(
-                          (factor) =>
-                            `${factor.label} ${factor.contribution > 0 ? "+" : "−"}${Math.abs(
-                              factor.contribution,
-                            ).toFixed(1)}`,
-                        )
+                        .map((factor) => {
+                          const effect = factor.effect_pct ?? 0;
+                          return `${factor.label} ${effect > 0 ? "+" : "−"}${Math.abs(effect).toFixed(0)}%`;
+                        })
                         .join(" · ")}
                     </td>
                   ) : null}

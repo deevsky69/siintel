@@ -3,6 +3,7 @@ tanpa basis data: batas informasi, pelatihan deterministik, alasan, uji tanda, P
 
 from __future__ import annotations
 
+import math
 from datetime import date, timedelta
 
 import pytest
@@ -23,10 +24,10 @@ PARAMS = model.ModelParams(
     version="uji",
     train_until=date(2024, 12, 31),
     data_from=date(2023, 1, 1),
-    n_estimators=60,
+    max_iter=40,
+    max_leaf_nodes=5,
+    min_samples_leaf=5,
     learning_rate=0.1,
-    max_depth=2,
-    min_samples_leaf=3,
     min_training_rows=60,
 )
 
@@ -66,7 +67,7 @@ def test_history_counts_only_what_was_reported_by_the_cutoff() -> None:
     features = dict(
         zip(model.FEATURES, history.features("Ramai", march + 1, date(2024, 3, 31)), strict=True)
     )
-    assert features["lag_1"] == 1.0
+    assert features["mean_1"] == 1.0 and features["horizon"] == 1.0
 
 
 def test_rows_before_data_from_are_ignored_and_windows_shorten() -> None:
@@ -88,9 +89,22 @@ def test_training_is_deterministic_and_never_sees_the_test_period() -> None:
     first = model.train(history, PARAMS)
     model._CACHE.clear()
     second = model.train(_history(), PARAMS)
-    assert first.version == second.version and first.version.startswith("gbr-uji#")
-    assert first.last_target == date(2024, 12, 1)
-    assert first.training_rows == len(AREAS) * 21  # April 2023 s.d. Desember 2024
+    assert first.version == second.version and first.version.startswith("hgb-uji#")
+    assert first.first_target == date(2023, 7, 1) and first.last_target == date(2024, 12, 1)
+    # Naskah Lampiran 8 E: bulan sasaran Juli 2023–Desember 2024 dengan horizon 1–12 yang
+    # tersedia → 150 pasangan (bulan, horizon) per kelurahan; pada 65 kelurahan = 9.750 baris.
+    assert first.training_rows == len(AREAS) * 150
+    rows, _, weights, targets = model.training_rows(history, PARAMS)
+    july = [
+        w for w, t in zip(weights, targets, strict=True) if t == model.month_index(date(2023, 7, 1))
+    ]
+    assert set(july) == {1.0}  # hanya horizon 1 yang tersedia
+    december = [
+        w
+        for w, t in zip(weights, targets, strict=True)
+        if t == model.month_index(date(2024, 12, 1))
+    ]
+    assert set(december) == {1 / 12} and len(rows) == len(weights)
     # Mengubah kejadian SETELAH masa latih tidak mengubah model.
     assert model.train(_history(date(2025, 6, 30)), PARAMS).version == first.version
     with pytest.raises(model.ModelUnavailable):
@@ -106,8 +120,14 @@ def test_prediction_ranks_busy_areas_first_and_explains_itself() -> None:
     assert predictions["Sedang"].predicted > predictions["Kosong"].predicted
     for prediction in predictions.values():
         explained = prediction.base + sum(prediction.contributions.values())
-        # Kontribusi berasal dari pohon model: jumlahnya = perkiraan (sebelum dibatasi >= 0).
-        assert max(0.0, explained) == pytest.approx(prediction.predicted, abs=1e-6)
+        # Kontribusi berasal dari pohon model, pada skala logaritma (kerugian Poisson):
+        # exp(nilai awal + jumlah kontribusi) tepat sama dengan perkiraan.
+        assert math.exp(explained) == pytest.approx(prediction.predicted, rel=1e-6)
+    # Skenario tetap: riwayat berhenti di akhir masa latih, horizon = jarak ke bulan sasaran.
+    fixed = model.predict_month(history, trained, target, PARAMS.train_until, horizon=6)
+    assert {p.features["horizon"] for p in fixed} == {6.0}
+    with pytest.raises(model.ModelUnavailable):
+        model.predict_month(history, trained, target, horizon=13)
 
 
 def test_model_is_unavailable_without_enough_history() -> None:

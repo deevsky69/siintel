@@ -30,6 +30,7 @@ adanya.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from functools import lru_cache
@@ -47,12 +48,16 @@ from .risk_engine import _known_by
 CONFIG_FILE = REPO_ROOT / "config" / "ranking" / "monthly.yaml"
 THREATS = ("CURANMOR", "CURAT", "CURAS")
 IKW_MONTHS = 12
+#: Penanda `data_source` pada laporan yang tanggal kejadiannya kosong di sumber.
+UNDATED_MARK = "TANPA-TANGGAL-KEJADIAN"
 
 BASIS = (
     "Peringkat bulan sasaran = perkiraan jumlah kejadian per kelurahan, hanya dari kejadian "
     "yang sudah dilaporkan sampai batas data; seri diurutkan menurut nama kelurahan. Metode "
-    "MODEL adalah gradient boosting dengan masukan riwayat 1, 3, 6, dan 12 bulan, tren, pola "
-    "bulanan, dan pola kelurahan lain sekecamatan; parameternya dibekukan. Peta historis "
+    "MODEL adalah gradient boosting (kerugian Poisson) dengan masukan rerata 1, 3, 6, dan 12 "
+    "bulan, rerata sepanjang riwayat, selisih rerata 3 dan 12 bulan, pola bulanan, dan "
+    "kelurahan lain sekecamatan, mengikuti naskah Taskap Lampiran 8; parameternya dibekukan. "
+    "Peta historis "
     "(3 bulan, 12 bulan, bulan sebelumnya, tahunan tetap) dihitung sebagai pembanding, dan "
     "model hanya menjadi dasar usulan bila cakupannya lebih tinggi daripada pembanding "
     "terbaik pada bulan-bulan uji terakhir. IKW (frekuensi 12 bulan, tren, konsistensi) "
@@ -226,6 +231,9 @@ def load_history(
             Location.kelurahan.is_not(None),
             CrimeIncident.incident_type.in_(THREATS),
             CrimeIncident.area_pending.is_(False),
+            # Laporan tanpa tanggal kejadian (importer mengisinya dengan tanggal laporan dan
+            # menandainya) tidak membentuk deret bulanan — naskah Tabel 6 mengecualikannya.
+            func.coalesce(CrimeIncident.data_source, "").not_like(f"%{UNDATED_MARK}"),
         )
     )
     if scope == "VEHICLE":
@@ -262,14 +270,18 @@ def scores(
     cutoff: date,
     config: RankingConfig | None = None,
 ) -> dict[str, float]:
-    """Perkiraan jumlah kejadian per kelurahan menurut metode itu (dua desimal)."""
+    """Perkiraan jumlah kejadian per kelurahan menurut metode itu.
+
+    Nilai TIDAK dibulatkan: peringkat disusun dari skor penuh (naskah Lampiran 8 E), dan
+    pembulatan dua desimal hanya dilakukan saat disimpan — membulatkan dulu menciptakan seri
+    yang tidak ada dan mengubah kelurahan pilihan."""
     config = config or load_config()
     kind = config.kind(method)
     if kind == "model":
         try:
             trained = model.train(history, config.model)
             return {
-                p.kelurahan: round(p.predicted, 2)
+                p.kelurahan: p.predicted
                 for p in model.predict_month(history, trained, target, cutoff, explain=False)
             }
         except model.ModelUnavailable as error:
@@ -282,9 +294,38 @@ def scores(
     first = model.month_index(basis_from)
     months = model.month_index(basis_to) - first + 1
     return {
-        name: round(sum(history.count(name, first + i, cutoff) for i in range(months)) / months, 2)
+        name: sum(history.count(name, first + i, cutoff) for i in range(months)) / months
         for name in history.areas
     }
+
+
+def fixed_scores(
+    history: model.IncidentHistory, method: str, target: int, config: RankingConfig
+) -> dict[str, float]:
+    """Skenario TETAP (naskah Tabel 12): seluruh informasi berhenti pada akhir masa latih.
+
+    MODEL_FIXED  model dengan riwayat sampai `train_until` dan horizon = jarak ke bulan sasaran
+    Q4_FIXED     peta tiga bulan terakhir masa latih (Oktober–Desember), tidak diperbarui
+    """
+    last = model.month_index(config.model.train_until)
+    cutoff = config.model.train_until
+    if method == "MODEL_FIXED":
+        try:
+            trained = model.train(history, config.model)
+            return {
+                p.kelurahan: p.predicted
+                for p in model.predict_month(
+                    history, trained, target, cutoff, horizon=target - last, explain=False
+                )
+            }
+        except model.ModelUnavailable as error:
+            raise RankingError(str(error)) from error
+    if method == "Q4_FIXED":
+        return {
+            name: sum(history.count(name, last - back, cutoff) for back in range(3)) / 3
+            for name in history.areas
+        }
+    raise RankingError(f"Metode {method} tidak dikenal.")
 
 
 def order(values: dict[str, float]) -> list[str]:
@@ -384,7 +425,7 @@ def compute(
                 kelurahan=name,
                 kecamatan=history.areas[name],
                 polsek=polsek_of.get(name, ""),
-                predicted_count=predicted[name],
+                predicted_count=round(predicted[name], 2),
                 ikw=round(ikw, 1),
                 ikw_category=_category(config, ikw),
                 basis=basis,
@@ -404,7 +445,11 @@ def compute(
 
 
 def _explanation(prediction: model.Prediction) -> dict[str, Any]:
-    """Alasan perkiraan model: masukan dan kontribusinya, dari pohon model itu sendiri."""
+    """Alasan perkiraan model: masukan dan kontribusinya, dari pohon model itu sendiri.
+
+    Model berkerugian Poisson bekerja pada skala logaritma, jadi kontribusi sebuah masukan
+    adalah PENGALI atas perkiraan: `effect_pct` +35 berarti masukan itu menaikkan perkiraan
+    35 persen dibanding tanpa pengaruhnya. `contribution` adalah nilai logaritmanya."""
     merged: dict[str, dict[str, Any]] = {}
     for name in model.FEATURES:
         label = model.FEATURE_LABELS[name]
@@ -413,10 +458,12 @@ def _explanation(prediction: model.Prediction) -> dict[str, Any]:
         entry["values"][name] = round(prediction.features[name], 2)
     factors = sorted(merged.values(), key=lambda item: -abs(item["contribution"]))
     for item in factors:
-        item["contribution"] = round(item["contribution"], 3)
+        item["effect_pct"] = round((math.exp(item["contribution"]) - 1) * 100, 1)
+        item["contribution"] = round(item["contribution"], 4)
     return {
         "source": "MODEL",
-        "model_base": round(prediction.base, 3),
+        "scale": "log",
+        "model_base": round(prediction.base, 4),
         "factors": factors,
     }
 

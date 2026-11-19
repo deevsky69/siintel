@@ -83,11 +83,25 @@ export type Backtest = {
     methods: BacktestMethod[];
     sign_tests: SignTest[];
   }[];
+  /** Skenario tetap (naskah Tabel 12): informasi berhenti pada akhir masa latih. */
+  fixed: {
+    span: string | null;
+    methods: {
+      method: string;
+      method_label: string;
+      covered: number;
+      total: number;
+      coverage_pct: number | null;
+    }[];
+  };
   area_source: string | null;
   basis: string;
 };
 
-export const getBacktest = (scope: string) =>
-  apiGet<Backtest>(
-    `/evaluation/monthly/backtest${scope ? `?scope=${encodeURIComponent(scope)}` : ""}`,
-  );
+export const getBacktest = (scope: string, topN?: number) => {
+  const query = new URLSearchParams();
+  if (scope) query.set("scope", scope);
+  if (topN) query.set("top_n", String(topN));
+  const suffix = query.toString();
+  return apiGet<Backtest>(`/evaluation/monthly/backtest${suffix ? `?${suffix}` : ""}`);
+};

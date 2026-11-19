@@ -420,6 +420,45 @@ def backtest(
         span = f"{monthly[0]['month']} s.d. {monthly[-1]['month']}"
         periods.append({"span": span, **summarise("Seluruh masa uji", monthly)})
 
+    # Skenario tetap (naskah Tabel 12): informasi berhenti pada akhir masa latih. Hanya
+    # berlaku selama horizon yang dilatih (12 bulan pertama setelah masa latih).
+    fixed: list[dict[str, Any]] = []
+    fixed_months = [
+        m
+        for m in range(first_test, first_test + config.model.max_horizon)
+        if end is not None and start <= m <= end
+    ]
+    fixed_methods = (
+        ("MODEL_FIXED", "Model AI, informasi sampai akhir masa latih"),
+        ("ANNUAL", f"Peta tahun {ranking.annual_year(config)}"),
+        ("Q4_FIXED", f"Peta Oktober-Desember {ranking.annual_year(config)}"),
+    )
+    if fixed_months and card["available"]:
+        total = 0
+        covered = dict.fromkeys((name for name, _ in fixed_methods), 0)
+        for month in fixed_months:
+            actual = {name: history.count(name, month, date.max) for name in universe}
+            total += sum(actual.values())
+            for name, _ in fixed_methods:
+                values = (
+                    ranking.scores(history, name, month, config.model.train_until, config)
+                    if name == "ANNUAL"
+                    else ranking.fixed_scores(history, name, month, config)
+                )
+                covered[name] += sum(
+                    actual[k] for k in ranking.order(values)[:top_n] if k in actual
+                )
+        fixed = [
+            {
+                "method": name,
+                "method_label": label,
+                "covered": covered[name],
+                "total": total,
+                "coverage_pct": round(covered[name] / total * 100, 2) if total else None,
+            }
+            for name, label in fixed_methods
+        ]
+
     for row in monthly:
         for entry in row["methods"].values():
             share = entry.pop("area_share")
@@ -434,6 +473,13 @@ def backtest(
         "model": card,
         "annual_year": ranking.annual_year(config),
         "periods": periods,
+        "fixed": {
+            "span": f"{model.month_from_index(fixed_months[0]).isoformat()[:7]} s.d. "
+            f"{model.month_from_index(fixed_months[-1]).isoformat()[:7]}"
+            if fixed_months
+            else None,
+            "methods": fixed,
+        },
         "monthly": monthly,
         "area_source": "config/ranking/kelurahan-area.yaml (perkiraan dari poligon peta)"
         if areas

@@ -15,7 +15,7 @@ export type RankedArea = {
     trend?: number;
     consistency_months?: number;
     /** Hanya pada metode MODEL: kontribusi tiap masukan, dihitung dari pohon model. */
-    factors?: { label: string; contribution: number }[];
+    factors?: { label: string; contribution: number; effect_pct?: number }[];
   };
 };
 

@@ -42,21 +42,22 @@ methods:
     basis_months: 12
 
 # Model gradient boosting. DIBEKUKAN: parameter dan masa latih tidak diubah tanpa pengujian
-# tersendiri (naskah Modul 3). Parameter dipilih pada validasi Juli–Desember 2024 dengan
-# model yang dilatih sampai Juni 2024 — bukan pada masa uji 2025/2026
-# (docs/implementation-notes/181-model-gradient-boosting.md).
+# tersendiri (naskah Modul 3). Sejak 19 November 2026 seluruh pengaturan mengikuti "Protokol
+# Replikasi Prediksi" naskah Taskap final, Lampiran 8 E — bukan lagi pilihan penyusun teknis
+# (catatan 185). scikit-learn dikunci pada versi naskah (1.8.0) di apps/api/pyproject.toml.
 model:
-  version: "2026-11-17"
+  version: "2026-11-19"
   data_from: "2023-01-01"     # awal data Pusiknas yang utuh
   train_until: "2024-12-31"   # kejadian yang dilaporkan sesudahnya tidak pernah dilihat model
-  min_history_months: 3
+  min_history_months: 6       # riwayat minimal enam bulan → bulan sasaran latih sejak Juli 2023
+  max_horizon: 12             # horizon 1–12 bulan; bobot baris = 1 / jumlah horizon tersedia
   min_training_rows: 300
-  n_estimators: 300
-  learning_rate: 0.03
-  max_depth: 2
-  min_samples_leaf: 20
-  subsample: 1.0
-  random_state: 20250101
+  max_iter: 100
+  max_leaf_nodes: 7
+  min_samples_leaf: 40
+  learning_rate: 0.05
+  l2_regularization: 2
+  random_state: 42
 
 # Penjaga pemakaian model. Dinilai pada `months` bulan terakhir sebelum bulan sasaran yang
 # berada DI LUAR masa latih, pada `evaluation.default_top_n` kelurahan, dengan batas data
