@@ -497,7 +497,13 @@ def _explanation(prediction: model.Prediction) -> dict[str, Any]:
     adalah PENGALI atas perkiraan: `effect_pct` +35 berarti masukan itu menaikkan perkiraan
     35 persen dibanding tanpa pengaruhnya. `contribution` adalah nilai logaritmanya."""
     merged: dict[str, dict[str, Any]] = {}
+    base = prediction.base
     for name in model.FEATURES:
+        if name == "horizon":
+            # Pada pemakaian rutin horizon selalu 1 — sama untuk semua kelurahan, jadi bukan
+            # "alasan" sebuah kelurahan; pengaruhnya digabung ke nilai awal.
+            base += prediction.contributions[name]
+            continue
         label = model.FEATURE_LABELS[name]
         entry = merged.setdefault(label, {"label": label, "contribution": 0.0, "values": {}})
         entry["contribution"] += prediction.contributions[name]
@@ -509,7 +515,7 @@ def _explanation(prediction: model.Prediction) -> dict[str, Any]:
     return {
         "source": "MODEL",
         "scale": "log",
-        "model_base": round(prediction.base, 4),
+        "model_base": round(base, 4),
         "factors": factors,
     }
 

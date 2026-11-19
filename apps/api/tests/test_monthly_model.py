@@ -123,6 +123,13 @@ def test_prediction_ranks_busy_areas_first_and_explains_itself() -> None:
         # Kontribusi berasal dari pohon model, pada skala logaritma (kerugian Poisson):
         # exp(nilai awal + jumlah kontribusi) tepat sama dengan perkiraan.
         assert math.exp(explained) == pytest.approx(prediction.predicted, rel=1e-6)
+        # Kontribusi harus sebanding dengan perkiraannya sendiri: selisih log terhadap nilai
+        # awal tidak mungkin jauh lebih kecil daripada kontribusi tunggal terbesar. (Cacat 19
+        # November 2026: nilai simpul dalam yang tidak sebanding membengkakkan kontribusi
+        # hingga ribuan persen tanpa mengubah jumlahnya.)
+        assert max(abs(v) for v in prediction.contributions.values()) < 6
+    spread = max(p.base for p in predictions.values()) - min(p.base for p in predictions.values())
+    assert spread == pytest.approx(0.0, abs=1e-9)  # nilai awal sama untuk semua kelurahan
     # Skenario tetap: riwayat berhenti di akhir masa latih, horizon = jarak ke bulan sasaran.
     fixed = model.predict_month(history, trained, target, PARAMS.train_until, horizon=6)
     assert {p.features["horizon"] for p in fixed} == {6.0}

@@ -290,6 +290,7 @@ class TrainedModel:
     last_target: date
     importances: dict[str, float]
     _estimator: Any
+    _node_values: list[list[float]] | None = None
 
     @property
     def version(self) -> str:
@@ -298,25 +299,55 @@ class TrainedModel:
     def predict(self, rows: list[list[float]]) -> list[float]:
         return [max(0.0, float(value)) for value in self._estimator.predict(rows)]
 
+    def _expected_values(self) -> list[list[float]]:
+        """Nilai harapan tiap simpul pada setiap pohon: nilai daun apa adanya, dan untuk
+        simpul dalam rata-rata nilai daun di bawahnya menurut jumlah sampel latih.
+
+        Nilai simpul dalam yang disimpan scikit-learn TIDAK sebanding dengan nilai daun (daun
+        sudah dikalikan laju belajar, simpul dalam belum), jadi tidak boleh dipakai langsung —
+        memakainya menghasilkan kontribusi yang membengkak ribuan persen."""
+        if self._node_values is None:
+            trees: list[list[float]] = []
+            for stage in self._estimator._predictors:
+                nodes = stage[0].nodes
+                values = [0.0] * len(nodes)
+                # Anak selalu berindeks lebih besar daripada induknya: hitung dari belakang.
+                for index in range(len(nodes) - 1, -1, -1):
+                    node = nodes[index]
+                    if node["is_leaf"]:
+                        values[index] = float(node["value"])
+                        continue
+                    left, right = int(node["left"]), int(node["right"])
+                    weight_left = float(nodes[left]["count"])
+                    weight_right = float(nodes[right]["count"])
+                    total = (weight_left + weight_right) or 1.0
+                    values[index] = (
+                        values[left] * weight_left + values[right] * weight_right
+                    ) / total
+                trees.append(values)
+            self._node_values = trees
+        return self._node_values
+
     def contributions(self, row: list[float]) -> tuple[float, dict[str, float]]:
         """(nilai awal, kontribusi per masukan) pada skala LOGARITMA: exp(nilai awal + jumlah
-        kontribusi) = perkiraan model. Dibaca dari simpul pohon model yang sudah dilatih."""
+        kontribusi) = perkiraan model. Nilai awal = rata-rata model atas data latih; kontribusi
+        sebuah masukan = perubahan nilai harapan pada tiap percabangan yang memakainya."""
         estimator = self._estimator
+        expected = self._expected_values()
         base = float(estimator._baseline_prediction.ravel()[0])
         totals: dict[str, float] = dict.fromkeys(FEATURES, 0.0)
-        for stage in estimator._predictors:
+        for stage, values in zip(estimator._predictors, expected, strict=True):
             nodes = stage[0].nodes
             index = 0
+            base += values[0]
             while not nodes[index]["is_leaf"]:
                 node = nodes[index]
                 feature = int(node["feature_idx"])
                 child = int(
                     node["left"] if row[feature] <= node["num_threshold"] else node["right"]
                 )
-                totals[FEATURES[feature]] += float(nodes[child]["value"] - node["value"])
+                totals[FEATURES[feature]] += values[child] - values[index]
                 index = child
-        # Nilai akar tiap pohon ikut membentuk perkiraan; dicatat pada nilai awal.
-        base += sum(float(stage[0].nodes[0]["value"]) for stage in estimator._predictors)
         return base, totals
 
     def describe(self) -> dict[str, Any]:
