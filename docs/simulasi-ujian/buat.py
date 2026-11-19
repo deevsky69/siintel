@@ -86,6 +86,41 @@ baris_menu = "".join(
     for u, r, _ in AKUN
 )
 
+# ---------------------------------------------------------------- daftar isi
+# (tingkat, judul, kunci pencarian pada teks halaman PDF). Nomor halaman diisi lintasan
+# kedua: nomor.py membaca PDF hasil cetak dan menulis halaman.json, lalu buat.py dijalankan
+# lagi (lihat bangun.sh).
+ISI = [
+    (1, "1 · Ringkasan dan akun peragaan", "1 · Ringkasan dan akun peragaan"),
+    (2, "Delapan akun peragaan dan kata sandi", "Delapan akun peragaan"),
+    (2, "Menu yang tampil pada tiap akun", "Menu yang tampil pada tiap akun"),
+    (1, "2 · Bagian A — Masyarakat (SIGAP BERSAMA)", "2 · Bagian A"),
+    (1, "3 · Alur A6 — Cek kendaraan", "3 · Alur A6"),
+    (2, "Tabel data contoh cek kendaraan", "Tabel data contoh cek kendaraan"),
+    (1, "4 · Alur A5 — Lacak laporan (nomor LP + PIN)", "4 · Alur A5"),
+    (2, "Tabel data contoh lacak laporan", "Tabel data contoh lacak laporan"),
+    (1, "5 · Alur A7 — Lapor kejadian sampai ditangani petugas", "5 · Alur A7"),
+    (2, "Alur A4 — Survei rasa aman", "Alur A4 — Survei rasa aman"),
+    (1, "6 · Alur A9 — Bot Telegram dan WhatsApp", "6 · Alur A9"),
+    (2, "Telegram, percakapan pribadi — melapor", "Telegram, percakapan pribadi — melapor"),
+    (2, "Telegram, percakapan pribadi — informasi", "Telegram, percakapan pribadi — informasi"),
+    (2, "WhatsApp, percakapan pribadi", "WhatsApp, percakapan pribadi."),
+    (2, "Grup kelurahan di WhatsApp", "6 · Grup kelurahan di WhatsApp"),
+    (1, "7 · Bagian B — Petugas: siklus bulanan", "7 · Bagian B"),
+    (2, "Langkah demi langkah tiap akun", "Langkah demi langkah"),
+    (1, "8 · Layar tiap tahap siklus bulanan", "8 · Layar tiap tahap siklus bulanan"),
+    (2, "Alur petugas lain yang dapat diperagakan", "Alur petugas lain yang dapat diperagakan"),
+    (1, "9 · Urutan simulasi ujian (± 15 menit)", "9 · Urutan simulasi ujian"),
+    (2, "Sebelum ujian", "Sebelum ujian"),
+    (2, "Yang perlu disampaikan apa adanya", "Yang perlu disampaikan apa adanya"),
+]
+Path("isi.json").write_text(json.dumps([k for _, _, k in ISI], ensure_ascii=False))
+halaman = json.loads(Path("halaman.json").read_text()) if Path("halaman.json").exists() else {}
+baris_isi = "".join(
+    f"<li class='t{t}'><span>{j}</span><i></i><b>{halaman.get(k, '')}</b></li>" for t, j, k in ISI
+)
+
+
 # Huruf aplikasi (Inter, Manrope, JetBrains Mono) diambil dari hasil build web: aturan
 # @font-face-nya ditulis ulang supaya menunjuk berkas setempat dan memakai nama keluarga polos.
 import re
@@ -100,7 +135,8 @@ for f in glob.glob(MEDIA + "/css/*.css"):
 FONT = "<style>" + "".join(faces) + "</style>"
 
 CSS = """<style>
-@page { size: A4; margin: 15mm 14mm 16mm; }
+@page { size: A4; margin: 15mm 14mm 16mm; @bottom-right { content: counter(page); font: 600 8.5pt Manrope, sans-serif; color: #5b6880; } @bottom-left { content: "Prototipe Simulasi Ujian SIGAP"; font: 8pt Inter, sans-serif; color: #8a94a8; } }
+@page :first { @bottom-right { content: none; } @bottom-left { content: none; } }
 * { box-sizing: border-box; }
 html { font-family: Inter, system-ui, sans-serif; font-size: 10pt; line-height: 1.5; color: #1b2433; }
 body { margin: 0; background: #fff; }
@@ -116,6 +152,12 @@ b, strong { font-weight: 700; }
 .cover .sub { font-size: 14pt; color: #d8deee; max-width: 140mm; line-height: 1.4; }
 .cover .rule { width: 40mm; height: 3px; background: #c9a227; margin: 9mm 0; }
 .cover .foot { margin-top: auto; font-size: 10pt; color: #c5cde3; line-height: 1.6; }
+.isi { break-after: page; } .isi ol { list-style: none; padding: 0; margin: 4mm 0 0; }
+.isi li { display: flex; align-items: baseline; gap: 2mm; margin: 0; padding: 1.5mm 0; }
+.isi li i { flex: 1; border-bottom: 1px dotted #9aa5ba; transform: translateY(-1mm); }
+.isi li b { font-family: Manrope; color: #0b1f4b; min-width: 7mm; text-align: right; }
+.isi .t1 { font-family: Manrope; font-weight: 700; color: #0b1f4b; font-size: 11pt; margin-top: 2.2mm; }
+.isi .t2 { padding-left: 7mm; font-size: 9.6pt; color: #33405a; } .isi .t2 b { font-weight: 600; }
 .page { break-before: page; }
 .lead { font-size: 11pt; color: #33405a; }
 .kecil { font-size: 8.4pt; color: #5b6880; }
@@ -156,7 +198,10 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <div class="sub" style="font-size:11.5pt">Sistem Intelijen Geospasial dan Analitik Prediktif<br>Deteksi dini kejahatan 3C: curat, curas, curanmor</div>
 <div class="foot">Keadaan aplikasi 19 November 2026 · {ALAMAT}<br>Seluruh nomor LP, PIN, plat, nomor rangka, dan akun pada dokumen ini adalah <b>data peragaan (dummy berlabel)</b>, bukan perkara, kendaraan, atau personel nyata. Dokumen ini memuat kata sandi akun peragaan — jangan disebarkan di luar keperluan ujian.</div></div>
 
-<section><h1>1 · Ringkasan dan akun peragaan</h1>
+<section class="isi"><h1>Daftar isi</h1><ol>{baris_isi}</ol>
+<p class="kecil" style="margin-top:5mm">Bagian 2–6 memperagakan layanan masyarakat (tanpa akun); bagian 7–8 pekerjaan petugas menurut peran; bagian 9 urutan peragaan dan daftar periksa.</p></section>
+
+<section class="page"><h1>1 · Ringkasan dan akun peragaan</h1>
 <p class="lead">SIGAP punya dua wajah pada satu alamat. Simulasi ujian mengikuti urutan yang sama: <b>bagian A</b> memperagakan apa yang dapat dilakukan masyarakat tanpa akun, <b>bagian B</b> memperagakan pekerjaan petugas menurut perannya.</p>
 <table><tbody>
 <tr><td style="width:48mm"><b>SIGAP BERSAMA</b> (masyarakat)<br><code>{ALAMAT}</code></td><td>Tanpa akun dan tanpa identitas: keadaan wilayah, peta kelurahan, panduan pengamanan, survei rasa aman, lacak laporan, cek kendaraan, lapor kejadian, Darurat 110.</td></tr>
