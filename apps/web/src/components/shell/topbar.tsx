@@ -57,23 +57,26 @@ export function Topbar({
         </svg>
       </button>
 
-      <div className="flex shrink-0 items-center gap-2.5">
+      {/* Jenama dan satuan dalam SATU blok yang boleh menyusut (`min-w-0` + `truncate`).
+          Sebelumnya nama satuan berdiri sendiri di tengah dengan `flex-1`, diapit dua blok
+          `shrink-0`: pada layar 1280–1500 px sisa ruangnya hanya ±250 px, sehingga teksnya
+          terlipat dua baris dan menabrak tulisan di kiri-kanannya. */}
+      <div className="flex min-w-0 items-center gap-2.5">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-accent/30 bg-accent/10 font-heading text-sm font-bold text-accent sm:h-10 sm:w-10">
           S
         </div>
-        <div className="leading-tight">
-          <div className="whitespace-nowrap font-heading text-sm font-bold tracking-wide text-ink sm:text-base">
-            SIGAP
+        <div className="min-w-0 leading-tight">
+          <div className="flex min-w-0 items-baseline gap-2.5">
+            <span className="shrink-0 font-heading text-sm font-bold tracking-wide text-ink sm:text-base">
+              SIGAP
+            </span>
+            <span className="hidden truncate text-2xs uppercase tracking-[0.12em] text-ink-faint 2xl:block">
+              Sistem Intelijen Geospasial dan Analitik Prediktif
+            </span>
           </div>
-          <div className="hidden whitespace-nowrap text-2xs uppercase tracking-[0.12em] text-ink-muted xl:block">
-            Sistem Intelijen Geospasial dan Analitik Prediktif
+          <div className="hidden truncate font-heading text-2xs font-semibold uppercase tracking-[0.14em] text-ink-muted sm:block">
+            Polres Metro Jakarta Selatan
           </div>
-        </div>
-      </div>
-
-      <div className="hidden flex-1 justify-center xl:flex">
-        <div className="font-heading text-lg font-bold uppercase tracking-[0.16em] text-ink">
-          Polres Metro Jakarta Selatan
         </div>
       </div>
 

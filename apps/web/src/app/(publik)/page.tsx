@@ -122,16 +122,20 @@ export default async function BerandaWarga() {
                     <li key={area.kelurahan}>
                       <Link
                         href={`/peta?kecamatan=${encodeURIComponent(area.kecamatan)}&kelurahan=${encodeURIComponent(area.kelurahan)}`}
-                        className="warga-row"
+                        className="warga-row flex-wrap gap-y-1.5 sm:flex-nowrap"
                       >
                         <span className="warga-num">{index + 1}</span>
-                        <span className="flex min-w-0 flex-1 flex-col">
+                        {/* Di ponsel nama mengambil sisa baris dan lencana turun ke baris kedua:
+                            berdampingan, kolom nama tinggal ±47 px dan teksnya meluber. */}
+                        <span className="flex min-w-0 flex-1 basis-[60%] flex-col sm:basis-0">
                           <span className="truncate text-base font-bold text-[rgb(var(--warga-navy))]">
                             {area.kelurahan}
                           </span>
-                          <span className="text-[13px] text-ink-faint">Kec. {area.kecamatan}</span>
+                          <span className="truncate text-[13px] text-ink-faint">Kec. {area.kecamatan}</span>
                         </span>
-                        <LevelBadge level={area.level} />
+                        <span className="ml-12 sm:ml-0">
+                          <LevelBadge level={area.level} />
+                        </span>
                         <span className="hidden whitespace-nowrap text-[13px] font-medium text-accent-soft sm:inline">
                           Lihat di peta →
                         </span>

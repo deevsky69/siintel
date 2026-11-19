@@ -106,7 +106,7 @@ function ScoreRow({
       >
         {score}
       </span>
-      <span className="w-11 text-right text-2xs uppercase text-ink-muted">
+      <span className="min-w-11 shrink-0 whitespace-nowrap text-right text-2xs uppercase text-ink-muted">
         {risk ? RISK_LABELS[risk] : "tanpa kelas"}
       </span>
     </li>
@@ -263,7 +263,7 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
                     style={{ width: `${Math.min(100, Math.max(0, factor.contribution * 100))}%` }}
                   />
                 </span>
-                <span className="w-9 shrink-0 text-right font-mono text-xs text-ink-muted">
+                <span className="min-w-9 shrink-0 text-right font-mono text-xs text-ink-muted">
                   {Math.round(factor.contribution * 100)}%
                 </span>
               </li>

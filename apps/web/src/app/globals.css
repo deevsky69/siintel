@@ -194,7 +194,21 @@
   /* Pembungkus tabel lebar. Tabel tidak dapat dibuat sempit tanpa kehilangan kolom, jadi
      ia digulung sendiri — bukan mendorong seluruh halaman melebar. */
   .table-scroll {
-    @apply -mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0;
+    @apply overflow-x-auto;
+  }
+  /* Di ponsel penggulung melebar sampai tepi panel — tetapi hanya bila badan panelnya
+     memang berpadding. Pada badan `p-0` (tabel CRUD) margin negatif itu mendorong tabel
+     12 px keluar dari panel di kedua sisi. */
+  .panel-body:not(.p-0) > .table-scroll {
+    @apply -mx-3 px-3 sm:mx-0 sm:px-0;
+  }
+
+  /* Jarak antarkolom baku untuk tabel polos di dalam panel. Tanpa ini sel yang rata kanan
+     menempel pada sel rata kiri di sebelahnya ("BAGIANRENTANG", "BOBOT TERSIMPAN DASAR").
+     Kelas utilitas pada sel (`p-0`, `px-*`, `pr-*`) tetap menang karena lapisannya lebih
+     akhir; `.data-table` punya padding sendiri. */
+  .panel table:not(.data-table) :is(th, td):not(:last-child) {
+    padding-right: 0.75rem;
   }
 
   /* Tabel data padat untuk layar CRUD (4 November 2026): kepala kolom kecil dan lengket,
