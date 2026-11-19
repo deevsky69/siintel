@@ -222,7 +222,10 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
         </div>
       </div>
 
-      <dl className="mt-2 grid grid-cols-4 gap-2 text-xs">
+      {/* Mengalir dan turun baris, bukan empat kolom sama lebar: pada kartu sempit (ponsel,
+          panel samping 1280 px) "Dipublikasikan" meluber keluar kartu dan "Confidence"
+          menempel pada "Status". */}
+      <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
         <div>
           {/* WHEN */}
           <dt className="text-ink-faint">Jendela</dt>
