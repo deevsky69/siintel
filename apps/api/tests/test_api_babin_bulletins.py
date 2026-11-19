@@ -206,8 +206,10 @@ def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_b
     assert mine["status"] == "DRAFT" and str(area.kelurahan).upper() in mine["content"]
     assert "SIGAP BERSAMA" in mine["content"] and mine["figures"]["week_start"] == week.isoformat()
 
-    # Hanya Pimpinan yang menyetujui; Administrator ditolak.
-    assert client.post(f"/api/v1/bulletins/{mine['id']}/approve", headers=admin).status_code == 403
+    # Persetujuan butuh `bulletin:approve`: Pimpinan dan, sejak 19 November 2026 (catatan 187),
+    # Administrator. Peran lain yang hanya dapat membaca tetap ditolak.
+    reader = _login(client, session, "Analis Intelkam")
+    assert client.post(f"/api/v1/bulletins/{mine['id']}/approve", headers=reader).status_code == 403
     approved = client.post(f"/api/v1/bulletins/{mine['id']}/approve", headers=leader)
     assert approved.status_code == 200 and approved.json()["status"] == "APPROVED"
     assert client.post(f"/api/v1/bulletins/{mine['id']}/approve", headers=leader).status_code == 409
@@ -368,11 +370,12 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
     )
 
     # Pratinjau untuk layar petugas: contoh teks dan jumlah grup. Sejak 19 November 2026
-    # imbauan menunggu persetujuan Humas — bukan Pimpinan, bukan Administrator.
+    # imbauan menunggu persetujuan pemegang `public_info:approve`: Humas dan, sejak catatan 187,
+    # Administrator. Pimpinan dan peran lain tetap ditolak.
     preview = client.get("/api/v1/advisories/preview", headers=leader).json()
     assert preview["automatic"] is False and preview["sample"] is not None
     assert preview["groups_registered"] >= 1
-    for not_humas in (leader, admin):
+    for not_humas in (leader, _login(client, session, "Kasat Intelkam")):
         assert (
             client.post(
                 "/api/v1/advisories/approvals", json={"month": "2030-01"}, headers=not_humas

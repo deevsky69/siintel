@@ -23,6 +23,17 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Administrator memegang seluruh kewenangan (19 November 2026, catatan 187).** Atas keputusan
+pemilik proyek, semua yang dapat dilakukan peran lain kini dapat dilakukan akun Administrator:
+menyusun, memeriksa (KBO), menelaah (Kasat Intelkam), dan menetapkan (Pimpinan) produk
+bulanan; mencatat pelaksanaan; menyetujui buletin mingguan dan imbauan bulanan (Humas);
+menerbitkan peringatan publik; dan menjalankan evaluasi. Tombol-tombol itu tampil pada akun
+Administrator di layar yang sama dengan peran aslinya. Peran lain tidak berubah. **Akibatnya:**
+lewat akun Administrator satu orang dapat menjalankan seluruh rantai sendirian — pemisahan
+tugas kini dijaga antarperan selain Administrator dan oleh **Audit Log**, yang tetap mencatat
+akun pelaku tiap langkah. Uraian lama di modul ini yang menyebut Administrator "di luar
+rantai" atau "tidak dapat menyusun draf" tidak berlaku lagi.
+
 **Disamakan dengan naskah Taskap final (19 November 2026, catatan 185–186).**
 
 - **Model AI** kini mengikuti resep Lampiran 8 E naskah. Pada layar Evaluasi, hasil 2025 sama

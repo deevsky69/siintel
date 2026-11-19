@@ -74,7 +74,7 @@ AKUN = [
     ("demo.humas", "Humas", "Menyetujui imbauan bulanan untuk masyarakat sebelum dikirim bot."),
     ("demo.fungsi", "Fungsi (Reskrim)", "Membaca keputusan dan mencatat pelaksanaan di kelurahan prioritas."),
     ("demo.polsek", "Polsek (Tebet)", "Seperti Fungsi, sebatas wilayah Polsek Tebet; menangani laporan warga dan berkas perkara wilayahnya."),
-    ("demo.admin", "Administrator", "Pengguna, mutu data, laporan masyarakat, berkas perkara, moderasi survei, audit. Di luar rantai persetujuan."),
+    ("demo.admin", "Administrator", "Pengguna, mutu data, laporan masyarakat, berkas perkara, moderasi survei, audit — dan, sejak 19 November 2026, <b>seluruh kewenangan peran lain</b> (tiap tahap produk bulanan, persetujuan buletin dan imbauan, evaluasi)."),
 ]
 baris_akun = "".join(
     f"<tr><td><b>{r}</b></td><td><code>{u}</code></td><td><code>{SANDI}</code></td><td>{t}</td></tr>" for u, r, t in AKUN
@@ -326,6 +326,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
       ("8 · Semua", "Evaluasi", "Cakupan, PAI, uji historis; dasar bulan berikutnya."))}
 <div class="note"><b>Sistem mengusulkan; manusia memutuskan.</b> Tidak ada keluaran sistem yang menjadi perintah. KBO dan Kasat tidak mengubah isi — mereka meneruskan atau mengembalikan dengan alasan, dan produk yang dikembalikan melewati jenjang itu lagi.</div>
 <h3>Langkah demi langkah — keluar lalu masuk dengan akun berikutnya pada tiap pergantian peran</h3>
+<p class="kecil">Akun <code>demo.admin</code> dapat menjalankan semua langkah di bawah ini sendirian (urutan tahap tetap berlaku dan tiap langkah tercatat di Audit Log). Untuk ujian, pakai akun tiap peran supaya pembagian tugasnya terlihat; akun admin berguna sebagai cadangan bila satu akun bermasalah.</p>
 {langkah([
  ("demo.admin", "Data → Mutu Data", "Baca <b>Kelengkapan</b>. Pada <b>Dampak belum terverifikasi</b> pilih kerugian, cedera, status, tulis rujukan sumber, tekan <b>Catat</b>. Pada <b>Laporan warga dan kejadian resmi</b> pilih padanan dan isi alasan.", "Persen kelengkapan; antrean dampak berkurang; IKW kelurahan itu tidak lagi “ditahan”."),
  ("demo.analis", "Bulan Ini → Produk Bulanan, tab Peringkat 65 Kelurahan", "Baca kolom <b>Perkiraan/bulan</b>, <b>Alasan model</b>, dan <b>IKW</b>. Buka peta pembanding lewat tautan di atas tabel.", "Peringkat bulan sasaran oleh model AI beserta alasannya."),
@@ -356,7 +357,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <tr><td><b>B5 · Moderasi survei</b></td><td><code>demo.admin</code></td><td>Warga → Survey Rasa Aman → tayangkan atau tolak ulasan yang dikirim pada alur A4.</td></tr>
 <tr><td><b>B6 · Kontak Babin</b></td><td><code>demo.admin</code></td><td>Warga → Babinkamtibmas → cari kelurahan, Tambah / Ubah / Hapus; kontak tampil pada peta warga.</td></tr>
 <tr><td><b>B7 · Pengguna dan audit</b></td><td><code>demo.admin</code> (audit juga <code>demo.pimpinan</code>)</td><td>Sistem → Manajemen Pengguna (akun dan peran) dan Sistem → Audit Log (siapa melakukan apa, termasuk penolakan akses).</td></tr>
-<tr><td><b>B8 · Batas wewenang</b></td><td><code>demo.humas</code>, <code>demo.kbo</code></td><td>Tunjukkan bahwa Humas tidak memiliki menu Produk Bulanan, dan KBO tidak dapat menyusun draf maupun menetapkan — pemisahan tugas dijaga server.</td></tr>
+<tr><td><b>B8 · Batas wewenang</b></td><td><code>demo.humas</code>, <code>demo.kbo</code></td><td>Tunjukkan bahwa Humas tidak memiliki menu Produk Bulanan, dan KBO tidak dapat menyusun draf maupun menetapkan — pemisahan tugas antarperan dijaga server. Hanya Administrator yang memegang semua kewenangan.</td></tr>
 </tbody></table>
 </section>
 
