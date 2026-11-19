@@ -125,7 +125,12 @@ def test_ranking_orders_by_three_month_mean_with_alphabetical_ties_and_report_cu
     # Sisanya seri 0 → abjad.
     rest = [row.kelurahan for row in result.rows[2:]]
     assert rest == sorted(rest)
-    assert all(row.ikw is not None and row.ikw_category for row in result.rows)
+    # IKW (naskah B.4.2) membawa statusnya; yang DITAHAN tidak diterbitkan, bukan dianggap nol.
+    for row in result.rows:
+        index = row.basis["ikw"]
+        assert index["status"] in ("LENGKAP", "SEMENTARA", "DITAHAN")
+        assert (row.ikw is None) == (index["status"] == "DITAHAN")
+        assert 0 <= index["frequency"] <= 4 and 0 <= index["recurrence"] <= 4
     assert result.rows[0].basis["basis_total"] == 6
 
     vehicle_only = ranking.compute(session, TARGET, "HISTORY_3M", "VEHICLE")

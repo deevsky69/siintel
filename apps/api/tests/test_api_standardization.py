@@ -421,3 +421,48 @@ def test_match_cannot_link_an_incident_outside_the_deciders_jurisdiction(
         session, report, "MATCHED", incident.code, "uji", actor, area.polsek
     )
     assert linked["matched_incident"] == incident.code
+
+
+def test_impact_entry_drives_the_ikw_status(client: TestClient, session: Session) -> None:
+    """Dampak diisi petugas dengan rujukan sumber; hanya yang terverifikasi masuk IKW."""
+    from prediksi_presisi_api.services import monthly_ranking as ranking
+
+    admin = _login(client, session, "Administrator")
+    area = _kelurahan(session)
+    entry = {**_entry("Kendaraan bermotor", area.code), "incident_date": "2025-12-28"}
+    first = client.post("/api/v1/crimes", json=entry, headers=admin).json()
+    path = f"/api/v1/crimes/{first['code']}/impact"
+    body = {"loss_status": "PRESENT", "injury_level": "NONE", "status": "VERIFIED", "source": "LP"}
+    assert client.post(path, json=body).status_code == 401
+    assert (
+        client.post(path, json=body, headers=_login(client, session, "Polsek")).status_code == 403
+    )
+    assert client.post(path, json={**body, "source": ""}, headers=admin).status_code == 400
+    # "Belum diketahui" tidak dapat dinyatakan terverifikasi.
+    unknown = {**body, "injury_level": "UNKNOWN"}
+    assert client.post(path, json=unknown, headers=admin).status_code == 400
+
+    queue = client.get("/api/v1/data-quality/impact?limit=200", headers=admin).json()
+    assert first["code"] in [row["code"] for row in queue["data"]]
+    waiting = queue["waiting"]
+
+    target = ranking.parse_month("2026-01")
+    before = ranking.compute(session, target, "HISTORY_3M", "VEHICLE")
+    mine = next(row for row in before.rows if row.kelurahan == area.kelurahan)
+    assert mine.basis["ikw"]["status"] in ("DITAHAN", "SEMENTARA")
+
+    saved = client.post(path, json={**body, "source": "LP/123/XII/2025"}, headers=admin)
+    assert saved.status_code == 200, saved.text
+    assert saved.json()["impact_score"] == 2 and saved.json()["impact_status"] == "VERIFIED"
+    after_queue = client.get("/api/v1/data-quality/impact?limit=200", headers=admin).json()
+    assert after_queue["waiting"] == waiting - 1
+    assert first["code"] not in [row["code"] for row in after_queue["data"]]
+
+    after = ranking.compute(session, target, "HISTORY_3M", "VEHICLE")
+    mine = next(row for row in after.rows if row.kelurahan == area.kelurahan)
+    index = mine.basis["ikw"]
+    assert index["impact_verified"] >= 1 and index["status"] in ("SEMENTARA", "LENGKAP")
+    assert index["impact"] >= 2 and mine.ikw is not None and mine.ikw_category
+    # Riwayat koreksi mencatat isian dampak beserta sumbernya.
+    history = client.get(f"/api/v1/crimes/{first['code']}/revisions", headers=admin).json()
+    assert any(row["field"] == "impact" for row in history["data"])

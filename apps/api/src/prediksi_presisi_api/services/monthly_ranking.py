@@ -41,7 +41,7 @@ from sqlalchemy.orm import Session
 
 from ..models import CrimeIncident, Location, MonthlyRanking, MonthlyRankingRow
 from ..seeding.paths import REPO_ROOT
-from . import clock, config_cache, visibility
+from . import clock, config_cache, ikw, visibility
 from . import monthly_model as model
 from .risk_engine import _known_by
 
@@ -60,8 +60,9 @@ BASIS = (
     "Peta historis "
     "(3 bulan, 12 bulan, bulan sebelumnya, tahunan tetap) dihitung sebagai pembanding, dan "
     "model hanya menjadi dasar usulan bila cakupannya lebih tinggi daripada pembanding "
-    "terbaik pada bulan-bulan uji terakhir. IKW (frekuensi 12 bulan, tren, konsistensi) "
-    "tampil di samping dan berstatus PROPOSED."
+    "terbaik pada bulan-bulan uji terakhir. IKW = 25 x (0,50 F + 0,35 D + 0,15 T): frekuensi "
+    "12 bulan, dampak terverifikasi 3 bulan, keberulangan 4 bulan, atas seluruh 3C; statusnya "
+    "lengkap, sementara, atau ditahan mengikuti verifikasi dampak (PROPOSED)."
 )
 
 
@@ -77,8 +78,7 @@ class RankingConfig:
     methods: dict[str, dict[str, Any]]
     scopes: tuple[str, ...]
     default_scope: str
-    ikw_weights: dict[str, float]
-    categories: dict[str, tuple[int, int]]
+    ikw: ikw.IkwConfig
     model: model.ModelParams
     guard_months: int
     guard_min_months: int
@@ -105,8 +105,16 @@ def load_config() -> RankingConfig:
         methods={str(k): dict(v) for k, v in raw["methods"].items()},
         scopes=tuple(str(s) for s in raw["scopes"]),
         default_scope=str(raw["default_scope"]),
-        ikw_weights={str(k): float(v) for k, v in raw["ikw"]["weights"].items()},
-        categories={str(k): (int(v[0]), int(v[1])) for k, v in raw["ikw"]["categories"].items()},
+        ikw=ikw.IkwConfig(
+            weights={str(k): float(v) for k, v in raw["ikw"]["weights"].items()},
+            categories=tuple(
+                sorted(
+                    ((str(k), float(v)) for k, v in raw["ikw"]["categories"].items()),
+                    key=lambda item: -item[1],
+                )
+            ),
+            lowest=str(raw["ikw"].get("lowest", "RENDAH")),
+        ),
         model=model.ModelParams.from_config(raw["model"]),
         guard_months=int(raw["guard"]["months"]),
         guard_min_months=int(raw["guard"]["min_months"]),
@@ -194,13 +202,6 @@ class ComputedRanking:
             "ikw_status": config.status,
             "data": [row.as_dict() for row in self.rows],
         }
-
-
-def _category(config: RankingConfig, value: float) -> str | None:
-    for name, (low, high) in config.categories.items():
-        if low <= round(value) <= high:
-            return name
-    return None
 
 
 def load_history(
@@ -393,29 +394,19 @@ def compute(
     }
     basis_first = model.month_index(basis_from)
     basis_last = model.month_index(basis_to)
-    peak12 = max((sum(counts) for counts in series.values()), default=0) or 1
+    indexes = _ikw_by_area(session, target, cutoff, config)
     rows: list[RankedArea] = []
     for rank, name in enumerate(order(predicted), start=1):
         counts = series[name]
-        mean3 = sum(counts[-3:]) / 3
-        mean9 = sum(counts[:-3]) / 9
-        trend = max(-1.0, min(1.0, (mean3 - mean9) / max(mean9, 1.0)))
-        frequency = sum(counts) / peak12 * 100
-        consistent = sum(1 for c in counts if c > 0)
-        ikw = (
-            config.ikw_weights["frequency"] * frequency
-            + config.ikw_weights["trend"] * (50 + 50 * trend)
-            + config.ikw_weights["consistency"] * (consistent / IKW_MONTHS * 100)
-        )
+        index = indexes.get(name)
         basis: dict[str, Any] = {
             "months": {m.isoformat()[:7]: c for m, c in zip(months12, counts, strict=True)},
             "basis_total": sum(
-                history.count(name, index, min(cutoff, basis_to))
-                for index in range(basis_first, basis_last + 1)
+                history.count(name, month, min(cutoff, basis_to))
+                for month in range(basis_first, basis_last + 1)
             ),
             "total_12m": sum(counts),
-            "trend": round(trend, 2),
-            "consistency_months": consistent,
+            "ikw": index,
         }
         if name in explained:
             basis.update(_explanation(explained[name]))
@@ -426,8 +417,8 @@ def compute(
                 kecamatan=history.areas[name],
                 polsek=polsek_of.get(name, ""),
                 predicted_count=round(predicted[name], 2),
-                ikw=round(ikw, 1),
-                ikw_category=_category(config, ikw),
+                ikw=index["value"] if index else None,
+                ikw_category=index["category"] if index else None,
                 basis=basis,
             )
         )
@@ -442,6 +433,61 @@ def compute(
         pending_count=pending_count,
         rows=rows,
     )
+
+
+def _ikw_by_area(
+    session: Session, target: int, cutoff: date, config: RankingConfig
+) -> dict[str, dict[str, Any]]:
+    """IKW tiap kelurahan untuk bulan sasaran, atas SELURUH 3C (naskah B.4.2) — terlepas dari
+    cakupan peringkat. Hanya kejadian yang sudah dilaporkan sampai batas data."""
+    first = model.month_from_index(target - ikw.FREQUENCY_MONTHS)
+    last = model.default_cutoff(target)
+    rows = session.execute(
+        select(
+            Location.kelurahan,
+            CrimeIncident.incident_date,
+            CrimeIncident.loss_status,
+            CrimeIncident.injury_level,
+            CrimeIncident.impact_status,
+        )
+        .join(Location, Location.location_id == CrimeIncident.location_id)
+        .where(
+            Location.kelurahan.is_not(None),
+            CrimeIncident.incident_type.in_(THREATS),
+            CrimeIncident.area_pending.is_(False),
+            CrimeIncident.incident_date >= first,
+            CrimeIncident.incident_date <= last,
+            func.coalesce(CrimeIncident.data_source, "").not_like(f"%{UNDATED_MARK}"),
+            _known_by(cutoff),
+        )
+    ).all()
+    names = [
+        str(name)
+        for name in session.scalars(
+            select(Location.kelurahan).where(Location.kelurahan.is_not(None)).distinct()
+        ).all()
+    ]
+    volume: dict[str, int] = dict.fromkeys(names, 0)
+    months: dict[str, set[int]] = {name: set() for name in names}
+    impacts: dict[str, list[int | None]] = {name: [] for name in names}
+    for kelurahan, day, loss, injury, status in rows:
+        name = str(kelurahan)
+        if name not in volume:
+            continue
+        month = model.month_index(day)
+        volume[name] += 1
+        if target - month <= ikw.RECURRENCE_MONTHS:
+            months[name].add(month)
+        if target - month <= ikw.IMPACT_MONTHS:
+            verified = status == "VERIFIED"
+            impacts[name].append(ikw.impact_score(loss, injury) if verified else None)
+    bounds = ikw.frequency_bounds(list(volume.values()))
+    result: dict[str, dict[str, Any]] = {}
+    for name in names:
+        entry = ikw.compute(volume[name], bounds, len(months[name]), impacts[name], config.ikw)
+        entry["quartiles"] = list(bounds) if bounds else None
+        result[name] = entry
+    return result
 
 
 def _explanation(prediction: model.Prediction) -> dict[str, Any]:

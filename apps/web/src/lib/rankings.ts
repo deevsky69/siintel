@@ -16,6 +16,17 @@ export type RankedArea = {
     consistency_months?: number;
     /** Hanya pada metode MODEL: kontribusi tiap masukan, dihitung dari pohon model. */
     factors?: { label: string; contribution: number; effect_pct?: number }[];
+    /** IKW = 25 × (0,50 F + 0,35 D + 0,15 T) beserta statusnya (naskah B.4.2). */
+    ikw?: {
+      value: number | null;
+      status: "LENGKAP" | "SEMENTARA" | "DITAHAN";
+      frequency: number;
+      impact: number | null;
+      recurrence: number;
+      impact_reports: number;
+      impact_verified: number;
+      review_now: boolean;
+    } | null;
   };
 };
 

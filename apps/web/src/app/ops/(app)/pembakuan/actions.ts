@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api";
-import { confirmArea, decideMatch, resolveDuplicate } from "@/lib/standardization";
+import { confirmArea, decideMatch, recordImpact, resolveDuplicate } from "@/lib/standardization";
 
 export type StandardState = { error: string | null; done: string | null };
 
@@ -62,6 +62,26 @@ export async function matchAction(_p: StandardState, form: FormData): Promise<St
       error: null,
       done: incident ? `${code} ditautkan ke ${incident}` : `${code} kejadian tambahan`,
     };
+  } catch (error) {
+    if (error instanceof ApiError) return { error: error.message, done: null };
+    throw error;
+  }
+}
+
+/** Isian dampak satu laporan; rujukan sumber wajib. */
+export async function impactAction(_p: StandardState, form: FormData): Promise<StandardState> {
+  const code = String(form.get("code") ?? "");
+  const source = String(form.get("source") ?? "").trim();
+  if (!source) return { error: "Rujukan sumber wajib diisi.", done: null };
+  try {
+    await recordImpact(code, {
+      loss_status: String(form.get("loss_status") ?? "UNKNOWN"),
+      injury_level: String(form.get("injury_level") ?? "UNKNOWN"),
+      status: String(form.get("status") ?? "PENDING"),
+      source,
+    });
+    revalidatePath("/ops/pembakuan");
+    return { error: null, done: `${code} dampak dicatat` };
   } catch (error) {
     if (error instanceof ApiError) return { error: error.message, done: null };
     throw error;

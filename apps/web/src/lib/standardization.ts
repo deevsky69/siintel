@@ -79,3 +79,28 @@ export const decideMatch = (
   code: string,
   body: { decision: "MATCHED" | "NOT_MATCHED"; incident_code?: string; reason: string },
 ) => apiPost<unknown>(`/citizen-reports/${encodeURIComponent(code)}/match`, body);
+
+/** Dampak laporan pada jendela tiga bulan (unsur D pada IKW; naskah Lampiran 9). */
+export type ImpactRow = {
+  code: string;
+  incident_type: string;
+  incident_date: string;
+  kecamatan: string;
+  kelurahan: string | null;
+  target_type: string | null;
+  impact_status: string | null;
+};
+
+export const getImpactQueue = () =>
+  apiGet<{
+    from: string;
+    to: string;
+    reports: number;
+    verified: number;
+    waiting: number;
+    data: ImpactRow[];
+  }>("/data-quality/impact?limit=30");
+export const recordImpact = (
+  code: string,
+  body: { loss_status: string; injury_level: string; status: string; source: string },
+) => apiPost<unknown>(`/crimes/${encodeURIComponent(code)}/impact`, body);

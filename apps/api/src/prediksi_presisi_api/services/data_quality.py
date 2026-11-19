@@ -30,7 +30,8 @@ from sqlalchemy import Select, and_, func, or_, select
 from sqlalchemy.orm import Session
 
 from ..models import CitizenReport, CrimeIncident, Location, User
-from . import clock
+from . import clock, visibility
+from .ikw import IMPACT_MONTHS
 from .monthly_ranking import THREATS
 
 #: Jarak hari antara laporan warga dan kejadian resmi yang masih diusulkan sebagai pasangan.
@@ -199,6 +200,58 @@ def flagged(
                 "target_type": incident.target_type,
                 "location_type": incident.location_type,
                 "data_source": incident.data_source,
+            }
+            for incident, location in rows
+        ],
+    }
+
+
+def _impact_window() -> tuple[date, date]:
+    """Jendela dampak IKW: tiga bulan kalender terakhir sampai batas tampilan data."""
+    until = visibility.display_cutoff() or clock.reference_now().astimezone(clock.JAKARTA).date()
+    index = until.year * 12 + until.month - 1 - (IMPACT_MONTHS - 1)
+    return date(index // 12, index % 12 + 1, 1), until
+
+
+def impact_queue(session: Session, polsek: str | None = None, limit: int = 50) -> dict[str, Any]:
+    """Laporan pada jendela dampak yang dampaknya belum terverifikasi — selama masih ada,
+    IKW kelurahannya berstatus sementara atau ditahan (naskah Lampiran 9)."""
+    since, until = _impact_window()
+    window = (
+        CrimeIncident.incident_type.in_(THREATS),
+        CrimeIncident.incident_date >= since,
+        CrimeIncident.incident_date <= until,
+    )
+    pending = or_(CrimeIncident.impact_status.is_(None), CrimeIncident.impact_status != "VERIFIED")
+    query = (
+        select(CrimeIncident, Location)
+        .join(Location, Location.location_id == CrimeIncident.location_id)
+        .where(*window, pending)
+    )
+    if polsek is not None:
+        query = query.where(Location.polsek == polsek)
+    rows = session.execute(
+        query.order_by(CrimeIncident.incident_date.desc(), CrimeIncident.code).limit(limit)
+    ).all()
+    total = int(session.scalar(_incidents(polsek).where(*window)) or 0)
+    waiting = int(session.scalar(_incidents(polsek).where(*window, pending)) or 0)
+    return {
+        "from": since,
+        "to": until,
+        "reports": total,
+        "verified": total - waiting,
+        "waiting": waiting,
+        "data": [
+            {
+                "code": incident.code,
+                "incident_type": incident.incident_type,
+                "incident_date": incident.incident_date,
+                "kecamatan": location.kecamatan,
+                "kelurahan": location.kelurahan,
+                "target_type": incident.target_type,
+                "loss_status": incident.loss_status,
+                "injury_level": incident.injury_level,
+                "impact_status": incident.impact_status,
             }
             for incident, location in rows
         ],

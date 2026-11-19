@@ -20,7 +20,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ...models import CitizenReport, CrimeIncident, CrimeIncidentRevision, Location
-from ...services import audit, data_quality, standardization
+from ...services import audit, clock, data_quality, ikw, standardization
 from ..deps import CurrentUser, get_db, jurisdiction_filter, not_found, require_permission
 from ..errors import ApiError
 
@@ -39,6 +39,17 @@ class DuplicateRequest(BaseModel):
     duplicate_of: str | None = Field(default=None, max_length=50)
     #: Alasan WAJIB sejak 18 November 2026 (naskah Taskap 4.1: "keputusan dan alasan dicatat").
     note: str = Field(min_length=3, max_length=500)
+
+
+class ImpactRequest(BaseModel):
+    """Isian dampak satu laporan (naskah Taskap Lampiran 9, "Format Isian Dampak")."""
+
+    model_config = ConfigDict(extra="ignore")
+    loss_status: str = Field(pattern="^(PRESENT|NONE|UNKNOWN)$")
+    injury_level: str = Field(pattern="^(NONE|INJURY|SEVERE|DEATH|UNKNOWN)$")
+    status: str = Field(pattern="^(VERIFIED|PENDING|NEEDS_CLARIFICATION)$")
+    #: Rujukan laporan polisi atau keterangan resmi — wajib, supaya isian dapat ditelusuri.
+    source: str = Field(min_length=3, max_length=200)
 
 
 class MatchRequest(BaseModel):
@@ -247,6 +258,68 @@ def revisions(
 # ---------------------------------------------------------------------------------------
 # Mutu data (naskah Taskap 4.1 dan Tabel 22 "Mutu data"; 18 November 2026).
 # ---------------------------------------------------------------------------------------
+
+
+@router.post("/crimes/{code}/impact", summary="Mencatat dampak satu kejadian")
+def record_impact(
+    code: str,
+    payload: ImpactRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("crime:triage"),
+) -> dict[str, Any]:
+    incident, location = _incident(session, current, code)
+    if payload.status == "VERIFIED" and "UNKNOWN" in (payload.loss_status, payload.injury_level):
+        raise ApiError(
+            status.HTTP_400_BAD_REQUEST,
+            "Dampak yang masih 'belum diketahui' tidak dapat dinyatakan terverifikasi.",
+        )
+    before = f"{incident.loss_status}/{incident.injury_level}/{incident.impact_status}"
+    incident.loss_status = payload.loss_status
+    incident.injury_level = payload.injury_level
+    incident.impact_status = payload.status
+    incident.impact_source = payload.source.strip()
+    incident.impact_verified_by = current.user.user_id
+    incident.impact_verified_at = clock.citizen_now()
+    after = f"{payload.loss_status}/{payload.injury_level}/{payload.status}"
+    standardization.record_revision(
+        session, incident, current.user.user_id, "impact", before, after, payload.source
+    )
+    audit.record(
+        session,
+        action="RECORD_CRIME_IMPACT",
+        resource_type="crime",
+        result=audit.RESULT_SUCCESS,
+        user_id=current.user.user_id,
+        resource_id=incident.code,
+        detail={
+            "loss": payload.loss_status,
+            "injury": payload.injury_level,
+            "status": payload.status,
+        },
+    )
+    session.commit()
+    session.refresh(incident)
+    return {
+        **_summary(incident, location),
+        "loss_status": incident.loss_status,
+        "injury_level": incident.injury_level,
+        "impact_status": incident.impact_status,
+        "impact_source": incident.impact_source,
+        "impact_score": ikw.impact_score(incident.loss_status, incident.injury_level)
+        if incident.impact_status == "VERIFIED"
+        else None,
+    }
+
+
+@router.get(
+    "/data-quality/impact", summary="Laporan tiga bulan terakhir yang dampaknya belum terverifikasi"
+)
+def quality_impact(
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("crime:triage"),
+    limit: int = Query(50, ge=1, le=200),
+) -> dict[str, Any]:
+    return data_quality.impact_queue(session, jurisdiction_filter(current, "crime:triage"), limit)
 
 
 @router.get("/data-quality", summary="Mutu data: kelengkapan, tanda, dan hitungan kejadian")

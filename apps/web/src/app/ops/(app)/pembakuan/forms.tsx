@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import type { MatchCandidate } from "@/lib/standardization";
 import {
   confirmAreaAction,
+  impactAction,
   matchAction,
   resolveDuplicateAction,
   type StandardState,
@@ -104,6 +105,43 @@ export function MatchForm({ code, candidates }: { code: string; candidates: Matc
         className={`${button} border-accent/60 bg-accent/10 text-accent`}
       >
         Simpan keputusan
+      </button>
+      {state.error ? <span className="text-xs text-risk-critical">{state.error}</span> : null}
+    </form>
+  );
+}
+
+/** Isian dampak (naskah Lampiran 9): kerugian, cedera, status verifikasi, dan sumbernya. */
+export function ImpactForm({ code }: { code: string }) {
+  const [state, submit, pending] = useActionState(impactAction, IDLE);
+  if (state.done) return <span className="text-xs text-risk-low">{state.done}</span>;
+  return (
+    <form action={submit} className="flex flex-wrap items-center gap-2">
+      <input type="hidden" name="code" value={code} />
+      <select name="loss_status" defaultValue="PRESENT" aria-label="Kerugian" className={field}>
+        <option value="PRESENT">Ada kerugian/kerusakan</option>
+        <option value="NONE">Tanpa kerugian</option>
+        <option value="UNKNOWN">Belum diketahui</option>
+      </select>
+      <select name="injury_level" defaultValue="NONE" aria-label="Cedera" className={field}>
+        <option value="NONE">Tanpa cedera</option>
+        <option value="INJURY">Cedera</option>
+        <option value="SEVERE">Cedera berat</option>
+        <option value="DEATH">Meninggal</option>
+        <option value="UNKNOWN">Belum diketahui</option>
+      </select>
+      <select name="status" defaultValue="VERIFIED" aria-label="Status" className={field}>
+        <option value="VERIFIED">Terverifikasi</option>
+        <option value="PENDING">Menunggu pemeriksaan</option>
+        <option value="NEEDS_CLARIFICATION">Perlu klarifikasi</option>
+      </select>
+      <input name="source" required placeholder="Rujukan sumber (wajib)" className={field} />
+      <button
+        type="submit"
+        disabled={pending}
+        className={`${button} border-accent/60 bg-accent/10 text-accent`}
+      >
+        Catat
       </button>
       {state.error ? <span className="text-xs text-risk-critical">{state.error}</span> : null}
     </form>

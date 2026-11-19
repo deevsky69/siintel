@@ -116,6 +116,20 @@ class CrimeIncident(TimestampMixin, Base):
     duplicate_of: Mapped[str | None] = mapped_column(String(50))
     duplicate_status: Mapped[str | None] = mapped_column(String(20))
 
+    # --- Dampak (migration 0028, 19 November 2026; naskah Taskap Lampiran 9) ---
+    #: Kerugian atau kerusakan: PRESENT / NONE / UNKNOWN. NULL = belum diisi.
+    loss_status: Mapped[str | None] = mapped_column(String(20))
+    #: Cedera: NONE / INJURY / SEVERE / DEATH / UNKNOWN.
+    injury_level: Mapped[str | None] = mapped_column(String(20))
+    #: Rujukan laporan polisi atau keterangan resmi yang menjadi dasar isian dampak.
+    impact_source: Mapped[str | None] = mapped_column(String(200))
+    #: VERIFIED / PENDING / NEEDS_CLARIFICATION. Hanya VERIFIED yang masuk unsur D pada IKW.
+    impact_status: Mapped[str | None] = mapped_column(String(30))
+    impact_verified_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="SET NULL")
+    )
+    impact_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
     location: Mapped[Location] = relationship(back_populates="crime_incidents")
     evaluations: Mapped[list[PredictionActual]] = relationship(back_populates="actual_incident")
     revisions: Mapped[list[CrimeIncidentRevision]] = relationship(
@@ -136,6 +150,21 @@ class CrimeIncident(TimestampMixin, Base):
             "duplicate_status IS NULL OR duplicate_status IN " + str(DUPLICATE_STATUSES),
             name="duplicate_status_known",
         ),
+        CheckConstraint(
+            "loss_status IS NULL OR loss_status IN ('PRESENT', 'NONE', 'UNKNOWN')",
+            name="impact_loss_allowed",
+        ),
+        CheckConstraint(
+            "injury_level IS NULL OR injury_level IN "
+            "('NONE', 'INJURY', 'SEVERE', 'DEATH', 'UNKNOWN')",
+            name="impact_injury_allowed",
+        ),
+        CheckConstraint(
+            "impact_status IS NULL OR impact_status IN "
+            "('VERIFIED', 'PENDING', 'NEEDS_CLARIFICATION')",
+            name="impact_status_allowed",
+        ),
+        Index("ix_crime_incidents_impact_verified_by", "impact_verified_by"),
         Index("ix_crime_incidents_occurred_at", "occurred_at"),
         Index("ix_crime_incidents_location_occurred", "location_id", "occurred_at"),
         Index("ix_crime_incidents_incident_type", "incident_type"),

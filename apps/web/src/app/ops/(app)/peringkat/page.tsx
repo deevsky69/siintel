@@ -133,11 +133,24 @@ export default async function PeringkatPage({
                   <td className="py-1.5 pr-2 text-right">
                     {row.ikw !== null && row.ikw_category ? (
                       <span
+                        title={
+                          row.basis.ikw
+                            ? `F ${row.basis.ikw.frequency} · D ${row.basis.ikw.impact ?? "–"} · T ${row.basis.ikw.recurrence} · dampak terverifikasi ${row.basis.ikw.impact_verified}/${row.basis.ikw.impact_reports}`
+                            : undefined
+                        }
                         className={`rounded px-1.5 py-0.5 tabular-nums ${CATEGORY[row.ikw_category] ?? ""}`}
                       >
                         {row.ikw.toFixed(0)}
+                        {row.basis.ikw?.status === "SEMENTARA" ? "*" : ""}
                       </span>
-                    ) : null}
+                    ) : (
+                      <span
+                        className="text-2xs text-ink-faint"
+                        title="Dampak laporan tiga bulan terakhir belum terverifikasi (Data → Mutu Data)"
+                      >
+                        ditahan
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -145,7 +158,8 @@ export default async function PeringkatPage({
           </table>
         )}
         <p className="mt-3 text-2xs text-ink-faint">
-          {ranking.method_label} · {ranking.model_version} · IKW {ranking.ikw_status}
+          {ranking.method_label} · {ranking.model_version} · IKW {ranking.ikw_status}: 25 × (0,50 F
+          + 0,35 D + 0,15 T); * sementara, “ditahan” = dampak belum terverifikasi
         </p>
         <p className="mt-1 text-2xs text-ink-faint">
           Dasar usulan{" "}

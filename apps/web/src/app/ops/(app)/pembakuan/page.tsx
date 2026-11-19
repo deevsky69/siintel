@@ -2,8 +2,13 @@ import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { ScreenTabs } from "@/components/shell/screen-tabs";
 import { getProfile } from "@/lib/decisions";
-import { getDataQuality, getMatchQueue, getStandardQueue } from "@/lib/standardization";
-import { AreaForm, DuplicateForm, MatchForm } from "./forms";
+import {
+  getDataQuality,
+  getImpactQueue,
+  getMatchQueue,
+  getStandardQueue,
+} from "@/lib/standardization";
+import { AreaForm, DuplicateForm, ImpactForm, MatchForm } from "./forms";
 
 export const dynamic = "force-dynamic";
 
@@ -26,10 +31,11 @@ export default async function PembakuanPage() {
   }
   // Tiga permintaan berjalan bersamaan; ringkasan mutu dan antrean pencocokan boleh gagal
   // tanpa menjatuhkan antrean pembakuan yang sudah ada.
-  const [queue, quality, matches] = await Promise.all([
+  const [queue, quality, matches, impact] = await Promise.all([
     getStandardQueue(),
     getDataQuality().catch(() => null),
     getMatchQueue().catch(() => null),
+    getImpactQueue().catch(() => null),
   ]);
   const pct = (value: number | null) => (value === null ? "—" : `${value.toFixed(2)}%`);
   return (
@@ -139,6 +145,39 @@ export default async function PembakuanPage() {
               ))}
             </ul>
           )}
+        </Panel>
+      ) : null}
+      {impact ? (
+        <Panel
+          title="Dampak belum terverifikasi"
+          action={
+            <span className="panel-action">
+              {impact.verified}/{impact.reports} terverifikasi · {impact.from} – {impact.to}
+            </span>
+          }
+        >
+          {impact.data.length === 0 ? (
+            <EmptyState label="Seluruh laporan tiga bulan terakhir sudah terverifikasi dampaknya." />
+          ) : (
+            <ul className="divide-y divide-base-800">
+              {impact.data.map((row) => (
+                <li key={row.code} className="space-y-1.5 py-2 text-xs">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="font-mono text-ink-muted">{row.code}</span>
+                    <span className="font-semibold text-ink">{row.incident_type}</span>
+                    <span className="text-ink-faint">{row.incident_date}</span>
+                    <span className="text-ink-muted">{row.kelurahan ?? row.kecamatan}</span>
+                    <span className="text-ink-faint">{row.target_type ?? "—"}</span>
+                  </div>
+                  <ImpactForm code={row.code} />
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-2 text-2xs text-ink-faint">
+            Dampak adalah unsur D pada IKW. Selama laporan tiga bulan terakhir di sebuah kelurahan
+            belum terverifikasi dampaknya, IKW kelurahan itu berstatus sementara atau ditahan.
+          </p>
         </Panel>
       ) : null}
       <Panel

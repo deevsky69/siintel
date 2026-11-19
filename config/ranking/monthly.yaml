@@ -10,9 +10,8 @@
 #     terakhir model tidak mengungguli pembanding terbaik, usulan kembali memakai peta.
 # Menggantikan keputusan 2A (6 November 2026): "peta 3 bulan dulu, model menyusul".
 #
-# IKW (Indeks Kerawanan Wilayah) — rancangan: frekuensi 12 bulan, tren, konsistensi.
-# Bobot dan ambang kategori di bawah ini BELUM diuji: status PROPOSED (dokumen: "diuji
-# sebelum dipakai"). IKW ditampilkan di samping peringkat, tidak menentukan urutan.
+# IKW (Indeks Kerawanan Wilayah) ditampilkan di samping peringkat dan tidak menentukan urutan;
+# rumusnya ada pada bagian `ikw` di bawah.
 version: peringkat-2026-11-17
 status: PROPOSED
 
@@ -76,15 +75,21 @@ guard:
 scopes: [ALL_3C, VEHICLE]
 default_scope: VEHICLE
 
+# IKW = 25 × (0,50 F + 0,35 D + 0,15 T) — naskah Taskap final Bab IV B.4.2 (19 November 2026;
+# menggantikan rancangan frekuensi/tren/konsistensi). F = kuartil volume 12 bulan (0–4),
+# D = dampak tertinggi terverifikasi 3 bulan (0–4), T = bulan berkejadian dalam 4 bulan (0–4).
+# Dihitung atas SELURUH 3C, apa pun cakupan peringkatnya. Bobot dan batas kategori adalah
+# asumsi awal simulasi peneliti: status PROPOSED sampai diuji dan disahkan.
 ikw:
   weights:
-    frequency: 0.50    # jumlah 12 bulan, dinormalkan ke kelurahan tertinggi
-    trend: 0.25        # rata-rata 3 bulan terakhir dibanding 9 bulan sebelumnya
-    consistency: 0.25  # bagian bulan (dari 12) yang mencatat >= 1 kejadian
-  categories:          # 0–100, PROPOSED
-    RENDAH: [0, 34]
-    SEDANG: [35, 64]
-    TINGGI: [65, 100]
+    frequency: 0.50
+    impact: 0.35
+    recurrence: 0.15
+  # Batas bawah inklusif: tinggi mulai 65, sedang 35 sampai kurang dari 65, rendah di bawah 35.
+  categories:
+    TINGGI: 65
+    SEDANG: 35
+  lowest: RENDAH
 
 # Produk bulanan (Modul 4): berapa kelurahan teratas yang dibuatkan draf usulan oleh sistem.
 # Pimpinan tetap bebas memilih jumlah dan kelurahan mana pun yang tidak ditolak analis.
