@@ -120,12 +120,12 @@ def compose(
         rule = rules.for_threat(top)
         lines.append(
             f"Ajakan untuk warga: {rule.action.lower()} bersama Babinkamtibmas; laporkan hal "
-            "mencurigakan lewat SIGAP WARGA atau 110."
+            "mencurigakan lewat SIGAP BERSAMA atau 110."
         )
     else:
         lines.append(
             "Ajakan untuk warga: tetap kunci ganda kendaraan dan saling jaga lingkungan; "
-            "laporkan hal mencurigakan lewat SIGAP WARGA atau 110."
+            "laporkan hal mencurigakan lewat SIGAP BERSAMA atau 110."
         )
     lines.append("")
     lines.append("Dari Polres Metro Jakarta Selatan melalui SIGAP · sigap.awansurya.com")

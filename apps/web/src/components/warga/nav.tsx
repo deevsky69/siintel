@@ -11,6 +11,13 @@ export const WARGA_NAV = [
   { href: "/lapor", label: "Lapor", icon: "pen" },
 ] as const;
 
+/** Navigasi atas memuat satu tautan lebih; tab bawah ponsel tetap lima (kisi lima kolom). */
+const TOP_NAV = [
+  ...WARGA_NAV.slice(0, 3),
+  { href: "/panduan", label: "Panduan" },
+  ...WARGA_NAV.slice(3),
+] as const;
+
 type Icon = (typeof WARGA_NAV)[number]["icon"];
 
 const PATHS: Record<Icon, string> = {
@@ -51,7 +58,7 @@ export function WargaTopNav() {
   const pathname = usePathname();
   return (
     <>
-      {WARGA_NAV.map((item) => (
+      {TOP_NAV.map((item) => (
         <Link
           key={item.href}
           href={item.href}

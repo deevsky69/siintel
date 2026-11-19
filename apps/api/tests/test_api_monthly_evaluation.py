@@ -17,12 +17,23 @@ from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.main import app
 from prediksi_presisi_api.models import CrimeIncident, Location, Role, User
 from prediksi_presisi_api.security.passwords import hash_password
-from prediksi_presisi_api.services import clock
+from prediksi_presisi_api.services import clock, monthly_ranking
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 PASSWORD = "KataSandiUji#2026"  # noqa: S105
 pytestmark = pytest.mark.skipif(not DATABASE_URL, reason="DATABASE_URL tidak diisi")
 MONTH = "2033-05"
+
+
+@pytest.fixture(autouse=True)
+def _peta_tiga_bulan(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Dasar usulan dipatok ke peta 3 bulan: pilihan penjaga (model atau peta) bergantung
+    pada isi basis data, sedangkan test ini memeriksa alur, bukan pemilihan metode."""
+    monkeypatch.setattr(
+        monthly_ranking,
+        "operational",
+        lambda *args, **kwargs: monthly_ranking.MethodChoice("HISTORY_3M", "uji", {}),
+    )
 
 
 @pytest.fixture
@@ -77,6 +88,7 @@ def _incident(session: Session, location: Location, day: date) -> None:
             time_known=True,
             location_id=location.location_id,
             reported_at=at + timedelta(hours=2),
+            vehicle_object=True,
             status="REPORTED",
         )
     )
@@ -95,8 +107,14 @@ def test_coverage_of_frozen_top_n_and_decision_review(client: TestClient, sessio
         _incident(session, b, date(2033, 3, 5) + timedelta(days=i * 10))
     analyst = _login(client, session, "Analis Intelkam")
     leader = _login(client, session, "Pimpinan")
+    kasat = _login(client, session, "Kasat Intelkam")
+    kbo = _login(client, session, "KBO")
     assert (
-        client.post("/api/v1/rankings/freeze", json={"month": MONTH}, headers=analyst).status_code
+        client.post(
+            "/api/v1/rankings/freeze",
+            json={"month": MONTH, "method": "HISTORY_3M"},
+            headers=analyst,
+        ).status_code
         == 200
     )
 
@@ -117,6 +135,10 @@ def test_coverage_of_frozen_top_n_and_decision_review(client: TestClient, sessio
     assert frozen["covered"] >= 4 and frozen["coverage_pct"] >= 66.0
     comparison = next(m for m in body["methods"] if m["method"] == "HISTORY_12M")
     assert comparison["frozen"] is False and comparison["top_n"] == 6
+    # Pembanding baru ikut dinilai pada N dan batas data yang sama; PAI terisi bila luas ada.
+    assert {"HISTORY_1M"} <= {m["method"] for m in body["methods"]}
+    if frozen["area_pct"] is not None:
+        assert frozen["pai"] == round((frozen["covered"] / 6) / (frozen["area_pct"] / 100), 2)
 
     # Dengan produk yang ditetapkan Pimpinan pada 1 kelurahan: cakupan keputusan = 3/6.
     base = f"/api/v1/monthly-products/{MONTH}"
@@ -136,6 +158,10 @@ def test_coverage_of_frozen_top_n_and_decision_review(client: TestClient, sessio
         ).status_code
         == 200
     )
+    assert client.post(f"{base}/kbo", json={"outcome": "ACCEPTED"}, headers=kbo).status_code == 200
+    assert (
+        client.post(f"{base}/kasat", json={"outcome": "ACCEPTED"}, headers=kasat).status_code == 200
+    )
     assert (
         client.post(
             f"{base}/decide", json={"selected": [{"kelurahan": a.kelurahan}]}, headers=leader
@@ -154,3 +180,25 @@ def test_coverage_of_frozen_top_n_and_decision_review(client: TestClient, sessio
     assert after["quality"]["reasons"][0]["reason"] == "tidak didukung"
     top1 = next(m for m in after["methods"] if m["frozen"])
     assert top1["top_n"] == 1 and top1["covered"] == 3
+
+
+def test_backtest_reports_coverage_pai_and_sign_test(client: TestClient, session: Session) -> None:
+    leader = _login(client, session, "Pimpinan")
+    response = client.get("/api/v1/evaluation/monthly/backtest?scope=VEHICLE", headers=leader)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["scope"] == "VEHICLE" and body["top_n"] == 6
+    assert "available" in body["model"]
+    for period in body["periods"]:
+        totals = {m["total"] for m in period["methods"]}
+        assert len(totals) <= 1  # semua metode dinilai pada kejadian aktual yang sama
+        for entry in period["methods"]:
+            assert 0 <= entry["covered"] <= entry["total"]
+        for check in period["sign_tests"]:
+            assert check["wins"] + check["losses"] + check["ties"] == period["months"]
+            assert check["p_value"] is None or 0 <= check["p_value"] <= 1
+    assert (
+        client.get("/api/v1/evaluation/monthly/backtest?scope=SEMUA", headers=leader).status_code
+        == 400
+    )
+    assert client.get("/api/v1/evaluation/monthly/backtest").status_code == 401

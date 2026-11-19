@@ -71,7 +71,7 @@ def test_outlook_uses_the_same_month_of_previous_years(session: Session) -> None
     hot, cold = rows[0], rows[1]
     # Maret 2097 dan Maret 2098 ramai di `hot` pukul 20; April tidak boleh ikut.
     _plant(session, hot, date(2097, 3, 10), 20, 2)
-    _plant(session, hot, date(2098, 3, 12), 19, 2)  # blok 18-21 juga
+    _plant(session, hot, date(2098, 3, 12), 21, 2)  # rentang 20-24 juga
     _plant(session, hot, date(2098, 4, 1), 20, 5)  # bulan lain
     _plant(session, cold, date(2098, 3, 3), 2, 1)
 
@@ -81,10 +81,10 @@ def test_outlook_uses_the_same_month_of_previous_years(session: Session) -> None
     curanmor = next(t for t in result["threats"] if t["threat_type"] == "CURANMOR")
     assert curanmor["basis_incidents"] == 5  # 2 + 2 + 1, tanpa April
     top = curanmor["slots"][0]
-    assert top["kelurahan"] == hot.kelurahan and top["block_label"] == "18.00-21.00"
+    assert top["kelurahan"] == hot.kelurahan and top["block_label"] == "20.00-24.00"
     assert top["incidents"] == 4
     assert "SAMAPTA" in top["recommendation"] and hot.kelurahan in top["recommendation"]
-    assert curanmor["peak_block"] == "18.00-21.00"
+    assert curanmor["peak_block"] == "20.00-24.00"
 
 
 def test_docx_export_is_a_word_document(client: TestClient, session: Session) -> None:

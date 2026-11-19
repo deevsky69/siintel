@@ -50,7 +50,7 @@ export type PatternDistribution = {
   ordering: "rank" | "natural";
   denominator: number;
   buckets: PatternBucket[];
-  /** Hanya pada sebaran jam: lebar blok (3 jam) dan kejadian tanpa jam tercatat. */
+  /** Hanya pada sebaran jam: lebar rentang (4 jam) dan kejadian tanpa jam tercatat. */
   block_hours?: number;
   unknown_time?: number;
   block_basis?: string;

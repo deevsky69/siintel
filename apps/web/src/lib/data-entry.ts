@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { apiGet, apiPost } from "./api";
 
 /**
@@ -129,7 +130,7 @@ export type TriageResult = {
   transition_basis: string;
 };
 
-export const getEntryOptions = () => apiGet<EntryOptions>("/data-entry/options");
+export const getEntryOptions = cache(() => apiGet<EntryOptions>("/data-entry/options"));
 
 /**
  * Seluruh wilayah/grid yang boleh dibaca pengguna.

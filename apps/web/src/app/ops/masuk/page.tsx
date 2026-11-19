@@ -30,7 +30,7 @@ export default function LoginPage() {
           </div>
           <h1 className="mt-4 text-[clamp(30px,4.6vw,44px)] text-white">SIGAP</h1>
           <p className="mt-2 max-w-[70ch] text-base text-[rgb(var(--warga-soft))]">
-            Sistem Inteligensi Geospasial dan Analitik Prediktif
+            Sistem Intelijen Geospasial dan Analitik Prediktif
           </p>
           <p className="mt-1 text-sm font-medium text-[rgb(var(--warga-goldl))]">
             Polres Metro Jakarta Selatan

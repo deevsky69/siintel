@@ -130,7 +130,9 @@ def test_vehicle_check_reveals_only_whether_a_report_exists(
 ) -> None:
     made = seed_dummy_case_files(session, reference=date(2026, 1, 1))
     with_plate = next(row for row in made if row.plate)
-    found = client.get("/api/v1/public/vehicles/check", params={"plat": with_plate.plate.lower()})
+    found = client.get(
+        "/api/v1/public/vehicles/check", params={"plat": str(with_plate.plate).lower()}
+    )
     assert found.status_code == 200 and found.json()["found"] is True
     record = found.json()["records"][0]
     assert set(record) == {"crime_type", "reported_month", "kecamatan", "recovered", "is_dummy"}
@@ -189,7 +191,9 @@ def test_officers_manage_case_files_within_their_jurisdiction(
         == 200
     )
     listing = client.get("/api/v1/case-files", headers=polsek).json()
-    mine = next(row for row in listing["data"] if row["lp_number"] == payload["lp_number"].upper())
+    mine = next(
+        row for row in listing["data"] if row["lp_number"] == str(payload["lp_number"]).upper()
+    )
     assert mine["dummy_pin"] is None and "reporter_pin" not in mine
 
     # Di luar wilayah: Polsek lain tidak melihat dan tidak dapat memindahkan tahapnya.

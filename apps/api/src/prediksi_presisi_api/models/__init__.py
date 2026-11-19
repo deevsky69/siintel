@@ -15,6 +15,7 @@ terdaftar pada `Base.metadata` saat Alembic membandingkan schema.
 
 from .advisory_approval import AdvisoryApproval
 from .area_review import AreaReview
+from .area_subscription import AreaSubscription
 from .audit_log import AuditLog
 from .babinkamtibmas import Babinkamtibmas
 from .bulletin import Bulletin
@@ -58,6 +59,7 @@ __all__ = [
     "COORDINATE_SOURCE_GPS",
     "AdvisoryApproval",
     "AreaReview",
+    "AreaSubscription",
     "AuditLog",
     "Babinkamtibmas",
     "Bulletin",

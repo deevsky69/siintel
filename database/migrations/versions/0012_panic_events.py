@@ -70,24 +70,40 @@ def upgrade() -> None:
         sa.Column("closed_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("closing_note", sa.Text(), nullable=True),
         sa.Column(
-            "created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.Column(
-            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.PrimaryKeyConstraint("event_id", name="pk_panic_events"),
         sa.UniqueConstraint("code", name="uq_panic_events_code"),
         sa.ForeignKeyConstraint(
-            ["location_id"], ["locations.location_id"], name="fk_panic_events_location_id", ondelete="RESTRICT"
+            ["location_id"],
+            ["locations.location_id"],
+            name="fk_panic_events_location_id",
+            ondelete="RESTRICT",
         ),
         sa.ForeignKeyConstraint(
-            ["acknowledged_by"], ["users.user_id"], name="fk_panic_events_acknowledged_by", ondelete="RESTRICT"
+            ["acknowledged_by"],
+            ["users.user_id"],
+            name="fk_panic_events_acknowledged_by",
+            ondelete="RESTRICT",
         ),
         sa.ForeignKeyConstraint(
             ["closed_by"], ["users.user_id"], name="fk_panic_events_closed_by", ondelete="RESTRICT"
         ),
-        sa.CheckConstraint("status IN ('OPEN', 'ACKNOWLEDGED', 'CLOSED')", name="panic_status_allowed"),
-        sa.CheckConstraint("(latitude IS NULL) = (longitude IS NULL)", name="panic_coordinates_paired"),
+        sa.CheckConstraint(
+            "status IN ('OPEN', 'ACKNOWLEDGED', 'CLOSED')", name="panic_status_allowed"
+        ),
+        sa.CheckConstraint(
+            "(latitude IS NULL) = (longitude IS NULL)", name="panic_coordinates_paired"
+        ),
     )
     op.create_index("ix_panic_events_status_pressed", "panic_events", ["status", "pressed_at"])
     op.create_index("ix_panic_events_location", "panic_events", ["location_id"])
@@ -106,12 +122,15 @@ def upgrade() -> None:
     bind = op.get_bind()
     for action in ("read", "acknowledge"):
         exists = bind.execute(
-            sa.text("SELECT 1 FROM permissions WHERE resource = 'panic' AND action = :a"), {"a": action}
+            sa.text("SELECT 1 FROM permissions WHERE resource = 'panic' AND action = :a"),
+            {"a": action},
         ).first()
         if exists:
             continue
         nxt = bind.execute(
-            sa.text("SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 6) AS INTEGER)), 0) + 1 FROM permissions WHERE code LIKE 'PERM-%'")
+            sa.text(
+                "SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 6) AS INTEGER)), 0) + 1 FROM permissions WHERE code LIKE 'PERM-%'"
+            )
         ).scalar_one()
         bind.execute(
             sa.text(

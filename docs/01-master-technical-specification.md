@@ -1,6 +1,6 @@
 # SIGAP
 
-> **Nama produk** (keputusan pemilik proyek 13 Oktober 2026, ditetapkan singkat **SIGAP** pada 19 Oktober 2026): **SIGAP — Sistem Inteligensi Geospasial dan Analitik Prediktif**. Sebelumnya PREDIKSI PRESISI; nama paket, repositori, dan pengenal internal tidak diubah.
+> **Nama produk** (keputusan pemilik proyek 13 Oktober 2026, ditetapkan singkat **SIGAP** pada 19 Oktober 2026): **SIGAP — Sistem Intelijen Geospasial dan Analitik Prediktif**. Sebelumnya PREDIKSI PRESISI; nama paket, repositori, dan pengenal internal tidak diubah. Sejak 17 November 2026 (penyesuaian ke naskah Taskap) kepanjangannya memakai kata **Intelijen** — sebelumnya "Inteligensi" — dan kanal masyarakat bernama **SIGAP BERSAMA** (sebelumnya SIGAP WARGA).
 ## MASTER TECHNICAL SPECIFICATION v1.0
 ### Predictive Policing & Spatial Intelligence System
 
@@ -97,15 +97,23 @@ Lima peran (keputusan pemilik proyek 10 November 2026, 1B — catatan 177; sumbe
 Menetapkan jumlah dan kelurahan prioritas beserta tindak lanjut (Kapolres / pejabat
 berwenang); menyetujui buletin dan imbauan publik.
 
-## Level 2 — (dibekukan) Kasat Intelkam
-Peran 6–10 November 2026 untuk tahap KBO dan validasi produk bulanan. Dibekukan 10 November
-2026: kedua tahap dihapus karena diklik orang yang sama berturut-turut tanpa menambah
-kontrol. Baris peran dihapus (0023) setelah pemegangnya dipindahkan ke Analis Intelkam; akun
-`demo.kasat` dikunci, bukan dihapus (jejak audit).
+## Level 2 — Kasat Intelkam
+Menelaah produk bulanan yang sudah diperiksa staf: meneruskannya ke Pimpinan, atau
+mengembalikannya ke staf dengan alasan. Tidak menyusun, tidak mengubah isi usulan, tidak
+menetapkan. Peran ini ada 6–10 November 2026, dibekukan 10–17 November 2026 (0023; tahapnya
+diklik orang yang sama berturut-turut), dan dihidupkan lagi 17 November 2026 (0026, catatan
+183) sebagai tahap telaah — sesuai naskah Taskap dan saran Kasat Intelkam.
 
-## Level 3 — Analis Intelkam
-Menyusun draf produk bulanan — peringkat bulan itu dibekukan sekaligus — memeriksanya dengan
-informasi lapangan (terima / perbaiki / tolak, dengan alasan), dan mengirimnya ke Pimpinan.
+## Level 3 — Analis Intelkam dan KBO
+**Analis Intelkam** (istilah naskah Taskap; 17–19 November 2026 bernama Staf Intelkam) menyusun
+draf produk bulanan — peringkat bulan itu dibekukan sekaligus — memeriksanya dengan informasi
+lapangan (terima / perbaiki / tolak, dengan alasan), dan mengirimnya ke KBO. **KBO** (sejak 19
+November 2026) memeriksa mutu dan kelengkapan validasi: meneruskan ke Kasat Intelkam atau
+mengembalikan ke analis dengan alasan.
+
+## Humas
+Sejak 19 November 2026: menyetujui informasi untuk masyarakat. Imbauan bulanan baru dikirim ke
+grup dan pelanggan setelah disetujui Humas.
 
 ## Level 4 — Fungsi
 Fungsi pelaksana (Samapta / Binmas / Reskrim / Lantas): membaca produk bulanan dan
@@ -115,12 +123,13 @@ mencatat kegiatan di kelurahan prioritas.
 Data dan situasi wilayahnya; mencatat kegiatan di kelurahan prioritas wilayahnya.
 
 ## Level 6 — Administrator
-Konfigurasi teknis, pengguna, pembakuan data; menyusun draf produk bulanan bila diminta.
-Tidak memeriksa, memvalidasi, menetapkan, maupun mencatat pelaksanaan.
+Konfigurasi teknis, pengguna, pembakuan data. Sejak 17 November 2026 berada di luar seluruh
+rantai produk bulanan: tidak menyusun, menelaah, menetapkan, maupun mencatat pelaksanaan.
 
 Sebelum 6 November 2026: Command Center dan Analyst dilebur ke Administrator (1 September
 2026). 6–10 November 2026 jenjang 2 dan 3 ditempati dua peran Satintelkam; sejak 10 November
-2026 hanya jenjang 3 (Analis Intelkam) yang berlaku.
+2026 hanya jenjang 3 yang berlaku; sejak 17 November 2026 jenjang 2 (Kasat Intelkam) dan 3
+(Analis Intelkam) keduanya berlaku; sejak 19 November 2026 ditambah KBO dan Humas — **delapan peran**.
 
 All important activities must be recorded in audit trail.
 
@@ -760,8 +769,12 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 | Threshold early warning & batas kelas risiko (U-01) | 9 September 2026 | `config/risk/warning-thresholds.yaml` versi `dummy-v1` |
 | Tombol darurat warga: penerima | 8 Oktober 2026 | Tombol di aplikasi warga memberi tahu Administrator (seluruh Polres), Polsek (wilayahnya), Pimpinan (baca); Polsek/Administrator yang menerima dan menutup. Migrasi 0012, permission `panic:read`/`panic:acknowledge` |
 | Navigasi web dirampingkan | 8 Oktober 2026 | Menu dan layar **Imbauan Publik** (/imbauan) dan **Dokumen Intelijen** (/intelijen) dihapus; Informasi Terbaru tinggal dua kanal (kejadian, laporan masyarakat); label versi ambang tidak dicetak di kartu peringatan/peta; pengalih tema dua keadaan. API `public_alert:publish` dan intake intelijen tetap ada — **belum ada layar penerbitan imbauan baru** (lihat gate terbuka) |
-| SIGAP WARGA — dasbor masyarakat (keputusan 1–6) | 2 November 2026 | (1) Publik melihat **angka historis per wilayah dan tingkat kerawanan kasar** saja — tanpa prediksi, skor, atau titik kejadian; sederhana. (2) Lacak laporan memakai **nomor LP** + pengaman, bukan nama/plat. (3) Berkas perkara, plat/nomor rangka, kontak Babinkamtibmas dimulai dengan **data dummy berlabel DUMMY** yang terlihat di layar. (4) Survey Rasa Aman **anonim**, moderasi dulu baru tayang, moderator Binmas/Administrator, nilai rata-rata tampil langsung. (5) Nomor Babinkamtibmas yang ditampilkan **nomor dinas** (dummy dulu), ada data per kelurahan/polsek. (6) Satu domain `sigap.awansurya.com`: warga di akar, polisi di bawah jalur `/ops` (usulan teknis). Nama: aplikasi polisi **SIGAP**, masyarakat **SIGAP WARGA**. Grup WhatsApp tidak dapat dikirimi API resmi → grup resmi di Telegram, WhatsApp perorangan ke Babin; buletin mingguan disetujui manusia sebelum terkirim |
-| Nama produk: SIGAP | 13 & 19 Oktober 2026 | Sistem Inteligensi Geospasial dan Analitik Prediktif. Diganti pada web (judul, kop, halaman masuk/muka), Android (nama aplikasi), bot, judul API, dokumen Word, modul; pengenal internal tetap. Dokumen Word perkiraan singkat disusun ulang bergaya naskah dinas (kop, bagian romawi, tabel bergaris) |
+| SIGAP BERSAMA — dasbor masyarakat (keputusan 1–6) | 2 November 2026 | (1) Publik melihat **angka historis per wilayah dan tingkat kerawanan kasar** saja — tanpa prediksi, skor, atau titik kejadian; sederhana. (2) Lacak laporan memakai **nomor LP** + pengaman, bukan nama/plat. (3) Berkas perkara, plat/nomor rangka, kontak Babinkamtibmas dimulai dengan **data dummy berlabel DUMMY** yang terlihat di layar. (4) Survey Rasa Aman **anonim**, moderasi dulu baru tayang, moderator Binmas/Administrator, nilai rata-rata tampil langsung. (5) Nomor Babinkamtibmas yang ditampilkan **nomor dinas** (dummy dulu), ada data per kelurahan/polsek. (6) Satu domain `sigap.awansurya.com`: warga di akar, polisi di bawah jalur `/ops` (usulan teknis). Nama: aplikasi polisi **SIGAP**, masyarakat **SIGAP BERSAMA**. Grup WhatsApp tidak dapat dikirimi API resmi → grup resmi di Telegram, WhatsApp perorangan ke Babin; buletin mingguan disetujui manusia sebelum terkirim |
+| Nama produk: SIGAP | 13 & 19 Oktober 2026 | Sistem Intelijen Geospasial dan Analitik Prediktif. Diganti pada web (judul, kop, halaman masuk/muka), Android (nama aplikasi), bot, judul API, dokumen Word, modul; pengenal internal tetap. Dokumen Word perkiraan singkat disusun ulang bergaya naskah dinas (kop, bagian romawi, tabel bergaris) |
+| Penyesuaian ke naskah Taskap | 17 November 2026 | Butir 1, 3, 9, 10 audit naskah–aplikasi: (1) peringkat bulanan memakai **model gradient boosting** untuk kelompok berobjek kendaraan, dengan penjaga "model hanya bila lebih tepat daripada peta" — menggantikan keputusan 2A; (3) pembanding bulan sebelumnya dan peta tahunan tetap, **PAI**, uji historis, **uji tanda**; (9) "Intelijen" dan **SIGAP BERSAMA**; (10) langganan imbauan per warga, panduan pengamanan, hasil survei per triwulan. Angka uji pada naskah mengikuti hasil aplikasi. Catatan 181, 182. Belum diputuskan: rentang jam 4 jam, rantai Kasat Intelkam, rekomendasi per tempat kejadian, Modul 1, persetujuan Humas |
+| **Produk bulanan tiga tahap** | 17 November 2026 | Pilihan A pemilik proyek atas saran Kasat Intelkam ("Staf – Kasat – Pimpinan; staf/KBO sama saja"), sejalan dengan naskah Taskap: **Staf Intelkam** (nama baru Analis Intelkam) menyusun dan memeriksa → **Kasat Intelkam** menelaah (meneruskan atau mengembalikan dengan alasan; tidak mengubah isi) → **Pimpinan** menetapkan. Administrator kehilangan `monthly_product:draft`. Enam peran. Membalik keputusan 1B 10 November 2026. Migrasi 0026, catatan 183 |
+| **Rentang jam, tempat kejadian, Mutu Data** | 18 November 2026 | Butir 4, 6, 7 audit naskah–aplikasi: jam disajikan dalam **enam rentang 4 jam** (membalik blok 3 jam 30 September 2026); alternatif rekomendasi dan pelaksana mengikuti **jenis tempat kejadian** terbanyak (Tabel 13 naskah); layar **Mutu Data** kembali ke menu dengan kelengkapan, penandaan isian, dan **pencocokan laporan warga dengan kejadian resmi** berkeputusan petugas dan alasan wajib (0027). Catatan 184. Persetujuan Humas (butir 8): diputuskan 18 November 2026 **tidak ada peran Humas** — informasi publik tetap disetujui Pimpinan atau terbit otomatis; naskah yang disesuaikan |
+| **Disamakan dengan Taskap final** | 19 November 2026 | Keputusan pemilik proyek setelah matriks perbandingan dengan `TASKAP_FINISH.docx` ("samakan untuk hal-hal yang beda"): (a) **model** mengikuti Lampiran 8 E — HistGradientBoosting Poisson, 9.750 baris berbobot, horizon 1–12 — hasil 2025 sama dengan naskah per bulan (catatan 185); (b) **IKW** = 25 × (0,50 F + 0,35 D + 0,15 T) dengan isian dampak dan status lengkap/sementara/ditahan (0028); (c) **rantai empat tahap** Analis → KBO → Kasat → Pimpinan, peran KBO baru, Staf Intelkam kembali bernama Analis Intelkam — membalik tiga tahap 17 November; (d) peran **Humas** menyetujui imbauan bulanan sebelum dikirim — membalik keputusan 18 November (0029, catatan 186). Delapan peran |
 | Administrator ikut memutuskan rekomendasi | 9 Oktober 2026 | `commander_decision:approve` diberikan kepada Administrator (migrasi 0014), membalik pemisahan 1 September 2026. Pertanggungjawaban kini bertumpu pada jejak audit per keputusan, bukan pemisahan peran. `evaluation:run` dan `public_alert:publish` tetap hanya Pimpinan |
 | Mengubah status laporan hanya Administrator | 9 Oktober 2026 | Permission baru `citizen_report:triage` dan `crime:triage` (0014), hanya Administrator. Polsek/Fungsi tetap mencatat (`*:write`) tetapi tidak mengubah status; antrean "laporan belum diverifikasi" dan tombol triase mengikuti permission baru |
 | Sorotan notifikasi mendesak | 9 Oktober 2026 | Darurat selalu berkedip; laporan masyarakat berkategori **Tawuran dan Perkelahian Kelompok** dan **Kejahatan Jalanan** (begal) disorot — daftar kategori satu sumber di `config/taxonomy/mappings.yaml` (`citizen_report_urgent_categories`). Fungsi tidak memegang `panic:read`/`citizen_report:triage` sehingga tidak menerima keduanya |
@@ -782,7 +795,8 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 | Jenis ancaman | 30 September 2026 | Mengikuti klasifikasi Laporan Polisi: **CURANMOR, CURAT, CURAS**. Bobot `pusiknas-2026-10-01` = angka U-02 utuh dengan `applies_to` tiga jenis; tujuh jenis rancangan sintetis dinyatakan `outside_scope` |
 | Jendela waktu | 30 September 2026 | Prediksi tetap **6 jam**; analitik menampilkan jam dalam **blok 3 jam** |
 | Taksonomi v2 (U-16) | 1 Oktober 2026 | `taksonomi-2026-10-01`: domain `data_group` dan `report_source` ditambahkan; nilai lama tidak berubah |
-| **Desain SIGAP WARGA mengikuti mockup pemilik proyek** | 10 November 2026 | Berkas "SIGAP-main.zip" (kanvas desain: Beranda, Peta, Survey, Lacak, Lapor; `sigap-login-petugas.html`; dua varian peta 3D) diterapkan pada sisi warga dan halaman masuk petugas (catatan 178): tema terang navy/emas, Inter + Manrope, sudut persegi; data, API, dan batas informasi publik tidak berubah. **Tidak dibangun, menunggu keputusan**: (a) blok "Kontak pelapor" (nama, HP) pada formulir Lapor — bertentangan dengan U-13 (laporan tanpa identitas); (b) peta 3D (maplibre dengan tile luar / three.js) — sumber tile produksi masih terbuka (U-15); (c) nomor LP + PIN sebagai hasil Lapor — LP lahir dari pencatatan petugas, laporan web tetap memberi nomor tiket |
+| **Menu /ops diringkas 20 → 14 submenu** | 12 November 2026 | Keputusan pemilik proyek **A** atas analisis birokrasi /ops (catatan 179): Wilayah Rawan, Pola, Peringkat, Input Data, Pembakuan, Pengaturan Sistem keluar dari menu — Pola tab di Analitik, Peringkat tab di Produk Bulanan, Input dan Pembakuan tab di Laporan Petugas, selebihnya hanya alamat. Peta /ops dan beranda membuka lapisan **historis** dan menggarisi emas kelurahan prioritas bulan ini (produk bulanan DECIDED); lapisan risiko berjalan/prediktif hanya lewat `?layer=`. `GET /notifications` tidak lagi memuat kelompok rantai harian; menambah `MONTHLY_PRODUCT` dan `BULLETIN`. Tidak ada perubahan basis data |
+| **Desain SIGAP BERSAMA mengikuti mockup pemilik proyek** | 10 November 2026 | Berkas "SIGAP-main.zip" (kanvas desain: Beranda, Peta, Survey, Lacak, Lapor; `sigap-login-petugas.html`; dua varian peta 3D) diterapkan pada sisi warga dan halaman masuk petugas (catatan 178): tema terang navy/emas, Inter + Manrope, sudut persegi; data, API, dan batas informasi publik tidak berubah. **Tidak dibangun, menunggu keputusan**: (a) blok "Kontak pelapor" (nama, HP) pada formulir Lapor — bertentangan dengan U-13 (laporan tanpa identitas); (b) peta 3D (maplibre dengan tile luar / three.js) — sumber tile produksi masih terbuka (U-15); (c) nomor LP + PIN sebagai hasil Lapor — LP lahir dari pencatatan petugas, laporan web tetap memberi nomor tiket |
 | **Imbauan bulanan warga kembali otomatis; perintah bot `/info`** | 10 November 2026 | Pemilik proyek **mencabut 3A** (6 November 2026): imbauan ke grup WhatsApp warga dikirim bot setiap awal bulan **tanpa persetujuan Pimpinan**, dan `/info` (alias lama `/rekomendasi`, `/imbauan`) membalas imbauan bulan depan kapan saja. Endpoint `/advisories/approvals` dihapus, diganti `GET /advisories/preview` (pratinjau di Warga → Buletin & Imbauan); tabel `advisory_approvals` (0022) dibiarkan, tidak dibaca |
 | **Alur /ops diringkas** | 10 November 2026 | Keputusan pemilik proyek atas analisis birokrasi /ops (catatan 177): **1B** produk bulanan dua tahap — Analis menyusun (peringkat dibekukan otomatis) & memeriksa → Pimpinan menetapkan; tahap KBO/validasi dan peran **Kasat Intelkam dibekukan** (migrasi 0023: permission `monthly_product:review/validate` dihapus, akun `demo.kasat` dikunci, peran dihapus setelah pemegangnya dipindah ke Analis Intelkam) — kembali **lima peran**. **2.i** beranda menjadi papan "Bulan ini" per peran; **2.ii** Rencana Patroli keluar dari menu, perkiraan bulan sasaran menjadi lampiran Produk Bulanan tanpa persetujuan sendiri; **2.iii** buletin mingguan dan imbauan bulanan satu antrean persetujuan. Endpoint `/monthly-products/{month}/kbo` dan `/kasat` dihapus |
 | **Mekanisme dan Fungsi SIGAP menjadi acuan** | 6 November 2026 | Dokumen "Mekanisme dan Fungsi SIGAP" (lima modul, siklus bulanan, peringkat 65 kelurahan, empat tahap validasi, evaluasi cakupan) **menggantikan** keputusan harian sebelumnya. Keputusan pemilik proyek: (1B) enam peran — Pimpinan, Kasat Intelkam, Analis Intelkam, Fungsi, Polsek, Administrator; pemeriksaan KBO dicatat sebagai tahap, imbauan publik oleh Pimpinan; (2A) peringkat bulanan dimulai dari peta 3 bulan terakhir, model menyusul setelah diuji; (3A) imbauan bulanan ke grup warga perlu persetujuan sebelum terkirim. Menu dan teks layar diringkas. Tahapan: catatan 176. Modul 1 selesai 6 November 2026 (migrasi 0019) |

@@ -56,11 +56,15 @@ def upgrade() -> None:
         )
     )
     bind.execute(
-        sa.text("DELETE FROM permissions WHERE resource = 'monthly_product' AND action IN ('review', 'validate')")
+        sa.text(
+            "DELETE FROM permissions WHERE resource = 'monthly_product' AND action IN ('review', 'validate')"
+        )
     )
     # 2. Kunci akun peragaan Kasat (tetap ada demi jejak audit).
     bind.execute(
-        sa.text("UPDATE users SET password_hash = '!', status = 'INACTIVE', updated_at = now() WHERE username = :u"),
+        sa.text(
+            "UPDATE users SET password_hash = '!', status = 'INACTIVE', updated_at = now() WHERE username = :u"
+        ),
         {"u": LOCKED_USER},
     )
     # 3. Pindahkan seluruh pemegang peran Kasat ke Analis Intelkam, lalu hapus perannya.
@@ -105,11 +109,20 @@ def downgrade() -> None:
         {"code": code, "u": LOCKED_USER},
     )
     for (resource, action), description in RETIRED_PERMISSIONS.items():
-        if bind.execute(sa.text("SELECT 1 FROM permissions WHERE resource = :r AND action = :a"), {"r": resource, "a": action}).first():
+        if bind.execute(
+            sa.text("SELECT 1 FROM permissions WHERE resource = :r AND action = :a"),
+            {"r": resource, "a": action},
+        ).first():
             continue
-        nxt = bind.execute(sa.text("SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 6) AS INTEGER)), 0) + 1 FROM permissions WHERE code LIKE 'PERM-%'")).scalar_one()
+        nxt = bind.execute(
+            sa.text(
+                "SELECT COALESCE(MAX(CAST(SUBSTRING(code FROM 6) AS INTEGER)), 0) + 1 FROM permissions WHERE code LIKE 'PERM-%'"
+            )
+        ).scalar_one()
         bind.execute(
-            sa.text("INSERT INTO permissions (permission_id, code, resource, action, description, created_at, updated_at) VALUES (gen_random_uuid(), :code, :r, :a, :d, now(), now())"),
+            sa.text(
+                "INSERT INTO permissions (permission_id, code, resource, action, description, created_at, updated_at) VALUES (gen_random_uuid(), :code, :r, :a, :d, now(), now())"
+            ),
             {"code": f"PERM-{int(nxt):03d}", "r": resource, "a": action, "d": description},
         )
     grants = {

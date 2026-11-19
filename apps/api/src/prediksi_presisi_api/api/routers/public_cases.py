@@ -1,4 +1,4 @@
-"""SIGAP WARGA — lacak laporan dan cek kendaraan. **Tanpa autentikasi.**
+"""SIGAP BERSAMA — lacak laporan dan cek kendaraan. **Tanpa autentikasi.**
 
 ```text
 GET /public/cases/track?lp=…&pin=…               tahap perkara milik pelapor (nomor LP + PIN)

@@ -37,7 +37,12 @@ GRANTS = {
 def upgrade() -> None:
     op.create_table(
         "case_files",
-        sa.Column("case_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "case_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("lp_number", sa.String(80), nullable=False),
         sa.Column("crime_type", sa.String(50), nullable=False),
         sa.Column("location_id", postgresql.UUID(as_uuid=True), nullable=False),
@@ -50,17 +55,39 @@ def upgrade() -> None:
         sa.Column("vehicle_vin", sa.String(30), nullable=True),
         sa.Column("vehicle_engine", sa.String(30), nullable=True),
         sa.Column("vehicle_desc", sa.String(120), nullable=True),
-        sa.Column("vehicle_recovered", sa.Boolean(), server_default=sa.text("false"), nullable=False),
+        sa.Column(
+            "vehicle_recovered", sa.Boolean(), server_default=sa.text("false"), nullable=False
+        ),
         sa.Column("reporter_pin_hash", sa.String(64), nullable=False),
         sa.Column("is_dummy", sa.Boolean(), server_default=sa.text("false"), nullable=False),
         sa.Column("dummy_pin", sa.String(4), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
         sa.PrimaryKeyConstraint("case_id", name="pk_case_files"),
         sa.UniqueConstraint("lp_number", name="uq_case_files_lp_number"),
-        sa.ForeignKeyConstraint(["location_id"], ["locations.location_id"], name="fk_case_files_location_id", ondelete="RESTRICT"),
-        sa.CheckConstraint("stage IN ('DITERIMA', 'LIDIK', 'SIDIK', 'P21', 'SP3', 'SELESAI')", name="case_stage_allowed"),
-        sa.CheckConstraint("crime_type IN ('CURANMOR', 'CURAT', 'CURAS')", name="case_crime_type_allowed"),
+        sa.ForeignKeyConstraint(
+            ["location_id"],
+            ["locations.location_id"],
+            name="fk_case_files_location_id",
+            ondelete="RESTRICT",
+        ),
+        sa.CheckConstraint(
+            "stage IN ('DITERIMA', 'LIDIK', 'SIDIK', 'P21', 'SP3', 'SELESAI')",
+            name="case_stage_allowed",
+        ),
+        sa.CheckConstraint(
+            "crime_type IN ('CURANMOR', 'CURAT', 'CURAS')", name="case_crime_type_allowed"
+        ),
         sa.CheckConstraint("is_dummy OR dummy_pin IS NULL", name="case_dummy_pin_only_for_dummy"),
     )
     op.create_index("ix_case_files_location", "case_files", ["location_id"])
@@ -73,16 +100,34 @@ def upgrade() -> None:
     )
     op.create_table(
         "case_file_stages",
-        sa.Column("stage_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "stage_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("case_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("stage", sa.String(20), nullable=False),
         sa.Column("changed_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("note", sa.String(300), nullable=True),
         sa.Column("changed_by", postgresql.UUID(as_uuid=True), nullable=True),
         sa.PrimaryKeyConstraint("stage_id", name="pk_case_file_stages"),
-        sa.ForeignKeyConstraint(["case_id"], ["case_files.case_id"], name="fk_case_file_stages_case_id", ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["changed_by"], ["users.user_id"], name="fk_case_file_stages_changed_by", ondelete="RESTRICT"),
-        sa.CheckConstraint("stage IN ('DITERIMA', 'LIDIK', 'SIDIK', 'P21', 'SP3', 'SELESAI')", name="case_stage_history_allowed"),
+        sa.ForeignKeyConstraint(
+            ["case_id"],
+            ["case_files.case_id"],
+            name="fk_case_file_stages_case_id",
+            ondelete="CASCADE",
+        ),
+        sa.ForeignKeyConstraint(
+            ["changed_by"],
+            ["users.user_id"],
+            name="fk_case_file_stages_changed_by",
+            ondelete="RESTRICT",
+        ),
+        sa.CheckConstraint(
+            "stage IN ('DITERIMA', 'LIDIK', 'SIDIK', 'P21', 'SP3', 'SELESAI')",
+            name="case_stage_history_allowed",
+        ),
     )
     op.create_index("ix_case_file_stages_case", "case_file_stages", ["case_id", "changed_at"])
     op.create_index("ix_case_file_stages_changed_by", "case_file_stages", ["changed_by"])
@@ -140,6 +185,11 @@ def downgrade() -> None:
     op.execute("DROP INDEX IF EXISTS ix_case_file_stages_case")
     op.drop_table("case_file_stages")
     op.execute("DROP TRIGGER IF EXISTS trg_case_files_set_updated_at ON case_files")
-    for name in ("ix_case_files_stage", "ix_case_files_vin", "ix_case_files_plate", "ix_case_files_location"):
+    for name in (
+        "ix_case_files_stage",
+        "ix_case_files_vin",
+        "ix_case_files_plate",
+        "ix_case_files_location",
+    ):
         op.execute(f"DROP INDEX IF EXISTS {name}")
     op.drop_table("case_files")

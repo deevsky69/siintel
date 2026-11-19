@@ -16,15 +16,26 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.main import app
-from prediksi_presisi_api.models import CrimeIncident, Location, MonthlyProduct, Role, User
+from prediksi_presisi_api.models import CrimeIncident, Location, Role, User
 from prediksi_presisi_api.security.passwords import hash_password
-from prediksi_presisi_api.services import clock
+from prediksi_presisi_api.services import clock, monthly_ranking
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 PASSWORD = "KataSandiUji#2026"  # noqa: S105
 pytestmark = pytest.mark.skipif(not DATABASE_URL, reason="DATABASE_URL tidak diisi")
 MONTH = "2032-03"
 BASE = "/api/v1/monthly-products"
+
+
+@pytest.fixture(autouse=True)
+def _peta_tiga_bulan(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Dasar usulan dipatok ke peta 3 bulan: pilihan penjaga (model atau peta) bergantung
+    pada isi basis data, sedangkan test ini memeriksa alur, bukan pemilihan metode."""
+    monkeypatch.setattr(
+        monthly_ranking,
+        "operational",
+        lambda *args, **kwargs: monthly_ranking.MethodChoice("HISTORY_3M", "uji", {}),
+    )
 
 
 @pytest.fixture
@@ -88,6 +99,8 @@ def _seed(session: Session) -> Location:
                 location_id=area.location_id,
                 reported_at=datetime.combine(day, time(23, 0), tzinfo=clock.JAKARTA),
                 vehicle_object=True,
+                # Empat di kos, satu tanpa tempat tercatat → tempat terbanyak: kos.
+                location_type="Kost" if i < 4 else None,
                 status="REPORTED",
             )
         )
@@ -103,12 +116,16 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     area = _seed(session)
     admin = _login(client, session, "Administrator")
     analyst = _login(client, session, "Analis Intelkam")
+    kbo = _login(client, session, "KBO")
+    kasat = _login(client, session, "Kasat Intelkam")
     leader = _login(client, session, "Pimpinan")
     polsek_in = _login(client, session, "Polsek", polsek=area.polsek)
 
-    # Peran Kasat Intelkam tidak ada lagi (0023); Pimpinan tidak menyusun draf.
-    assert session.scalar(select(Role).where(Role.role_name == "Kasat Intelkam")) is None
+    # Tiga tahap (17 November 2026): hanya Staf Intelkam yang menyusun — bukan Pimpinan,
+    # bukan Kasat, dan bukan lagi Administrator (rantai tidak dapat dilewati lewat admin).
     assert client.post(BASE, json={"month": MONTH}, headers=leader).status_code == 403
+    assert client.post(BASE, json={"month": MONTH}, headers=kasat).status_code == 403
+    assert client.post(BASE, json={"month": MONTH}, headers=admin).status_code == 403
 
     # "Susun" membekukan peringkat bulan itu sekaligus — tidak ada langkah terpisah.
     assert client.get(f"/api/v1/rankings?month={MONTH}", headers=analyst).json()["frozen"] is False
@@ -120,10 +137,34 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     assert client.get(f"/api/v1/rankings?month={MONTH}", headers=analyst).json()["frozen"] is True
     assert body["items"][0]["kelurahan"] == area.kelurahan
     assert body["items"][0]["pattern"]["dominant_threat"] == "CURANMOR"
-    assert body["items"][0]["pattern"]["peak_block_label"] == "21.00-24.00"
-    assert client.post(BASE, json={"month": MONTH}, headers=admin).status_code == 409
+    assert body["items"][0]["pattern"]["peak_block_label"] == "20.00-24.00"
+    # Rentang jam per jenis, dengan jumlah laporan berjam dan tanpa jam (naskah Bab IV).
+    first = body["items"][0]
+    assert first["pattern"]["peaks_by_threat"]["CURANMOR"] == {
+        "block_start": 20,
+        "block_label": "20.00-24.00",
+        "count": 5,
+        "with_time": 5,
+        "unknown_time": 0,
+    }
+    # Rekomendasi menurut tempat kejadian (naskah Tabel 13): kos → Binmas, pengelola.
+    assert first["pattern"]["dominant_place"] == "kos" and first["pattern"]["places"] == {"kos": 4}
+    assert first["proposed_function"] == "BINMAS"
+    assert "pengelola atau pemilik" in first["proposal_text"]
+    assert "4 dari 5 laporan" in first["proposal_text"]
+    assert "Pelaksana: Binmas, Polsek" in first["proposal_text"]
+    assert "5 dari 5 laporan berjam; 0 tanpa jam" in first["proposal_text"]
+    # Kelurahan tanpa tempat tercatat memakai aturan per jenis ancaman, bukan mengarang tempat.
+    plain = body["items"][-1]
+    assert (
+        plain["pattern"]["dominant_place"] is None
+        and "Tempat terbanyak" not in plain["proposal_text"]
+    )
+    assert client.post(BASE, json={"month": MONTH}, headers=analyst).status_code == 409
+    # Kasat belum dapat menelaah draf yang belum dikirim staf.
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
 
-    # Analis: tolak tanpa alasan ditolak; dengan alasan diterima → langsung menunggu Pimpinan.
+    # Staf: tolak tanpa alasan ditolak; dengan alasan diterima → menunggu telaah Kasat.
     second = body["items"][1]["kelurahan"]
     bad = _post(
         client, "analyst", {"items": [{"kelurahan": second, "status": "REJECTED"}]}, analyst
@@ -152,16 +193,53 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     )
     assert reviewed.status_code == 200, reviewed.text
     assert reviewed.json()["status"] == "ANALYST_REVIEWED"
-    assert reviewed.json()["next_stage"] == "PIMPINAN"
-    assert reviewed.json()["awaiting_decision"] is True
+    assert reviewed.json()["next_stage"] == "KBO"
+    assert reviewed.json()["awaiting_kbo"] is True
+    assert reviewed.json()["awaiting_review"] is False
+    assert reviewed.json()["awaiting_decision"] is False
     assert reviewed.json()["items"][1]["analyst_status"] == "REJECTED"
 
-    # Tahap KBO dan Kasat tidak ada lagi.
-    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, analyst).status_code == 404
-    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, leader).status_code == 404
+    # Empat tahap (19 November 2026): KBO memeriksa mutu sebelum Kasat menelaah. Kasat belum
+    # dapat menelaah, dan hanya KBO yang memeriksa — bukan analis yang menulisnya.
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
+    for other_role in (analyst, kasat, leader, admin):
+        assert _post(client, "kbo", {"outcome": "ACCEPTED"}, other_role).status_code == 403
+    assert _post(client, "kbo", {"outcome": "REJECTED"}, kbo).status_code == 400
+    checked = _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo)
+    assert checked.status_code == 200, checked.text
+    assert checked.json()["status"] == "KBO_CHECKED" and checked.json()["next_stage"] == "KASAT"
+    assert checked.json()["awaiting_review"] is True
 
-    # Pimpinan menetapkan: yang ditolak analis tidak dapat dipilih; Admin dan Analis tidak boleh.
     pick = {"selected": [{"kelurahan": area.kelurahan}]}
+    # Pimpinan belum dapat menetapkan sebelum Kasat menelaah.
+    assert _post(client, "decide", pick, leader).status_code == 409
+    # Telaah hanya oleh Kasat Intelkam — bukan staf yang menulisnya, bukan Pimpinan, bukan admin.
+    for other_role in (analyst, kbo, leader, admin):
+        assert _post(client, "kasat", {"outcome": "ACCEPTED"}, other_role).status_code == 403
+    # Mengembalikan tanpa alasan ditolak; dengan alasan produk kembali menjadi draf staf.
+    assert _post(client, "kasat", {"outcome": "REJECTED"}, kasat).status_code == 400
+    assert _post(client, "kasat", {"outcome": "SETUJU"}, kasat).status_code == 400
+    returned = _post(
+        client, "kasat", {"outcome": "REJECTED", "reason": "lengkapi dasar lapangan"}, kasat
+    )
+    assert returned.status_code == 200, returned.text
+    assert returned.json()["status"] == "DRAFT" and returned.json()["next_stage"] == "ANALYST"
+    assert _post(client, "decide", pick, leader).status_code == 409
+    # Staf mengirim ulang; pemeriksaan sebelumnya tetap tersimpan.
+    resent = _post(client, "analyst", {"items": [], "note": "dasar dilengkapi"}, analyst)
+    assert resent.status_code == 200, resent.text
+    assert resent.json()["items"][1]["analyst_status"] == "REJECTED"
+    # Setelah dikembalikan, produk melewati KBO lagi sebelum sampai ke Kasat.
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
+    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo).status_code == 200
+    passed = _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat)
+    assert passed.status_code == 200, passed.text
+    assert passed.json()["status"] == "VALIDATED" and passed.json()["next_stage"] == "PIMPINAN"
+    assert passed.json()["awaiting_decision"] is True
+    # Kasat menelaah, tidak menetapkan.
+    assert _post(client, "decide", pick, kasat).status_code == 403
+
+    # Pimpinan menetapkan: yang ditolak staf tidak dapat dipilih; Admin dan staf tidak boleh.
     assert _post(client, "decide", pick, admin).status_code == 403
     assert _post(client, "decide", pick, analyst).status_code == 403
     assert _post(client, "decide", {"selected": [{"kelurahan": second}]}, leader).status_code == 400
@@ -179,7 +257,7 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     chosen = decided.json()["items"][0]
     assert chosen["selected"] is True and chosen["decided_action"].startswith("Patroli")
     stages = [s["stage"] for s in decided.json()["stages"]]
-    assert stages == ["ANALYST", "PIMPINAN"]
+    assert stages == ["ANALYST", "KBO", "KASAT", "ANALYST", "KBO", "KASAT", "PIMPINAN"]
 
     # Pelaksanaan: Polsek wilayah mencatat; Polsek lain 404; bukan prioritas 404.
     action = {
@@ -202,20 +280,19 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     assert MONTH in months
 
 
-def test_product_left_in_a_retired_status_can_still_be_decided(
-    client: TestClient, session: Session
-) -> None:
-    """Produk yang tertahan di KBO_CHECKED/VALIDATED (alur lama) tidak boleh terkunci."""
-    area = _seed(session)
+def test_kbo_can_return_a_product_to_the_analyst(client: TestClient, session: Session) -> None:
+    """KBO mengembalikan dengan alasan; produk kembali menjadi draf analis."""
+    _seed(session)
     analyst = _login(client, session, "Analis Intelkam")
-    leader = _login(client, session, "Pimpinan")
+    kbo = _login(client, session, "KBO")
     assert client.post(BASE, json={"month": MONTH}, headers=analyst).status_code == 201
-    product = session.scalar(select(MonthlyProduct))
-    assert product is not None
-    product.status = "VALIDATED"
-    session.flush()
-    shown = client.get(f"{BASE}/{MONTH}", headers=leader).json()
-    assert shown["awaiting_decision"] is True and shown["next_stage"] == "PIMPINAN"
-    decided = _post(client, "decide", {"selected": [{"kelurahan": area.kelurahan}]}, leader)
-    assert decided.status_code == 200, decided.text
-    assert decided.json()["status"] == "DECIDED"
+    # Draf yang belum dikirim analis belum dapat diperiksa KBO.
+    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo).status_code == 409
+    assert _post(client, "analyst", {"items": []}, analyst).status_code == 200
+    returned = _post(
+        client, "kbo", {"outcome": "REJECTED", "reason": "validasi belum lengkap"}, kbo
+    )
+    assert returned.status_code == 200, returned.text
+    assert returned.json()["status"] == "DRAFT" and returned.json()["next_stage"] == "ANALYST"
+    last = returned.json()["stages"][-1]
+    assert last["stage"] == "KBO" and last["reason"] == "validasi belum lengkap"

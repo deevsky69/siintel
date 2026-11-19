@@ -206,14 +206,17 @@ def _load_rbac(path: Path | None = None) -> dict[str, Any]:
 def seed_permissions(session: Session, summary: SeedSummary, path: Path | None = None) -> None:
     """Memuat katalog `resource:action` dari config/rbac, bukan dari data dummy."""
     catalog = _load_rbac(path)["permissions"]
-    existing = {
-        (resource, action)
-        for resource, action in session.execute(
-            select(Permission.resource, Permission.action)
-        ).all()
-    }
+    rows = session.execute(select(Permission.resource, Permission.action, Permission.code)).all()
+    existing = {(resource, action) for resource, action, _ in rows}
     inserted = 0
-    index = len(existing)
+    # Kode berikutnya = suffix numerik terbesar + 1, bukan jumlah baris: migrasi 0012–0023
+    # juga menyisipkan permission dengan pola MAX+1, sehingga jumlah baris dan kode
+    # tertinggi tidak lagi sama. Memakai jumlah baris menabrak `uq_permissions_code`
+    # (CI merah sejak 6 November 2026).
+    index = max(
+        (int(code[5:]) for _, _, code in rows if code.startswith("PERM-") and code[5:].isdigit()),
+        default=0,
+    )
 
     for resource, actions in catalog.items():
         for action in actions:

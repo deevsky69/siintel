@@ -79,7 +79,8 @@ export const getRecommendations = () =>
 
 export const getDecisions = () => apiGet<{ data: DecisionRow[] }>("/commander-decisions");
 
-export const getProfile = () => apiGet<Profile>("/auth/me");
+// Satu sumber ber-cache(): lihat lib/dashboard.ts.
+export { getProfile } from "./dashboard";
 
 /** Mengirim keputusan. Kewenangan tetap diperiksa backend — lihat `routers/decisions.py`. */
 export const submitDecision = (

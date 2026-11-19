@@ -16,15 +16,108 @@ Polres Metro Jakarta Selatan
 
 ---
 
-## 0. DUA WAJAH SATU DOMAIN — SIGAP WARGA DAN SIGAP (2 November 2026)
+## 0. DUA WAJAH SATU DOMAIN — SIGAP BERSAMA DAN SIGAP (2 November 2026)
 
 | Alamat | Untuk siapa | Isi |
 |---|---|---|
-| `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP WARGA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
+| `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
-**Rupa baru SIGAP WARGA (10 November 2026).** Sisi warga memakai desain yang diserahkan
-pemilik proyek (mockup "SIGAP WARGA Redesign", catatan 178): kanvas terang, kepala putih
+**Disamakan dengan naskah Taskap final (19 November 2026, catatan 185–186).**
+
+- **Model AI** kini mengikuti resep Lampiran 8 E naskah. Pada layar Evaluasi, hasil 2025 sama
+  dengan naskah tiap bulan (190 dari 634); untuk Januari–Agustus 2026 aplikasi menghitung 83
+  dari 483, naskah 86 — selisih ini menunggu buku kerja replikasi asli. Panel uji historis
+  mendapat tabel **skenario tetap** dan pilihan **4, 6, atau 8 kelurahan**. Kolom *Alasan
+  model* kini berupa persen (masukan itu menaikkan atau menurunkan perkiraan sekian persen).
+- **IKW berumus baru:** 25 × (0,50 F + 0,35 D + 0,15 T) — frekuensi 12 bulan (kuartil),
+  **dampak** tertinggi yang terverifikasi dalam tiga bulan, dan keberulangan dalam empat bulan.
+  Dampak diisi di **Data → Mutu Data → Dampak belum terverifikasi**: pilih kerugian, cedera,
+  status, dan **tulis rujukan sumbernya**. Selama dampak laporan tiga bulan terakhir di sebuah
+  kelurahan belum terverifikasi, kolom IKW menampilkan **ditahan**; bila baru sebagian, angkanya
+  diberi tanda * (sementara).
+- **Produk bulanan empat tahap:** Analis Intelkam menyusun dan memeriksa → **KBO memeriksa
+  mutu** → Kasat Intelkam menelaah → Pimpinan menetapkan. KBO dan Kasat meneruskan atau
+  mengembalikan dengan alasan, tanpa mengubah isi. Peran Staf Intelkam kembali bernama
+  **Analis Intelkam**; akun peragaan baru `demo.kbo`.
+- **Humas menyetujui imbauan bulanan.** Di **Warga → Buletin & Imbauan**, akun Humas
+  (`demo.humas`) menekan *Setujui imbauan*; sebelum itu bot tidak mengirim imbauan ke grup
+  maupun pelanggan. Buletin mingguan tetap disetujui Pimpinan.
+- Peran menjadi **delapan**. Kedelapan akun peragaan diberi kata sandi lewat
+  `scripts/sandi-peragaan-produksi.sh`.
+
+**Rentang jam, rekomendasi menurut tempat, dan Mutu Data (18 November 2026, catatan 184).**
+
+- **Jam disajikan dalam enam rentang empat jam** mulai 00.00 WIB (00–04, 04–08, 08–12, 12–16,
+  16–20, 20–24), sesuai naskah — menggantikan blok 3 jam. Berlaku di Analitik, Pola, lampiran
+  jam rawan, produk bulanan, dan panduan warga.
+- **Usulan produk bulanan mengikuti tempat kejadian.** Untuk tiap kelurahan, sistem melihat
+  jenis tempat yang paling banyak tercatat lalu mengusulkan langkah dan pelaksananya: rumah
+  tinggal → siskamling dan kunci ganda lewat Bhabinkamtibmas; kos/kontrakan → koordinasi
+  parkir penghuni (Binmas, Polsek); jalan dan perparkiran → kewaspadaan dan pengamanan parkir
+  (Samapta, Polsek); niaga dan perkantoran → koordinasi dengan pengelola gedung (Binmas,
+  Polsek). Usulan menyebut jenis ancaman, rentang jam beserta jumlah laporan berjam dan tanpa
+  jam, tempat terbanyak, dan dasar datanya. Usulan disusun aturan, bukan model bahasa; staf,
+  Kasat, dan Pimpinan tetap yang menilai.
+- **Menu Data → Mutu Data** (Administrator). Empat bagian: (1) *Kelengkapan dan hitungan* —
+  persen isian yang terisi, isian yang ditandai untuk diperiksa, dan hitungan kejadian resmi,
+  laporan warga tertaut, kejadian tambahan terverifikasi, serta yang masih menunggu; (2)
+  *Laporan warga dan kejadian resmi* — untuk tiap laporan warga yang sudah diverifikasi,
+  pilih kejadian padanannya atau "tidak ada padanan resmi", **isi alasan**, lalu simpan; yang
+  ditautkan tidak menambah hitungan, yang tanpa padanan menjadi kejadian tambahan; (3)
+  *Kelurahan belum pasti*; (4) *Dugaan laporan ganda* — kini **alasan wajib**. Sistem hanya
+  menandai dan mengusulkan dengan aturan tertulis; tidak ada isian yang diubah otomatis.
+
+**Produk bulanan tiga tahap (17 November 2026, catatan 183).** Atas saran Kasat Intelkam dan
+sejalan dengan naskah Taskap, rantainya menjadi **Staf → Kasat → Pimpinan**:
+
+1. **Staf Intelkam** (nama baru peran Analis Intelkam; staf dan KBO dianggap satu) menyusun
+   draf, memeriksa tiap usulan, lalu menekan *Kirim ke Kasat Intelkam*.
+2. **Kasat Intelkam** menelaah: *Teruskan ke Pimpinan*, atau *Kembalikan ke staf* dengan alasan
+   (wajib). Ia tidak mengubah isi usulan; bila dikembalikan, alasannya tampil di atas draf
+   staf, dan staf mengirim ulang.
+3. **Pimpinan** menetapkan jumlah dan kelurahan prioritas — hanya atas produk yang sudah
+   diteruskan Kasat.
+
+**Administrator tidak lagi dapat menyusun draf**: selama ia bisa, rantai ini dapat dilewati
+lewat akun admin. Peran menjadi **enam** (Pimpinan, Kasat Intelkam, Staf Intelkam, Fungsi,
+Polsek, Administrator). Akun peragaan: `demo.analis` (Staf Intelkam) dan `demo.kasat` (Kasat
+Intelkam — baru dapat dipakai setelah kata sandinya ditetapkan lewat
+`scripts/sandi-peragaan-produksi.sh`). Tiga hak — menyusun, menelaah, menetapkan — dipegang
+tiga peran yang berbeda dan dijaga test; supaya kontrolnya nyata, ketiganya juga perlu
+dipegang orang yang berbeda.
+
+**Penyesuaian ke naskah Taskap (17 November 2026).** Empat hal berubah supaya aplikasi
+sejalan dengan Bab IV naskah:
+
+- **Nama.** Kepanjangan SIGAP memakai kata *Intelijen* (sebelumnya "Inteligensi"), dan kanal
+  masyarakat bernama **SIGAP BERSAMA** (sebelumnya SIGAP WARGA).
+- **Peringkat memakai model AI.** Peringkat 65 kelurahan kini disusun **model gradient
+  boosting** untuk kelompok kejadian berobjek kendaraan bermotor. Masukannya riwayat 1, 3, 6,
+  dan 12 bulan, tren, pola bulanan, dan kelurahan lain sekecamatan — hanya dari kejadian yang
+  sudah dilaporkan sebelum bulan sasaran. Peta 3 bulan, 12 bulan, bulan sebelumnya, dan peta
+  tahunan tetap dihitung sebagai **pembanding**. Aturan naskah dijalankan sistem: model hanya
+  menjadi dasar usulan bila pada bulan-bulan uji terakhir cakupannya lebih tinggi daripada
+  pembanding terbaik; bila tidak, usulan kembali memakai peta. Alasan pemilihannya tertulis
+  di kaki layar Peringkat, dan kolom *Alasan model* menyebut masukan yang paling menaikkan
+  atau menurunkan perkiraan tiap kelurahan.
+- **Evaluasi memuat PAI dan uji historis.** Layar **Evaluasi** kini menampilkan PAI (porsi
+  kejadian tercakup dibagi porsi luas kelurahan yang ditandai) dan panel **Uji historis
+  model**: cakupan model dan tiap pembanding per tahun, beserta uji tanda (berapa bulan model
+  unggul, kalah, seri, dan nilai p). Pada data Pusiknas posisi 29 September 2026: 2025 model
+  186 dari 634 kejadian (peta 3 bulan 176); Januari–Agustus 2026 model 88 dari 483 (peta
+  12 bulan 79). Keunggulan atas dua pembanding terkuat **belum bermakna** menurut uji tanda —
+  baca sebagai "lebih tinggi, dievaluasi ulang tiap bulan", bukan "terbukti lebih baik".
+  Luas kelurahan untuk PAI adalah perkiraan dari poligon peta.
+- **SIGAP BERSAMA bertambah tiga layanan.** Halaman **Panduan** (pengamanan kos, tempat
+  parkir, gedung, dan RT/RW, disertai pola kejadian setahun terakhir pada jenis tempat itu);
+  **langganan imbauan** per warga lewat bot (`/langganan <kelurahan>`, berhenti dengan
+  `/berhenti` — yang disimpan hanya pengenal percakapan dan kelurahan, dan dihapus saat
+  berhenti); serta **hasil Survey Rasa Aman per triwulan** dengan jumlah responden dan
+  kelurahan yang terwakili. Teks panduan masih rancangan dan menunggu tinjauan Binmas.
+
+**Rupa baru SIGAP BERSAMA (10 November 2026).** Sisi warga memakai desain yang diserahkan
+pemilik proyek (mockup "SIGAP BERSAMA Redesign", catatan 178): kanvas terang, kepala putih
 bergaris emas ganda, hero navy berisi peta kecamatan dan angka ringkas, strip Imbauan Polres,
 empat kartu layanan; Peta menjadi panggung tiga kolom (panel cari/saring, peta, kartu rincian);
 Survey, Lacak, dan Lapor berspanduk merah untuk keadaan darurat; halaman **Masuk petugas** ikut
@@ -40,7 +133,7 @@ tampil di panel kelurahan pada peta warga dan lewat perintah bot `/babin`; dikel
 di **Laporan → Babinkamtibmas** (dummy berlabel dulu) — sejak 4 November 2026 berupa tabel per kelurahan: cari, centang *Belum terisi*, **+ Tambah**, **Ubah/Isi**, dan **Hapus** di panel samping. **Buletin mingguan** disusun sistem dari
 minggu sebelumnya (**Laporan → Buletin Kelurahan**, Administrator), **disetujui Pimpinan**, lalu
 bot mengirimnya ke grup Telegram kelurahan dan nomor WhatsApp Babin yang tercatat. Perintah bot
-`/dasbor` menautkan ke SIGAP WARGA.
+`/dasbor` menautkan ke SIGAP BERSAMA.
 
 **Imbauan bulanan ke grup warga otomatis (10 November 2026).** Keputusan 3A (6 November 2026,
 perlu persetujuan Pimpinan) **dicabut pemilik proyek**: bot mengirim imbauan bulan berjalan ke
@@ -60,29 +153,39 @@ menu: perkiraan jam rawan bulan sasaran menjadi **lampiran** Produk Bulanan dan 
 Pimpinan (tidak ada persetujuan tersendiri); `/ops/rencana-patroli` tetap sebagai bacaan dan
 unduhan .docx. (4) Buletin mingguan satu antrean; imbauan bulanan otomatis (di atas).
 
-**Menu ringkas (6 November 2026).** Lima kelompok: **Wilayah** (beranda, peta, wilayah rawan,
-pola, analitik), **Bulan Ini** (peringkat, produk bulanan, evaluasi), **Data**
-(laporan petugas dan masyarakat, pembakuan, input, berkas perkara, panic button), **Warga**
-(Babinkamtibmas, buletin & imbauan, survey), **Sistem**. Layar harian (peringatan dini,
-prediksi, penilaian risiko, rekomendasi harian, operasi, brief) keluar dari menu; alamatnya
-tetap dapat dibuka langsung.
+**Menu ringkas (6 November 2026; diringkas lagi 12 November 2026, keputusan A — catatan
+179).** Lima kelompok, **14 submenu**: **Wilayah** (Beranda, Peta, Analitik — Pola Gangguan
+menjadi tab di Analitik), **Bulan Ini** (Produk Bulanan — Peringkat 65 kelurahan menjadi tab
+di dalamnya — dan Evaluasi), **Data** (Laporan Petugas — dengan tab *+ Catat kejadian* dan
+*Pembakuan* — Laporan Masyarakat, Berkas Perkara, Panic Button), **Warga** (Babinkamtibmas,
+Buletin & Imbauan, Survey Rasa Aman), **Sistem** (Manajemen Pengguna, Audit Log). Keluar dari
+menu tetapi alamatnya tetap: Wilayah Rawan, Pengaturan Sistem, Input Data, dan seluruh layar
+harian (peringatan dini, prediksi, penilaian risiko, rekomendasi harian, operasi, brief).
+**Peta** kini membuka lapisan **historis** dan menggarisi emas **kelurahan prioritas bulan
+ini** (produk bulanan yang ditetapkan Pimpinan); lapisan risiko berjalan/prediktif hanya
+lewat alamat lama. **Lonceng notifikasi** hanya memuat pekerjaan siklus bulanan dan warga:
+darurat, produk bulanan (penetapan / draf), buletin menunggu persetujuan, laporan warga belum
+diverifikasi, ulasan menunggu moderasi.
 
-**Evaluasi bulanan (Modul 5 mekanisme).** Menu **Evaluasi → Cakupan Bulanan**: setelah bulan
+**Evaluasi bulanan (Modul 5 mekanisme).** Menu **Bulan Ini → Evaluasi**: setelah bulan
 berakhir, berapa persen kejadian jatuh di kelurahan pilihan (peringkat beku dan keputusan
-Pimpinan), dibanding peta 3 dan 12 bulan pada jumlah kelurahan dan batas data yang sama; rekap
-usulan diterima/direvisi/ditolak beserta alasan; kegiatan yang tercatat per kelurahan prioritas.
+Pimpinan), dibanding model dan seluruh peta pembanding pada jumlah kelurahan dan batas data
+yang sama, beserta PAI; rekap usulan diterima/direvisi/ditolak beserta alasan; kegiatan yang
+tercatat per kelurahan prioritas; dan panel uji historis model (17 November 2026).
 
-**Produk bulanan (Modul 4 mekanisme).** Menu **Bulan Ini → Produk Bulanan**. Analis Intelkam
+**Produk bulanan (Modul 4 mekanisme).** Menu **Bulan Ini → Produk Bulanan**. Staf Intelkam
 menyusun draf (peringkat bulan itu dibekukan sekaligus), lalu memeriksanya: terima, perbaiki,
-atau tolak tiap usulan dengan alasan, dan mengirimnya ke Pimpinan. Pimpinan menetapkan berapa
+atau tolak tiap usulan dengan alasan, dan mengirimnya ke Kasat Intelkam, yang menelaah lalu
+meneruskannya ke Pimpinan (atau mengembalikannya dengan alasan). Pimpinan menetapkan berapa
 dan kelurahan mana yang diprioritaskan; lampiran perkiraan jam rawan ikut ditetapkan. Fungsi
 dan Polsek mencatat kegiatan (waktu, tempat, tindakan, hasil) di kelurahan prioritas. Akun
-peragaan: `demo.analis`. (Tahap KBO/Kasat 6–10 November 2026 dihapus; produk lama yang
-tertahan di tahap itu langsung dapat ditetapkan Pimpinan.)
+peragaan: `demo.analis` dan `demo.kasat`. (Riwayat: empat tahap 6–10 November 2026, dua tahap
+10–17 November 2026, tiga tahap sejak 17 November 2026. Tahap KBO tidak dihidupkan lagi.)
 
 **Peringkat bulanan (Modul 2–3 mekanisme).** Menu **Analisis → Peringkat Bulanan**: 65
-kelurahan diurutkan untuk bulan depan dari peta 3 bulan terakhir (atau 12 bulan), hanya dari
-kejadian yang sudah dilaporkan sampai batas data. Peringkat **dibekukan otomatis saat draf
+kelurahan diurutkan untuk bulan depan oleh model AI (gradient boosting) — atau oleh peta
+historis bila model belum unggul; peta 3 bulan, 12 bulan, bulan sebelumnya, dan tahunan dapat
+dipilih sebagai pembanding — hanya dari kejadian yang sudah dilaporkan sampai batas data. Peringkat **dibekukan otomatis saat draf
 produk bulanan disusun** (Administrator/Analis masih dapat membekukannya lebih dulu secara manual)
 sebelum bulan berjalan; yang dibekukan itulah yang dievaluasi setelah bulan berakhir. IKW
 tampil di samping (PROPOSED).
@@ -140,7 +243,7 @@ menolak setiap tindakan yang tidak berasal dari keputusan berstatus **DISETUJUI*
 
 ---
 
-## 3. EMPAT PERAN DAN FUNGSINYA
+## 3. PERAN DAN FUNGSINYA
 
 Pemisahan peran di sini bukan sekadar pengelompokan menu. Ia menjalankan **pemisahan
 kewenangan**: tidak ada satu akun pun yang dapat mengusulkan, menyetujui, dan
@@ -155,7 +258,11 @@ melaksanakan sekaligus.
 | **Fungsi** | Menindaklanjuti sesuai fungsi masing-masing | **Hanya fungsinya sendiri** | Menulis laporan intelijen dan kegiatan fungsinya |
 | **Polsek** | Bertindak di wilayah hukumnya | **Hanya polseknya sendiri** | Menerima peringatan di wilayahnya; mencatat laporan masyarakat |
 
-> **Empat peran, empat akun peragaan.** Command Center dan Analyst dilebur ke Administrator
+> **Sejak 17 November 2026 ada enam peran.** Dua di antaranya khusus rantai produk bulanan:
+> **Staf Intelkam** menyusun dan memeriksa draf, **Kasat Intelkam** menelaahnya sebelum
+> sampai ke Pimpinan (lihat §0). Tabel di atas memuat empat peran yang lebih lama.
+>
+> **Empat peran, empat akun peragaan (keadaan Oktober 2026).** Command Center dan Analyst dilebur ke Administrator
 > pada 1 September 2026 atas keputusan pemilik proyek. Pada 7 Oktober 2026 pemilik proyek
 > menetapkan akun peragaan cukup empat — `demo.pimpinan`, `demo.polsek`, `demo.fungsi`,
 > `demo.admin` — dan dua akun tinggalan (`demo.commandcenter`, `demo.analyst`) dikunci
@@ -1051,7 +1158,16 @@ Setiap awal bulan bot mengirim **imbauan kehati-hatian** (jenis ancaman, jam raw
 bulan yang sama tahun-tahun sebelumnya, tips) secara otomatis; `/info` membalas imbauan
 bulan depan. Tanpa skor atau rekomendasi kepolisian — itu tetap di `/ops`. Di grup bot menjawab
 `/daftar`, `/info`, `/babin`, dan `/mulai`/`/bantuan` (pengenalan: fitur, tautan SIGAP
-WARGA, kontak Babin); melapor tetap lewat pesan pribadi.
+BERSAMA, kontak Babin); melapor tetap lewat pesan pribadi.
+
+**Langganan imbauan per warga dan panduan (17 November 2026).** Di percakapan PRIBADI dengan
+bot (WhatsApp atau Telegram), `/langganan <kelurahan>` mendaftarkan percakapan itu untuk
+menerima imbauan bulanan kelurahan tersebut; `/langganan` tanpa nama kelurahan menyebut
+langganan yang sedang berlaku; `/berhenti` menghentikannya dan **menghapus** datanya. Yang
+disimpan hanya kanal, pengenal percakapan, dan kelurahan — tanpa nama, tanpa alamat — dan
+tidak ada layar yang menampilkannya; layar **Buletin & Imbauan** hanya memperlihatkan
+jumlah pelanggan. `/panduan` menampilkan daftar panduan pengamanan, dan `/panduan kos`
+(atau `parkir`, `gedung`, `rtrw`) mengirim isinya.
 
 Tanpa akun, tanpa pendaftaran, tanpa identitas. Yang diterima pelapor sebagai bukti
 pengiriman adalah **nomor tiket** seperti `RPT-0151` — satu-satunya penanda yang

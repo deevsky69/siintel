@@ -38,15 +38,14 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 from typing import Any
 
-import yaml
 from sqlalchemy import Integer, cast, func, select
 from sqlalchemy.orm import Session
 
 from ..api.analysis import HOUR_BLOCK_STARTS, hour_block_label, hour_block_of
 from ..models import CrimeIncident, Location, PatrolPlanDecision
 from ..seeding.paths import REPO_ROOT
+from . import config_cache, visibility
 from . import risk_engine as risk
-from . import visibility
 
 PLAN_RULES_FILE = REPO_ROOT / "config" / "patrol" / "plan-rules.yaml"
 
@@ -85,7 +84,7 @@ def load_rules() -> PlanRules:
     if not PLAN_RULES_FILE.exists():
         message = "config/patrol/plan-rules.yaml tidak ditemukan"
         raise PatrolPlanError(message)
-    raw: dict[str, Any] = yaml.safe_load(PLAN_RULES_FILE.read_text(encoding="utf-8"))
+    raw: dict[str, Any] = config_cache.load_yaml(PLAN_RULES_FILE)
     rules = PlanRules(
         status=str(raw.get("status", "UNKNOWN")),
         version=str(raw.get("version", "rencana-patroli-v1")),

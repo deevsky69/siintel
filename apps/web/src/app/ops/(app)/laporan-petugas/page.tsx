@@ -2,11 +2,19 @@ import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { ReportFilters } from "@/components/reports/report-filters";
 import { StatusForm } from "@/components/reports/status-form";
+import { ScreenTabs } from "@/components/shell/screen-tabs";
+import { getProfile } from "@/lib/dashboard";
 import { getEntryOptions } from "@/lib/data-entry";
 import { getCrimes, jamKejadian } from "@/lib/reports";
 import { changeCrimeStatus } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const TABS = [
+  { href: "/ops/laporan-petugas", label: "Daftar kejadian" },
+  { href: "/ops/input?formulir=kejadian", label: "+ Catat kejadian", permission: "crime:write" },
+  { href: "/ops/pembakuan", label: "Pembakuan", permission: "crime:triage" },
+] as const;
 
 const PAGE_SIZE = 100;
 
@@ -41,6 +49,7 @@ export default async function LaporanPetugasPage({
   const kecamatan = one("wilayah");
   const statusFilter = one("status");
 
+  const profile = await getProfile();
   const [page, options] = await Promise.all([
     getCrimes({
       page_size: PAGE_SIZE,
@@ -83,6 +92,7 @@ export default async function LaporanPetugasPage({
 
   return (
     <div className="space-y-3">
+      <ScreenTabs tabs={TABS} current="/ops/laporan-petugas" permissions={profile.permissions} />
       <ReportFilters
         action="/ops/laporan-petugas"
         search={search}

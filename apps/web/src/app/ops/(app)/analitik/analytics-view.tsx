@@ -303,7 +303,7 @@ function CompositionPanel({ trend }: { trend: TrendResponse }) {
   );
 }
 
-/** Matriks hari x blok jam: 7 x 8 sel (blok 3 jam), digambar sebagai kotak berkelas warna tetap. */
+/** Matriks hari x blok jam: 7 x 6 sel (rentang 4 jam), digambar sebagai kotak berkelas warna tetap. */
 function TimePatternPanel({ pattern }: { pattern: TimePatternResponse }) {
   const peak = pattern.peak_cell?.incidents ?? 0;
 

@@ -26,14 +26,29 @@ depends_on: str | Sequence[str] | None = None
 def upgrade() -> None:
     op.create_table(
         "advisory_approvals",
-        sa.Column("approval_id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "approval_id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("month", sa.String(7), nullable=False),
         sa.Column("approved_by", postgresql.UUID(as_uuid=True), nullable=True),
-        sa.Column("approved_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column(
+            "approved_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
         sa.Column("note", sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint("approval_id", name="pk_advisory_approvals"),
         sa.UniqueConstraint("month", name="uq_advisory_approvals_month"),
-        sa.ForeignKeyConstraint(["approved_by"], ["users.user_id"], name="fk_advisory_approvals_approved_by", ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["approved_by"],
+            ["users.user_id"],
+            name="fk_advisory_approvals_approved_by",
+            ondelete="SET NULL",
+        ),
     )
     op.create_index("ix_advisory_approvals_approved_by", "advisory_approvals", ["approved_by"])
 

@@ -10,7 +10,12 @@ import {
   getMapData,
   resolveSelectedDistrict,
 } from "@/lib/map-data";
-import { getProduct, listProducts, type MonthlyProduct } from "@/lib/monthly-products";
+import {
+  getPriorityKelurahan,
+  getProduct,
+  listProducts,
+  type MonthlyProduct,
+} from "@/lib/monthly-products";
 import { getCitizenReports, getCrimes } from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
@@ -60,12 +65,13 @@ export default async function DashboardPage({
   const selectedKelurahan =
     level === "kelurahan" && typeof params.kelurahan === "string" ? params.kelurahan : null;
 
-  const [profile, summary, map, products] = await Promise.all([
+  const [profile, summary, map, products, priority] = await Promise.all([
     getProfile(),
     getSummary(),
     getMapData(),
     // Tanpa monthly_product:read papan tetap tampil kosong-jujur, bukan menjatuhkan beranda.
     listProducts().catch(() => null),
+    getPriorityKelurahan().catch(() => null),
   ]);
   const can = (p: string) => profile.permissions.includes(p);
 
@@ -158,6 +164,7 @@ export default async function DashboardPage({
         crimes={crimes}
         reports={reports}
         level={level}
+        priority={priority?.items.map((item) => item.kelurahan) ?? []}
       />
     </div>
   );

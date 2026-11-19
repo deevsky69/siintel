@@ -1,26 +1,37 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
+import { ScreenTabs } from "@/components/shell/screen-tabs";
 import { ApiError } from "@/lib/api";
 import { getProfile } from "@/lib/decisions";
 import {
   getProduct,
   isAwaitingDecision,
+  isAwaitingKbo,
+  isAwaitingReview,
   listProducts,
   type MonthlyProduct,
 } from "@/lib/monthly-products";
 import { getMonthlyOutlook, type MonthlyOutlook } from "@/lib/patrol-plan-api";
-import { ActionForm, AnalystForm, DecideForm, DraftForm } from "./forms";
+import { ActionForm, AnalystForm, DecideForm, DraftForm, KasatForm } from "./forms";
 
 export const dynamic = "force-dynamic";
 
+const TABS = [
+  { href: "/ops/produk-bulanan", label: "Produk Bulanan" },
+  { href: "/ops/peringkat", label: "Peringkat 65 Kelurahan" },
+] as const;
+
 /**
- * Dua tahap sejak 10 November 2026 (keputusan pemilik proyek 1B, catatan 177):
- * Analis menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa dan
- * mengirim; Pimpinan menetapkan; Fungsi/Polsek mencatat. Tahap KBO dan Kasat dihapus.
+ * Empat tahap sejak 19 November 2026 (catatan 186; sama dengan naskah Taskap final): Analis
+ * menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa dan mengirim; KBO
+ * memeriksa mutu; Kasat Intelkam menelaah; Pimpinan menetapkan; Fungsi/Polsek mencatat. KBO
+ * dan Kasat meneruskan atau mengembalikan dengan alasan, tanpa mengubah isi.
  */
 const STEPS = [
   { key: "ANALYST", label: "Analis menyusun & memeriksa" },
+  { key: "KBO", label: "KBO memeriksa mutu" },
+  { key: "KASAT", label: "Kasat menelaah" },
   { key: "PIMPINAN", label: "Pimpinan menetapkan" },
   { key: "EXECUTE", label: "Pelaksanaan dicatat" },
 ] as const;
@@ -30,13 +41,30 @@ const THREAT_LABEL: Record<string, string> = {
   CURAS: "curas",
 };
 
-function doneAt(product: MonthlyProduct | null): number {
-  if (!product) return 0;
-  if (product.status === "DECIDED") return 2;
-  return isAwaitingDecision(product.status) ? 1 : 0;
+/**
+ * Waktu kegiatan dalam WIB. API mengirim UTC; memotong teksnya begitu saja menampilkan
+ * kegiatan pukul 05.30 WIB sebagai "22:30" hari sebelumnya.
+ */
+function waktuWib(iso: string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    timeZone: "Asia/Jakarta",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
 }
 
-/** Produk bulanan (Modul 4 mekanisme): satu naskah per bulan, dua tahap, lalu pelaksanaan. */
+function doneAt(product: MonthlyProduct | null): number {
+  if (!product) return 0;
+  if (product.status === "DECIDED") return 4;
+  if (isAwaitingDecision(product.status)) return 3;
+  if (isAwaitingReview(product.status)) return 2;
+  return isAwaitingKbo(product.status) ? 1 : 0;
+}
+
+/** Produk bulanan (Modul 4 mekanisme): satu naskah per bulan, empat tahap, lalu pelaksanaan. */
 export default async function ProdukBulananPage({
   searchParams,
 }: {
@@ -48,21 +76,33 @@ export default async function ProdukBulananPage({
   const month =
     (Array.isArray(raw) ? raw[0] : raw) || list.data[0]?.target_month || list.suggested_month;
   const can = (p: string) => profile.permissions.includes(p);
-  let product: MonthlyProduct | null = null;
-  try {
-    product = await getProduct(month);
-  } catch (error) {
-    if (!(error instanceof ApiError) || error.status !== 404) throw error;
-  }
+  // Produk dan lampirannya diminta bersamaan begitu bulan diketahui (audit 15 November 2026).
   // Lampiran: perkiraan singkat bulan sasaran (sebelumnya layar Rencana Patroli tersendiri
   // dengan persetujuannya sendiri — 2.ii). Gagal/403 → lampiran tidak tampil, naskah tetap.
-  const outlook: MonthlyOutlook | null = product
-    ? await getMonthlyOutlook(month).catch(() => null)
-    : null;
+  const [product, outlookResult] = await Promise.all([
+    getProduct(month).catch((error: unknown): MonthlyProduct | null => {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }),
+    getMonthlyOutlook(month).catch((): MonthlyOutlook | null => null),
+  ]);
+  const outlook: MonthlyOutlook | null = product ? outlookResult : null;
   const done = doneAt(product);
   const awaiting = product ? isAwaitingDecision(product.status) : false;
+  const reviewing = product ? isAwaitingReview(product.status) : false;
   const analystTurn = product?.status === "DRAFT" && can("monthly_product:draft");
+  const checking = product ? isAwaitingKbo(product.status) : false;
+  const kboTurn = checking && can("monthly_product:review");
+  const kasatTurn = reviewing && can("monthly_product:validate");
   const leaderTurn = awaiting && can("monthly_product:decide");
+  // Draf yang dikembalikan Kasat: alasannya harus terlihat oleh staf yang memperbaikinya.
+  const lastStage = product?.stages.at(-1);
+  const returned =
+    product?.status === "DRAFT" &&
+    (lastStage?.stage === "KASAT" || lastStage?.stage === "KBO") &&
+    lastStage.outcome === "REJECTED"
+      ? `${lastStage.stage === "KBO" ? "KBO" : "Kasat Intelkam"}: ${lastStage.reason}`
+      : null;
   const attachedNames = new Set(
     (product?.status === "DECIDED"
       ? product.items.filter((item) => item.selected)
@@ -77,6 +117,7 @@ export default async function ProdukBulananPage({
 
   return (
     <div className="space-y-3">
+      <ScreenTabs tabs={TABS} current="/ops/produk-bulanan" />
       <Panel
         title={`Produk Bulanan ${month}`}
         action={
@@ -122,7 +163,7 @@ export default async function ProdukBulananPage({
               <DraftForm month={month} />
             </div>
           ) : (
-            <EmptyState label="Produk bulan ini belum disusun Analis." />
+            <EmptyState label="Produk bulan ini belum disusun Analis Intelkam." />
           )
         ) : (
           <>
@@ -133,9 +174,26 @@ export default async function ProdukBulananPage({
               {product.priority_count !== null
                 ? ` · ${product.priority_count} kelurahan prioritas`
                 : ""}
+              {checking && !kboTurn ? " · menunggu pemeriksaan KBO" : ""}
+              {reviewing && !kasatTurn ? " · menunggu telaah Kasat Intelkam" : ""}
               {awaiting && !leaderTurn ? " · menunggu penetapan Pimpinan" : ""}
             </p>
+            {returned ? (
+              <p className="mb-3 rounded border border-risk-moderate/40 bg-risk-moderate/10 px-2.5 py-1.5 text-xs text-ink">
+                Dikembalikan {returned}
+              </p>
+            ) : null}
 
+            {kboTurn ? (
+              <div className="mb-3">
+                <KasatForm month={month} stage="KBO" />
+              </div>
+            ) : null}
+            {kasatTurn ? (
+              <div className="mb-3">
+                <KasatForm month={month} />
+              </div>
+            ) : null}
             {analystTurn ? <AnalystForm month={month} items={product.items} /> : null}
             {leaderTurn ? <DecideForm month={month} items={product.items} /> : null}
 
@@ -176,8 +234,7 @@ export default async function ProdukBulananPage({
                       <ul className="mt-1 text-2xs text-ink-faint">
                         {item.actions.map((a) => (
                           <li key={`${a.acted_at}-${a.place}`}>
-                            {a.acted_at.slice(0, 16).replace("T", " ")} · {a.unit} · {a.place} ·{" "}
-                            {a.action}
+                            {waktuWib(a.acted_at)} · {a.unit} · {a.place} · {a.action}
                             {a.result ? ` · ${a.result}` : ""}
                           </li>
                         ))}

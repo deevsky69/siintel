@@ -21,6 +21,7 @@ dependencies = [
   # Menerima unggahan multipart pada kanal laporan masyarakat.
   "python-multipart>=0.0.20",
   "python-docx>=1.1",
+  "scikit-learn==1.8.0",
 ]
 
 [dependency-groups]
@@ -96,6 +97,11 @@ python_version = "3.12"
 files = ["src", "tests"]
 strict = true
 warn_unreachable = true
+
+# scikit-learn tidak membawa anotasi tipe; hanya services/monthly_model.py yang memakainya.
+[[tool.mypy.overrides]]
+module = ["sklearn.*"]
+ignore_missing_imports = true
 
 # ---------------------------------------------------------------------------
 # pytest

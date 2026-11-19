@@ -44,10 +44,15 @@ export const MAP_LAYERS: ReadonlyArray<{ id: MapLayer; label: string }> = [
   { id: "predictive", label: "Prediktif" },
 ] as const;
 
+/**
+ * Lapisan bawaan **historis** sejak 12 November 2026 (catatan 179): rantai skor harian
+ * keluar dari menu, dan peta mengikuti siklus bulanan. `current` dan `predictive` tetap
+ * dapat diminta lewat alamat (`?layer=current`) untuk tautan lama.
+ */
 export function toMapLayer(value: string | null | undefined): MapLayer {
   if (value === "predictive") return "predictive";
-  if (value === "historical") return "historical";
-  return "current";
+  if (value === "current") return "current";
+  return "historical";
 }
 
 /** Panjang jendela historis yang dilayani `GET /map/historical`. */
@@ -97,7 +102,7 @@ export function toRiskClass(value: string | null | undefined): RiskClass | null 
  */
 export function mapHref(
   kecamatan: string | null,
-  layer: MapLayer = "current",
+  layer: MapLayer = "historical",
   months: HistoricalMonths = DEFAULT_HISTORICAL_MONTHS,
   level: MapLevel = "kecamatan",
   kelurahan: string | null = null,
@@ -110,7 +115,7 @@ export function mapHref(
   // Tingkat kecamatan tidak ditulis: ia bawaan, dan parameter yang hanya mengulang nilai
   // bawaan memanjangkan tautan yang dibagikan saat paparan tanpa mengubah apa pun.
   if (level !== "kecamatan") params.set("tingkat", level);
-  if (layer !== "current") params.set("layer", layer);
+  if (layer !== "historical") params.set("layer", layer);
   // Jendela hanya ditulis bila layer historis sedang tampil **dan** bukan jendela bawaan:
   // parameter yang tidak berpengaruh pada layer lain hanya memanjangkan tautan paparan.
   if (layer === "historical" && months !== DEFAULT_HISTORICAL_MONTHS) {

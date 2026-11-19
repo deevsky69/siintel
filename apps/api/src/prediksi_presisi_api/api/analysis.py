@@ -30,19 +30,22 @@ DAY_LABELS = ("Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu")
 
 HOURS_PER_DAY = 24
 
-#: Keputusan pemilik proyek 30 September 2026: PREDIKSI memakai jendela 6 jam, ANALITIK
-#: menampilkan jam dalam BLOK 3 JAM. Sebaran per jam tunggal pada data asli terlalu tipis
-#: — 22% kejadian tanpa jam, dan satu jam tunggal mudah berpindah karena kebetulan —
-#: sementara blok 6 jam terlalu kasar untuk membaca jam rawan. Tiga jam adalah satuan
-#: yang sama dengan jendela patroli pada rekomendasi layar Pimpinan.
-HOUR_BLOCK_HOURS = 3
+#: Jam disajikan dalam RENTANG EMPAT JAM mulai pukul 00.00 WIB — enam rentang sehari — sejak
+#: 18 November 2026, mengikuti naskah Taskap Bab IV ("jam dibagi menjadi enam rentang empat
+#: jam mulai pukul 00.00 WIB; jam pada batas rentang masuk ke kelompok yang dimulai pada jam
+#: itu"). Sebelumnya blok 3 jam (keputusan pemilik proyek 30 September 2026). Alasan memakai
+#: rentang, bukan jam tunggal, tidak berubah: sebaran per jam pada data asli terlalu tipis —
+#: 22% kejadian tanpa jam, dan satu jam tunggal mudah berpindah karena kebetulan. Rantai
+#: harian (penilaian risiko, prediksi) tetap memakai jendela 6 jamnya sendiri.
+HOUR_BLOCK_HOURS = 4
 HOUR_BLOCK_STARTS = tuple(range(0, HOURS_PER_DAY, HOUR_BLOCK_HOURS))
 
 HOUR_BLOCK_BASIS = (
-    f"Jam disajikan dalam blok {HOUR_BLOCK_HOURS} jam (keputusan pemilik proyek 30 September "
-    "2026). Kejadian yang jamnya tidak tercatat pada Laporan Polisi tidak membentuk pola jam "
-    "dan dihitung terpisah sebagai unknown_time; pada data Pusiknas jam yang tercatat dapat "
-    "berupa waktu kejadian diketahui, bukan waktu kejadian berlangsung — terutama Curat."
+    f"Jam disajikan dalam rentang {HOUR_BLOCK_HOURS} jam mulai pukul 00.00 WIB (naskah Taskap; "
+    "18 November 2026). Kejadian yang jamnya tidak tercatat pada Laporan Polisi tidak "
+    "membentuk pola jam dan dihitung terpisah sebagai unknown_time; pada data Pusiknas jam "
+    "yang tercatat dapat berupa waktu kejadian diketahui, bukan waktu kejadian berlangsung — "
+    "terutama Curat."
 )
 
 
@@ -52,7 +55,7 @@ def hour_block_of(hour: int) -> int:
 
 
 def hour_block_label(start: int) -> str:
-    """Label blok untuk layar: 12 -> 12.00-15.00, 21 -> 21.00-24.00."""
+    """Label rentang untuk layar: 12 -> 12.00-16.00, 20 -> 20.00-24.00."""
     end = start + HOUR_BLOCK_HOURS
     return f"{start:02d}.00-{end:02d}.00"
 

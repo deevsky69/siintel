@@ -1,5 +1,5 @@
 /**
- * SIGAP WARGA — data publik (tanpa akun). Dipanggil dari Server Component; tidak membawa
+ * SIGAP BERSAMA — data publik (tanpa akun). Dipanggil dari Server Component; tidak membawa
  * sesi apa pun. Bentuk respons mengikuti `routers/public_areas.py` dan `routers/reviews.py`.
  */
 
@@ -69,7 +69,7 @@ export const LEVEL_CLASS: Record<AreaLevel, string> = {
   TINGGI: "bg-risk-high/12 text-risk-high border-risk-high/30",
 };
 
-/** Warna isian peta — mengikuti mockup SIGAP WARGA (10 November 2026): biru muda, kuning, jingga. */
+/** Warna isian peta — mengikuti mockup SIGAP BERSAMA (10 November 2026): biru muda, kuning, jingga. */
 export const LEVEL_FILL: Record<AreaLevel, string> = {
   RENDAH: "#BFD7EA",
   SEDANG: "#F2B45A",
@@ -127,6 +127,45 @@ export const getPublicSummary = () => publicGet<PublicSummary>("/public/areas/su
 
 export const getPublicReviews = (kelurahan: string) =>
   publicGet<ReviewPage>(`/public/reviews?kelurahan=${encodeURIComponent(kelurahan)}`);
+
+/** Hasil Survey Rasa Aman per triwulan, dengan cakupan responden (naskah 4.7 h). */
+export type SurveyQuarter = {
+  label: string;
+  from: string;
+  to: string;
+  running: boolean;
+  respondents: number;
+  average: number | null;
+  kelurahan_covered: number;
+  kelurahan_total: number;
+  coverage_pct: number | null;
+};
+
+export const getQuarterlySurvey = () =>
+  publicGet<{ quarters: SurveyQuarter[]; basis: string }>("/public/survey/quarterly");
+
+/** Panduan pengamanan kos, parkir, gedung, dan RT/RW (naskah 4.7 f). */
+export type SecurityGuide = {
+  id: string;
+  title: string;
+  audience: string;
+  steps: string[];
+  pattern: {
+    incidents: number;
+    share_pct: number | null;
+    top_modus: { modus: string; count: number }[];
+    peak_block: string | null;
+    peak_block_count: number;
+    with_time: number;
+    from: string;
+    to: string;
+  };
+};
+
+export const getSecurityGuides = () =>
+  publicGet<{ status: string; closing: string; data: SecurityGuide[]; basis: string }>(
+    "/public/guides",
+  );
 
 /** Kelurahan dengan ulasan terbanyak dan terbaik — untuk sorotan beranda. */
 export function highlightAreas(summary: PublicSummary, limit = 3): AreaSummary[] {

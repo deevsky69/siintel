@@ -2,7 +2,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { getProfile } from "@/lib/decisions";
-import { getModerationQueue } from "@/lib/reviews";
+import { getModerationQueue, getQuarterlyDetail } from "@/lib/reviews";
 import { ModerationForm } from "./moderation-form";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +29,8 @@ export default async function SurveyModerationPage({
   const status = STATUSES.find((value) => value === wanted) ?? "PENDING";
   const [queue, profile] = await Promise.all([getModerationQueue(status), getProfile()]);
   const canModerate = profile.permissions.includes("review:moderate");
+  // Rincian triwulanan hanya untuk moderator; bila ditolak, antrean tetap tampil.
+  const quarterly = canModerate ? await getQuarterlyDetail().catch(() => null) : null;
 
   return (
     <div className="space-y-3">
@@ -96,6 +98,46 @@ export default async function SurveyModerationPage({
           kasar, atau iklan. Ulasan adalah persepsi warga, bukan data kejadian.
         </p>
       </Panel>
+
+      {quarterly ? (
+        <Panel title="Hasil triwulanan">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Triwulan</th>
+                <th className="text-right">Rata-rata</th>
+                <th className="text-right">Responden</th>
+                <th className="text-right">Masuk</th>
+                <th className="text-right">Kelurahan terwakili</th>
+                <th>Per kecamatan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quarterly.quarters.map((row) => (
+                <tr key={row.label}>
+                  <td className="font-semibold text-ink">
+                    {row.label}
+                    {row.running ? <span className="ml-1 text-ink-faint">· berjalan</span> : null}
+                  </td>
+                  <td className="text-right tabular-nums">{row.average ?? "—"}</td>
+                  <td className="text-right tabular-nums">{row.respondents}</td>
+                  <td className="text-right tabular-nums">{row.submitted}</td>
+                  <td className="text-right tabular-nums">
+                    {row.kelurahan_covered}/{row.kelurahan_total}
+                    {row.coverage_pct === null ? "" : ` (${row.coverage_pct}%)`}
+                  </td>
+                  <td className="text-ink-faint">
+                    {row.kecamatan
+                      .map((item) => `${item.kecamatan} ${item.respondents}`)
+                      .join(" · ")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-3 text-2xs leading-relaxed text-ink-faint">{quarterly.basis}</p>
+        </Panel>
+      ) : null}
     </div>
   );
 }

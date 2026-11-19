@@ -5,7 +5,7 @@ import { Reveal } from "@/components/warga/reveal";
 import { getPublicSummary, highlightAreas, longMonth } from "@/lib/warga";
 import { getImbauanPublik } from "./lapor/actions";
 
-export const metadata = { title: "SIGAP WARGA — Polres Metro Jakarta Selatan" };
+export const metadata = { title: "SIGAP BERSAMA — Polres Metro Jakarta Selatan" };
 export const dynamic = "force-dynamic";
 
 const SERVICES = [
@@ -33,10 +33,22 @@ const SERVICES = [
     text: "Data bulanan tiga jenis kejahatan serta kontak Babinkamtibmas setiap kelurahan.",
     cta: "Buka peta →",
   },
+  {
+    href: "/panduan",
+    title: "Panduan pengamanan",
+    text: "Langkah pengamanan kos, tempat parkir, gedung, dan lingkungan RT/RW dari pola kejadian.",
+    cta: "Baca panduan →",
+  },
+  {
+    href: "/panduan#langganan",
+    title: "Imbauan bulanan",
+    text: "Terima imbauan kehati-hatian kelurahan Anda setiap awal bulan lewat WhatsApp atau Telegram.",
+    cta: "Cara berlangganan →",
+  },
 ] as const;
 
 /**
- * Beranda SIGAP WARGA (mockup 10 November 2026).
+ * Beranda SIGAP BERSAMA (mockup 10 November 2026).
  *
  * Hero navy berisi peta kecamatan dan angka ringkas; strip Imbauan Polres; empat kartu
  * layanan; lalu dua kolom — daftar kelurahan berkerawanan tinggi dan kartu navy Survey Rasa
@@ -67,7 +79,7 @@ export default async function BerandaWarga() {
           <h2 id="layanan" className="mt-1.5 text-3xl text-[rgb(var(--warga-navy))] sm:text-[34px]">
             Layanan untuk warga
           </h2>
-          <nav aria-label="Jalan pintas" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <nav aria-label="Jalan pintas" className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {SERVICES.map((item) => (
               <Link key={item.href} href={item.href} className="warga-card-link">
                 <span className="text-[19px] font-bold text-[rgb(var(--warga-navy))]">
@@ -110,16 +122,20 @@ export default async function BerandaWarga() {
                     <li key={area.kelurahan}>
                       <Link
                         href={`/peta?kecamatan=${encodeURIComponent(area.kecamatan)}&kelurahan=${encodeURIComponent(area.kelurahan)}`}
-                        className="warga-row"
+                        className="warga-row flex-wrap gap-y-1.5 sm:flex-nowrap"
                       >
                         <span className="warga-num">{index + 1}</span>
-                        <span className="flex min-w-0 flex-1 flex-col">
+                        {/* Di ponsel nama mengambil sisa baris dan lencana turun ke baris kedua:
+                            berdampingan, kolom nama tinggal ±47 px dan teksnya meluber. */}
+                        <span className="flex min-w-0 flex-1 basis-[60%] flex-col sm:basis-0">
                           <span className="truncate text-base font-bold text-[rgb(var(--warga-navy))]">
                             {area.kelurahan}
                           </span>
-                          <span className="text-[13px] text-ink-faint">Kec. {area.kecamatan}</span>
+                          <span className="truncate text-[13px] text-ink-faint">Kec. {area.kecamatan}</span>
                         </span>
-                        <LevelBadge level={area.level} />
+                        <span className="ml-12 sm:ml-0">
+                          <LevelBadge level={area.level} />
+                        </span>
                         <span className="hidden whitespace-nowrap text-[13px] font-medium text-accent-soft sm:inline">
                           Lihat di peta →
                         </span>

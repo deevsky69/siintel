@@ -1,4 +1,4 @@
-"""SIGAP WARGA: ringkasan wilayah publik dan Survey Rasa Aman."""
+"""SIGAP BERSAMA: ringkasan wilayah publik dan Survey Rasa Aman."""
 
 from __future__ import annotations
 
@@ -190,7 +190,8 @@ def test_moderation_publishes_and_only_published_count(
             AuditLog.action == "MODERATE_AREA_REVIEW", AuditLog.resource_id == code
         )
     )
-    assert entry is not None and entry.detail["to"] == "PUBLISHED"
+    assert entry is not None and entry.detail is not None
+    assert entry.detail["to"] == "PUBLISHED"
 
 
 def test_moderation_queue_appears_in_the_administrator_notifications(
@@ -206,3 +207,69 @@ def test_moderation_queue_appears_in_the_administrator_notifications(
     ).json()
     group = next(g for g in feed["groups"] if g["kind"] == "REVIEW")
     assert group["total"] >= 1 and group["href"] == "/ops/survey"
+
+
+def test_quarterly_survey_reports_respondents_and_coverage(
+    client: TestClient, session: Session
+) -> None:
+    """Naskah 4.7 h: hasil survei per triwulan disertai cakupan responden."""
+    area = _kelurahan(session)
+    before = client.get("/api/v1/public/survey/quarterly").json()
+    assert len(before["quarters"]) == 4 and before["quarters"][0]["running"] is True
+    assert before["quarters"][0]["label"].startswith("Triwulan ")
+    starting = before["quarters"][0]["respondents"]
+
+    body = {"kecamatan": area.kecamatan, "kelurahan": area.kelurahan, "rating": 4}
+    code = client.post("/api/v1/public/reviews", json=body).json()["code"]
+    # Yang belum tayang belum menjadi responden.
+    assert (
+        client.get("/api/v1/public/survey/quarterly").json()["quarters"][0]["respondents"]
+        == starting
+    )
+    admin = _login(client, session, "Administrator")
+    client.post(f"/api/v1/reviews/{code}/moderate", json={"decision": "PUBLISH"}, headers=admin)
+
+    current = client.get("/api/v1/public/survey/quarterly").json()["quarters"][0]
+    assert current["respondents"] == starting + 1
+    assert 1 <= current["kelurahan_covered"] <= current["kelurahan_total"]
+    assert current["coverage_pct"] == round(
+        current["kelurahan_covered"] / current["kelurahan_total"] * 100, 1
+    )
+    assert "kecamatan" not in current  # rincian hanya untuk moderator
+
+    assert client.get("/api/v1/reviews/quarterly").status_code == 401
+    assert (
+        client.get(
+            "/api/v1/reviews/quarterly", headers=_login(client, session, "Polsek")
+        ).status_code
+        == 403
+    )
+    detail = client.get("/api/v1/reviews/quarterly", headers=admin).json()["quarters"][0]
+    assert detail["submitted"] >= detail["respondents"]
+    assert area.kecamatan in [row["kecamatan"] for row in detail["kecamatan"]]
+
+
+def test_security_guides_are_public_and_carry_only_aggregates(client: TestClient) -> None:
+    """Naskah 4.7 f: panduan kos, parkir, gedung, RT/RW — dengan pola agregat dari data."""
+    response = client.get("/api/v1/public/guides")
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert [guide["id"] for guide in body["data"]] == ["kos", "parkir", "gedung", "rtrw"]
+    assert body["status"] == "PROPOSED"
+    for guide in body["data"]:
+        assert len(guide["steps"]) >= 4 and guide["title"] in guide["text"]
+        pattern = guide["pattern"]
+        assert set(pattern) == {
+            "incidents",
+            "share_pct",
+            "top_modus",
+            "peak_block",
+            "peak_block_count",
+            "with_time",
+            "from",
+            "to",
+        }
+        assert pattern["with_time"] <= pattern["incidents"]
+    # Hanya agregat: tidak ada kelurahan, alamat, kode kejadian, maupun skor.
+    text = response.text.lower()
+    assert "risk_score" not in text and "inc-" not in text and "latitude" not in text

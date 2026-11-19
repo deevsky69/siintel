@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { LevelBadge, Stars } from "@/components/warga/bits";
-import { getPublicReviews, getPublicSummary } from "@/lib/warga";
+import { getPublicReviews, getPublicSummary, getQuarterlySurvey } from "@/lib/warga";
 import { ReviewForm } from "./review-form";
 
-export const metadata = { title: "Survey Rasa Aman — SIGAP WARGA" };
+export const metadata = { title: "Survey Rasa Aman — SIGAP BERSAMA" };
 export const dynamic = "force-dynamic";
 
 const PROTECTIONS = [
@@ -42,7 +42,10 @@ export default async function SurveyPage({
     );
   }
   const area = summary.areas.find((row) => row.kelurahan.toLowerCase() === wanted.toLowerCase());
-  const reviews = area ? await getPublicReviews(area.kelurahan).catch(() => null) : null;
+  const [reviews, quarterly] = await Promise.all([
+    area ? getPublicReviews(area.kelurahan).catch(() => null) : null,
+    getQuarterlySurvey().catch(() => null),
+  ]);
   const byKecamatan = new Map<string, typeof summary.areas>();
   for (const row of summary.areas) {
     byKecamatan.set(row.kecamatan, [...(byKecamatan.get(row.kecamatan) ?? []), row]);
@@ -207,6 +210,47 @@ export default async function SurveyPage({
             </p>
           )}
         </section>
+
+        {quarterly ? (
+          <section className="warga-card px-6 py-6 sm:px-8" aria-labelledby="triwulan">
+            <h2 id="triwulan" className="mb-3 text-lg text-[rgb(var(--warga-navy))]">
+              Hasil per triwulan
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[520px] text-left text-sm">
+                <thead className="text-xs uppercase tracking-wide text-ink-faint">
+                  <tr>
+                    <th className="py-2 pr-4 font-semibold">Triwulan</th>
+                    <th className="py-2 pr-4 text-right font-semibold">Nilai rata-rata</th>
+                    <th className="py-2 pr-4 text-right font-semibold">Responden</th>
+                    <th className="py-2 text-right font-semibold">Kelurahan terwakili</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-base-700">
+                  {quarterly.quarters.map((row) => (
+                    <tr key={row.label}>
+                      <td className="py-2.5 pr-4 font-semibold text-[rgb(var(--warga-navy))]">
+                        {row.label}
+                        {row.running ? (
+                          <span className="ml-2 text-xs font-medium text-ink-faint">berjalan</span>
+                        ) : null}
+                      </td>
+                      <td className="py-2.5 pr-4 text-right tabular-nums">
+                        {row.average === null ? "–" : `${row.average} ★`}
+                      </td>
+                      <td className="py-2.5 pr-4 text-right tabular-nums">{row.respondents}</td>
+                      <td className="py-2.5 text-right tabular-nums">
+                        {row.kelurahan_covered} dari {row.kelurahan_total}
+                        {row.coverage_pct === null ? "" : ` (${row.coverage_pct}%)`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-ink-faint">{quarterly.basis}</p>
+          </section>
+        ) : null}
 
         <section className="warga-card-navy flex flex-col gap-4 p-7" aria-labelledby="lindung">
           <h2 id="lindung" className="text-xl text-white">

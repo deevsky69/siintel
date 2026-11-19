@@ -203,8 +203,8 @@ def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_b
         "/api/v1/bulletins", params={"week": week.isoformat()}, headers=leader
     ).json()
     mine = next(row for row in listing["data"] if row["kelurahan"] == area.kelurahan)
-    assert mine["status"] == "DRAFT" and area.kelurahan.upper() in mine["content"]
-    assert "SIGAP WARGA" in mine["content"] and mine["figures"]["week_start"] == week.isoformat()
+    assert mine["status"] == "DRAFT" and str(area.kelurahan).upper() in mine["content"]
+    assert "SIGAP BERSAMA" in mine["content"] and mine["figures"]["week_start"] == week.isoformat()
 
     # Hanya Pimpinan yang menyetujui; Administrator ditolak.
     assert client.post(f"/api/v1/bulletins/{mine['id']}/approve", headers=admin).status_code == 403
@@ -232,7 +232,21 @@ def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_b
         )
     )
     assert entry is not None
-    assert session.get(Bulletin, uuid.UUID(mine["id"])).sent_at is not None
+    sent_row = session.get(Bulletin, uuid.UUID(mine["id"]))
+    assert sent_row is not None and sent_row.sent_at is not None
+
+
+def _humas_approves(client: TestClient, session: Session) -> None:
+    """Humas menyetujui imbauan bulan berjalan (naskah Taskap final B.4.7)."""
+    from prediksi_presisi_api.services import citizen_advisory
+
+    year, month = citizen_advisory.current_month()
+    response = client.post(
+        "/api/v1/advisories/approvals",
+        json={"month": f"{year:04d}-{month:02d}", "note": "uji"},
+        headers=_login(client, session, "Humas"),
+    )
+    assert response.status_code in (201, 409), response.text
 
 
 def test_citizen_group_registration_and_monthly_advisory_for_bot(
@@ -353,13 +367,18 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
         == 400
     )
 
-    # Pratinjau untuk layar petugas: contoh teks dan jumlah grup; tidak ada tombol setuju.
+    # Pratinjau untuk layar petugas: contoh teks dan jumlah grup. Sejak 19 November 2026
+    # imbauan menunggu persetujuan Humas — bukan Pimpinan, bukan Administrator.
     preview = client.get("/api/v1/advisories/preview", headers=leader).json()
-    assert preview["automatic"] is True and preview["sample"] is not None
+    assert preview["automatic"] is False and preview["sample"] is not None
     assert preview["groups_registered"] >= 1
-    assert client.post(
-        "/api/v1/advisories/approvals", json={"month": "2030-01"}, headers=leader
-    ).status_code in (404, 405)
+    for not_humas in (leader, admin):
+        assert (
+            client.post(
+                "/api/v1/advisories/approvals", json={"month": "2030-01"}, headers=not_humas
+            ).status_code
+            == 403
+        )
     this_month = preview["month"]
     assert (
         client.get(
@@ -370,7 +389,13 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
         == 200
     )
 
-    # Grup terdaftar masuk antrean sampai ditandai terkirim — tanpa persetujuan.
+    # Sebelum disetujui Humas antrean kosong; sesudahnya grup terdaftar masuk antrean sampai
+    # ditandai terkirim.
+    held = client.get("/api/v1/messaging/advisories/pending", headers=key).json()
+    if held.get("awaiting_approval"):
+        assert held["data"] == []
+    _humas_approves(client, session)
+    assert client.get("/api/v1/advisories/preview", headers=leader).json()["approved"] is True
     pending = client.get("/api/v1/messaging/advisories/pending", headers=key).json()
     mine = next(row for row in pending["data"] if row["kelurahan"] == area.kelurahan)
     assert mine["chat_id"] == "120363@g.us" and mine["month"] == pending["month"]
@@ -391,3 +416,95 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
     listing = client.get("/api/v1/babin", headers=admin).json()
     row = next(r for r in listing["data"] if r["kelurahan"] == area.kelurahan)
     assert row["whatsapp_group_chat_id"] == "120363@g.us"
+
+
+def test_citizen_subscribes_to_area_advisory_and_can_leave(
+    client: TestClient, session: Session
+) -> None:
+    """Pemberitahuan wilayah per warga (naskah 4.7 b): berlangganan dari percakapan pribadi,
+    menerima imbauan bulan berjalan sekali, pindah kelurahan, dan berhenti (baris dihapus)."""
+    from prediksi_presisi_api.models import AreaSubscription, AuditLog
+
+    areas = session.scalars(
+        select(Location).where(Location.kelurahan.is_not(None)).order_by(Location.kelurahan)
+    ).all()
+    first, second = areas[0], next(a for a in areas if a.kelurahan != areas[0].kelurahan)
+    chat = f"62812{uuid.uuid4().int % 10**8:08d}@c.us"
+    body = {"channel": "WHATSAPP", "chat_id": chat, "kelurahan": str(first.kelurahan).upper()}
+
+    assert client.post("/api/v1/messaging/subscriptions", json=body).status_code == 401
+    assert (
+        client.post(
+            "/api/v1/messaging/subscriptions", json={**body, "chat_id": "1203@g.us"}, headers=BOT
+        ).status_code
+        == 400
+    )
+    assert (
+        client.post(
+            "/api/v1/messaging/subscriptions", json={**body, "kelurahan": "Nirwana"}, headers=BOT
+        ).status_code
+        == 404
+    )
+    assert (
+        client.post(
+            "/api/v1/messaging/subscriptions", json={**body, "channel": "SMS"}, headers=BOT
+        ).status_code
+        == 400
+    )
+    created = client.post("/api/v1/messaging/subscriptions", json=body, headers=BOT)
+    assert created.status_code == 200, created.text
+    assert created.json()["kelurahan"] == first.kelurahan  # nama baku, bukan ketikan warga
+
+    query = {"channel": "WHATSAPP", "chat_id": chat}
+    mine = client.get("/api/v1/messaging/subscriptions", params=query, headers=BOT)
+    assert mine.status_code == 200 and mine.json()["kelurahan"] == first.kelurahan
+
+    # Sebelum Humas menyetujui imbauan bulan ini, tidak ada yang dikirim.
+    held = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
+    if held.get("awaiting_approval"):
+        assert held["data"] == []
+    _humas_approves(client, session)
+    pending = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
+    row = next(item for item in pending["data"] if item["chat_id"] == chat)
+    assert row["kelurahan"] == first.kelurahan and row["text"]
+    sent = client.post(
+        "/api/v1/messaging/subscriptions/sent",
+        json={
+            "subscription_id": row["subscription_id"],
+            "month": pending["month"],
+            "delivery": {"whatsapp": "ok"},
+        },
+        headers=BOT,
+    )
+    assert sent.status_code == 200
+    again = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
+    assert chat not in [item["chat_id"] for item in again["data"]]  # sekali per bulan
+
+    # Pindah kelurahan: satu percakapan satu kelurahan, dan imbauan kelurahan baru menyusul.
+    moved = client.post(
+        "/api/v1/messaging/subscriptions",
+        json={**body, "kelurahan": second.kelurahan},
+        headers=BOT,
+    )
+    assert moved.status_code == 200 and moved.json()["kelurahan"] == second.kelurahan
+    after_move = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
+    assert [i["kelurahan"] for i in after_move["data"] if i["chat_id"] == chat] == [
+        second.kelurahan
+    ]
+
+    # Jejak audit tidak memuat pengenal percakapan.
+    trail = session.scalars(
+        select(AuditLog).where(AuditLog.action == "SUBSCRIBE_AREA_ADVISORY")
+    ).all()
+    assert trail and all(chat not in str(entry.detail) + str(entry.resource_id) for entry in trail)
+
+    gone = client.delete("/api/v1/messaging/subscriptions", params=query, headers=BOT)
+    assert gone.status_code == 200 and gone.json()["unsubscribed"] is True
+    assert session.scalar(select(AreaSubscription).where(AreaSubscription.chat_id == chat)) is None
+    assert (
+        client.get("/api/v1/messaging/subscriptions", params=query, headers=BOT).status_code == 404
+    )
+    assert (
+        client.delete("/api/v1/messaging/subscriptions", params=query, headers=BOT).status_code
+        == 404
+    )

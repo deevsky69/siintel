@@ -1,0 +1,67 @@
+# PANDUAN PENGAMANAN UNTUK WARGA — SIGAP BERSAMA
+#
+# Status: PROPOSED — REQUIRES USER APPROVAL. Teks panduan disusun sebagai rancangan awal dan
+# belum ditinjau Binmas/Humas; ubah kata-katanya di sini, bukan di kode (CLAUDE.md §12).
+#
+# Naskah Taskap 4.7 f: "Panduan pengamanan kos, parkir, gedung, dan lingkungan RT/RW
+# berdasarkan pola kejadian." Empat panduan di bawah mengikuti empat jenis tempat pada
+# Tabel 13 naskah. Untuk WARGA dan pengelola: langkah yang dapat mereka kerjakan sendiri.
+# TIDAK memuat taktik kepolisian, lokasi patroli, atau skor risiko.
+#
+# `location_types` = kategori tempat kejadian pada data (nilai Pusiknas apa adanya). Dipakai
+# untuk menghitung pola setahun terakhir yang ditampilkan di samping panduan: jumlah kejadian,
+# modus terbanyak, dan rentang jam terbanyak. Kategori yang tidak tercantum tidak dihitung.
+
+status: PROPOSED
+usulan: 2026-11-17
+
+closing: "Keadaan darurat: 110. Melihat atau mendengar hal mencurigakan: laporkan lewat SIGAP BERSAMA atau Bhabinkamtibmas kelurahan Anda."
+
+guides:
+  - id: kos
+    title: Kos, kontrakan, dan asrama
+    audience: Pemilik, pengelola, dan penghuni
+    location_types: [Kost, Kontrakan, Apartemen, Penginapan]
+    steps:
+      - Sediakan parkir motor di dalam pagar yang terkunci; hindari parkir di teras yang langsung terlihat dari jalan.
+      - Pasang lampu yang menyala sepanjang malam di area parkir dan pintu masuk.
+      - Sepakati jam kunci gerbang dan satu orang penanggung jawab kunci setiap malam.
+      - Wajibkan kunci ganda (kunci stang ditambah gembok cakram) untuk setiap motor penghuni.
+      - Catat tamu yang menginap dan laporkan penghuni baru kepada RT sesuai aturan setempat.
+      - Pasang CCTV yang menghadap gerbang dan area parkir bila memungkinkan, dan periksa rekamannya berfungsi.
+
+  - id: parkir
+    title: Jalan dan tempat parkir
+    audience: Pengendara, juru parkir, dan pengelola parkir
+    location_types: [Jalan Umum, Perparkiran, Spbu, Stasiun kereta]
+    steps:
+      - Parkir di tempat yang terang, ramai, dan berpenjaga; hindari badan jalan pada rentang jam rawan kelurahan Anda.
+      - Selalu kunci stang dan tambahkan gembok cakram atau kunci tambahan, walau hanya ditinggal sebentar.
+      - Jangan tinggalkan kunci, STNK, helm mahal, atau barang berharga di kendaraan.
+      - Minta dan simpan karcis parkir; pengelola mencocokkan karcis dengan kendaraan saat keluar.
+      - Pengelola memastikan lampu dan CCTV area parkir menyala, terutama di sudut yang tidak terlihat dari pos.
+      - Catat nomor rangka dan nomor mesin kendaraan Anda; laporkan segera bila hilang.
+
+  - id: gedung
+    title: Toko, perkantoran, dan gedung
+    audience: Pengelola gedung, pemilik usaha, dan petugas keamanan
+    location_types: [Pertokoan, Perkantoran, Cafe, Rumah Makan, Warung, Minimarket, "Mall / Swalayan", Pasar, Hotel, Gedung, Pergudangan]
+    steps:
+      - Periksa kunci pintu, jendela, dan rolling door setiap tutup; gunakan gembok yang terlindung dari pemotong.
+      - Jangan menyimpan uang tunai dalam jumlah besar di tempat usaha pada malam hari.
+      - Atur satu pintu keluar-masuk kendaraan dengan pemeriksaan karcis atau kartu akses.
+      - Pasang CCTV di pintu masuk, kasir, dan parkir; simpan rekaman sekurangnya dua pekan.
+      - Buat jadwal ronda petugas keamanan yang tidak selalu sama jamnya.
+      - Simpan nomor Polsek dan Bhabinkamtibmas setempat di pos keamanan.
+
+  - id: rtrw
+    title: Lingkungan RT/RW dan rumah tinggal
+    audience: Pengurus RT/RW dan warga
+    location_types: ["Perumahan / Pemukiman", Perkampungan]
+    steps:
+      - Aktifkan siskamling atau ronda bergilir, terutama pada rentang jam rawan kelurahan Anda.
+      - Kunci pintu, jendela, dan pagar sebelum tidur dan saat rumah kosong; nyalakan lampu teras.
+      - Masukkan motor ke dalam rumah atau garasi terkunci, dan pakai kunci ganda.
+      - Titipkan rumah kepada tetangga atau RT bila bepergian lama; jangan mengumumkannya di media sosial.
+      - Sepakati satu grup warga untuk kabar cepat, dan daftarkan grup itu ke bot SIGAP dengan /daftar.
+      - Kenali Bhabinkamtibmas kelurahan Anda dan simpan nomornya.

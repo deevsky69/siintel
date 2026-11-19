@@ -125,7 +125,12 @@ def test_ranking_orders_by_three_month_mean_with_alphabetical_ties_and_report_cu
     # Sisanya seri 0 → abjad.
     rest = [row.kelurahan for row in result.rows[2:]]
     assert rest == sorted(rest)
-    assert all(row.ikw is not None and row.ikw_category for row in result.rows)
+    # IKW (naskah B.4.2) membawa statusnya; yang DITAHAN tidak diterbitkan, bukan dianggap nol.
+    for row in result.rows:
+        index = row.basis["ikw"]
+        assert index["status"] in ("LENGKAP", "SEMENTARA", "DITAHAN")
+        assert (row.ikw is None) == (index["status"] == "DITAHAN")
+        assert 0 <= index["frequency"] <= 4 and 0 <= index["recurrence"] <= 4
     assert result.rows[0].basis["basis_total"] == 6
 
     vehicle_only = ranking.compute(session, TARGET, "HISTORY_3M", "VEHICLE")
@@ -141,35 +146,76 @@ def test_freeze_once_then_read_frozen_and_only_manager_may_freeze(
     leader = _login(client, session, "Pimpinan")
 
     options = client.get("/api/v1/rankings/options", headers=leader)
-    assert options.status_code == 200 and options.json()["default_method"] == "HISTORY_3M"
+    assert options.status_code == 200
+    body = options.json()
+    # Metode dasar usulan ditentukan penjaga (model bila terbukti lebih tepat, selain itu
+    # peta historis) — bergantung pada data, jadi yang diperiksa adalah kesepadanannya.
+    assert body["configured_method"] == "MODEL"
+    assert body["default_method"] == body["method_choice"]["method"]
+    assert body["method_choice"]["reason"]
+    assert {m["value"] for m in body["methods"]} == {
+        "MODEL",
+        "HISTORY_3M",
+        "HISTORY_12M",
+        "HISTORY_1M",
+        "ANNUAL",
+    }
+    assert body["model"] is not None and "available" in body["model"]
 
-    preview = client.get("/api/v1/rankings?month=2031-02", headers=leader)
+    preview = client.get("/api/v1/rankings?month=2031-02&method=HISTORY_3M", headers=leader)
     assert preview.status_code == 200 and preview.json()["frozen"] is False
     assert preview.json()["data"][0]["kelurahan"] == areas[2].kelurahan
 
     assert (
         client.post(
-            "/api/v1/rankings/freeze", json={"month": "2031-02"}, headers=leader
+            "/api/v1/rankings/freeze",
+            json={"month": "2031-02", "method": "HISTORY_3M"},
+            headers=leader,
         ).status_code
         == 403
     )
-    frozen = client.post("/api/v1/rankings/freeze", json={"month": "2031-02"}, headers=admin)
+    payload = {"month": "2031-02", "method": "HISTORY_3M"}
+    frozen = client.post("/api/v1/rankings/freeze", json=payload, headers=admin)
     assert frozen.status_code == 200, frozen.text
     assert frozen.json()["frozen"] is True and frozen.json()["data_cutoff"] == "2031-01-31"
-    assert (
-        client.post("/api/v1/rankings/freeze", json={"month": "2031-02"}, headers=admin).status_code
-        == 409
-    )
+    assert client.post("/api/v1/rankings/freeze", json=payload, headers=admin).status_code == 409
     assert (
         client.post(
-            "/api/v1/rankings/freeze", json={"month": "2031-02", "method": "MODEL"}, headers=admin
+            "/api/v1/rankings/freeze",
+            json={"month": "2031-02", "method": "TIDAK_ADA"},
+            headers=admin,
         ).status_code
         == 400
     )
 
-    again = client.get("/api/v1/rankings?month=2031-02", headers=leader).json()
+    again = client.get("/api/v1/rankings?month=2031-02&method=HISTORY_3M", headers=leader).json()
     assert again["frozen"] is True and again["ranking_id"] == frozen.json()["ranking_id"]
     assert "2031-02" in [
         row["target_month"]
         for row in client.get("/api/v1/rankings/options", headers=leader).json()["frozen"]
     ]
+
+
+def test_new_comparators_previous_month_and_fixed_annual_map(session: Session) -> None:
+    areas = _areas(session)
+    a, b = areas[0], areas[1]
+    # Bulan sebelumnya (Jan 2031): hanya B. Tiga bulan terakhir: A lebih ramai.
+    for i in range(5):
+        _incident(session, a, date(2030, 11, 5) + timedelta(days=i * 3))
+    for i in range(2):
+        _incident(session, b, date(2031, 1, 3) + timedelta(days=i))
+
+    last_month = ranking.compute(session, TARGET, "HISTORY_1M", "VEHICLE")
+    assert last_month.rows[0].kelurahan == b.kelurahan and last_month.rows[0].predicted_count == 2.0
+    assert last_month.basis_from == date(2031, 1, 1)
+
+    config = ranking.load_config()
+    year = ranking.annual_year(config)
+    annual = ranking.compute(session, TARGET, "ANNUAL", "VEHICLE")
+    assert annual.basis_from == date(year, 1, 1) and annual.basis_to == date(year, 12, 31)
+    # Peta tahunan TETAP: kejadian sesudah tahunnya tidak mengubah apa pun.
+    assert [r.kelurahan for r in annual.rows] == [
+        r.kelurahan for r in ranking.compute(session, date(2032, 6, 1), "ANNUAL", "VEHICLE").rows
+    ]
+    with pytest.raises(ranking.RankingError):
+        ranking.compute(session, date(year, 6, 1), "ANNUAL", "VEHICLE")

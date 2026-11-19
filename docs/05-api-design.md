@@ -470,15 +470,22 @@ tidak terjadi.
 > tangan pemilik proyek. Aplikasi Android LAPOR PRESISI (PHASE 17) tetap direncanakan
 > terpisah.
 
-### 2.11d SIGAP WARGA — ringkasan wilayah publik dan Survey Rasa Aman (2 November 2026)
+### 2.11d SIGAP BERSAMA — ringkasan wilayah publik dan Survey Rasa Aman (2 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
 | GET | `/public/areas/summary` | — | per kelurahan: jumlah 3C 12 bulan terakhir, per jenis, per bulan, tingkat RENDAH/SEDANG/TINGGI (tertil, PROPOSED), rata-rata ulasan tayang; agregat per kecamatan. Tanpa prediksi/skor/titik |
 | POST | `/public/reviews` | — | ulasan anonim (kecamatan, kelurahan, rating 1–5, komentar ≤300); kuota 3/jam per alamat; masuk PENDING; audit `SUBMIT_AREA_REVIEW` |
 | GET | `/public/reviews?kelurahan=` | — | ulasan PUBLISHED + rata-rata + jumlah |
+| GET | `/public/survey/quarterly` | — | **17 November 2026 (naskah Taskap 4.7 h):** empat triwulan kalender terakhir — responden (ulasan tayang), nilai rata-rata, kelurahan terwakili dari seluruh kelurahan, `coverage_pct`; triwulan berjalan ditandai `running` |
+| GET | `/reviews/quarterly` | `review:moderate` | sama, ditambah `submitted` (seluruh ulasan masuk) dan rincian per kecamatan |
+| GET | `/public/guides` | — | **17 November 2026 (naskah 4.7 f):** panduan pengamanan kos, parkir, gedung, RT/RW dari `config/recommendation/security-guides.yaml` (PROPOSED); tiap panduan membawa `pattern` — agregat 3C 12 bulan terakhir pada jenis tempat itu (jumlah, porsi, modus terbanyak, blok jam terbanyak) — dan `text` siap kirim untuk bot |
 | GET | `/reviews?status=` | `review:moderate` | antrean moderasi |
 | POST | `/reviews/{code}/moderate` | `review:moderate` | `PUBLISH` / `REJECT` + catatan; audit `MODERATE_AREA_REVIEW` |
+
+Sejak 17 November 2026 `area_reviews.submitted_at` memakai waktu sebenarnya
+(`clock.citizen_now`), seperti laporan warga — hasil triwulanan hanya bermakna bila cap
+waktunya nyata.
 
 Tabel `area_reviews` (migration 0015). `GET /notifications` memuat kelompok `REVIEW` bagi
 pemegang `review:moderate`. Tautan `href` pada `/notifications` kini berawalan `/ops`
@@ -509,42 +516,87 @@ idempoten, mencetak LP + PIN contoh).
 imbauan bulan berjalan; `GET /messaging/advisory` (perintah bot **`/info`**, alias lama
 `/rekomendasi`) menjawab teks bulan depan tanpa syarat.
 
-### 2.11j Evaluasi bulanan (Modul 5 mekanisme, 6 November 2026)
+**Persetujuan Humas (19 November 2026, naskah Taskap final B.4.7):** `POST /advisories/approvals
+{month, note?}` (`public_info:approve`, peran Humas; 409 bila sudah disetujui; audit
+`APPROVE_CITIZEN_ADVISORY`). Sebelum bulan itu disetujui, `GET /messaging/advisories/pending`
+dan `GET /messaging/subscriptions/pending` menjawab daftar kosong dengan `awaiting_approval`.
+`GET /advisories/preview` memuat `approved`, `approved_at`, `approval_note`; `automatic` kini
+`false`. `/messaging/advisory` (perintah `/info`) tidak ditahan.
+
+**Langganan warga (17 November 2026, naskah Taskap 4.7 b "Pemberitahuan wilayah")** — kunci
+bot `X-Messaging-Key`:
+
+| Method | Path | Keterangan |
+|---|---|---|
+| POST | `/messaging/subscriptions {channel, chat_id, kelurahan}` | warga berlangganan dari percakapan PRIBADI (`/langganan <kelurahan>`); kanal `WHATSAPP`/`TELEGRAM`; chat grup (`@g.us`) ditolak 400; satu percakapan satu kelurahan (berlangganan lagi = pindah); audit `SUBSCRIBE_AREA_ADVISORY` tanpa pengenal percakapan |
+| GET | `/messaging/subscriptions?channel=&chat_id=` | langganan percakapan itu; 404 bila tidak ada |
+| DELETE | `/messaging/subscriptions?channel=&chat_id=` | berhenti (`/berhenti`): baris **dihapus**; audit `UNSUBSCRIBE_AREA_ADVISORY` |
+| GET | `/messaging/subscriptions/pending` | pelanggan yang belum menerima imbauan bulan berjalan, dengan teksnya |
+| POST | `/messaging/subscriptions/sent {subscription_id, month, delivery}` | menandai bulan itu — juga saat gagal, supaya tidak diulang tiap putaran; audit `SEND_SUBSCRIBER_ADVISORY` |
+
+Tabel `area_subscriptions` (0025): kanal, pengenal percakapan, kelurahan, bulan imbauan
+terakhir. Pengenal percakapan WhatsApp memuat nomor telepon — data pribadi yang diminimalkan
+(`models/area_subscription.py`). `GET /advisories/preview` kini juga memuat `subscribers`
+dan `subscribers_sent`.
+
+### 2.11j Evaluasi bulanan (Modul 5 mekanisme, 6 November 2026; PAI dan uji historis 17 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
 | GET | `/evaluation/monthly?month=YYYY-MM` | `evaluation:read` | per peringkat beku: **cakupan** = kejadian aktual bulan itu di N kelurahan teratas / seluruh yang dapat dipetakan (N = jumlah yang ditetapkan Pimpinan, atau `evaluation.default_top_n` = 6); pembanding peta 3/12 bulan pada N dan batas data yang sama; `decision` (kelurahan pilihan: aktual, jumlah kegiatan); `quality` (diterima/direvisi/ditolak + alasan, tahap yang dikembalikan). PAI `null` — luas kelurahan belum ada di API |
 
+| GET | `/evaluation/monthly/backtest?scope=&first=&last=&top_n=` | `evaluation:read` | **17 November 2026 (Tabel 12 naskah):** uji historis bulan demi bulan di luar masa latih model — per periode (tiap tahun, dan seluruh masa uji) tiap metode: `covered`/`total`, `coverage_pct`, `area_pct`, `pai`; `sign_tests` = uji tanda satu arah model terhadap tiap pembanding (`wins`, `losses`, `ties`, `p_value`); `model` (versi, masa latih, parameter, bobot masukan). Bawaan: cakupan `VEHICLE`, enam kelurahan, sampai bulan utuh terakhir |
+
 Kejadian bulan sasaran dibaca melewati batas tampilan (`visibility.all_incidents`) — hanya
 untuk pencocokan.
 
-### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; dua tahap sejak 10 November 2026)
+Sejak 17 November 2026 `GET /evaluation/monthly` juga menilai MODEL, bulan sebelumnya, dan
+peta tahunan tetap pada N dan batas data yang sama; setiap baris membawa `method_label`,
+`area_pct`, dan `pai` (tidak lagi `null`). PAI = porsi kejadian tercakup / porsi luas
+kelurahan pilihan; luas dari `config/ranking/kelurahan-area.yaml` (perkiraan dari poligon
+peta, PROPOSED).
+
+### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; empat tahap sejak 19 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
 | GET | `/monthly-products` | `monthly_product:read` | daftar bulan + status, bulan yang disarankan |
-| POST | `/monthly-products {month}` | `monthly_product:draft` (Analis Intelkam, Administrator) | draf dari peringkat bulan itu — **dibekukan otomatis** bila belum (`facts.ranking_frozen_by_draft`, audit `FREEZE_RANKING` detail `by: draft`); item = `draft_top_n` kelurahan teratas dengan pola (jenis dominan, blok jam puncak) dan usulan dari function-rules; 409 bila sudah ada |
+| POST | `/monthly-products {month}` | `monthly_product:draft` (Analis Intelkam; Administrator tidak lagi sejak 17 November 2026) | draf dari peringkat bulan itu — **dibekukan otomatis** bila belum (`facts.ranking_frozen_by_draft`, audit `FREEZE_RANKING` detail `by: draft`); item = `draft_top_n` kelurahan teratas dengan pola (jenis dominan, blok jam puncak) dan usulan dari function-rules; 409 bila sudah ada |
 | GET | `/monthly-products/{month}` | `monthly_product:read` | item, tahap, kegiatan |
-| POST | `/monthly-products/{month}/analyst {items[{kelurahan,status,text?,reason?}], note?}` | `monthly_product:draft` | ACCEPTED / REVISED (teks + alasan wajib) / REJECTED (alasan wajib); status → ANALYST_REVIEWED = **menunggu Pimpinan** (`awaiting_decision: true`, `next_stage: PIMPINAN`) |
-| ~~POST~~ | ~~`/monthly-products/{month}/kbo`~~, ~~`/kasat`~~ | — | **dihapus 10 November 2026** (404) bersama permission `review`/`validate`; status KBO_CHECKED/VALIDATED yang sudah tersimpan diperlakukan sama dengan ANALYST_REVIEWED |
-| POST | `/monthly-products/{month}/decide {selected[{kelurahan,action?}], reason?}` | `monthly_product:decide` (Pimpinan) | dari ANALYST_REVIEWED (atau KBO_CHECKED/VALIDATED tinggalan); menetapkan jumlah dan kelurahan prioritas; yang ditolak analis tidak dapat dipilih; → DECIDED |
+| POST | `/monthly-products/{month}/analyst {items[{kelurahan,status,text?,reason?}], note?}` | `monthly_product:draft` | ACCEPTED / REVISED (teks + alasan wajib) / REJECTED (alasan wajib); status → ANALYST_REVIEWED = **menunggu telaah Kasat Intelkam** (`awaiting_review`); sebelum 17 November 2026: menunggu Pimpinan (`awaiting_decision: true`, `next_stage: PIMPINAN`) |
+| POST | `/monthly-products/{month}/kasat {outcome, reason?}` | `monthly_product:validate` (Kasat Intelkam) | **dihidupkan lagi 17 November 2026 (0026):** telaah atas produk berstatus ANALYST_REVIEWED (atau KBO_CHECKED tinggalan). `ACCEPTED` → VALIDATED = menunggu Pimpinan (`awaiting_decision`); `REJECTED` → kembali DRAFT, **alasan wajib** (400 bila kosong). Tidak mengubah isi usulan. Audit `VALIDATE_MONTHLY_PRODUCT` |
+| POST | `/monthly-products/{month}/kbo {outcome, reason?}` | `monthly_product:review` (KBO) | **dihidupkan lagi 19 November 2026 (0029):** pemeriksaan mutu atas produk ANALYST_REVIEWED. `ACCEPTED` → KBO_CHECKED = menunggu telaah Kasat (`awaiting_review`); `REJECTED` → kembali DRAFT, alasan wajib. Audit `REVIEW_MONTHLY_PRODUCT_KBO`. Telaah Kasat kini hanya menerima KBO_CHECKED |
+| POST | `/monthly-products/{month}/decide {selected[{kelurahan,action?}], reason?}` | `monthly_product:decide` (Pimpinan) | hanya dari VALIDATED (sudah ditelaah Kasat; 409 bila belum); menetapkan jumlah dan kelurahan prioritas; yang ditolak analis tidak dapat dipilih; → DECIDED |
 | POST | `/monthly-products/{month}/items/{kelurahan}/actions {unit?, acted_at, place, action, result?}` | `monthly_product:execute` (Fungsi, Polsek) | kegiatan nyata; Polsek hanya kelurahan di polseknya (404) |
 
 Tabel `monthly_products`, `monthly_product_items`, `monthly_product_stages`, `monthly_actions`
-(0021). Audit: `DRAFT_/REVIEW_/DECIDE_MONTHLY_PRODUCT`, `RECORD_MONTHLY_ACTION` (`VALIDATE_` hanya pada baris lama).
+(0021). Audit: `DRAFT_/REVIEW_/VALIDATE_/DECIDE_MONTHLY_PRODUCT`, `RECORD_MONTHLY_ACTION`.
+`GET /monthly-products/{month}` memuat `next_stage` (`ANALYST` / `KASAT` / `PIMPINAN`),
+`awaiting_review`, dan `awaiting_decision`. `GET /notifications` memberi Kasat Intelkam
+antrean produk yang menunggu telaahnya.
 Peringkat awal (tabel 0020) dan keputusan Pimpinan (item `selected`/`decided_action`,
 tahap PIMPINAN) tersimpan terpisah.
 
-### 2.11h Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026)
+### 2.11h Peringkat bulanan kelurahan (Modul 2–3 mekanisme, 6 November 2026; model 17 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
-| GET | `/rankings/options` | `ranking:read` | metode (HISTORY_3M bawaan — keputusan 2A; HISTORY_12M; MODEL belum tersedia), cakupan (ALL_3C/VEHICLE), bulan yang disarankan, daftar yang sudah dibekukan |
+| GET | `/rankings/options` | `ranking:read` | metode: **MODEL** (gradient boosting; metode utama sejak 17 November 2026, menggantikan keputusan 2A), pembanding HISTORY_3M, HISTORY_12M, HISTORY_1M, ANNUAL — masing-masing dengan `kind` dan `available`; `default_method` = metode dasar usulan hasil penjaga, `configured_method`, `method_choice` (`reason`, `evidence`), `model` (kartu model); cakupan (ALL_3C/VEHICLE, bawaan VEHICLE), bulan yang disarankan, daftar yang sudah dibekukan |
 | GET | `/rankings?month=YYYY-MM&method=&scope=` | `ranking:read` | peringkat 65 kelurahan; `frozen: true` bila sudah dibekukan, selain itu hitungan saat ini |
 | POST | `/rankings/freeze {month, method?, scope?, data_cutoff?}` | `ranking:manage` (Administrator) | membekukan beserta batas data, versi metode, jumlah laporan menunggu konfirmasi; 409 bila sudah ada; audit `FREEZE_RANKING` |
 
-Tabel `monthly_rankings` + `monthly_ranking_rows` (0020). Perkiraan = rata-rata bulanan
-pada bulan dasar, hanya kejadian yang **dilaporkan** sampai batas data; seri menurut nama.
+Tanpa `method`, `GET /rankings` dan `POST /rankings/freeze` memakai metode dasar usulan
+bulan itu (`ranking.operational`): MODEL bila cakupannya pada bulan-bulan uji terakhir lebih
+tinggi daripada pembanding terbaik, selain itu peta historis. Baris MODEL membawa
+`basis.factors` — kontribusi tiap masukan, dihitung dari pohon model. CHECK `method`
+diperluas pada 0024. Sejak 19 November 2026 model mengikuti naskah Lampiran 8 E (catatan 185);
+`basis.factors[].effect_pct` adalah pengaruh masukan sebagai persen (model berskala log).
+`GET /evaluation/monthly/backtest` menambah `fixed` (skenario tetap) dan menerima `top_n`
+4, 6, atau 8.
+
+Tabel `monthly_rankings` + `monthly_ranking_rows` (0020). Perkiraan = keluaran model, atau
+rata-rata bulanan pada bulan dasar untuk peta historis; hanya kejadian yang **dilaporkan**
+sampai batas data; seri menurut nama.
 IKW (frekuensi 12 bulan, tren, konsistensi; `config/ranking/monthly.yaml`, PROPOSED)
 tampil di samping, tidak menentukan urutan.
 
@@ -561,6 +613,26 @@ tampil di samping, tidak menentukan urutan.
 `POST /crimes` (entri petugas) kini mengisi `data_source = ENTRI:<polsek/fungsi/peran>`,
 `receiving_unit`, `vehicle_object`, `area_pending`, dan menandai dugaan ganda
 (sejenis, lokasi sama, ±1 hari — PROPOSED). Perubahan status juga menulis revisi.
+
+**Mutu data (18 November 2026, naskah Taskap 4.1; catatan 184)** — semuanya `crime:triage`:
+
+| Method | Path | Keterangan |
+|---|---|---|
+| GET | `/data-quality` | `completeness` (kelurahan, jam, koordinat, objek sasaran, tempat kejadian: terisi dan %), `flags` (jumlah per tanda), `counting` (`official`, `linked_reports`, `additional_verified`, `awaiting_match`, `awaiting_verification`) |
+| GET | `/data-quality/flags?kind=&limit=` | kejadian bertanda `NO_TIME`, `NO_TARGET`, `NO_PLACE`, `LABEL_OBJECT`, `REPORT_BEFORE_INCIDENT`; aturan tertulis, bukan model |
+| GET | `/data-quality/matches` | laporan warga terverifikasi yang belum diputuskan, masing-masing dengan paling banyak 5 usulan kejadian resmi (wilayah sama, ±3 hari) |
+| POST | `/citizen-reports/{code}/match {decision, incident_code?, reason}` | `MATCHED` (wajib `incident_code`) / `NOT_MATCHED`; `reason` wajib; 409 bila laporan masih RECEIVED; audit `MATCH_CITIZEN_REPORT` |
+
+**Dampak dan IKW (19 November 2026, naskah final B.4.2 dan Lampiran 9):** `POST
+/crimes/{code}/impact {loss_status, injury_level, status, source}` (`crime:triage`; `source`
+wajib; `VERIFIED` ditolak bila masih ada isian `UNKNOWN`; audit `RECORD_CRIME_IMPACT`) dan
+`GET /data-quality/impact` (laporan tiga bulan terakhir yang dampaknya belum terverifikasi).
+Baris `/rankings` membawa `basis.ikw` = `{value, category, status, frequency, impact,
+recurrence, impact_reports, impact_verified, review_now, quartiles}`; `ikw` bernilai `null`
+bila berstatus `DITAHAN`. Kolom dampak pada `crime_incidents` (0028).
+
+`POST /crimes/{code}/duplicate` kini mewajibkan `note` (alasan). Kolom `citizen_reports`
+`matched_incident_id`, `match_decision`, `match_reason`, `matched_by`, `matched_at` (0027).
 
 ### 2.11f Babinkamtibmas dan buletin kelurahan (tahap 3, 2 November 2026)
 
@@ -611,7 +683,7 @@ mencatat `channel` tanpa `chat_id`.
 | GET | `/dashboard/trends` | `dashboard:read` |
 | GET | `/dashboard/active-warnings` | `dashboard:read`, `warning:read` |
 | GET | `/dashboard/leadership` | `dashboard:read` — ✅ **ADA** |
-| GET | `/notifications` | `dashboard:read` — ✅ **ADA** |
+| GET | `/notifications` | `dashboard:read` — ✅ **ADA**; sejak 12 November 2026 kelompoknya: `PANIC`, `MONTHLY_PRODUCT` (decide: menunggu penetapan; draft: draf belum dikirim), `BULLETIN` (`bulletin:approve`), `CITIZEN_REPORT`, `REVIEW` — kelompok rantai harian `WARNING`/`DECISION`/`PREDICTION`/`OPERATION`/`PATROL_PLAN` dihapus (catatan 179) |
 
 **`/dashboard/leadership` (TASK 150).** Permintaan pemilik proyek, 2 September 2026: layar
 beranda yang tersusun mengikuti urutan pertanyaan seorang pimpinan, bukan urutan

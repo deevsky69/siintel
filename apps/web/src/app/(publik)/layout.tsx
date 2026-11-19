@@ -3,9 +3,9 @@ import { PolriEmblem } from "@/components/warga/brand";
 import { WargaBottomNav, WargaTopNav } from "@/components/warga/nav";
 
 /**
- * SIGAP WARGA — kerangka halaman masyarakat (rupa lembaga terang, 10 November 2026).
+ * SIGAP BERSAMA — kerangka halaman masyarakat (rupa lembaga terang, 10 November 2026).
  *
- * Mengikuti mockup "SIGAP WARGA Redesign" pemilik proyek: strip navy berisi nama satuan dan
+ * Mengikuti mockup "SIGAP BERSAMA Redesign" pemilik proyek: strip navy berisi nama satuan dan
  * tautan masuk petugas; masthead putih bergaris **emas ganda** dengan lambang, nama dua
  * baris, menu teks bergaris emas, dan dua tombol tetap (Lapor kejadian, Darurat 110); kaki
  * halaman navy. Tidak ada pil, tidak ada sudut membulat. Di ponsel menu turun ke tab bawah.
@@ -33,7 +33,7 @@ export default function WargaLayout({ children }: { children: React.ReactNode })
           <Link href="/" className="warga-brand">
             <PolriEmblem size={96} className="h-[50px] w-auto" />
             <span>
-              <b>SIGAP WARGA</b>
+              <b>SIGAP BERSAMA</b>
               <small>Polres Metro Jakarta Selatan</small>
             </span>
           </Link>
@@ -60,13 +60,13 @@ export default function WargaLayout({ children }: { children: React.ReactNode })
               <PolriEmblem size={96} className="h-[46px] w-auto" />
               <span className="flex flex-col leading-tight">
                 <span className="text-xl font-extrabold tracking-wider text-white">
-                  SIGAP WARGA
+                  SIGAP BERSAMA
                 </span>
                 <span className="text-xs font-medium">Polres Metro Jakarta Selatan</span>
               </span>
             </div>
             <p className="text-sm leading-relaxed">
-              Sistem Inteligensi Geospasial dan Analitik Prediktif. Angka di situs ini adalah
+              Sistem Intelijen Geospasial dan Analitik Prediktif. Angka di situs ini adalah
               ringkasan historis per wilayah, bukan ramalan untuk perorangan.
             </p>
           </div>
@@ -76,6 +76,7 @@ export default function WargaLayout({ children }: { children: React.ReactNode })
               Darurat 110
             </a>
             <Link href="/lapor">Lapor kejadian</Link>
+            <Link href="/panduan">Panduan pengamanan</Link>
             <Link href="/ops/masuk">Masuk petugas</Link>
           </nav>
         </div>

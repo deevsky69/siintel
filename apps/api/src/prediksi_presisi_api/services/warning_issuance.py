@@ -36,13 +36,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-import yaml
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..models import EarlyWarning, Location, Prediction, Recommendation
 from ..seeding.paths import REPO_ROOT
-from . import clock
+from . import clock, config_cache
 from . import risk_engine as risk
 
 FUNCTION_RULES_FILE = REPO_ROOT / "config" / "recommendation" / "function-rules.yaml"
@@ -108,7 +107,7 @@ def load_function_rules() -> FunctionRules:
         message = "config/recommendation/function-rules.yaml tidak ditemukan"
         raise IssuanceError(message)
 
-    raw: dict[str, Any] = yaml.safe_load(FUNCTION_RULES_FILE.read_text(encoding="utf-8"))
+    raw: dict[str, Any] = config_cache.load_yaml(FUNCTION_RULES_FILE)
     rules = {
         str(threat).upper(): FunctionRule(
             function=str(body["function"]).upper(), action=str(body["action"])

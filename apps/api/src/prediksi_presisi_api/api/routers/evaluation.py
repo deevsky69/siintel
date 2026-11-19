@@ -236,3 +236,28 @@ def monthly(
     return monthly_evaluation.evaluate(
         session, target, jurisdiction_filter(current, "evaluation:read")
     )
+
+
+@router.get(
+    "/monthly/backtest",
+    summary="Uji historis model terhadap peta pembanding: cakupan, PAI, uji tanda",
+)
+def monthly_backtest(
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("evaluation:read"),
+    scope: str | None = Query(None, description="ALL_3C atau VEHICLE; kosong = bawaan"),
+    first: str | None = Query(None, description="YYYY-MM; kosong = bulan pertama di luar latih"),
+    last: str | None = Query(None, description="YYYY-MM; kosong = bulan utuh terakhir"),
+    top_n: int | None = Query(None, ge=1, le=65),
+) -> dict[str, Any]:
+    try:
+        return monthly_evaluation.backtest(
+            session,
+            scope,
+            monthly_ranking.parse_month(first) if first else None,
+            monthly_ranking.parse_month(last) if last else None,
+            top_n,
+            jurisdiction_filter(current, "evaluation:read"),
+        )
+    except monthly_ranking.RankingError as error:
+        raise ApiError(status.HTTP_400_BAD_REQUEST, str(error)) from error

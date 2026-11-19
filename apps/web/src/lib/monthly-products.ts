@@ -1,10 +1,12 @@
+import { cache } from "react";
 import { apiGet, apiPost } from "./api";
 
 /**
  * Produk bulanan (Modul 4 mekanisme), dua tahap sejak 10 November 2026 (catatan 177):
- * Analis menyusun & memeriksa (peringkat dibekukan otomatis) → Pimpinan menetapkan →
- * Fungsi/Polsek mencatat. `KBO_CHECKED` / `VALIDATED` hanya tinggalan alur empat tahap dan
- * diperlakukan sama dengan `ANALYST_REVIEWED`: menunggu Pimpinan.
+ * Tiga tahap sejak 17 November 2026: Staf Intelkam menyusun & memeriksa (peringkat dibekukan
+ * otomatis) → Kasat Intelkam menelaah → Pimpinan menetapkan → Fungsi/Polsek mencatat.
+ * `KBO_CHECKED` adalah tinggalan alur empat tahap dan diperlakukan sama dengan
+ * `ANALYST_REVIEWED`: menunggu telaah Kasat.
  */
 export type ProductItem = {
   rank: number;
@@ -47,7 +49,9 @@ export type MonthlyProduct = {
   product_id: string;
   target_month: string;
   status: ProductStatus;
-  next_stage: "ANALYST" | "PIMPINAN" | null;
+  next_stage: "ANALYST" | "KBO" | "KASAT" | "PIMPINAN" | null;
+  awaiting_kbo: boolean;
+  awaiting_review: boolean;
   awaiting_decision: boolean;
   facts: Record<string, string | number | boolean>;
   priority_count: number | null;
@@ -68,15 +72,19 @@ export type ProductList = {
   basis: string;
 };
 
+/** Status yang menunggu pemeriksaan mutu oleh KBO. */
+export const AWAITING_KBO: readonly ProductStatus[] = ["ANALYST_REVIEWED"];
+export const isAwaitingKbo = (status: ProductStatus) => AWAITING_KBO.includes(status);
+
+/** Status yang menunggu telaah Kasat Intelkam: sudah diperiksa KBO. */
+export const AWAITING_REVIEW: readonly ProductStatus[] = ["KBO_CHECKED"];
+export const isAwaitingReview = (status: ProductStatus) => AWAITING_REVIEW.includes(status);
+
 /** Status yang menunggu penetapan Pimpinan — satu tempat, dipakai lencana dan beranda. */
-export const AWAITING_DECISION: readonly ProductStatus[] = [
-  "ANALYST_REVIEWED",
-  "KBO_CHECKED",
-  "VALIDATED",
-];
+export const AWAITING_DECISION: readonly ProductStatus[] = ["VALIDATED"];
 export const isAwaitingDecision = (status: ProductStatus) => AWAITING_DECISION.includes(status);
 
-export const listProducts = () => apiGet<ProductList>("/monthly-products");
+export const listProducts = cache(() => apiGet<ProductList>("/monthly-products"));
 export const getProduct = (month: string) => apiGet<MonthlyProduct>(`/monthly-products/${month}`);
 export const draftProduct = (month: string) =>
   apiPost<MonthlyProduct>("/monthly-products", { month });
@@ -87,6 +95,14 @@ export const analystReview = (
     note?: string;
   },
 ) => apiPost<MonthlyProduct>(`/monthly-products/${month}/analyst`, body);
+export const kboCheck = (
+  month: string,
+  body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },
+) => apiPost<MonthlyProduct>(`/monthly-products/${month}/kbo`, body);
+export const kasatReview = (
+  month: string,
+  body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },
+) => apiPost<MonthlyProduct>(`/monthly-products/${month}/kasat`, body);
 export const decideProduct = (
   month: string,
   body: { selected: { kelurahan: string; action?: string }[]; reason?: string },
@@ -104,3 +120,28 @@ export const recordAction = (
 /** Produk bulanan yang menunggu penetapan Pimpinan — lencana sidebar. */
 export const countAwaitingDecision = async (): Promise<number> =>
   (await listProducts()).data.filter((row) => isAwaitingDecision(row.status)).length;
+
+/**
+ * Kelurahan prioritas bulan ini: dari produk bulanan terakhir yang DITETAPKAN Pimpinan.
+ * Dipakai peta (/ops/peta, beranda) untuk menggarisi kelurahan itu — pengganti lapisan skor
+ * harian (12 November 2026, catatan 179). `null` bila belum ada produk yang ditetapkan.
+ */
+export async function getPriorityKelurahan(): Promise<{
+  month: string;
+  items: { kelurahan: string; kecamatan: string; polsek: string }[];
+} | null> {
+  const list = await listProducts();
+  const decided = list.data.find((row) => row.status === "DECIDED");
+  if (!decided) return null;
+  const product = await getProduct(decided.target_month);
+  return {
+    month: product.target_month,
+    items: product.items
+      .filter((item) => item.selected)
+      .map((item) => ({
+        kelurahan: item.kelurahan,
+        kecamatan: item.kecamatan,
+        polsek: item.polsek,
+      })),
+  };
+}

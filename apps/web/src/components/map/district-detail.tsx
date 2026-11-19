@@ -106,7 +106,7 @@ function ScoreRow({
       >
         {score}
       </span>
-      <span className="w-11 text-right text-2xs uppercase text-ink-muted">
+      <span className="min-w-11 shrink-0 whitespace-nowrap text-right text-2xs uppercase text-ink-muted">
         {risk ? RISK_LABELS[risk] : "tanpa kelas"}
       </span>
     </li>
@@ -222,7 +222,10 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
         </div>
       </div>
 
-      <dl className="mt-2 grid grid-cols-4 gap-2 text-xs">
+      {/* Mengalir dan turun baris, bukan empat kolom sama lebar: pada kartu sempit (ponsel,
+          panel samping 1280 px) "Dipublikasikan" meluber keluar kartu dan "Confidence"
+          menempel pada "Status". */}
+      <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
         <div>
           {/* WHEN */}
           <dt className="text-ink-faint">Jendela</dt>
@@ -263,7 +266,7 @@ function PredictionCard({ prediction }: { prediction: AreaPrediction }) {
                     style={{ width: `${Math.min(100, Math.max(0, factor.contribution * 100))}%` }}
                   />
                 </span>
-                <span className="w-9 shrink-0 text-right font-mono text-xs text-ink-muted">
+                <span className="min-w-9 shrink-0 text-right font-mono text-xs text-ink-muted">
                   {Math.round(factor.contribution * 100)}%
                 </span>
               </li>

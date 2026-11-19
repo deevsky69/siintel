@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { TrackForm, VehicleForm } from "./forms";
 
-export const metadata = { title: "Lacak Laporan — SIGAP WARGA" };
+export const metadata = { title: "Lacak Laporan — SIGAP BERSAMA" };
 
 /**
  * Lacak laporan dan cek kendaraan (mockup 10 November 2026): hero navy berjudul "Lacak &

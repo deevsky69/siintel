@@ -68,10 +68,10 @@ case "$kode" in
   *) tidak "tanpa kunci, /api/v1/messaging/updates menjawab $kode — seharusnya 401/503" ;;
 esac
 
-# 3c. Dua wajah satu domain (2 November 2026): akar = SIGAP WARGA (terbuka), /ops = kepolisian
+# 3c. Dua wajah satu domain (2 November 2026): akar = SIGAP BERSAMA (terbuka), /ops = kepolisian
 #     (dialihkan ke halaman masuk bila tanpa sesi). Ringkasan wilayah publik harus terbuka.
 kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/")
-[ "$kode" = "200" ] && lulus "beranda SIGAP WARGA terbuka" || tidak "beranda warga menjawab $kode"
+[ "$kode" = "200" ] && lulus "beranda SIGAP BERSAMA terbuka" || tidak "beranda warga menjawab $kode"
 kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/ops")
 case "$kode" in 302|307|308) lulus "tanpa sesi, /ops dialihkan ke halaman masuk" ;; *) tidak "/ops tanpa sesi menjawab $kode — seharusnya dialihkan" ;; esac
 kode=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$BASE/api/v1/public/areas/summary")

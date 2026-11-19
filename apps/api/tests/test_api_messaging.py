@@ -21,7 +21,10 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.api.routers import messaging
-from prediksi_presisi_api.api.routers.public_intake import load_report_categories
+from prediksi_presisi_api.api.routers.public_intake import (
+    RATE_LIMIT_PER_HOUR,
+    load_report_categories,
+)
 from prediksi_presisi_api.main import app
 from prediksi_presisi_api.models import (
     AuditLog,
@@ -129,7 +132,8 @@ def test_a_report_from_a_chat_stores_its_contact_separately(
             AuditLog.action == "SUBMIT_CITIZEN_REPORT", AuditLog.resource_id == body["ticket"]
         )
     )
-    assert entry is not None and entry.detail["channel"] == "TELEGRAM"
+    assert entry is not None and entry.detail is not None
+    assert entry.detail["channel"] == "TELEGRAM"
     assert "chat_id" not in str(entry.detail)
 
 
@@ -157,7 +161,7 @@ def test_an_unknown_channel_and_identity_fields_are_refused(
 def test_the_quota_is_counted_per_chat_not_per_network(
     client: TestClient, session: Session
 ) -> None:
-    for _ in range(messaging.RATE_LIMIT_PER_HOUR):
+    for _ in range(RATE_LIMIT_PER_HOUR):
         assert (
             client.post(
                 "/api/v1/messaging/reports", json=_payload(session, "A"), headers=HEADERS

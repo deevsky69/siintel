@@ -4,7 +4,7 @@ import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
 import { getAdvisoryPreview, getBulletins } from "@/lib/babin";
 import { getProfile } from "@/lib/decisions";
-import { ApproveButton, GenerateForm } from "./bulletin-forms";
+import { ApproveAdvisoryForm, ApproveButton, GenerateForm } from "./bulletin-forms";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +36,7 @@ export default async function BuletinPage({
   ]);
   const canManage = profile.permissions.includes("bulletin:manage");
   const canApprove = profile.permissions.includes("bulletin:approve");
+  const canApproveInfo = profile.permissions.includes("public_info:approve");
   const week = one("minggu") || history.weeks[0] || "";
   const sent = (week ? history.data.filter((row) => row.week_start === week) : history.data).filter(
     (row) => row.status !== "DRAFT",
@@ -45,8 +46,8 @@ export default async function BuletinPage({
   return (
     <div className="space-y-3">
       <StatusNotice status="PROPOSED" tone="caution">
-        Buletin mingguan hanya terkirim setelah disetujui Pimpinan. Imbauan bulanan ke grup warga
-        dikirim bot secara otomatis setiap awal bulan (keputusan 10 November 2026).
+        Buletin mingguan hanya terkirim setelah disetujui Pimpinan. Imbauan bulanan ke grup dan
+        pelanggan dikirim bot setelah disetujui Humas (19 November 2026).
       </StatusNotice>
 
       <Panel
@@ -89,15 +90,23 @@ export default async function BuletinPage({
           title={`Imbauan bulanan ke grup warga · ${advisory.month}`}
           action={
             <span className="panel-action">
-              otomatis · {advisory.groups_sent}/{advisory.groups_registered} grup sudah menerima
+              {advisory.approved ? "disetujui Humas" : "menunggu persetujuan Humas"} ·{" "}
+              {advisory.groups_sent}/{advisory.groups_registered} grup · {advisory.subscribers_sent}
+              /{advisory.subscribers} pelanggan sudah menerima
             </span>
           }
         >
           <p className="text-2xs leading-relaxed text-ink-faint">
-            Dikirim bot setiap awal bulan ke grup yang terdaftar lewat /daftar; warga dapat
-            memintanya kapan saja dengan /info. Tidak ada persetujuan: isinya imbauan kehati-hatian
-            dari pola bulan yang sama tahun-tahun sebelumnya, tanpa skor maupun taktik kepolisian.
+            Dikirim bot ke grup yang terdaftar lewat /daftar dan ke warga yang berlangganan,
+            <b> setelah disetujui Humas</b>; warga dapat memintanya kapan saja dengan /info. Isinya
+            imbauan kehati-hatian dari pola bulan yang sama tahun-tahun sebelumnya, tanpa skor
+            maupun taktik kepolisian.
           </p>
+          {!advisory.approved && canApproveInfo ? (
+            <div className="mt-2">
+              <ApproveAdvisoryForm month={advisory.month} />
+            </div>
+          ) : null}
           {advisory.sample ? (
             <details className="mt-1">
               <summary className="cursor-pointer text-2xs text-accent">

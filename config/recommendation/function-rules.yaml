@@ -50,3 +50,42 @@ priority_by_severity:
   WATCH: MEDIUM
   WARNING: HIGH
   CRITICAL: URGENT
+
+# ---------------------------------------------------------------------------------------
+# REKOMENDASI MENURUT TEMPAT KEJADIAN — produk bulanan (naskah Taskap Tabel 13).
+#
+# Ditambahkan 18 November 2026 (penyesuaian ke naskah, butir 6 audit). Untuk tiap kelurahan
+# usulan, sistem melihat JENIS TEMPAT yang paling banyak tercatat pada bulan-bulan dasar
+# peringkat, lalu memakai alternatif rekomendasi dan fungsi pelaksana pada baris yang sesuai.
+# Isi keempat baris mengikuti Tabel 13 naskah apa adanya. Bila tempat kejadian tidak tercatat
+# atau tidak termasuk kelompok mana pun, dipakai `rules` per jenis ancaman di atas.
+#
+# `location_types` = nilai kategori tempat kejadian pada data (Pusiknas apa adanya).
+# `function` = fungsi utama yang tercatat pada usulan; `executors` = pelaksana menurut naskah.
+# Status tetap PROPOSED: ini alternatif untuk dinilai staf, Kasat, dan Pimpinan — bukan perintah.
+# ---------------------------------------------------------------------------------------
+place_rules:
+  - id: rumah
+    label: Rumah tinggal
+    location_types: ["Perumahan / Pemukiman", Perkampungan]
+    function: BINMAS
+    executors: Bhabinkamtibmas
+    action: Aktifkan siskamling dan imbauan kunci ganda melalui RT/RW
+  - id: kos
+    label: Kos, kontrakan, asrama
+    location_types: [Kost, Kontrakan, Apartemen, Penginapan]
+    function: BINMAS
+    executors: Binmas, Polsek
+    action: Koordinasikan pengamanan parkir penghuni dengan pengelola atau pemilik
+  - id: jalan
+    label: Jalan dan perparkiran
+    location_types: [Jalan Umum, Perparkiran, Spbu, Stasiun kereta]
+    function: SAMAPTA
+    executors: Samapta, Polsek
+    action: Pertimbangkan penguatan kewaspadaan dan pengamanan parkir
+  - id: niaga
+    label: Niaga dan perkantoran
+    location_types: [Pertokoan, Perkantoran, Cafe, Rumah Makan, Warung, Minimarket, "Mall / Swalayan", Pasar, Hotel, Gedung, Pergudangan]
+    function: BINMAS
+    executors: Binmas, Polsek
+    action: Koordinasikan pengamanan dengan pengelola gedung dan pertokoan

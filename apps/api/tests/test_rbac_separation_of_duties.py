@@ -148,11 +148,40 @@ def test_the_permissions_administrator_lacks_are_all_command_decisions() -> None
     # Sejak 9 Oktober 2026 commander_decision:approve diberikan pemilik proyek; sejak
     # 2 November 2026 bulletin:approve (penerbitan buletin ke masyarakat) hanya Pimpinan.
     # 6 November 2026 (Modul 4 mekanisme): penetapan dan pelaksanaan produk bulanan bukan
-    # pekerjaan Administrator. 10 November 2026: tahap review/validate dihapus (catatan 177).
+    # pekerjaan Administrator. 17 November 2026 (catatan 183): Administrator di luar seluruh
+    # rantai produk bulanan — menyusun (draft) dan menelaah (validate) juga bukan miliknya.
     assert catalogue - admin == {
         "evaluation:run",
         "public_alert:publish",
         "bulletin:approve",
+        "monthly_product:draft",
+        "monthly_product:review",
+        "monthly_product:validate",
+        "public_info:approve",
         "monthly_product:decide",
         "monthly_product:execute",
     }
+
+
+def test_monthly_product_chain_is_held_by_four_different_roles() -> None:
+    """Analis menyusun, KBO memeriksa, Kasat menelaah, Pimpinan menetapkan — empat peran.
+
+    Tahap KBO/Kasat dihapus 10 November 2026 karena diklik orang yang sama berturut-turut.
+    Yang mencegahnya terulang bukan janji, melainkan tidak adanya satu peran pun yang
+    memegang dua dari empat hak ini."""
+    roles = yaml.safe_load(RBAC_FILE.read_text(encoding="utf-8"))["roles"]
+
+    def holders(permission: str) -> set[str]:
+        return {
+            name
+            for name, scopes in roles.items()
+            for entries in scopes.values()
+            if permission in entries
+        }
+
+    assert holders("monthly_product:draft") == {"Analis Intelkam"}
+    assert holders("monthly_product:review") == {"KBO"}
+    assert holders("monthly_product:validate") == {"Kasat Intelkam"}
+    assert holders("monthly_product:decide") == {"Pimpinan"}
+    # Informasi untuk masyarakat disetujui Humas, bukan oleh penyusun analisisnya.
+    assert holders("public_info:approve") == {"Humas"}

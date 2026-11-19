@@ -98,6 +98,9 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=40s --retries=6 \
   CMD python -c "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=4).status == 200 else 1)"
 
 # --proxy-headers: alamat klien yang benar saat berada di belakang reverse proxy.
+# --workers 2: seluruh endpoint sinkron; satu proses membuat permintaan berat (perkiraan
+#   .docx, evaluasi) menahan semua halaman lain (audit 15 November 2026). Pembatas laju
+#   publik bersifat per proses, jadi batasnya efektif berlipat dua — diterima untuk peragaan.
 CMD ["uvicorn", "prediksi_presisi_api.main:app", \
-     "--host", "0.0.0.0", "--port", "8000", \
+     "--host", "0.0.0.0", "--port", "8000", "--workers", "2", \
      "--proxy-headers", "--forwarded-allow-ips", "*"]

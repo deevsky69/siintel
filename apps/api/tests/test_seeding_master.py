@@ -55,14 +55,17 @@ def test_master_seed_loads_expected_volumes(session: Session) -> None:
         "users": session.scalar(select(func.count()).select_from(User)),
     }
 
-    # Empat peran sejak 1 September 2026, ditambah Analis Intelkam (6 November 2026, 1B);
-    # Kasat Intelkam dibekukan 10 November 2026 (catatan 177).
-    assert counts["roles"] == 5
-    # + panic, triage, review, case_file, babin x2, bulletin x3, ranking x2, monthly_product x4
-    assert counts["permissions"] == 61
-    # Enam akun tetap (dua kini Administrator) + demo.analis + demo.kasat (kini Analis, terkunci
-    # di produksi oleh migrasi 0023).
-    assert counts["users"] == 8
+    # Empat peran sejak 1 September 2026, ditambah Staf Intelkam (6 November 2026, 1B, bernama
+    # Analis Intelkam sampai 17 November 2026) dan Kasat Intelkam (dibekukan 10 November,
+    # dihidupkan lagi 17 November 2026 — catatan 183).
+    # 19 November 2026 (catatan 186): + KBO dan Humas, mengikuti naskah Taskap final.
+    assert counts["roles"] == 8
+    # + panic, triage, review, case_file, babin x2, bulletin x3, ranking x2, monthly_product x6,
+    #   public_info
+    assert counts["permissions"] == 64
+    # Enam akun tetap (dua kini Administrator) + demo.analis (Staf Intelkam) + demo.kasat
+    # (Kasat Intelkam; terkunci di produksi sejak migrasi 0023).
+    assert counts["users"] == 10  # + demo.kbo, demo.humas
 
 
 def test_master_seed_is_idempotent(session: Session) -> None:

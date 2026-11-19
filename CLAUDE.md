@@ -9,9 +9,11 @@
 
 # 0. IDENTITAS PROYEK
 
-Nama: **SIGAP** — Sistem Inteligensi Geospasial dan Analitik Prediktif
+Nama: **SIGAP** — Sistem Intelijen Geospasial dan Analitik Prediktif
 
 (Sebelum 13 Oktober 2026 bernama PREDIKSI PRESISI, sempat KRESNA SIGAP, ditetapkan **SIGAP** 19 Oktober 2026; nama paket, repositori, dan pengenal internal tidak diubah.)
+
+(17 November 2026, penyesuaian ke naskah Taskap: kepanjangan memakai kata **Intelijen** — sebelumnya "Inteligensi" — dan kanal masyarakat bernama **SIGAP BERSAMA**, sebelumnya SIGAP WARGA.)
 
 Tema:
 
@@ -542,13 +544,20 @@ Role baseline:
 
 ```text
 Pimpinan
+Kasat Intelkam
+KBO
+Analis Intelkam
+Humas
 Fungsi
 Polsek
 Administrator
 ```
 
 Command Center dan Analyst **dilebur ke dalam Administrator** — keputusan pemilik proyek
-1 September 2026, ditegaskan kembali 9 September 2026. Sumber kebenaran pemberian
+1 September 2026, ditegaskan kembali 9 September 2026. Sejak 19 November 2026 peran dan rantai produk bulanan mengikuti naskah
+Taskap final: **Analis Intelkam** menyusun → **KBO** memeriksa mutu → **Kasat Intelkam** menelaah
+→ **Pimpinan** menetapkan; **Humas** menyetujui informasi untuk masyarakat. Administrator berada
+di luar rantai itu. Sumber kebenaran pemberian
 permission adalah `config/rbac/permissions.yaml`; matriks `docs/03` §3 dibangkitkan
 darinya oleh `scripts/matriks-rbac.py`.
 

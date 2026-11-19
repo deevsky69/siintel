@@ -53,7 +53,6 @@ import time
 from datetime import datetime, timedelta
 from typing import Any
 
-import yaml
 from fastapi import APIRouter, Depends, File, Path, Request, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
@@ -69,7 +68,7 @@ from ...models import (
 )
 from ...seeding.paths import TAXONOMY_FILE
 from ...services import attachments as attachment_store
-from ...services import audit, clock
+from ...services import audit, clock, config_cache
 from ..deps import get_db
 from ..errors import ApiError
 
@@ -222,7 +221,7 @@ def _client_key(request: Request) -> str:
 
 def load_report_categories() -> list[str]:
     """Kategori yang boleh dipilih pelapor, dari config taksonomi."""
-    raw: dict[str, Any] = yaml.safe_load(TAXONOMY_FILE.read_text(encoding="utf-8"))
+    raw: dict[str, Any] = config_cache.load_yaml(TAXONOMY_FILE)
     categories = raw.get("citizen_report_categories") or []
     if not categories:
         message = "config/taxonomy/mappings.yaml tidak memuat citizen_report_categories"
@@ -232,7 +231,7 @@ def load_report_categories() -> list[str]:
 
 def load_urgent_categories() -> tuple[str, ...]:
     """Kategori yang disorot pada notifikasi (tawuran, begal) — dari taksonomi, satu sumber."""
-    raw: dict[str, Any] = yaml.safe_load(TAXONOMY_FILE.read_text(encoding="utf-8"))
+    raw: dict[str, Any] = config_cache.load_yaml(TAXONOMY_FILE)
     return tuple(str(name) for name in (raw.get("citizen_report_urgent_categories") or []))
 
 

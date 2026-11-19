@@ -75,7 +75,7 @@ export function PatrolPlanView({
           <div className="space-y-4">
             <p className="text-xs leading-relaxed text-ink-muted">
               Dari pola kejadian tahun dasar, untuk tiap jenis diusulkan paling banyak{" "}
-              {plan.rules.max_slots_per_threat} slot (kelurahan × blok 3 jam) dengan
+              {plan.rules.max_slots_per_threat} slot (kelurahan × rentang 4 jam) dengan
               sekurang-kurangnya {plan.rules.minimum_incidents} kejadian. Patroli pada slot itu
               menjangkau kejadian yang polanya berulang; slot di bawah batas minimum tidak diusulkan
               karena satu-dua kejadian setahun bukan pola.

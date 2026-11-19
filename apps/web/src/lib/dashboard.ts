@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { apiGet } from "./api";
 
 /** Bentuk data yang dikembalikan API dashboard (lihat `apps/api/.../routers/dashboard.py`). */
@@ -85,7 +86,12 @@ export type Profile = {
   permissions: string[];
 };
 
-export const getProfile = () => apiGet<Profile>("/auth/me");
+/**
+ * Profil pengguna yang sedang masuk — dibungkus `cache()` supaya layout dan halaman yang
+ * sama-sama memanggilnya dalam satu render hanya memukul `/auth/me` SEKALI
+ * (audit 15 November 2026: sebelumnya dua kali per navigasi).
+ */
+export const getProfile = cache(() => apiGet<Profile>("/auth/me"));
 
 /**
  * Jumlah rekomendasi yang menunggu keputusan.

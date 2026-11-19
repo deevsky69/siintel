@@ -43,9 +43,7 @@ def upgrade() -> None:
         sa.Column("area_pending", sa.Boolean(), nullable=False, server_default=sa.false()),
     )
     op.add_column("crime_incidents", sa.Column("duplicate_of", sa.String(50), nullable=True))
-    op.add_column(
-        "crime_incidents", sa.Column("duplicate_status", sa.String(20), nullable=True)
-    )
+    op.add_column("crime_incidents", sa.Column("duplicate_status", sa.String(20), nullable=True))
     op.create_check_constraint(
         "duplicate_status_known",
         "crime_incidents",
@@ -67,8 +65,7 @@ def upgrade() -> None:
     # Isi ulang dari data yang sudah ada: objek kendaraan dari kolom sasaran Pusiknas,
     # kelurahan tertunda dari lokasi tingkat kecamatan.
     op.execute(
-        "UPDATE crime_incidents SET vehicle_object = TRUE "
-        "WHERE target_type = 'Kendaraan bermotor'"
+        "UPDATE crime_incidents SET vehicle_object = TRUE WHERE target_type = 'Kendaraan bermotor'"
     )
     op.execute(
         "UPDATE crime_incidents c SET area_pending = TRUE FROM locations l "

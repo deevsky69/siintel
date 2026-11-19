@@ -6,7 +6,7 @@ import { ReportForm } from "./lapor/report-form";
 import BerandaWarga from "./page";
 
 /**
- * Halaman warga SIGAP WARGA (2 November 2026): hanya memuat yang diputuskan boleh terbuka
+ * Halaman warga SIGAP BERSAMA (2 November 2026): hanya memuat yang diputuskan boleh terbuka
  * — tingkat kasar dan angka historis — dan tidak pernah memuat skor, prediksi, atau titik.
  */
 
@@ -78,7 +78,7 @@ vi.mock("@/lib/warga", async (importOriginal) => {
   return { ...actual, getPublicSummary: vi.fn(async () => summary) };
 });
 
-describe("beranda SIGAP WARGA", () => {
+describe("beranda SIGAP BERSAMA", () => {
   it("menawarkan lapor dan darurat 110, dengan peta sebagai isi utama", async () => {
     render(await BerandaWarga());
 

@@ -75,23 +75,30 @@ function RankedDistribution({ distribution }: { distribution: PatternDistributio
   return (
     <div>
       <h3 className="stat-label mb-2">{distribution.label}</h3>
-      <ul className="flex flex-col gap-1.5">
+      <ul className="mb-2 flex flex-col gap-2">
         {distribution.buckets.map((bucket) => (
-          <li key={bucket.key} className="flex items-center gap-2.5">
-            <span className="w-28 shrink-0 truncate text-xs text-ink" title={bucket.label}>
-              {humanize(bucket.label)}
-            </span>
-            <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-base-800">
+          // Dua baris — nama dan angka di atas, batang di bawah — supaya baris tetap muat
+          // pada panel seperempat lebar (HOW, TARGET) maupun ponsel. Susunan satu baris
+          // dengan kolom berlebar tetap meluber keluar panel begitu panelnya sempit.
+          <li key={bucket.key}>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+              <span className="min-w-0 break-words text-xs text-ink">
+                {humanize(bucket.label)}
+              </span>
+              <span className="ml-auto flex items-baseline gap-2 text-right">
+                <span className="font-mono text-xs font-semibold text-ink">
+                  {bucket.incidents}
+                </span>
+                <span className="text-2xs text-ink-muted">
+                  {shareText(bucket.share_percent, distribution.denominator)}
+                </span>
+              </span>
+            </div>
+            <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-base-800">
               <span
                 className="block h-full rounded-full bg-accent-deep"
                 style={{ width: `${barWidth(bucket.incidents, peak)}%` }}
               />
-            </span>
-            <span className="w-10 text-right font-mono text-xs font-semibold text-ink">
-              {bucket.incidents}
-            </span>
-            <span className="w-36 shrink-0 text-right text-2xs text-ink-muted">
-              {shareText(bucket.share_percent, distribution.denominator)}
             </span>
           </li>
         ))}
@@ -176,7 +183,7 @@ function Distribution({ distribution }: { distribution: PatternDistribution }) {
 function RepeatPanel({ repeat }: { repeat: RepeatProfile }) {
   return (
     <DimensionPanel code="REPEAT" name="Pengulangan" className="col-span-12 xl:col-span-6">
-      <dl className="grid grid-cols-3 gap-3">
+      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
           <dt className="stat-label">Grid berulang</dt>
           <dd className="stat-value">{repeat.repeat_grids}</dd>
@@ -195,25 +202,25 @@ function RepeatPanel({ repeat }: { repeat: RepeatProfile }) {
         <EmptyState label="Tidak ada grid yang mengalami kejadian berulang untuk jenis ini." />
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full min-w-[34rem] text-left text-xs">
             <thead>
               <tr className="border-b border-base-800">
-                <th className="stat-label py-1.5 font-medium">Grid</th>
-                <th className="stat-label py-1.5 font-medium">Kecamatan</th>
-                <th className="stat-label py-1.5 text-right font-medium">Kejadian</th>
-                <th className="stat-label py-1.5 text-right font-medium">Bagian</th>
+                <th className="stat-label py-1.5 pr-3 font-medium">Grid</th>
+                <th className="stat-label py-1.5 pr-3 font-medium">Kecamatan</th>
+                <th className="stat-label py-1.5 pr-3 text-right font-medium">Kejadian</th>
+                <th className="stat-label py-1.5 pr-4 text-right font-medium">Bagian</th>
                 <th className="stat-label py-1.5 font-medium">Rentang</th>
               </tr>
             </thead>
             <tbody>
               {repeat.grids.map((grid) => (
                 <tr key={grid.grid_id} className="border-b border-base-800/60">
-                  <td className="py-1.5 font-mono text-ink">{grid.grid_id}</td>
-                  <td className="py-1.5 text-ink-muted">{grid.kecamatan}</td>
-                  <td className="py-1.5 text-right font-mono font-semibold text-ink">
+                  <td className="py-1.5 pr-3 font-mono text-ink">{grid.grid_id}</td>
+                  <td className="py-1.5 pr-3 text-ink-muted">{grid.kecamatan}</td>
+                  <td className="py-1.5 pr-3 text-right font-mono font-semibold text-ink">
                     {grid.incidents}
                   </td>
-                  <td className="py-1.5 text-right text-2xs text-ink-muted">
+                  <td className="whitespace-nowrap py-1.5 pr-4 text-right text-2xs text-ink-muted">
                     {shareText(grid.share_percent, repeat.denominator)}
                   </td>
                   <td className="py-1.5 text-2xs text-ink-muted">
