@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Menetapkan SATU kata sandi yang sama untuk keenam akun peragaan di PRODUKSI, lalu
+# Menetapkan SATU kata sandi yang sama untuk kedelapan akun peragaan di PRODUKSI, lalu
 # menulis ulang ~/siintel-demo-passwords.txt. Kata sandi diberikan lewat variabel
 # lingkungan supaya tidak masuk riwayat perintah sebagai argumen:
 #
@@ -20,8 +20,9 @@ COMPOSE=(docker compose --env-file .env.production -f infra/docker/docker-compos
 PASSFILE="$HOME/siintel-demo-passwords.txt"
 # demo.kasat dikunci migrasi 0023 (10 November 2026) dan dihidupkan lagi migrasi 0026
 # (17 November 2026, produk bulanan tiga tahap). Sampai skrip ini dijalankan, akun itu
-# belum punya kata sandi yang sah. demo.analis kini berperan Staf Intelkam.
-AKUN=(demo.pimpinan demo.kasat demo.analis demo.polsek demo.fungsi demo.admin)
+# belum punya kata sandi yang sah. demo.analis berperan Analis Intelkam.
+# demo.kbo dan demo.humas dibuat migrasi 0029 (19 November 2026) tanpa kata sandi yang sah.
+AKUN=(demo.pimpinan demo.kasat demo.kbo demo.analis demo.humas demo.polsek demo.fungsi demo.admin)
 
 for akun in "${AKUN[@]}"; do
   echo "== $akun"
@@ -34,10 +35,10 @@ done
 umask 077
 {
   echo "PASSWORD AKUN DEMO — ditetapkan $(date +%F) lewat scripts/sandi-peragaan-produksi.sh"
-  echo "Satu kata sandi untuk keenam akun. Ganti setelah paparan."
+  echo "Satu kata sandi untuk kedelapan akun. Ganti setelah paparan."
   echo
   for akun in "${AKUN[@]}"; do echo "$akun $SANDI"; done
 } > "$PASSFILE"
 chmod 600 "$PASSFILE"
 echo
-echo "Selesai. Keenam akun memakai kata sandi yang sama; berkas $PASSFILE diperbarui (mode 600)."
+echo "Selesai. Kedelapan akun memakai kata sandi yang sama; berkas $PASSFILE diperbarui (mode 600)."

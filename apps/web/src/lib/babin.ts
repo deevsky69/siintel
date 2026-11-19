@@ -99,11 +99,16 @@ export const generateBulletins = (week: string | null) =>
 
 export const approveBulletin = (id: string) => apiPost<BulletinRow>(`/bulletins/${id}/approve`, {});
 
-/** Persetujuan imbauan bulanan ke grup warga (3A, 6 November 2026). */
-/** Imbauan bulanan ke grup warga: otomatis sejak 10 November 2026 (tanpa persetujuan). */
+/**
+ * Imbauan bulanan untuk warga. Sejak 19 November 2026 menunggu persetujuan Humas sebelum
+ * dikirim (naskah Taskap final B.4.7); sebelumnya otomatis.
+ */
 export type AdvisoryPreview = {
   month: string;
-  automatic: true;
+  automatic: boolean;
+  approved: boolean;
+  approved_at: string | null;
+  approval_note: string | null;
   groups_sent: number;
   note: string | null;
   groups_registered: number;
@@ -115,3 +120,6 @@ export type AdvisoryPreview = {
 
 export const getAdvisoryPreview = (month?: string) =>
   apiGet<AdvisoryPreview>(`/advisories/preview${month ? `?month=${month}` : ""}`);
+
+export const approveAdvisory = (month: string, note?: string) =>
+  apiPost<{ month: string; approved: boolean }>("/advisories/approvals", { month, note });

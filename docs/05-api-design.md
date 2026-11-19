@@ -516,6 +516,13 @@ idempoten, mencetak LP + PIN contoh).
 imbauan bulan berjalan; `GET /messaging/advisory` (perintah bot **`/info`**, alias lama
 `/rekomendasi`) menjawab teks bulan depan tanpa syarat.
 
+**Persetujuan Humas (19 November 2026, naskah Taskap final B.4.7):** `POST /advisories/approvals
+{month, note?}` (`public_info:approve`, peran Humas; 409 bila sudah disetujui; audit
+`APPROVE_CITIZEN_ADVISORY`). Sebelum bulan itu disetujui, `GET /messaging/advisories/pending`
+dan `GET /messaging/subscriptions/pending` menjawab daftar kosong dengan `awaiting_approval`.
+`GET /advisories/preview` memuat `approved`, `approved_at`, `approval_note`; `automatic` kini
+`false`. `/messaging/advisory` (perintah `/info`) tidak ditahan.
+
 **Langganan warga (17 November 2026, naskah Taskap 4.7 b "Pemberitahuan wilayah")** — kunci
 bot `X-Messaging-Key`:
 
@@ -549,16 +556,16 @@ peta tahunan tetap pada N dan batas data yang sama; setiap baris membawa `method
 kelurahan pilihan; luas dari `config/ranking/kelurahan-area.yaml` (perkiraan dari poligon
 peta, PROPOSED).
 
-### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; tiga tahap sejak 17 November 2026)
+### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; empat tahap sejak 19 November 2026)
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
 | GET | `/monthly-products` | `monthly_product:read` | daftar bulan + status, bulan yang disarankan |
-| POST | `/monthly-products {month}` | `monthly_product:draft` (Staf Intelkam; Administrator tidak lagi sejak 17 November 2026) | draf dari peringkat bulan itu — **dibekukan otomatis** bila belum (`facts.ranking_frozen_by_draft`, audit `FREEZE_RANKING` detail `by: draft`); item = `draft_top_n` kelurahan teratas dengan pola (jenis dominan, blok jam puncak) dan usulan dari function-rules; 409 bila sudah ada |
+| POST | `/monthly-products {month}` | `monthly_product:draft` (Analis Intelkam; Administrator tidak lagi sejak 17 November 2026) | draf dari peringkat bulan itu — **dibekukan otomatis** bila belum (`facts.ranking_frozen_by_draft`, audit `FREEZE_RANKING` detail `by: draft`); item = `draft_top_n` kelurahan teratas dengan pola (jenis dominan, blok jam puncak) dan usulan dari function-rules; 409 bila sudah ada |
 | GET | `/monthly-products/{month}` | `monthly_product:read` | item, tahap, kegiatan |
 | POST | `/monthly-products/{month}/analyst {items[{kelurahan,status,text?,reason?}], note?}` | `monthly_product:draft` | ACCEPTED / REVISED (teks + alasan wajib) / REJECTED (alasan wajib); status → ANALYST_REVIEWED = **menunggu telaah Kasat Intelkam** (`awaiting_review`); sebelum 17 November 2026: menunggu Pimpinan (`awaiting_decision: true`, `next_stage: PIMPINAN`) |
 | POST | `/monthly-products/{month}/kasat {outcome, reason?}` | `monthly_product:validate` (Kasat Intelkam) | **dihidupkan lagi 17 November 2026 (0026):** telaah atas produk berstatus ANALYST_REVIEWED (atau KBO_CHECKED tinggalan). `ACCEPTED` → VALIDATED = menunggu Pimpinan (`awaiting_decision`); `REJECTED` → kembali DRAFT, **alasan wajib** (400 bila kosong). Tidak mengubah isi usulan. Audit `VALIDATE_MONTHLY_PRODUCT` |
-| ~~POST~~ | ~~`/monthly-products/{month}/kbo`~~ | — | dihapus 10 November 2026 (404) dan tidak dihidupkan lagi: staf dan KBO dianggap satu |
+| POST | `/monthly-products/{month}/kbo {outcome, reason?}` | `monthly_product:review` (KBO) | **dihidupkan lagi 19 November 2026 (0029):** pemeriksaan mutu atas produk ANALYST_REVIEWED. `ACCEPTED` → KBO_CHECKED = menunggu telaah Kasat (`awaiting_review`); `REJECTED` → kembali DRAFT, alasan wajib. Audit `REVIEW_MONTHLY_PRODUCT_KBO`. Telaah Kasat kini hanya menerima KBO_CHECKED |
 | POST | `/monthly-products/{month}/decide {selected[{kelurahan,action?}], reason?}` | `monthly_product:decide` (Pimpinan) | hanya dari VALIDATED (sudah ditelaah Kasat; 409 bila belum); menetapkan jumlah dan kelurahan prioritas; yang ditolak analis tidak dapat dipilih; → DECIDED |
 | POST | `/monthly-products/{month}/items/{kelurahan}/actions {unit?, acted_at, place, action, result?}` | `monthly_product:execute` (Fungsi, Polsek) | kegiatan nyata; Polsek hanya kelurahan di polseknya (404) |
 
@@ -582,7 +589,10 @@ Tanpa `method`, `GET /rankings` dan `POST /rankings/freeze` memakai metode dasar
 bulan itu (`ranking.operational`): MODEL bila cakupannya pada bulan-bulan uji terakhir lebih
 tinggi daripada pembanding terbaik, selain itu peta historis. Baris MODEL membawa
 `basis.factors` — kontribusi tiap masukan, dihitung dari pohon model. CHECK `method`
-diperluas pada 0024. Rancangan, parameter, dan hasil uji: catatan 181.
+diperluas pada 0024. Sejak 19 November 2026 model mengikuti naskah Lampiran 8 E (catatan 185);
+`basis.factors[].effect_pct` adalah pengaruh masukan sebagai persen (model berskala log).
+`GET /evaluation/monthly/backtest` menambah `fixed` (skenario tetap) dan menerima `top_n`
+4, 6, atau 8.
 
 Tabel `monthly_rankings` + `monthly_ranking_rows` (0020). Perkiraan = keluaran model, atau
 rata-rata bulanan pada bulan dasar untuk peta historis; hanya kejadian yang **dilaporkan**
@@ -612,6 +622,14 @@ tampil di samping, tidak menentukan urutan.
 | GET | `/data-quality/flags?kind=&limit=` | kejadian bertanda `NO_TIME`, `NO_TARGET`, `NO_PLACE`, `LABEL_OBJECT`, `REPORT_BEFORE_INCIDENT`; aturan tertulis, bukan model |
 | GET | `/data-quality/matches` | laporan warga terverifikasi yang belum diputuskan, masing-masing dengan paling banyak 5 usulan kejadian resmi (wilayah sama, ±3 hari) |
 | POST | `/citizen-reports/{code}/match {decision, incident_code?, reason}` | `MATCHED` (wajib `incident_code`) / `NOT_MATCHED`; `reason` wajib; 409 bila laporan masih RECEIVED; audit `MATCH_CITIZEN_REPORT` |
+
+**Dampak dan IKW (19 November 2026, naskah final B.4.2 dan Lampiran 9):** `POST
+/crimes/{code}/impact {loss_status, injury_level, status, source}` (`crime:triage`; `source`
+wajib; `VERIFIED` ditolak bila masih ada isian `UNKNOWN`; audit `RECORD_CRIME_IMPACT`) dan
+`GET /data-quality/impact` (laporan tiga bulan terakhir yang dampaknya belum terverifikasi).
+Baris `/rankings` membawa `basis.ikw` = `{value, category, status, frequency, impact,
+recurrence, impact_reports, impact_verified, review_now, quartiles}`; `ikw` bernilai `null`
+bila berstatus `DITAHAN`. Kolom dampak pada `crime_incidents` (0028).
 
 `POST /crimes/{code}/duplicate` kini mewajibkan `note` (alasan). Kolom `citizen_reports`
 `matched_incident_id`, `match_decision`, `match_reason`, `matched_by`, `matched_at` (0027).

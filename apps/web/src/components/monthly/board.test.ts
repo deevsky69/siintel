@@ -3,10 +3,11 @@ import type { ProductStatus } from "@/lib/monthly-products";
 import { buildCards } from "./board";
 
 /**
- * Papan "Bulan ini" — tiga tahap sejak 17 November 2026: staf menyusun, Kasat menelaah,
+ * Papan "Bulan ini" — empat tahap sejak 19 November 2026: analis menyusun, KBO memeriksa, Kasat menelaah,
  * Pimpinan menetapkan. Kartu produk hanya menandai giliran peran yang memang dinanti.
  */
 const STAF = ["monthly_product:read", "monthly_product:draft"];
+const KBO = ["monthly_product:read", "monthly_product:review"];
 const KASAT = ["monthly_product:read", "monthly_product:validate"];
 const PIMPINAN = ["monthly_product:read", "monthly_product:decide"];
 const ADMIN = ["monthly_product:read"];
@@ -28,15 +29,18 @@ function produk(permissions: string[], status: ProductStatus | null) {
 describe("papan bulanan — giliran tiap peran", () => {
   it("draf adalah giliran staf, bukan Kasat atau Pimpinan", () => {
     expect(produk(STAF, "DRAFT").mine).toBe(true);
-    expect(produk(STAF, "DRAFT").cta).toContain("Kasat Intelkam");
+    expect(produk(STAF, "DRAFT").cta).toContain("KBO");
     expect(produk(KASAT, "DRAFT").mine).toBe(false);
     expect(produk(PIMPINAN, "DRAFT").mine).toBe(false);
   });
 
-  it("yang sudah diperiksa staf menunggu telaah Kasat", () => {
+  it("yang sudah diperiksa analis menunggu KBO, lalu Kasat", () => {
+    expect(produk(KBO, "ANALYST_REVIEWED").mine).toBe(true);
+    expect(produk(KBO, "ANALYST_REVIEWED").state).toBe("Menunggu pemeriksaan mutu KBO");
+    expect(produk(KASAT, "ANALYST_REVIEWED").mine).toBe(false);
+    expect(produk(KASAT, "KBO_CHECKED").mine).toBe(true);
+    expect(produk(KASAT, "KBO_CHECKED").state).toBe("Menunggu telaah Kasat Intelkam");
     for (const status of ["ANALYST_REVIEWED", "KBO_CHECKED"] as const) {
-      expect(produk(KASAT, status).mine).toBe(true);
-      expect(produk(KASAT, status).state).toBe("Menunggu telaah Kasat Intelkam");
       expect(produk(PIMPINAN, status).mine).toBe(false);
       expect(produk(STAF, status).mine).toBe(false);
     }

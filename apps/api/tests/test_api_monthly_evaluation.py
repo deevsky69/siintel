@@ -105,9 +105,10 @@ def test_coverage_of_frozen_top_n_and_decision_review(client: TestClient, sessio
         _incident(session, a, date(2033, 2, 3) + timedelta(days=i * 12))
     for i in range(2):
         _incident(session, b, date(2033, 3, 5) + timedelta(days=i * 10))
-    analyst = _login(client, session, "Staf Intelkam")
+    analyst = _login(client, session, "Analis Intelkam")
     leader = _login(client, session, "Pimpinan")
     kasat = _login(client, session, "Kasat Intelkam")
+    kbo = _login(client, session, "KBO")
     assert (
         client.post(
             "/api/v1/rankings/freeze",
@@ -157,6 +158,7 @@ def test_coverage_of_frozen_top_n_and_decision_review(client: TestClient, sessio
         ).status_code
         == 200
     )
+    assert client.post(f"{base}/kbo", json={"outcome": "ACCEPTED"}, headers=kbo).status_code == 200
     assert (
         client.post(f"{base}/kasat", json={"outcome": "ACCEPTED"}, headers=kasat).status_code == 200
     )

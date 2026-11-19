@@ -104,10 +104,16 @@ menetapkan. Peran ini ada 6–10 November 2026, dibekukan 10–17 November 2026 
 diklik orang yang sama berturut-turut), dan dihidupkan lagi 17 November 2026 (0026, catatan
 183) sebagai tahap telaah — sesuai naskah Taskap dan saran Kasat Intelkam.
 
-## Level 3 — Staf Intelkam
-Bernama Analis Intelkam sampai 17 November 2026; staf dan KBO dianggap satu. Menyusun draf
-produk bulanan — peringkat bulan itu dibekukan sekaligus — memeriksanya dengan informasi
-lapangan (terima / perbaiki / tolak, dengan alasan), dan mengirimnya ke Kasat Intelkam.
+## Level 3 — Analis Intelkam dan KBO
+**Analis Intelkam** (istilah naskah Taskap; 17–19 November 2026 bernama Staf Intelkam) menyusun
+draf produk bulanan — peringkat bulan itu dibekukan sekaligus — memeriksanya dengan informasi
+lapangan (terima / perbaiki / tolak, dengan alasan), dan mengirimnya ke KBO. **KBO** (sejak 19
+November 2026) memeriksa mutu dan kelengkapan validasi: meneruskan ke Kasat Intelkam atau
+mengembalikan ke analis dengan alasan.
+
+## Humas
+Sejak 19 November 2026: menyetujui informasi untuk masyarakat. Imbauan bulanan baru dikirim ke
+grup dan pelanggan setelah disetujui Humas.
 
 ## Level 4 — Fungsi
 Fungsi pelaksana (Samapta / Binmas / Reskrim / Lantas): membaca produk bulanan dan
@@ -123,7 +129,7 @@ rantai produk bulanan: tidak menyusun, menelaah, menetapkan, maupun mencatat pel
 Sebelum 6 November 2026: Command Center dan Analyst dilebur ke Administrator (1 September
 2026). 6–10 November 2026 jenjang 2 dan 3 ditempati dua peran Satintelkam; sejak 10 November
 2026 hanya jenjang 3 yang berlaku; sejak 17 November 2026 jenjang 2 (Kasat Intelkam) dan 3
-(Staf Intelkam) keduanya berlaku — **enam peran**.
+(Analis Intelkam) keduanya berlaku; sejak 19 November 2026 ditambah KBO dan Humas — **delapan peran**.
 
 All important activities must be recorded in audit trail.
 
@@ -768,6 +774,7 @@ Rincian: `docs/implementation-notes/000c-specification-lock.md`.
 | Penyesuaian ke naskah Taskap | 17 November 2026 | Butir 1, 3, 9, 10 audit naskah–aplikasi: (1) peringkat bulanan memakai **model gradient boosting** untuk kelompok berobjek kendaraan, dengan penjaga "model hanya bila lebih tepat daripada peta" — menggantikan keputusan 2A; (3) pembanding bulan sebelumnya dan peta tahunan tetap, **PAI**, uji historis, **uji tanda**; (9) "Intelijen" dan **SIGAP BERSAMA**; (10) langganan imbauan per warga, panduan pengamanan, hasil survei per triwulan. Angka uji pada naskah mengikuti hasil aplikasi. Catatan 181, 182. Belum diputuskan: rentang jam 4 jam, rantai Kasat Intelkam, rekomendasi per tempat kejadian, Modul 1, persetujuan Humas |
 | **Produk bulanan tiga tahap** | 17 November 2026 | Pilihan A pemilik proyek atas saran Kasat Intelkam ("Staf – Kasat – Pimpinan; staf/KBO sama saja"), sejalan dengan naskah Taskap: **Staf Intelkam** (nama baru Analis Intelkam) menyusun dan memeriksa → **Kasat Intelkam** menelaah (meneruskan atau mengembalikan dengan alasan; tidak mengubah isi) → **Pimpinan** menetapkan. Administrator kehilangan `monthly_product:draft`. Enam peran. Membalik keputusan 1B 10 November 2026. Migrasi 0026, catatan 183 |
 | **Rentang jam, tempat kejadian, Mutu Data** | 18 November 2026 | Butir 4, 6, 7 audit naskah–aplikasi: jam disajikan dalam **enam rentang 4 jam** (membalik blok 3 jam 30 September 2026); alternatif rekomendasi dan pelaksana mengikuti **jenis tempat kejadian** terbanyak (Tabel 13 naskah); layar **Mutu Data** kembali ke menu dengan kelengkapan, penandaan isian, dan **pencocokan laporan warga dengan kejadian resmi** berkeputusan petugas dan alasan wajib (0027). Catatan 184. Persetujuan Humas (butir 8): diputuskan 18 November 2026 **tidak ada peran Humas** — informasi publik tetap disetujui Pimpinan atau terbit otomatis; naskah yang disesuaikan |
+| **Disamakan dengan Taskap final** | 19 November 2026 | Keputusan pemilik proyek setelah matriks perbandingan dengan `TASKAP_FINISH.docx` ("samakan untuk hal-hal yang beda"): (a) **model** mengikuti Lampiran 8 E — HistGradientBoosting Poisson, 9.750 baris berbobot, horizon 1–12 — hasil 2025 sama dengan naskah per bulan (catatan 185); (b) **IKW** = 25 × (0,50 F + 0,35 D + 0,15 T) dengan isian dampak dan status lengkap/sementara/ditahan (0028); (c) **rantai empat tahap** Analis → KBO → Kasat → Pimpinan, peran KBO baru, Staf Intelkam kembali bernama Analis Intelkam — membalik tiga tahap 17 November; (d) peran **Humas** menyetujui imbauan bulanan sebelum dikirim — membalik keputusan 18 November (0029, catatan 186). Delapan peran |
 | Administrator ikut memutuskan rekomendasi | 9 Oktober 2026 | `commander_decision:approve` diberikan kepada Administrator (migrasi 0014), membalik pemisahan 1 September 2026. Pertanggungjawaban kini bertumpu pada jejak audit per keputusan, bukan pemisahan peran. `evaluation:run` dan `public_alert:publish` tetap hanya Pimpinan |
 | Mengubah status laporan hanya Administrator | 9 Oktober 2026 | Permission baru `citizen_report:triage` dan `crime:triage` (0014), hanya Administrator. Polsek/Fungsi tetap mencatat (`*:write`) tetapi tidak mengubah status; antrean "laporan belum diverifikasi" dan tombol triase mengikuti permission baru |
 | Sorotan notifikasi mendesak | 9 Oktober 2026 | Darurat selalu berkedip; laporan masyarakat berkategori **Tawuran dan Perkelahian Kelompok** dan **Kejahatan Jalanan** (begal) disorot — daftar kategori satu sumber di `config/taxonomy/mappings.yaml` (`citizen_report_urgent_categories`). Fungsi tidak memegang `panic:read`/`citizen_report:triage` sehingga tidak menerima keduanya |

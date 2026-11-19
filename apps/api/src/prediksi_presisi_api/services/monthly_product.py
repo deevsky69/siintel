@@ -1,25 +1,22 @@
 """Produk bulanan — Modul 4 "Menyusun dan memvalidasi rekomendasi".
 
-Tiga tahap sejak 17 November 2026 (catatan 183; naskah Taskap Bab IV dan saran Kasat
-Intelkam "Staf – Kasat – Pimpinan"):
+Empat tahap sejak 19 November 2026 (catatan 186), sama dengan naskah Taskap final Bab IV
+B.4.4 dan Lampiran 9 D:
 
-    Staf Intelkam menyusun draf — peringkat bulan itu DIBEKUKAN otomatis bila belum —
-      lalu memeriksanya dengan informasi lapangan: terima / perbaiki / tolak, dengan alasan,
-      dan mengirimkannya ke Kasat Intelkam
-      → Kasat Intelkam MENELAAH: meneruskan ke Pimpinan, atau mengembalikan ke staf dengan
-        alasan. Ia tidak mengubah isi usulan — yang menulis tetap staf
+    Analis Intelkam menyusun draf — peringkat bulan itu DIBEKUKAN otomatis bila belum —
+      lalu memeriksanya dengan informasi lapangan: terima / perbaiki / tolak, dengan alasan
+      → KBO MEMERIKSA MUTU dan kelengkapan validasi: meneruskan, atau mengembalikan ke analis
+      → Kasat Intelkam MENELAAH: meneruskan ke Pimpinan, atau mengembalikan ke analis
       → Pimpinan menetapkan JUMLAH dan KELURAHAN prioritas beserta tindak lanjutnya
       → Fungsi pelaksana / Polsek mencatat waktu, tempat, tindakan, hasil.
 
-Riwayat: empat tahap (Analis → KBO → Kasat → Pimpinan) pada 6–10 November 2026; dua tahap
-(Analis → Pimpinan) pada 10–17 November 2026 karena KBO dan Kasat diklik orang yang sama
-berturut-turut. Tahap KBO tidak dihidupkan lagi — staf dan KBO dianggap satu. Produk lama
-berstatus KBO_CHECKED diperlakukan seperti ANALYST_REVIEWED: menunggu telaah Kasat.
+KBO dan Kasat tidak mengubah isi usulan — yang menulis tetap analis; pengembalian selalu
+beralasan. Riwayat: empat tahap 6–10 November 2026, dua tahap 10–17 November, tiga tahap
+17–19 November, lalu kembali empat tahap mengikuti naskah final.
 
 Draf tetap disusun dari peringkat yang dibekukan, supaya "peringkat awal model dan daftar
-keputusan pimpinan disimpan terpisah" (dokumen mekanisme) — pembekuan bagian dari tombol
-"Susun", bukan langkah tersendiri. Usulan langkah mengikuti
-config/recommendation/function-rules.yaml (PROPOSED) — bukan model bahasa.
+keputusan pimpinan disimpan terpisah" — pembekuan bagian dari tombol "Susun". Usulan langkah
+mengikuti config/recommendation/function-rules.yaml (PROPOSED) — bukan model bahasa.
 """
 
 from __future__ import annotations
@@ -55,14 +52,15 @@ class ProductError(ValueError):
         self.status = status
 
 
-#: Status yang menunggu telaah Kasat Intelkam. KBO_CHECKED adalah tinggalan alur empat
-#: tahap (6–10 November 2026); produk lama di status itu ikut ditelaah Kasat.
-AWAITING_REVIEW = ("ANALYST_REVIEWED", "KBO_CHECKED")
+#: Status yang menunggu pemeriksaan mutu oleh KBO.
+AWAITING_KBO = ("ANALYST_REVIEWED",)
+#: Status yang menunggu telaah Kasat Intelkam: sudah diperiksa KBO.
+AWAITING_REVIEW = ("KBO_CHECKED",)
 #: Status yang menunggu penetapan Pimpinan: hanya yang sudah ditelaah Kasat Intelkam.
 AWAITING_DECISION = ("VALIDATED",)
 STAGE_FOR_STATUS = {
     "DRAFT": "ANALYST",
-    "ANALYST_REVIEWED": "KASAT",
+    "ANALYST_REVIEWED": "KBO",
     "KBO_CHECKED": "KASAT",
     "VALIDATED": "PIMPINAN",
 }
@@ -374,6 +372,21 @@ def analyst_review(
     return product
 
 
+def kbo_check(
+    session: Session, product: MonthlyProduct, outcome: str, reason: str | None, user_id: Any
+) -> MonthlyProduct:
+    """Pemeriksaan mutu oleh KBO: ACCEPTED meneruskan ke Kasat Intelkam; REJECTED
+    mengembalikan ke analis (alasan wajib). Isi usulan tidak diubah di tahap ini."""
+    _require(product, *AWAITING_KBO)
+    outcome = outcome.upper()
+    if outcome not in ("ACCEPTED", "REJECTED"):
+        raise ProductError("Hasil pemeriksaan harus ACCEPTED atau REJECTED.")
+    _stage(product, "KBO", outcome, user_id, reason)
+    product.status = "KBO_CHECKED" if outcome == "ACCEPTED" else "DRAFT"
+    session.flush()
+    return product
+
+
 def validate(
     session: Session, product: MonthlyProduct, outcome: str, reason: str | None, user_id: Any
 ) -> MonthlyProduct:
@@ -460,6 +473,7 @@ def as_dict(product: MonthlyProduct) -> dict[str, Any]:
         "target_month": product.target_month.isoformat()[:7],
         "status": product.status,
         "next_stage": STAGE_FOR_STATUS.get(product.status),
+        "awaiting_kbo": product.status in AWAITING_KBO,
         "awaiting_review": product.status in AWAITING_REVIEW,
         "awaiting_decision": product.status in AWAITING_DECISION,
         "facts": product.facts,

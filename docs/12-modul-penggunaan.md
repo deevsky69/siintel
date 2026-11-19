@@ -23,6 +23,29 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Disamakan dengan naskah Taskap final (19 November 2026, catatan 185–186).**
+
+- **Model AI** kini mengikuti resep Lampiran 8 E naskah. Pada layar Evaluasi, hasil 2025 sama
+  dengan naskah tiap bulan (190 dari 634); untuk Januari–Agustus 2026 aplikasi menghitung 83
+  dari 483, naskah 86 — selisih ini menunggu buku kerja replikasi asli. Panel uji historis
+  mendapat tabel **skenario tetap** dan pilihan **4, 6, atau 8 kelurahan**. Kolom *Alasan
+  model* kini berupa persen (masukan itu menaikkan atau menurunkan perkiraan sekian persen).
+- **IKW berumus baru:** 25 × (0,50 F + 0,35 D + 0,15 T) — frekuensi 12 bulan (kuartil),
+  **dampak** tertinggi yang terverifikasi dalam tiga bulan, dan keberulangan dalam empat bulan.
+  Dampak diisi di **Data → Mutu Data → Dampak belum terverifikasi**: pilih kerugian, cedera,
+  status, dan **tulis rujukan sumbernya**. Selama dampak laporan tiga bulan terakhir di sebuah
+  kelurahan belum terverifikasi, kolom IKW menampilkan **ditahan**; bila baru sebagian, angkanya
+  diberi tanda * (sementara).
+- **Produk bulanan empat tahap:** Analis Intelkam menyusun dan memeriksa → **KBO memeriksa
+  mutu** → Kasat Intelkam menelaah → Pimpinan menetapkan. KBO dan Kasat meneruskan atau
+  mengembalikan dengan alasan, tanpa mengubah isi. Peran Staf Intelkam kembali bernama
+  **Analis Intelkam**; akun peragaan baru `demo.kbo`.
+- **Humas menyetujui imbauan bulanan.** Di **Warga → Buletin & Imbauan**, akun Humas
+  (`demo.humas`) menekan *Setujui imbauan*; sebelum itu bot tidak mengirim imbauan ke grup
+  maupun pelanggan. Buletin mingguan tetap disetujui Pimpinan.
+- Peran menjadi **delapan**. Kedelapan akun peragaan diberi kata sandi lewat
+  `scripts/sandi-peragaan-produksi.sh`.
+
 **Rentang jam, rekomendasi menurut tempat, dan Mutu Data (18 November 2026, catatan 184).**
 
 - **Jam disajikan dalam enam rentang empat jam** mulai 00.00 WIB (00–04, 04–08, 08–12, 12–16,

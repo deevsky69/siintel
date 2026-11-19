@@ -15,6 +15,12 @@ GET    /messaging/subscriptions/pending    pelanggan yang belum menerima imbauan
 POST   /messaging/subscriptions/sent       hasil pengiriman ke satu pelanggan
 ```
 
+19 November 2026 (naskah Taskap final B.4.7 dan Tabel 24): imbauan bulanan adalah informasi
+untuk masyarakat dan **disetujui Humas** lebih dulu — `POST /advisories/approvals`
+(`public_info:approve`). Sebelum bulan itu disetujui, antrean pengiriman ke grup maupun
+pelanggan kosong. Menggantikan pengiriman otomatis 10 November 2026; tabel
+`advisory_approvals` (0022) dipakai lagi. `/info` atas permintaan warga tidak ditahan.
+
 17 November 2026 (naskah Taskap 4.7 b): selain grup, WARGA dapat berlangganan sendiri dari
 percakapan pribadinya (`/langganan <kelurahan>`, berhenti dengan `/berhenti`). Yang disimpan
 hanya kanal, pengenal percakapan, dan kelurahan (`models/area_subscription.py`).
@@ -37,7 +43,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ...models import AreaSubscription, Babinkamtibmas, Location
+from ...models import AdvisoryApproval, AreaSubscription, Babinkamtibmas, Location
 from ...models.area_subscription import CHANNELS
 from ...services import audit, citizen_advisory, clock
 from ..deps import CurrentUser, get_db, require_permission
@@ -64,6 +70,11 @@ def _kelurahan_row(session: Session, kelurahan: str) -> tuple[str, str, str] | N
         .limit(1)
     ).first()
     return None if area is None else (str(area[0]), str(area[1]), str(area[2]))
+
+
+def _approval(session: Session, month: str) -> AdvisoryApproval | None:
+    """Persetujuan Humas atas imbauan bulan itu (YYYY-MM), bila sudah ada."""
+    return session.scalar(select(AdvisoryApproval).where(AdvisoryApproval.month == month))
 
 
 def _digits(value: str | None) -> str:
@@ -186,6 +197,9 @@ def advisory_text(
 def pending_advisories(session: Session = Depends(get_db)) -> dict[str, Any]:
     year, month_number = citizen_advisory.current_month()
     key = f"{year:04d}-{month_number:02d}"
+    if _approval(session, key) is None:
+        # Belum disetujui Humas: tidak ada yang dikirim.
+        return {"month": key, "data": [], "awaiting_approval": True}
     rows = session.scalars(
         select(Babinkamtibmas)
         .where(
@@ -379,6 +393,8 @@ def unsubscribe(
 def pending_subscriptions(session: Session = Depends(get_db)) -> dict[str, Any]:
     year, month_number = citizen_advisory.current_month()
     key = f"{year:04d}-{month_number:02d}"
+    if _approval(session, key) is None:
+        return {"month": key, "data": [], "awaiting_approval": True}
     rows = session.scalars(
         select(AreaSubscription)
         .where(
@@ -495,12 +511,56 @@ def advisory_preview(
         )
         or 0
     )
+    approval = _approval(session, key)
     return {
         "month": key,
-        "automatic": True,
+        # Sejak 19 November 2026 imbauan menunggu persetujuan Humas (naskah B.4.7).
+        "automatic": False,
+        "approved": approval is not None,
+        "approved_at": approval.approved_at if approval else None,
+        "approval_note": approval.note if approval else None,
         "groups_registered": groups,
         "groups_sent": sent,
         "subscribers": subscribers,
         "subscribers_sent": subscribers_sent,
         "sample": sample,
     }
+
+
+class ApprovalRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
+    note: str | None = Field(default=None, max_length=1000)
+
+
+@router.post(
+    "/advisories/approvals",
+    status_code=status.HTTP_201_CREATED,
+    summary="Humas menyetujui imbauan bulanan untuk masyarakat",
+)
+def approve_advisory(
+    payload: ApprovalRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("public_info:approve"),
+) -> dict[str, Any]:
+    if _approval(session, payload.month) is not None:
+        raise ApiError(status.HTTP_409_CONFLICT, "Imbauan bulan ini sudah disetujui.")
+    row = AdvisoryApproval(
+        month=payload.month,
+        approved_by=current.user.user_id,
+        approved_at=clock.citizen_now(),
+        note=(payload.note or "").strip() or None,
+    )
+    session.add(row)
+    audit.record(
+        session,
+        action="APPROVE_CITIZEN_ADVISORY",
+        resource_type="advisory",
+        result=audit.RESULT_SUCCESS,
+        user_id=current.user.user_id,
+        resource_id=payload.month,
+        detail={"note": bool(row.note)},
+    )
+    session.commit()
+    return {"month": row.month, "approved": True, "approved_at": row.approved_at}

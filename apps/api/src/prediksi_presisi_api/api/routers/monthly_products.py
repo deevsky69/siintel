@@ -1,6 +1,6 @@
-"""Produk bulanan (Modul 4 mekanisme), tiga tahap sejak 17 November 2026 (catatan 183):
-Staf Intelkam menyusun & memeriksa (peringkat dibekukan otomatis) → Kasat Intelkam menelaah
-→ Pimpinan menetapkan → pelaksanaan. Endpoint `/kbo` tidak dihidupkan lagi."""
+"""Produk bulanan (Modul 4 mekanisme), empat tahap sejak 19 November 2026 (catatan 186):
+Analis menyusun & memeriksa (peringkat dibekukan otomatis) → KBO memeriksa mutu → Kasat
+Intelkam menelaah → Pimpinan menetapkan → pelaksanaan."""
 
 from __future__ import annotations
 
@@ -179,6 +179,31 @@ def analyst(
         current,
         product,
         {"stage": "ANALYST", "items": len(decisions)},
+    )
+    session.commit()
+    return products.as_dict(_load(session, month))
+
+
+@router.post("/monthly-products/{month}/kbo", summary="Pemeriksaan mutu oleh KBO")
+def kbo(
+    month: str,
+    payload: OutcomeRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("monthly_product:review"),
+) -> dict[str, Any]:
+    product = _load(session, month)
+    _run(
+        session,
+        lambda: products.kbo_check(
+            session, product, payload.outcome, payload.reason, current.user.user_id
+        ),
+    )
+    _audit(
+        session,
+        "REVIEW_MONTHLY_PRODUCT_KBO",
+        current,
+        product,
+        {"outcome": payload.outcome.upper()},
     )
     session.commit()
     return products.as_dict(_load(session, month))

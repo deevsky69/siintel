@@ -103,6 +103,7 @@ MODEL UPDATE
 
 ```text
 crime_incidents.location_id        → locations
+crime_incidents.impact_verified_by → users             (0028; isian dampak untuk unsur D pada IKW: loss_status, injury_level, impact_source, impact_status)
 crime_incident_revisions.incident_id → crime_incidents   (0019; riwayat koreksi: field, before, after, by, note)
 monthly_rankings.generated_by      → users              (0020; peringkat bulanan: target_month, method, scope, data_cutoff, model_version, basis_from/to, pending_count; 0024: method menerima MODEL, HISTORY_3M, HISTORY_12M, HISTORY_1M, ANNUAL)
 area_subscriptions                 (tanpa FK)           (0025; langganan imbauan warga: channel WHATSAPP/TELEGRAM, chat_id, kelurahan, subscribed_at, advisory_sent_month; unik (channel, chat_id); baris dihapus saat berhenti)

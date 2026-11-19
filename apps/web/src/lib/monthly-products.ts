@@ -49,7 +49,8 @@ export type MonthlyProduct = {
   product_id: string;
   target_month: string;
   status: ProductStatus;
-  next_stage: "ANALYST" | "KASAT" | "PIMPINAN" | null;
+  next_stage: "ANALYST" | "KBO" | "KASAT" | "PIMPINAN" | null;
+  awaiting_kbo: boolean;
   awaiting_review: boolean;
   awaiting_decision: boolean;
   facts: Record<string, string | number | boolean>;
@@ -71,8 +72,12 @@ export type ProductList = {
   basis: string;
 };
 
-/** Status yang menunggu telaah Kasat Intelkam. */
-export const AWAITING_REVIEW: readonly ProductStatus[] = ["ANALYST_REVIEWED", "KBO_CHECKED"];
+/** Status yang menunggu pemeriksaan mutu oleh KBO. */
+export const AWAITING_KBO: readonly ProductStatus[] = ["ANALYST_REVIEWED"];
+export const isAwaitingKbo = (status: ProductStatus) => AWAITING_KBO.includes(status);
+
+/** Status yang menunggu telaah Kasat Intelkam: sudah diperiksa KBO. */
+export const AWAITING_REVIEW: readonly ProductStatus[] = ["KBO_CHECKED"];
 export const isAwaitingReview = (status: ProductStatus) => AWAITING_REVIEW.includes(status);
 
 /** Status yang menunggu penetapan Pimpinan — satu tempat, dipakai lencana dan beranda. */
@@ -90,6 +95,10 @@ export const analystReview = (
     note?: string;
   },
 ) => apiPost<MonthlyProduct>(`/monthly-products/${month}/analyst`, body);
+export const kboCheck = (
+  month: string,
+  body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },
+) => apiPost<MonthlyProduct>(`/monthly-products/${month}/kbo`, body);
 export const kasatReview = (
   month: string,
   body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },

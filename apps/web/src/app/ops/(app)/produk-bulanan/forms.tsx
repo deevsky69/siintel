@@ -68,9 +68,9 @@ export function AnalystForm({ month, items }: { month: string; items: ProductIte
         </div>
       ))}
       <div className="flex flex-wrap items-center gap-2">
-        <input name="note" placeholder="Catatan staf" className={`${field} flex-1`} />
+        <input name="note" placeholder="Catatan analis" className={`${field} flex-1`} />
         <button type="submit" disabled={pending} className={primary}>
-          Kirim ke Kasat Intelkam
+          Kirim ke KBO
         </button>
         <Status state={state} />
       </div>
@@ -83,20 +83,22 @@ export function AnalystForm({ month, items }: { month: string; items: ProductIte
  * Enter di kolom alasan hanya dapat mengembalikan — tidak pernah meneruskan ke Pimpinan tanpa
  * sengaja. Kasat tidak mengubah isi usulan; bila perlu perbaikan, ia mengembalikannya ke staf.
  */
-export function KasatForm({ month }: { month: string }) {
+export function KasatForm({ month, stage = "KASAT" }: { month: string; stage?: "KBO" | "KASAT" }) {
   const [state, submit, pending] = useActionState(kasatAction, IDLE);
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
       <form action={submit}>
         <input type="hidden" name="month" value={month} />
         <input type="hidden" name="outcome" value="ACCEPTED" />
+        <input type="hidden" name="stage" value={stage} />
         <button type="submit" disabled={pending} className={primary}>
-          Teruskan ke Pimpinan
+          {stage === "KBO" ? "Teruskan ke Kasat Intelkam" : "Teruskan ke Pimpinan"}
         </button>
       </form>
       <form action={submit} className="flex flex-1 flex-wrap items-center gap-2">
         <input type="hidden" name="month" value={month} />
         <input type="hidden" name="outcome" value="REJECTED" />
+        <input type="hidden" name="stage" value={stage} />
         <input
           name="reason"
           required
@@ -109,7 +111,7 @@ export function KasatForm({ month }: { month: string }) {
           disabled={pending}
           className="rounded border border-base-700 px-3 py-1 text-xs font-semibold text-ink-muted disabled:opacity-50"
         >
-          Kembalikan ke staf
+          Kembalikan ke analis
         </button>
       </form>
       <Status state={state} />

@@ -7,6 +7,7 @@ import { getProfile } from "@/lib/decisions";
 import {
   getProduct,
   isAwaitingDecision,
+  isAwaitingKbo,
   isAwaitingReview,
   listProducts,
   type MonthlyProduct,
@@ -22,13 +23,14 @@ const TABS = [
 ] as const;
 
 /**
- * Tiga tahap sejak 17 November 2026 (catatan 183; naskah Taskap dan saran Kasat Intelkam):
- * Staf Intelkam menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa dan
- * mengirim; Kasat Intelkam menelaah (meneruskan atau mengembalikan dengan alasan); Pimpinan
- * menetapkan; Fungsi/Polsek mencatat.
+ * Empat tahap sejak 19 November 2026 (catatan 186; sama dengan naskah Taskap final): Analis
+ * menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa dan mengirim; KBO
+ * memeriksa mutu; Kasat Intelkam menelaah; Pimpinan menetapkan; Fungsi/Polsek mencatat. KBO
+ * dan Kasat meneruskan atau mengembalikan dengan alasan, tanpa mengubah isi.
  */
 const STEPS = [
-  { key: "ANALYST", label: "Staf menyusun & memeriksa" },
+  { key: "ANALYST", label: "Analis menyusun & memeriksa" },
+  { key: "KBO", label: "KBO memeriksa mutu" },
   { key: "KASAT", label: "Kasat menelaah" },
   { key: "PIMPINAN", label: "Pimpinan menetapkan" },
   { key: "EXECUTE", label: "Pelaksanaan dicatat" },
@@ -56,12 +58,13 @@ function waktuWib(iso: string): string {
 
 function doneAt(product: MonthlyProduct | null): number {
   if (!product) return 0;
-  if (product.status === "DECIDED") return 3;
-  if (isAwaitingDecision(product.status)) return 2;
-  return isAwaitingReview(product.status) ? 1 : 0;
+  if (product.status === "DECIDED") return 4;
+  if (isAwaitingDecision(product.status)) return 3;
+  if (isAwaitingReview(product.status)) return 2;
+  return isAwaitingKbo(product.status) ? 1 : 0;
 }
 
-/** Produk bulanan (Modul 4 mekanisme): satu naskah per bulan, tiga tahap, lalu pelaksanaan. */
+/** Produk bulanan (Modul 4 mekanisme): satu naskah per bulan, empat tahap, lalu pelaksanaan. */
 export default async function ProdukBulananPage({
   searchParams,
 }: {
@@ -88,13 +91,17 @@ export default async function ProdukBulananPage({
   const awaiting = product ? isAwaitingDecision(product.status) : false;
   const reviewing = product ? isAwaitingReview(product.status) : false;
   const analystTurn = product?.status === "DRAFT" && can("monthly_product:draft");
+  const checking = product ? isAwaitingKbo(product.status) : false;
+  const kboTurn = checking && can("monthly_product:review");
   const kasatTurn = reviewing && can("monthly_product:validate");
   const leaderTurn = awaiting && can("monthly_product:decide");
   // Draf yang dikembalikan Kasat: alasannya harus terlihat oleh staf yang memperbaikinya.
   const lastStage = product?.stages.at(-1);
   const returned =
-    product?.status === "DRAFT" && lastStage?.stage === "KASAT" && lastStage.outcome === "REJECTED"
-      ? lastStage.reason
+    product?.status === "DRAFT" &&
+    (lastStage?.stage === "KASAT" || lastStage?.stage === "KBO") &&
+    lastStage.outcome === "REJECTED"
+      ? `${lastStage.stage === "KBO" ? "KBO" : "Kasat Intelkam"}: ${lastStage.reason}`
       : null;
   const attachedNames = new Set(
     (product?.status === "DECIDED"
@@ -156,7 +163,7 @@ export default async function ProdukBulananPage({
               <DraftForm month={month} />
             </div>
           ) : (
-            <EmptyState label="Produk bulan ini belum disusun Staf Intelkam." />
+            <EmptyState label="Produk bulan ini belum disusun Analis Intelkam." />
           )
         ) : (
           <>
@@ -167,15 +174,21 @@ export default async function ProdukBulananPage({
               {product.priority_count !== null
                 ? ` · ${product.priority_count} kelurahan prioritas`
                 : ""}
+              {checking && !kboTurn ? " · menunggu pemeriksaan KBO" : ""}
               {reviewing && !kasatTurn ? " · menunggu telaah Kasat Intelkam" : ""}
               {awaiting && !leaderTurn ? " · menunggu penetapan Pimpinan" : ""}
             </p>
             {returned ? (
               <p className="mb-3 rounded border border-risk-moderate/40 bg-risk-moderate/10 px-2.5 py-1.5 text-xs text-ink">
-                Dikembalikan Kasat Intelkam: {returned}
+                Dikembalikan {returned}
               </p>
             ) : null}
 
+            {kboTurn ? (
+              <div className="mb-3">
+                <KasatForm month={month} stage="KBO" />
+              </div>
+            ) : null}
             {kasatTurn ? (
               <div className="mb-3">
                 <KasatForm month={month} />
@@ -213,7 +226,9 @@ export default async function ProdukBulananPage({
                       {item.decided_action ?? item.analyst_text ?? item.proposal_text}
                     </p>
                     {item.analyst_reason ? (
-                      <p className="text-2xs text-ink-faint">Alasan staf: {item.analyst_reason}</p>
+                      <p className="text-2xs text-ink-faint">
+                        Alasan analis: {item.analyst_reason}
+                      </p>
                     ) : null}
                     {item.actions.length > 0 ? (
                       <ul className="mt-1 text-2xs text-ink-faint">

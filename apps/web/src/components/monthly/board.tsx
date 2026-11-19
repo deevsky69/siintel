@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { MonthlyProduct, ProductSummary } from "@/lib/monthly-products";
-import { isAwaitingDecision, isAwaitingReview } from "@/lib/monthly-products";
+import { isAwaitingDecision, isAwaitingKbo, isAwaitingReview } from "@/lib/monthly-products";
 
 /**
  * Papan "Bulan Ini" di beranda (10 November 2026, keputusan pemilik proyek 2.i).
@@ -34,6 +34,7 @@ export function buildCards(input: BoardInput): Card[] {
   const status = summary?.status ?? null;
   const awaiting = status ? isAwaitingDecision(status) : false;
   const reviewing = status ? isAwaitingReview(status) : false;
+  const checking = status ? isAwaitingKbo(status) : false;
   const decided = status === "DECIDED";
   const cards: Card[] = [];
 
@@ -41,13 +42,16 @@ export function buildCards(input: BoardInput): Card[] {
   const productState = !status
     ? "Belum disusun"
     : status === "DRAFT"
-      ? "Draf menunggu pemeriksaan Staf Intelkam"
-      : reviewing
-        ? "Menunggu telaah Kasat Intelkam"
-        : awaiting
-          ? "Menunggu penetapan Pimpinan"
-          : `Ditetapkan · ${summary?.priority_count ?? 0} kelurahan prioritas`;
+      ? "Draf menunggu pemeriksaan Analis Intelkam"
+      : checking
+        ? "Menunggu pemeriksaan mutu KBO"
+        : reviewing
+          ? "Menunggu telaah Kasat Intelkam"
+          : awaiting
+            ? "Menunggu penetapan Pimpinan"
+            : `Ditetapkan · ${summary?.priority_count ?? 0} kelurahan prioritas`;
   const analystTurn = can("monthly_product:draft") && (!status || status === "DRAFT");
+  const kboTurn = can("monthly_product:review") && checking;
   const kasatTurn = can("monthly_product:validate") && reviewing;
   const leaderTurn = can("monthly_product:decide") && awaiting;
   cards.push({
@@ -57,14 +61,16 @@ export function buildCards(input: BoardInput): Card[] {
     href: `/ops/produk-bulanan?bulan=${month}`,
     cta: analystTurn
       ? status
-        ? "Periksa & kirim ke Kasat Intelkam"
+        ? "Periksa & kirim ke KBO"
         : "Susun draf (membekukan peringkat)"
-      : kasatTurn
-        ? "Telaah: teruskan atau kembalikan"
-        : leaderTurn
-          ? "Tetapkan kelurahan prioritas"
-          : null,
-    mine: analystTurn || kasatTurn || leaderTurn,
+      : kboTurn
+        ? "Periksa mutu: teruskan atau kembalikan"
+        : kasatTurn
+          ? "Telaah: teruskan atau kembalikan"
+          : leaderTurn
+            ? "Tetapkan kelurahan prioritas"
+            : null,
+    mine: analystTurn || kboTurn || kasatTurn || leaderTurn,
   });
 
   // 2. Pelaksanaan — hanya bermakna setelah ditetapkan.

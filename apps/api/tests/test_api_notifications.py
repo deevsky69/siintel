@@ -167,7 +167,7 @@ def test_a_polsek_officer_is_told_about_the_work_they_do(
 def test_an_analyst_is_told_about_drafts_not_decisions(
     client: TestClient, session: Session
 ) -> None:
-    analyst = _make_user(session, "Staf Intelkam")
+    analyst = _make_user(session, "Analis Intelkam")
     groups = _feed(client, analyst)["groups"]
     assert isinstance(groups, list)
     product = next(group for group in groups if group["kind"] == "MONTHLY_PRODUCT")
@@ -188,9 +188,14 @@ def test_kasat_is_told_about_products_awaiting_review(client: TestClient, sessio
     waiting = session.scalar(
         select(func.count())
         .select_from(MonthlyProduct)
-        .where(MonthlyProduct.status.in_(("ANALYST_REVIEWED", "KBO_CHECKED")))
+        .where(MonthlyProduct.status == "KBO_CHECKED")
     )
     assert product["total"] == int(waiting or 0)
+    # KBO menerima antreannya sendiri: produk yang sudah divalidasi analis.
+    kbo_groups = _feed(client, _make_user(session, "KBO"))["groups"]
+    assert isinstance(kbo_groups, list)
+    mine = next(group for group in kbo_groups if group["kind"] == "MONTHLY_PRODUCT")
+    assert "pemeriksaan mutu" in str(mine["title"])
     # Administrator tidak lagi menerima antrean draf: ia di luar rantai persetujuan.
     admin_groups = _feed(client, _make_user(session, "Administrator"))["groups"]
     assert isinstance(admin_groups, list)

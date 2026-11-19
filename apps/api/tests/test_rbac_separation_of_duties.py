@@ -155,18 +155,20 @@ def test_the_permissions_administrator_lacks_are_all_command_decisions() -> None
         "public_alert:publish",
         "bulletin:approve",
         "monthly_product:draft",
+        "monthly_product:review",
         "monthly_product:validate",
+        "public_info:approve",
         "monthly_product:decide",
         "monthly_product:execute",
     }
 
 
-def test_monthly_product_chain_is_held_by_three_different_roles() -> None:
-    """Staf menyusun, Kasat menelaah, Pimpinan menetapkan — tiga peran, tanpa tumpang-tindih.
+def test_monthly_product_chain_is_held_by_four_different_roles() -> None:
+    """Analis menyusun, KBO memeriksa, Kasat menelaah, Pimpinan menetapkan — empat peran.
 
     Tahap KBO/Kasat dihapus 10 November 2026 karena diklik orang yang sama berturut-turut.
     Yang mencegahnya terulang bukan janji, melainkan tidak adanya satu peran pun yang
-    memegang dua dari tiga hak ini."""
+    memegang dua dari empat hak ini."""
     roles = yaml.safe_load(RBAC_FILE.read_text(encoding="utf-8"))["roles"]
 
     def holders(permission: str) -> set[str]:
@@ -177,6 +179,9 @@ def test_monthly_product_chain_is_held_by_three_different_roles() -> None:
             if permission in entries
         }
 
-    assert holders("monthly_product:draft") == {"Staf Intelkam"}
+    assert holders("monthly_product:draft") == {"Analis Intelkam"}
+    assert holders("monthly_product:review") == {"KBO"}
     assert holders("monthly_product:validate") == {"Kasat Intelkam"}
     assert holders("monthly_product:decide") == {"Pimpinan"}
+    # Informasi untuk masyarakat disetujui Humas, bukan oleh penyusun analisisnya.
+    assert holders("public_info:approve") == {"Humas"}

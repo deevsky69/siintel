@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from prediksi_presisi_api.api.deps import get_db
 from prediksi_presisi_api.main import app
-from prediksi_presisi_api.models import CrimeIncident, Location, MonthlyProduct, Role, User
+from prediksi_presisi_api.models import CrimeIncident, Location, Role, User
 from prediksi_presisi_api.security.passwords import hash_password
 from prediksi_presisi_api.services import clock, monthly_ranking
 
@@ -115,7 +115,8 @@ def _post(client: TestClient, path: str, body: dict[str, Any], headers: dict[str
 def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: Session) -> None:
     area = _seed(session)
     admin = _login(client, session, "Administrator")
-    analyst = _login(client, session, "Staf Intelkam")
+    analyst = _login(client, session, "Analis Intelkam")
+    kbo = _login(client, session, "KBO")
     kasat = _login(client, session, "Kasat Intelkam")
     leader = _login(client, session, "Pimpinan")
     polsek_in = _login(client, session, "Polsek", polsek=area.polsek)
@@ -192,19 +193,28 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     )
     assert reviewed.status_code == 200, reviewed.text
     assert reviewed.json()["status"] == "ANALYST_REVIEWED"
-    assert reviewed.json()["next_stage"] == "KASAT"
-    assert reviewed.json()["awaiting_review"] is True
+    assert reviewed.json()["next_stage"] == "KBO"
+    assert reviewed.json()["awaiting_kbo"] is True
+    assert reviewed.json()["awaiting_review"] is False
     assert reviewed.json()["awaiting_decision"] is False
     assert reviewed.json()["items"][1]["analyst_status"] == "REJECTED"
 
-    # Tahap KBO tidak dihidupkan lagi.
-    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, analyst).status_code == 404
+    # Empat tahap (19 November 2026): KBO memeriksa mutu sebelum Kasat menelaah. Kasat belum
+    # dapat menelaah, dan hanya KBO yang memeriksa — bukan analis yang menulisnya.
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
+    for other_role in (analyst, kasat, leader, admin):
+        assert _post(client, "kbo", {"outcome": "ACCEPTED"}, other_role).status_code == 403
+    assert _post(client, "kbo", {"outcome": "REJECTED"}, kbo).status_code == 400
+    checked = _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo)
+    assert checked.status_code == 200, checked.text
+    assert checked.json()["status"] == "KBO_CHECKED" and checked.json()["next_stage"] == "KASAT"
+    assert checked.json()["awaiting_review"] is True
 
     pick = {"selected": [{"kelurahan": area.kelurahan}]}
     # Pimpinan belum dapat menetapkan sebelum Kasat menelaah.
     assert _post(client, "decide", pick, leader).status_code == 409
     # Telaah hanya oleh Kasat Intelkam — bukan staf yang menulisnya, bukan Pimpinan, bukan admin.
-    for other_role in (analyst, leader, admin):
+    for other_role in (analyst, kbo, leader, admin):
         assert _post(client, "kasat", {"outcome": "ACCEPTED"}, other_role).status_code == 403
     # Mengembalikan tanpa alasan ditolak; dengan alasan produk kembali menjadi draf staf.
     assert _post(client, "kasat", {"outcome": "REJECTED"}, kasat).status_code == 400
@@ -219,6 +229,9 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     resent = _post(client, "analyst", {"items": [], "note": "dasar dilengkapi"}, analyst)
     assert resent.status_code == 200, resent.text
     assert resent.json()["items"][1]["analyst_status"] == "REJECTED"
+    # Setelah dikembalikan, produk melewati KBO lagi sebelum sampai ke Kasat.
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
+    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo).status_code == 200
     passed = _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat)
     assert passed.status_code == 200, passed.text
     assert passed.json()["status"] == "VALIDATED" and passed.json()["next_stage"] == "PIMPINAN"
@@ -244,7 +257,7 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     chosen = decided.json()["items"][0]
     assert chosen["selected"] is True and chosen["decided_action"].startswith("Patroli")
     stages = [s["stage"] for s in decided.json()["stages"]]
-    assert stages == ["ANALYST", "KASAT", "ANALYST", "KASAT", "PIMPINAN"]
+    assert stages == ["ANALYST", "KBO", "KASAT", "ANALYST", "KBO", "KASAT", "PIMPINAN"]
 
     # Pelaksanaan: Polsek wilayah mencatat; Polsek lain 404; bukan prioritas 404.
     action = {
@@ -267,25 +280,19 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     assert MONTH in months
 
 
-def test_product_left_in_a_retired_status_is_not_locked(
-    client: TestClient, session: Session
-) -> None:
-    """Produk yang tertahan di KBO_CHECKED (alur empat tahap) menunggu telaah Kasat seperti
-    ANALYST_REVIEWED; yang sudah VALIDATED langsung dapat ditetapkan Pimpinan."""
-    area = _seed(session)
-    analyst = _login(client, session, "Staf Intelkam")
-    kasat = _login(client, session, "Kasat Intelkam")
-    leader = _login(client, session, "Pimpinan")
+def test_kbo_can_return_a_product_to_the_analyst(client: TestClient, session: Session) -> None:
+    """KBO mengembalikan dengan alasan; produk kembali menjadi draf analis."""
+    _seed(session)
+    analyst = _login(client, session, "Analis Intelkam")
+    kbo = _login(client, session, "KBO")
     assert client.post(BASE, json={"month": MONTH}, headers=analyst).status_code == 201
-    product = session.scalar(select(MonthlyProduct))
-    assert product is not None
-    product.status = "KBO_CHECKED"
-    session.flush()
-    shown = client.get(f"{BASE}/{MONTH}", headers=leader).json()
-    assert shown["awaiting_review"] is True and shown["next_stage"] == "KASAT"
-    pick = {"selected": [{"kelurahan": area.kelurahan}]}
-    assert _post(client, "decide", pick, leader).status_code == 409
-    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 200
-    decided = _post(client, "decide", pick, leader)
-    assert decided.status_code == 200, decided.text
-    assert decided.json()["status"] == "DECIDED"
+    # Draf yang belum dikirim analis belum dapat diperiksa KBO.
+    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo).status_code == 409
+    assert _post(client, "analyst", {"items": []}, analyst).status_code == 200
+    returned = _post(
+        client, "kbo", {"outcome": "REJECTED", "reason": "validasi belum lengkap"}, kbo
+    )
+    assert returned.status_code == 200, returned.text
+    assert returned.json()["status"] == "DRAFT" and returned.json()["next_stage"] == "ANALYST"
+    last = returned.json()["stages"][-1]
+    assert last["stage"] == "KBO" and last["reason"] == "validasi belum lengkap"

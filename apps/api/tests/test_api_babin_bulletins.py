@@ -236,6 +236,19 @@ def test_bulletin_is_composed_from_the_week_then_approved_by_pimpinan_and_sent_b
     assert sent_row is not None and sent_row.sent_at is not None
 
 
+def _humas_approves(client: TestClient, session: Session) -> None:
+    """Humas menyetujui imbauan bulan berjalan (naskah Taskap final B.4.7)."""
+    from prediksi_presisi_api.services import citizen_advisory
+
+    year, month = citizen_advisory.current_month()
+    response = client.post(
+        "/api/v1/advisories/approvals",
+        json={"month": f"{year:04d}-{month:02d}", "note": "uji"},
+        headers=_login(client, session, "Humas"),
+    )
+    assert response.status_code in (201, 409), response.text
+
+
 def test_citizen_group_registration_and_monthly_advisory_for_bot(
     client: TestClient, session: Session
 ) -> None:
@@ -354,13 +367,18 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
         == 400
     )
 
-    # Pratinjau untuk layar petugas: contoh teks dan jumlah grup; tidak ada tombol setuju.
+    # Pratinjau untuk layar petugas: contoh teks dan jumlah grup. Sejak 19 November 2026
+    # imbauan menunggu persetujuan Humas — bukan Pimpinan, bukan Administrator.
     preview = client.get("/api/v1/advisories/preview", headers=leader).json()
-    assert preview["automatic"] is True and preview["sample"] is not None
+    assert preview["automatic"] is False and preview["sample"] is not None
     assert preview["groups_registered"] >= 1
-    assert client.post(
-        "/api/v1/advisories/approvals", json={"month": "2030-01"}, headers=leader
-    ).status_code in (404, 405)
+    for not_humas in (leader, admin):
+        assert (
+            client.post(
+                "/api/v1/advisories/approvals", json={"month": "2030-01"}, headers=not_humas
+            ).status_code
+            == 403
+        )
     this_month = preview["month"]
     assert (
         client.get(
@@ -371,7 +389,13 @@ def test_citizen_group_registration_and_monthly_advisory_for_bot(
         == 200
     )
 
-    # Grup terdaftar masuk antrean sampai ditandai terkirim — tanpa persetujuan.
+    # Sebelum disetujui Humas antrean kosong; sesudahnya grup terdaftar masuk antrean sampai
+    # ditandai terkirim.
+    held = client.get("/api/v1/messaging/advisories/pending", headers=key).json()
+    if held.get("awaiting_approval"):
+        assert held["data"] == []
+    _humas_approves(client, session)
+    assert client.get("/api/v1/advisories/preview", headers=leader).json()["approved"] is True
     pending = client.get("/api/v1/messaging/advisories/pending", headers=key).json()
     mine = next(row for row in pending["data"] if row["kelurahan"] == area.kelurahan)
     assert mine["chat_id"] == "120363@g.us" and mine["month"] == pending["month"]
@@ -435,6 +459,11 @@ def test_citizen_subscribes_to_area_advisory_and_can_leave(
     mine = client.get("/api/v1/messaging/subscriptions", params=query, headers=BOT)
     assert mine.status_code == 200 and mine.json()["kelurahan"] == first.kelurahan
 
+    # Sebelum Humas menyetujui imbauan bulan ini, tidak ada yang dikirim.
+    held = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
+    if held.get("awaiting_approval"):
+        assert held["data"] == []
+    _humas_approves(client, session)
     pending = client.get("/api/v1/messaging/subscriptions/pending", headers=BOT).json()
     row = next(item for item in pending["data"] if item["chat_id"] == chat)
     assert row["kelurahan"] == first.kelurahan and row["text"]

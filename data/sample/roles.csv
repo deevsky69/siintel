@@ -1,7 +1,9 @@
 role_id,role_name,level
 ROLE-01,Pimpinan,Level 1
 ROLE-02,Kasat Intelkam,Level 2
-ROLE-03,Staf Intelkam,Level 3
+ROLE-03,Analis Intelkam,Level 3
 ROLE-04,Fungsi,Level 4
 ROLE-05,Polsek,Level 5
 ROLE-06,Administrator,Level 6
+ROLE-07,KBO,Level 3
+ROLE-08,Humas,Level 4

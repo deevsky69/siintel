@@ -7,6 +7,7 @@ import {
   decideProduct,
   draftProduct,
   kasatReview,
+  kboCheck,
   recordAction,
 } from "@/lib/monthly-products";
 
@@ -43,7 +44,7 @@ export async function analystAction(_p: ProductState, form: FormData): Promise<P
   }));
   return guard(async () => {
     await analystReview(month, { items, note: String(form.get("note") ?? "") || undefined });
-    return IDLE_OK("Pemeriksaan tersimpan; produk dikirim ke Kasat Intelkam.");
+    return IDLE_OK("Pemeriksaan tersimpan; produk dikirim ke KBO.");
   });
 }
 
@@ -57,12 +58,22 @@ export async function kasatAction(_p: ProductState, form: FormData): Promise<Pro
   const outcome: "ACCEPTED" | "REJECTED" = raw;
   const reason = String(form.get("reason") ?? "").trim();
   if (outcome === "REJECTED" && !reason) {
-    return { error: "Alasan wajib diisi bila dikembalikan ke staf.", done: null };
+    return { error: "Alasan wajib diisi bila dikembalikan ke analis.", done: null };
   }
+  // Formulir yang sama dipakai KBO dan Kasat; `stage` menentukan tahap yang dicatat.
+  const stage = String(form.get("stage") ?? "KASAT");
   return guard(async () => {
+    if (stage === "KBO") {
+      await kboCheck(month, { outcome, reason: reason || undefined });
+      return IDLE_OK(
+        outcome === "ACCEPTED"
+          ? "Produk diteruskan ke Kasat Intelkam."
+          : "Produk dikembalikan ke analis.",
+      );
+    }
     await kasatReview(month, { outcome, reason: reason || undefined });
     return IDLE_OK(
-      outcome === "ACCEPTED" ? "Produk diteruskan ke Pimpinan." : "Produk dikembalikan ke staf.",
+      outcome === "ACCEPTED" ? "Produk diteruskan ke Pimpinan." : "Produk dikembalikan ke analis.",
     );
   });
 }
