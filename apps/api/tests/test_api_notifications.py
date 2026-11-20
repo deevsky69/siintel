@@ -196,10 +196,11 @@ def test_kasat_is_told_about_products_awaiting_review(client: TestClient, sessio
     assert isinstance(kbo_groups, list)
     mine = next(group for group in kbo_groups if group["kind"] == "MONTHLY_PRODUCT")
     assert "pemeriksaan mutu" in str(mine["title"])
-    # Administrator tidak lagi menerima antrean draf: ia di luar rantai persetujuan.
+    # Sejak 19 November 2026 (catatan 187) Administrator memegang seluruh kewenangan rantai,
+    # sehingga antrean produk bulanan ikut tampil padanya.
     admin_groups = _feed(client, _make_user(session, "Administrator"))["groups"]
     assert isinstance(admin_groups, list)
-    assert "MONTHLY_PRODUCT" not in [group["kind"] for group in admin_groups]
+    assert "MONTHLY_PRODUCT" in [group["kind"] for group in admin_groups]
 
 
 def test_two_roles_receive_different_queues(client: TestClient, session: Session) -> None:

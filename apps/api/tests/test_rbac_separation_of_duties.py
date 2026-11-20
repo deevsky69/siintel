@@ -14,6 +14,13 @@ aplikasinya tetap berjalan sempurna.
 Test ini pernah dibutuhkan: pada 1 September 2026 tiga peran digabung menjadi
 Administrator, dan `evaluation:run` sempat ikut terkumpul di peran yang juga menulis
 data kejadian, menjalankan prediksi, dan mencatat hasil operasi.
+
+**19 November 2026 (catatan 187) — keputusan pemilik proyek:** Administrator memegang
+SELURUH kewenangan, termasuk yang dahulu sengaja dijauhkan darinya. Sejak itu jawaban atas
+dua pertanyaan di atas berlaku untuk peran SELAIN Administrator; untuk Administrator
+pemisahannya tinggal jejak audit. Test di bawah menjaga keduanya: Administrator memang
+memegang semuanya (bukan sebagian, tanpa disadari), dan di antara peran lain tidak ada yang
+ikut melebar.
 """
 
 from __future__ import annotations
@@ -52,8 +59,17 @@ def _granted(grants: dict[str, list[str]]) -> set[str]:
     return {permission for perms in grants.values() for permission in perms}
 
 
+#: Peran yang atas keputusan 19 November 2026 memegang seluruh katalog.
+SUPER_ROLE = "Administrator"
+
+
 def _holders(permission: str) -> list[str]:
     return sorted(role for role, grants in _roles().items() if permission in _granted(grants))
+
+
+def _other_holders(permission: str) -> list[str]:
+    """Pemegang selain Administrator — di sinilah pemisahan tugas masih ditegakkan peran."""
+    return [role for role in _holders(permission) if role != SUPER_ROLE]
 
 
 def test_only_the_two_designated_roles_may_approve_recommendations() -> None:
@@ -76,7 +92,9 @@ def test_nobody_evaluates_the_numbers_they_produced() -> None:
     offenders = {
         role: sorted(PRODUCES_THE_NUMBERS & _granted(grants))
         for role, grants in _roles().items()
-        if JUDGES_THE_NUMBERS in _granted(grants) and PRODUCES_THE_NUMBERS & _granted(grants)
+        if role != SUPER_ROLE
+        and JUDGES_THE_NUMBERS in _granted(grants)
+        and PRODUCES_THE_NUMBERS & _granted(grants)
     }
 
     assert not offenders, (
@@ -92,7 +110,8 @@ def test_the_evaluator_is_the_one_who_relies_on_the_measurement() -> None:
     di peran administratif membuat evaluasi menjadi pekerjaan teknis internal, bukan
     pemeriksaan atas alat yang dipakai mengambil keputusan.
     """
-    assert _holders(JUDGES_THE_NUMBERS) == ["Pimpinan"]
+    assert _other_holders(JUDGES_THE_NUMBERS) == ["Pimpinan"]
+    assert _holders(JUDGES_THE_NUMBERS) == [SUPER_ROLE, "Pimpinan"]
 
 
 def test_the_check_would_catch_a_regression() -> None:
@@ -130,41 +149,37 @@ def test_publishing_to_the_public_is_a_command_decision_not_a_technical_one() ->
         if "public_alert:publish" in entries
     }
 
-    assert holders == {"Pimpinan"}, (
+    # 19 November 2026: Administrator ikut memegangnya (catatan 187); tidak ada peran lain.
+    assert holders == {"Pimpinan", SUPER_ROLE}, (
         f"pemegang public_alert:publish: {sorted(holders) or 'tidak ada'}"
     )
 
 
-def test_the_permissions_administrator_lacks_are_all_command_decisions() -> None:
-    """Yang menjalankan prediksi tidak memutuskan, tidak menilai, dan tidak mengumumkan."""
+def test_administrator_holds_the_whole_catalogue() -> None:
+    """Keputusan 19 November 2026: semua kewenangan peran lain dapat dijalankan Administrator.
+
+    Sampai hari itu Administrator sengaja kekurangan sembilan kewenangan (menilai, mengumumkan,
+    menyetujui informasi publik, dan seluruh rantai produk bulanan). Test ini menjaga dua arah:
+    tidak ada kewenangan baru yang lupa diberikan, dan cakupannya ALL — bukan terbatas wilayah.
+    """
     config = yaml.safe_load(RBAC_FILE.read_text(encoding="utf-8"))
     catalogue = {
         f"{resource}:{action}"
         for resource, actions in config["permissions"].items()
         for action in actions
     }
-    admin = {entry for entries in config["roles"]["Administrator"].values() for entry in entries}
+    scopes = config["roles"][SUPER_ROLE]
 
-    # Sejak 9 Oktober 2026 commander_decision:approve diberikan pemilik proyek; sejak
-    # 2 November 2026 bulletin:approve (penerbitan buletin ke masyarakat) hanya Pimpinan.
-    # 6 November 2026 (Modul 4 mekanisme): penetapan dan pelaksanaan produk bulanan bukan
-    # pekerjaan Administrator. 17 November 2026 (catatan 183): Administrator di luar seluruh
-    # rantai produk bulanan — menyusun (draft) dan menelaah (validate) juga bukan miliknya.
-    assert catalogue - admin == {
-        "evaluation:run",
-        "public_alert:publish",
-        "bulletin:approve",
-        "monthly_product:draft",
-        "monthly_product:review",
-        "monthly_product:validate",
-        "public_info:approve",
-        "monthly_product:decide",
-        "monthly_product:execute",
-    }
+    assert set(scopes) == {"ALL"}
+    assert set(scopes["ALL"]) == catalogue
+    assert len(scopes["ALL"]) == len(catalogue), "ada kewenangan yang tertulis dua kali"
 
 
 def test_monthly_product_chain_is_held_by_four_different_roles() -> None:
     """Analis menyusun, KBO memeriksa, Kasat menelaah, Pimpinan menetapkan — empat peran.
+
+    Administrator memegang keempatnya sejak 19 November 2026 (catatan 187) dan dikecualikan
+    di sini; yang dijaga adalah tidak ada peran LAIN yang memegang dua dari empat hak ini.
 
     Tahap KBO/Kasat dihapus 10 November 2026 karena diklik orang yang sama berturut-turut.
     Yang mencegahnya terulang bukan janji, melainkan tidak adanya satu peran pun yang
@@ -176,7 +191,7 @@ def test_monthly_product_chain_is_held_by_four_different_roles() -> None:
             name
             for name, scopes in roles.items()
             for entries in scopes.values()
-            if permission in entries
+            if permission in entries and name != SUPER_ROLE
         }
 
     assert holders("monthly_product:draft") == {"Analis Intelkam"}

@@ -20,10 +20,13 @@
 > alih-alih dinomori ulang, supaya rujukan lama pada dokumen dan catatan implementasi
 > tidak berpindah arti.
 >
-> Administrator karenanya memegang 42 dari 45 permission. Dua yang sengaja berada di
-> luar jangkauannya milik Pimpinan: `commander_decision:approve` (yang mengusulkan tidak
-> boleh menjadi yang memutuskan) dan `evaluation:run` (yang menghasilkan angka tidak
-> boleh menilai ketepatannya sendiri).
+> **Keadaan sekarang — keputusan pemilik proyek 19 November 2026 (catatan 187):
+> Administrator memegang SELURUH katalog (64 dari 64 permission, cakupan ALL).** Sampai
+> hari itu ia sengaja kekurangan kewenangan komando: mula-mula `commander_decision:approve`
+> dan `evaluation:run` (1 September 2026), kemudian juga penerbitan ke publik, persetujuan
+> buletin dan imbauan, serta seluruh rantai produk bulanan. Pemisahan "yang mengusulkan
+> bukan yang memutuskan" dan "yang menghasilkan angka tidak menilainya" kini berlaku
+> antarperan SELAIN Administrator; untuk Administrator ia dijaga jejak audit saja.
 
 ---
 
@@ -110,13 +113,13 @@ permission atas resource tersebut.
 | risk_score | read(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run(ALL) |
 | prediction | read(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run, publish(ALL) |
 | warning | read(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read(ALL) | read, acknowledge(OWN_JURISDICTION) | read, acknowledge, resolve(ALL) |
-| public_alert | read, publish(ALL) | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| public_alert | read, publish(ALL) | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, publish(ALL) |
 | recommendation | read(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
 | commander_decision | read, approve(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, approve(ALL) |
 | operation | read(ALL) | — | — | — | — | read(OWN_FUNCTION) | read(OWN_JURISDICTION) | read, write(ALL) |
 | citizen_report | read(ALL) | — | — | — | — | — | read, write(OWN_JURISDICTION) | read, write, triage(ALL) |
 | community_feedback | read(ALL) | — | — | read(ALL) | — | — | read(OWN_JURISDICTION) | read(ALL) |
-| evaluation | read, run(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read(ALL) |
+| evaluation | read, run(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read(ALL) | read(OWN_JURISDICTION) | read, run(ALL) |
 | user | — | — | — | — | — | — | — | read, manage(ALL) |
 | role | — | — | — | — | — | — | — | read, manage(ALL) |
 | audit | read(ALL) | — | — | — | — | — | — | read(ALL) |
@@ -125,12 +128,12 @@ permission atas resource tersebut.
 | review | — | — | — | — | — | — | — | moderate(ALL) |
 | case_file | read(ALL) | — | — | — | — | — | read, write(OWN_JURISDICTION) | read, write(ALL) |
 | babin | read(ALL) | read(ALL) | read(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read, manage(ALL) |
-| bulletin | read, approve(ALL) | read(ALL) | read(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read, manage(ALL) |
+| bulletin | read, approve(ALL) | read(ALL) | read(ALL) | read(ALL) | read(ALL) | — | read(ALL) | read, manage, approve(ALL) |
 | ranking | read(ALL) | read(ALL) | read(ALL) | — | read, manage(ALL) | read(ALL) | read(ALL) | read, manage(ALL) |
-| monthly_product | read, decide(ALL) | read, validate(ALL) | read, review(ALL) | — | read, draft(ALL) | read, execute(ALL) | read, execute(ALL) | read(ALL) |
-| public_info | — | — | — | approve(ALL) | — | — | — | — |
+| monthly_product | read, decide(ALL) | read, validate(ALL) | read, review(ALL) | — | read, draft(ALL) | read, execute(ALL) | read, execute(ALL) | read, draft, review, validate, decide, execute(ALL) |
+| public_info | — | — | — | approve(ALL) | — | — | — | approve(ALL) |
 
-Jumlah permission per peran: Pimpinan 31, Kasat Intelkam 18, KBO 18, Humas 8, Analis Intelkam 19, Fungsi 20, Polsek 31, Administrator 55.
+Jumlah permission per peran: Pimpinan 31, Kasat Intelkam 18, KBO 18, Humas 8, Analis Intelkam 19, Fungsi 20, Polsek 31, Administrator 64.
 
 <!-- matriks:selesai -->
 

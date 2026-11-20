@@ -344,6 +344,22 @@ roles:
   # mungkin diajukan penguji: siapa yang memutuskan, dan siapa yang memverifikasi.
   Administrator:
     ALL:
+      # KEPUTUSAN PEMILIK PROYEK 19 November 2026 (catatan 187): seluruh kewenangan peran
+      # lain dapat dijalankan Administrator. Sembilan kewenangan di bawah ini sebelumnya
+      # sengaja TIDAK dipegangnya (keputusan 9 September, 2 November, 6 dan 17 November 2026).
+      # Akibat yang disadari: lewat akun Administrator satu orang dapat menyusun, memeriksa,
+      # menelaah, dan menetapkan produk bulanan, menyetujui informasi publik, serta
+      # mengevaluasi angka yang dihasilkannya sendiri. Pemisahan tugas kini hanya terjaga
+      # ANTARPERAN SELAIN Administrator dan oleh jejak audit (tiap langkah mencatat akunnya).
+      - monthly_product:draft
+      - monthly_product:review
+      - monthly_product:validate
+      - monthly_product:decide
+      - monthly_product:execute
+      - bulletin:approve
+      - public_info:approve
+      - public_alert:publish
+      - evaluation:run
       # KEPUTUSAN PEMILIK PROYEK 9 Oktober 2026 — membalik pemisahan 1 September 2026:
       # Administrator BOLEH memutuskan rekomendasi (setujui/ubah/tolak) seperti Pimpinan.
       # Akibat yang disadari: rantai "yang mengusulkan bukan yang memutuskan" kini hanya

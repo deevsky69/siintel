@@ -102,13 +102,14 @@ def _a_candidate(client: TestClient, headers: dict[str, str]) -> dict[str, objec
 
 
 def test_only_the_holder_of_publish_may_announce(client: TestClient, session: Session) -> None:
-    """Administrator menjalankan prediksi, tetapi tidak mengumumkan hasilnya.
+    """Yang hanya dapat membaca peringatan publik tidak dapat mengumumkannya.
 
-    Ini keputusan pemilik proyek 9 September 2026, dan justru peran yang paling berkuasa
-    secara teknis yang harus terhalang di sini.
+    Sampai 19 November 2026 yang dijadikan contoh penolakan adalah Administrator (keputusan
+    9 September 2026). Sejak catatan 187 Administrator memegang `public_alert:publish`;
+    penolakan diuji dengan peran yang memang hanya membaca.
     """
     leader = _user(session, "Pimpinan")
-    admin = _user(session, "Administrator")
+    admin = _user(session, "Analis Intelkam")
     candidate = _a_candidate(client, _auth(client, leader))
 
     refused = client.post(
@@ -122,7 +123,7 @@ def test_only_the_holder_of_publish_may_announce(client: TestClient, session: Se
 
 def test_a_refused_attempt_leaves_a_trace(client: TestClient, session: Session) -> None:
     """Percobaan mengumumkan tanpa kewenangan tercatat, bukan hanya ditolak."""
-    admin = _user(session, "Administrator")
+    admin = _user(session, "Analis Intelkam")
     before = session.scalar(
         select(AuditLog.audit_id).where(AuditLog.result == "DENIED").order_by(AuditLog.timestamp)
     )
