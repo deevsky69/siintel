@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
+import { getProfile } from "@/lib/dashboard";
 import { getBacktest, getMonthlyEvaluation } from "@/lib/monthly-evaluation";
 import { listProducts } from "@/lib/monthly-products";
 import { getRankingOptions } from "@/lib/rankings";
+import { WorkLogForm } from "./work-form";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,12 @@ export default async function EvaluasiBulananPage({
 }) {
   const params = await searchParams;
   const raw = params.bulan;
-  const [options, products] = await Promise.all([getRankingOptions(), listProducts()]);
+  const [options, products, profile] = await Promise.all([
+    getRankingOptions(),
+    listProducts(),
+    getProfile(),
+  ]);
+  const canRecord = profile.permissions.includes("monthly_product:review");
   const months = [
     ...new Set([
       ...options.frozen.map((f) => f.target_month),
@@ -38,6 +45,15 @@ export default async function EvaluasiBulananPage({
   ]);
   const pct = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}%`);
   const num = (value: number | null) => (value === null ? "—" : value.toFixed(2));
+  const menit = (value: number | null) => (value === null ? "belum tercatat" : `${value} menit`);
+  const waktu = (iso: string | null) =>
+    iso === null
+      ? "belum ada"
+      : new Intl.DateTimeFormat("id-ID", {
+          timeZone: "Asia/Jakarta",
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date(iso));
 
   return (
     <div className="space-y-3">
@@ -143,6 +159,47 @@ export default async function EvaluasiBulananPage({
                 </li>
               ))}
             </ul>
+          ) : null}
+        </Panel>
+      ) : null}
+      {result.work ? (
+        <Panel title="Mutu draf dan waktu kerja">
+          <dl className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 xl:grid-cols-4">
+            <div>
+              <dt className="stat-label">Skor mutu draf SIGAP</dt>
+              <dd className="mt-1 text-ink">
+                {result.work.quality_sigap_total === null
+                  ? "belum dinilai"
+                  : `${result.work.quality_sigap_total} dari ${result.work.quality_max}`}
+              </dd>
+            </div>
+            <div>
+              <dt className="stat-label">Skor cara kerja biasa</dt>
+              <dd className="mt-1 text-ink">
+                {result.work.quality_manual_total === null
+                  ? "belum dinilai"
+                  : `${result.work.quality_manual_total} dari ${result.work.quality_max}`}
+              </dd>
+            </div>
+            <div>
+              <dt className="stat-label">Data siap olah → validasi selesai</dt>
+              <dd className="mt-1 text-ink">{menit(result.work.minutes_ready_to_validated)}</dd>
+            </div>
+            <div>
+              <dt className="stat-label">Data diterima → siap olah</dt>
+              <dd className="mt-1 text-ink">{menit(result.work.minutes_receive_to_ready)}</dd>
+            </div>
+          </dl>
+          <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
+            Draf siap {waktu(result.work.draft_ready_at)} · validasi selesai{" "}
+            {waktu(result.work.validated_at)} — keduanya dari catatan sistem. Rubrik:{" "}
+            {result.work.rubric.map((item) => item.label.toLowerCase()).join(", ")}; skor tiap unsur
+            0 belum memenuhi, 1 perlu revisi, 2 memenuhi.
+          </p>
+          {canRecord ? (
+            <div className="mt-3 border-t border-base-800 pt-3">
+              <WorkLogForm month={month} work={result.work} />
+            </div>
           ) : null}
         </Panel>
       ) : null}

@@ -33,6 +33,15 @@ Polres Metro Jakarta Selatan
   dikembalikan melewati KBO dan Wakasat lagi. Deret langkah di atas naskah kini enam:
   analis, KBO, Wakasat, Kasat, Pimpinan, pelaksanaan. Peran menjadi **sembilan**; akun
   peragaan baru `demo.wakasat` (kata sandinya ditetapkan `scripts/sandi-peragaan-produksi.sh`).
+- **Mutu draf dan waktu kerja (Modul 5).** Layar **Bulan Ini → Evaluasi** mendapat panel *Mutu
+  draf dan waktu kerja*, sesuai Tabel 4.17 dan Lampiran L huruf D naskah. KBO (dan
+  Administrator) mengisi skor draf SIGAP menurut rubrik empat unsur — keterlacakan bukti,
+  kesesuaian tempat dan waktu, kecocokan lapangan, kelayakan — masing-masing 0 belum memenuhi,
+  1 perlu revisi, 2 memenuhi (jumlah paling tinggi 8); skor cara kerja biasa boleh diisi sebagai
+  pembanding. Ia juga mengisi tiga waktu yang tidak diketahui sistem: data diterima, data siap
+  olah, peta siap (WIB). *Draf siap* dan *validasi selesai* tidak diisi tangan — diambil dari
+  saat draf disusun dan saat Kasat Intelkam meneruskan. Panel menampilkan menit dari data siap
+  olah sampai validasi selesai, dan jeda data diterima sampai siap olah secara terpisah.
 - **Halaman SOP & Modul** (`/ops/sop`, tautan *SOP & modul →* di kanan atas papan "Bulan ini"
   pada Beranda). Memuat desain program (Gambar 4.3), **Tabel 4.17 Muatan SOP dan Modul
   Aplikasi SIGAP**, dan ringkasan SOP (Lampiran I) kata demi kata seperti naskah, dengan

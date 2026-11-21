@@ -42,7 +42,28 @@ export type MonthlyEvaluation = {
     reasons: { kelurahan: string; status: string; reason: string }[];
     returned: { stage: string; reason: string | null; acted_at: string }[];
   } | null;
+  /** Modul 5: mutu draf dan waktu kerja (naskah Taskap Lampiran L huruf D). */
+  work: WorkSummary | null;
   basis: string;
+};
+
+export type WorkSummary = {
+  recorded: boolean;
+  rubric: { key: string; label: string }[];
+  quality_sigap: Record<string, number> | null;
+  quality_manual: Record<string, number> | null;
+  quality_sigap_total: number | null;
+  quality_manual_total: number | null;
+  quality_max: number;
+  received_at: string | null;
+  data_ready_at: string | null;
+  map_ready_at: string | null;
+  draft_ready_at: string | null;
+  validated_at: string | null;
+  minutes_receive_to_ready: number | null;
+  minutes_ready_to_validated: number | null;
+  note: string | null;
+  recorded_at: string | null;
 };
 
 export const getMonthlyEvaluation = (month: string) =>

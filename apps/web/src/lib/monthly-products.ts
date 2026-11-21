@@ -118,6 +118,17 @@ export const kasatReview = (
   month: string,
   body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },
 ) => apiPost<MonthlyProduct>(`/monthly-products/${month}/kasat`, body);
+export const recordWorkLog = (
+  month: string,
+  body: {
+    quality_sigap: Record<string, number>;
+    quality_manual?: Record<string, number>;
+    received_at?: string;
+    data_ready_at?: string;
+    map_ready_at?: string;
+    note?: string;
+  },
+) => apiPost<unknown>(`/monthly-products/${month}/work-log`, body);
 export const decideProduct = (
   month: string,
   body: { selected: { kelurahan: string; action?: string }[]; reason?: string },

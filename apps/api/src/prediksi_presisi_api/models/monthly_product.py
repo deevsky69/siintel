@@ -70,6 +70,11 @@ class MonthlyProduct(TimestampMixin, Base):
         UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="SET NULL")
     )
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    #: Modul 5 (naskah Taskap Tabel 4.17, Lampiran L huruf D): skor mutu draf menurut rubrik
+    #: empat unsur dan cap waktu kerja yang tidak diketahui sistem. Kosong = belum dicatat.
+    work_log: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default="{}"
+    )
 
     items: Mapped[list[MonthlyProductItem]] = relationship(
         back_populates="product", cascade="all, delete-orphan", order_by="MonthlyProductItem.rank"

@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from datetime import datetime
+from itertools import pairwise
 from typing import Any
 
 from sqlalchemy import select
@@ -484,6 +485,114 @@ def record_action(
     item.actions.append(row)
     session.flush()
     return row
+
+
+#: Rubrik mutu draf (naskah Taskap Lampiran L huruf D): empat unsur, masing-masing 0 belum
+#: memenuhi, 1 perlu revisi, 2 memenuhi — jumlah paling tinggi 8.
+QUALITY_ITEMS: dict[str, str] = {
+    "traceability": "Keterlacakan bukti",
+    "place_time": "Kesesuaian tempat dan waktu",
+    "field_fit": "Kecocokan lapangan",
+    "feasibility": "Kelayakan",
+}
+#: Cap waktu yang tidak diketahui sistem dan karena itu dicatat petugas. "Draf siap" dan
+#: "validasi selesai" TIDAK diisi tangan: keduanya diambil dari catatan sistem.
+WORK_TIMES: dict[str, str] = {
+    "received_at": "Data diterima",
+    "data_ready_at": "Data siap olah",
+    "map_ready_at": "Peta siap",
+}
+
+
+def _scores(raw: Any, label: str) -> dict[str, int]:
+    if not isinstance(raw, dict) or set(raw) != set(QUALITY_ITEMS):
+        raise ProductError(f"Skor {label} harus memuat keempat unsur rubrik.")
+    scores: dict[str, int] = {}
+    for key in QUALITY_ITEMS:
+        value = raw[key]
+        if isinstance(value, bool) or not isinstance(value, int) or value not in (0, 1, 2):
+            raise ProductError(f"Skor {label} tiap unsur harus 0, 1, atau 2.")
+        scores[key] = value
+    return scores
+
+
+def record_work_log(
+    session: Session, product: MonthlyProduct, payload: dict[str, Any], user_id: Any
+) -> MonthlyProduct:
+    """Mencatat skor mutu draf dan cap waktu kerja satu produk (Modul 5).
+
+    Skor draf SIGAP wajib; skor cara kerja biasa boleh kosong (belum ada pembandingnya).
+    Cap waktu boleh sebagian, tetapi urutannya harus masuk akal: diterima ≤ siap olah ≤ peta
+    siap. Catatan lama ditimpa, dan siapa serta kapan mencatat ikut tersimpan."""
+    sigap = _scores(payload.get("quality_sigap"), "draf SIGAP")
+    manual_raw = payload.get("quality_manual")
+    manual = _scores(manual_raw, "cara kerja biasa") if manual_raw is not None else None
+    times: dict[str, datetime] = {}
+    for key in WORK_TIMES:
+        value = payload.get(key)
+        if value is None:
+            continue
+        if not isinstance(value, datetime) or value.tzinfo is None:
+            raise ProductError(f"{WORK_TIMES[key]} harus berupa waktu dengan zona.")
+        times[key] = value
+    ordered = [times[key] for key in WORK_TIMES if key in times]
+    if any(later < earlier for earlier, later in pairwise(ordered)):
+        raise ProductError("Urutan waktu tidak masuk akal: diterima, siap olah, lalu peta siap.")
+    note = str(payload.get("note") or "").strip() or None
+    product.work_log = {
+        "quality_sigap": sigap,
+        "quality_manual": manual,
+        **{key: times[key].isoformat() if key in times else None for key in WORK_TIMES},
+        "note": note,
+        "recorded_by": str(user_id) if user_id else None,
+        "recorded_at": clock.reference_now().isoformat(),
+    }
+    session.flush()
+    return product
+
+
+def _minutes(start: datetime | None, end: datetime | None) -> int | None:
+    if start is None or end is None or end < start:
+        return None
+    return int((end - start).total_seconds() // 60)
+
+
+def work_summary(product: MonthlyProduct) -> dict[str, Any]:
+    """Mutu draf dan waktu kerja satu produk, siap ditampilkan pada Evaluasi.
+
+    "Draf siap" = saat draf disusun sistem; "validasi selesai" = saat Kasat Intelkam
+    meneruskan produk. Keduanya dari catatan sistem, sehingga tidak dapat dipercantik."""
+    log = product.work_log or {}
+
+    def parsed(key: str) -> datetime | None:
+        value = log.get(key)
+        return datetime.fromisoformat(value) if isinstance(value, str) else None
+
+    validated = [
+        s.acted_at for s in product.stages if s.stage == "KASAT" and s.outcome == "ACCEPTED"
+    ]
+    validated_at = validated[-1] if validated else None
+    draft_ready_at = product.created_at
+    sigap = log.get("quality_sigap")
+    manual = log.get("quality_manual")
+    return {
+        "recorded": bool(log),
+        "rubric": [{"key": key, "label": label} for key, label in QUALITY_ITEMS.items()],
+        "quality_sigap": sigap,
+        "quality_manual": manual,
+        "quality_sigap_total": sum(sigap.values()) if isinstance(sigap, dict) else None,
+        "quality_manual_total": sum(manual.values()) if isinstance(manual, dict) else None,
+        "quality_max": 2 * len(QUALITY_ITEMS),
+        "received_at": parsed("received_at"),
+        "data_ready_at": parsed("data_ready_at"),
+        "map_ready_at": parsed("map_ready_at"),
+        "draft_ready_at": draft_ready_at,
+        "validated_at": validated_at,
+        "minutes_receive_to_ready": _minutes(parsed("received_at"), parsed("data_ready_at")),
+        "minutes_ready_to_validated": _minutes(parsed("data_ready_at"), validated_at),
+        "note": log.get("note"),
+        "recorded_at": log.get("recorded_at"),
+    }
 
 
 def as_dict(product: MonthlyProduct) -> dict[str, Any]:

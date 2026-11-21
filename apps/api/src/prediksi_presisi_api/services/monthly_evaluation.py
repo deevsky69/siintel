@@ -38,6 +38,7 @@ from ..models import CrimeIncident, Location, MonthlyProduct, MonthlyRanking
 from ..seeding.paths import REPO_ROOT
 from . import config_cache, visibility
 from . import monthly_model as model
+from . import monthly_product as products
 from . import monthly_ranking as ranking
 
 AREA_FILE = REPO_ROOT / "config" / "ranking" / "kelurahan-area.yaml"
@@ -246,6 +247,7 @@ def evaluate(session: Session, month: Any, polsek: str | None = None) -> dict[st
 
     decision: dict[str, Any] | None = None
     quality: dict[str, Any] | None = None
+    work: dict[str, Any] | None = None
     if product is not None:
         actual, _ = actual_for(str(product.facts.get("scope", "ALL_3C")))
         decided = [
@@ -287,6 +289,7 @@ def evaluate(session: Session, month: Any, polsek: str | None = None) -> dict[st
             if s.outcome == "REJECTED"
         ]
         quality = {"analyst": tally, "reasons": reasons, "returned": returns}
+        work = products.work_summary(product)
 
     return {
         "target_month": start.isoformat()[:7],
@@ -294,6 +297,7 @@ def evaluate(session: Session, month: Any, polsek: str | None = None) -> dict[st
         "methods": methods,
         "decision": decision,
         "quality": quality,
+        "work": work,
         "basis": BASIS,
     }
 
