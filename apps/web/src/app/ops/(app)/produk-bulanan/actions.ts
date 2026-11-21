@@ -9,6 +9,7 @@ import {
   kasatReview,
   kboCheck,
   recordAction,
+  wakasatCheck,
 } from "@/lib/monthly-products";
 
 export type ProductState = { error: string | null; done: string | null };
@@ -65,6 +66,14 @@ export async function kasatAction(_p: ProductState, form: FormData): Promise<Pro
   return guard(async () => {
     if (stage === "KBO") {
       await kboCheck(month, { outcome, reason: reason || undefined });
+      return IDLE_OK(
+        outcome === "ACCEPTED"
+          ? "Produk diteruskan ke Wakasat Intelkam."
+          : "Produk dikembalikan ke analis.",
+      );
+    }
+    if (stage === "WAKASAT") {
+      await wakasatCheck(month, { outcome, reason: reason || undefined });
       return IDLE_OK(
         outcome === "ACCEPTED"
           ? "Produk diteruskan ke Kasat Intelkam."

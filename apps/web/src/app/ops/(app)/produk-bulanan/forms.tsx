@@ -83,7 +83,19 @@ export function AnalystForm({ month, items }: { month: string; items: ProductIte
  * Enter di kolom alasan hanya dapat mengembalikan — tidak pernah meneruskan ke Pimpinan tanpa
  * sengaja. Kasat tidak mengubah isi usulan; bila perlu perbaikan, ia mengembalikannya ke staf.
  */
-export function KasatForm({ month, stage = "KASAT" }: { month: string; stage?: "KBO" | "KASAT" }) {
+const FORWARD_LABEL = {
+  KBO: "Teruskan ke Wakasat Intelkam",
+  WAKASAT: "Teruskan ke Kasat Intelkam",
+  KASAT: "Teruskan ke Pimpinan",
+} as const;
+
+export function KasatForm({
+  month,
+  stage = "KASAT",
+}: {
+  month: string;
+  stage?: "KBO" | "WAKASAT" | "KASAT";
+}) {
   const [state, submit, pending] = useActionState(kasatAction, IDLE);
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -92,7 +104,7 @@ export function KasatForm({ month, stage = "KASAT" }: { month: string; stage?: "
         <input type="hidden" name="outcome" value="ACCEPTED" />
         <input type="hidden" name="stage" value={stage} />
         <button type="submit" disabled={pending} className={primary}>
-          {stage === "KBO" ? "Teruskan ke Kasat Intelkam" : "Teruskan ke Pimpinan"}
+          {FORWARD_LABEL[stage]}
         </button>
       </form>
       <form action={submit} className="flex flex-1 flex-wrap items-center gap-2">

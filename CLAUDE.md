@@ -545,6 +545,7 @@ Role baseline:
 ```text
 Pimpinan
 Kasat Intelkam
+Wakasat Intelkam
 KBO
 Analis Intelkam
 Humas
@@ -555,7 +556,8 @@ Administrator
 
 Command Center dan Analyst **dilebur ke dalam Administrator** — keputusan pemilik proyek
 1 September 2026, ditegaskan kembali 9 September 2026. Sejak 19 November 2026 peran dan rantai produk bulanan mengikuti naskah
-Taskap final: **Analis Intelkam** menyusun → **KBO** memeriksa mutu → **Kasat Intelkam** menelaah
+Taskap: **Analis Intelkam** menyusun → **KBO** memeriksa mutu → **Wakasat Intelkam** memeriksa
+(sejak 21 November 2026, naskah revisi Gambar 4.3; catatan 188) → **Kasat Intelkam** menelaah
 → **Pimpinan** menetapkan; **Humas** menyetujui informasi untuk masyarakat. Sejak keputusan
 pemilik proyek 19 November 2026 (catatan 187) **Administrator memegang seluruh kewenangan**
 peran lain, termasuk tiap tahap rantai itu; pemisahan tugas ditegakkan antarperan selain

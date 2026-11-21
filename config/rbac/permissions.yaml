@@ -51,7 +51,9 @@ permissions:
   # disamakan dengan naskah Taskap final Bab IV B.4.4 dan Lampiran 9 D):
   # Analis menyusun & memvalidasi draf (draft) → KBO memeriksa mutu (review) → Kasat Intelkam
   # menelaah (validate) → Pimpinan menetapkan (decide) → pelaksanaan (execute).
-  monthly_product: [read, draft, review, validate, decide, execute]
+  # 21 November 2026 (catatan 188, naskah Taskap revisi Gambar 4.3): `examine` = pemeriksaan
+  # Wakasat Intelkam di antara KBO (review) dan Kasat Intelkam (validate).
+  monthly_product: [read, draft, review, examine, validate, decide, execute]
   # Informasi untuk masyarakat disetujui Humas (naskah B.4.7, Tabel 24; 19 November 2026).
   public_info: [approve]
 
@@ -171,6 +173,29 @@ roles:
       - ranking:read
       - monthly_product:read
       - monthly_product:review
+  # Wakasat Intelkam (21 November 2026, catatan 188): memeriksa produk yang sudah lolos KBO
+  # sebelum ditelaah Kasat Intelkam — meneruskan atau mengembalikan dengan alasan, tanpa
+  # mengubah isi (naskah Taskap revisi: Gambar 4.3, Tabel 4.16, Lampiran I butir 7).
+  Wakasat Intelkam:
+    ALL:
+      - dashboard:read
+      - location:read
+      - crime:read
+      - intelligence:read
+      - map:read
+      - analytics:read
+      - risk_score:read
+      - prediction:read
+      - warning:read
+      - public_alert:read
+      - recommendation:read
+      - commander_decision:read
+      - evaluation:read
+      - babin:read
+      - bulletin:read
+      - ranking:read
+      - monthly_product:read
+      - monthly_product:examine
   # Humas (19 November 2026): menyetujui informasi untuk masyarakat — imbauan bulanan baru
   # terkirim setelah disetujui. Tidak melihat data kejadian rinci maupun produk intelijen.
   Humas:
@@ -353,6 +378,7 @@ roles:
       # ANTARPERAN SELAIN Administrator dan oleh jejak audit (tiap langkah mencatat akunnya).
       - monthly_product:draft
       - monthly_product:review
+      - monthly_product:examine
       - monthly_product:validate
       - monthly_product:decide
       - monthly_product:execute

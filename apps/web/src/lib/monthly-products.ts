@@ -36,21 +36,28 @@ export type ProductItem = {
 };
 
 export type ProductStage = {
-  stage: "ANALYST" | "KBO" | "KASAT" | "PIMPINAN";
+  stage: "ANALYST" | "KBO" | "WAKASAT" | "KASAT" | "PIMPINAN";
   outcome: string;
   reason: string | null;
   note: string | null;
   acted_at: string;
 };
 
-export type ProductStatus = "DRAFT" | "ANALYST_REVIEWED" | "KBO_CHECKED" | "VALIDATED" | "DECIDED";
+export type ProductStatus =
+  | "DRAFT"
+  | "ANALYST_REVIEWED"
+  | "KBO_CHECKED"
+  | "WAKASAT_CHECKED"
+  | "VALIDATED"
+  | "DECIDED";
 
 export type MonthlyProduct = {
   product_id: string;
   target_month: string;
   status: ProductStatus;
-  next_stage: "ANALYST" | "KBO" | "KASAT" | "PIMPINAN" | null;
+  next_stage: "ANALYST" | "KBO" | "WAKASAT" | "KASAT" | "PIMPINAN" | null;
   awaiting_kbo: boolean;
+  awaiting_wakasat: boolean;
   awaiting_review: boolean;
   awaiting_decision: boolean;
   facts: Record<string, string | number | boolean>;
@@ -76,8 +83,12 @@ export type ProductList = {
 export const AWAITING_KBO: readonly ProductStatus[] = ["ANALYST_REVIEWED"];
 export const isAwaitingKbo = (status: ProductStatus) => AWAITING_KBO.includes(status);
 
-/** Status yang menunggu telaah Kasat Intelkam: sudah diperiksa KBO. */
-export const AWAITING_REVIEW: readonly ProductStatus[] = ["KBO_CHECKED"];
+/** Status yang menunggu pemeriksaan Wakasat Intelkam: sudah diperiksa KBO (21 November 2026). */
+export const AWAITING_WAKASAT: readonly ProductStatus[] = ["KBO_CHECKED"];
+export const isAwaitingWakasat = (status: ProductStatus) => AWAITING_WAKASAT.includes(status);
+
+/** Status yang menunggu telaah Kasat Intelkam: sudah diperiksa Wakasat. */
+export const AWAITING_REVIEW: readonly ProductStatus[] = ["WAKASAT_CHECKED"];
 export const isAwaitingReview = (status: ProductStatus) => AWAITING_REVIEW.includes(status);
 
 /** Status yang menunggu penetapan Pimpinan — satu tempat, dipakai lencana dan beranda. */
@@ -99,6 +110,10 @@ export const kboCheck = (
   month: string,
   body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },
 ) => apiPost<MonthlyProduct>(`/monthly-products/${month}/kbo`, body);
+export const wakasatCheck = (
+  month: string,
+  body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },
+) => apiPost<MonthlyProduct>(`/monthly-products/${month}/wakasat`, body);
 export const kasatReview = (
   month: string,
   body: { outcome: "ACCEPTED" | "REJECTED"; reason?: string },

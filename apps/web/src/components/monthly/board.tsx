@@ -1,6 +1,11 @@
 import Link from "next/link";
 import type { MonthlyProduct, ProductSummary } from "@/lib/monthly-products";
-import { isAwaitingDecision, isAwaitingKbo, isAwaitingReview } from "@/lib/monthly-products";
+import {
+  isAwaitingDecision,
+  isAwaitingKbo,
+  isAwaitingReview,
+  isAwaitingWakasat,
+} from "@/lib/monthly-products";
 
 /**
  * Papan "Bulan Ini" di beranda (10 November 2026, keputusan pemilik proyek 2.i).
@@ -35,6 +40,7 @@ export function buildCards(input: BoardInput): Card[] {
   const awaiting = status ? isAwaitingDecision(status) : false;
   const reviewing = status ? isAwaitingReview(status) : false;
   const checking = status ? isAwaitingKbo(status) : false;
+  const examining = status ? isAwaitingWakasat(status) : false;
   const decided = status === "DECIDED";
   const cards: Card[] = [];
 
@@ -45,13 +51,16 @@ export function buildCards(input: BoardInput): Card[] {
       ? "Draf menunggu pemeriksaan Analis Intelkam"
       : checking
         ? "Menunggu pemeriksaan mutu KBO"
-        : reviewing
-          ? "Menunggu telaah Kasat Intelkam"
-          : awaiting
-            ? "Menunggu penetapan Pimpinan"
-            : `Ditetapkan · ${summary?.priority_count ?? 0} kelurahan prioritas`;
+        : examining
+          ? "Menunggu pemeriksaan Wakasat Intelkam"
+          : reviewing
+            ? "Menunggu telaah Kasat Intelkam"
+            : awaiting
+              ? "Menunggu penetapan Pimpinan"
+              : `Ditetapkan · ${summary?.priority_count ?? 0} kelurahan prioritas`;
   const analystTurn = can("monthly_product:draft") && (!status || status === "DRAFT");
   const kboTurn = can("monthly_product:review") && checking;
+  const wakasatTurn = can("monthly_product:examine") && examining;
   const kasatTurn = can("monthly_product:validate") && reviewing;
   const leaderTurn = can("monthly_product:decide") && awaiting;
   cards.push({
@@ -65,12 +74,14 @@ export function buildCards(input: BoardInput): Card[] {
         : "Susun draf (membekukan peringkat)"
       : kboTurn
         ? "Periksa mutu: teruskan atau kembalikan"
-        : kasatTurn
-          ? "Telaah: teruskan atau kembalikan"
-          : leaderTurn
-            ? "Tetapkan kelurahan prioritas"
-            : null,
-    mine: analystTurn || kboTurn || kasatTurn || leaderTurn,
+        : wakasatTurn
+          ? "Periksa: teruskan atau kembalikan"
+          : kasatTurn
+            ? "Telaah: teruskan atau kembalikan"
+            : leaderTurn
+              ? "Tetapkan kelurahan prioritas"
+              : null,
+    mine: analystTurn || kboTurn || wakasatTurn || kasatTurn || leaderTurn,
   });
 
   // 2. Pelaksanaan — hanya bermakna setelah ditetapkan.
@@ -131,7 +142,12 @@ export function MonthlyBoard({ input }: { input: BoardInput }) {
         <h2 id="papan-bulan-ini" className="text-2xs uppercase tracking-wider text-ink-faint">
           Bulan ini · {input.month}
         </h2>
-        <span className="text-2xs text-ink-faint">
+        <span className="flex items-baseline gap-3 text-2xs text-ink-faint">
+          {/* SOP dan lima modul (naskah Taskap, Gambar 4.3 dan Tabel 4.17) — di luar menu,
+              supaya susunan menu tetap sama dengan panduan aplikasi pada Lampiran M. */}
+          <Link href="/ops/sop" className="uppercase tracking-wider text-accent hover:underline">
+            SOP &amp; modul →
+          </Link>
           {mine === 0 ? "Tidak ada yang menunggu Anda" : `${mine} menunggu Anda`}
         </span>
       </div>

@@ -54,14 +54,17 @@ class ProductError(ValueError):
 
 #: Status yang menunggu pemeriksaan mutu oleh KBO.
 AWAITING_KBO = ("ANALYST_REVIEWED",)
-#: Status yang menunggu telaah Kasat Intelkam: sudah diperiksa KBO.
-AWAITING_REVIEW = ("KBO_CHECKED",)
+#: Status yang menunggu pemeriksaan Wakasat Intelkam: sudah diperiksa KBO.
+AWAITING_WAKASAT = ("KBO_CHECKED",)
+#: Status yang menunggu telaah Kasat Intelkam: sudah diperiksa Wakasat.
+AWAITING_REVIEW = ("WAKASAT_CHECKED",)
 #: Status yang menunggu penetapan Pimpinan: hanya yang sudah ditelaah Kasat Intelkam.
 AWAITING_DECISION = ("VALIDATED",)
 STAGE_FOR_STATUS = {
     "DRAFT": "ANALYST",
     "ANALYST_REVIEWED": "KBO",
-    "KBO_CHECKED": "KASAT",
+    "KBO_CHECKED": "WAKASAT",
+    "WAKASAT_CHECKED": "KASAT",
     "VALIDATED": "PIMPINAN",
 }
 BASIS = (
@@ -375,7 +378,7 @@ def analyst_review(
 def kbo_check(
     session: Session, product: MonthlyProduct, outcome: str, reason: str | None, user_id: Any
 ) -> MonthlyProduct:
-    """Pemeriksaan mutu oleh KBO: ACCEPTED meneruskan ke Kasat Intelkam; REJECTED
+    """Pemeriksaan mutu oleh KBO: ACCEPTED meneruskan ke Wakasat Intelkam; REJECTED
     mengembalikan ke analis (alasan wajib). Isi usulan tidak diubah di tahap ini."""
     _require(product, *AWAITING_KBO)
     outcome = outcome.upper()
@@ -383,6 +386,22 @@ def kbo_check(
         raise ProductError("Hasil pemeriksaan harus ACCEPTED atau REJECTED.")
     _stage(product, "KBO", outcome, user_id, reason)
     product.status = "KBO_CHECKED" if outcome == "ACCEPTED" else "DRAFT"
+    session.flush()
+    return product
+
+
+def wakasat_check(
+    session: Session, product: MonthlyProduct, outcome: str, reason: str | None, user_id: Any
+) -> MonthlyProduct:
+    """Pemeriksaan Wakasat Intelkam (naskah Taskap revisi, Gambar 4.3 dan Lampiran I butir 7):
+    ACCEPTED meneruskan ke Kasat Intelkam; REJECTED mengembalikan ke analis (alasan wajib).
+    Isi usulan tidak diubah di tahap ini."""
+    _require(product, *AWAITING_WAKASAT)
+    outcome = outcome.upper()
+    if outcome not in ("ACCEPTED", "REJECTED"):
+        raise ProductError("Hasil pemeriksaan harus ACCEPTED atau REJECTED.")
+    _stage(product, "WAKASAT", outcome, user_id, reason)
+    product.status = "WAKASAT_CHECKED" if outcome == "ACCEPTED" else "DRAFT"
     session.flush()
     return product
 
@@ -474,6 +493,7 @@ def as_dict(product: MonthlyProduct) -> dict[str, Any]:
         "status": product.status,
         "next_stage": STAGE_FOR_STATUS.get(product.status),
         "awaiting_kbo": product.status in AWAITING_KBO,
+        "awaiting_wakasat": product.status in AWAITING_WAKASAT,
         "awaiting_review": product.status in AWAITING_REVIEW,
         "awaiting_decision": product.status in AWAITING_DECISION,
         "facts": product.facts,

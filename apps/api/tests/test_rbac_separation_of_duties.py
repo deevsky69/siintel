@@ -175,11 +175,12 @@ def test_administrator_holds_the_whole_catalogue() -> None:
     assert len(scopes["ALL"]) == len(catalogue), "ada kewenangan yang tertulis dua kali"
 
 
-def test_monthly_product_chain_is_held_by_four_different_roles() -> None:
-    """Analis menyusun, KBO memeriksa, Kasat menelaah, Pimpinan menetapkan — empat peran.
+def test_monthly_product_chain_is_held_by_five_different_roles() -> None:
+    """Analis menyusun, KBO dan Wakasat memeriksa, Kasat menelaah, Pimpinan menetapkan — lima
+    peran (naskah Taskap revisi, Gambar 4.3; catatan 188).
 
     Administrator memegang keempatnya sejak 19 November 2026 (catatan 187) dan dikecualikan
-    di sini; yang dijaga adalah tidak ada peran LAIN yang memegang dua dari empat hak ini.
+    di sini; yang dijaga adalah tidak ada peran LAIN yang memegang dua dari lima hak ini.
 
     Tahap KBO/Kasat dihapus 10 November 2026 karena diklik orang yang sama berturut-turut.
     Yang mencegahnya terulang bukan janji, melainkan tidak adanya satu peran pun yang
@@ -196,6 +197,7 @@ def test_monthly_product_chain_is_held_by_four_different_roles() -> None:
 
     assert holders("monthly_product:draft") == {"Analis Intelkam"}
     assert holders("monthly_product:review") == {"KBO"}
+    assert holders("monthly_product:examine") == {"Wakasat Intelkam"}
     assert holders("monthly_product:validate") == {"Kasat Intelkam"}
     assert holders("monthly_product:decide") == {"Pimpinan"}
     # Informasi untuk masyarakat disetujui Humas, bukan oleh penyusun analisisnya.

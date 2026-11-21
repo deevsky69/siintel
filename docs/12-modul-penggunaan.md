@@ -23,6 +23,24 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Disamakan dengan naskah Taskap REVISI (21 November 2026, catatan 188).** Acuan kini
+`docs/TASKAP - IRKHAMUL KHAKIM - 202608003058 REVISI.docx`.
+
+- **Tahap Wakasat Intelkam.** Rantai produk bulanan menjadi lima pemeriksa, seperti Gambar 4.3
+  naskah: Analis Intelkam → KBO → **Wakasat Intelkam** → Kasat Intelkam → Pimpinan (Kapolres).
+  Wakasat membuka **Bulan Ini → Produk Bulanan**, lalu menekan *Teruskan ke Kasat Intelkam*
+  atau mengisi alasan dan *Kembalikan ke analis*; ia tidak mengubah isi usulan. Produk yang
+  dikembalikan melewati KBO dan Wakasat lagi. Deret langkah di atas naskah kini enam:
+  analis, KBO, Wakasat, Kasat, Pimpinan, pelaksanaan. Peran menjadi **sembilan**; akun
+  peragaan baru `demo.wakasat` (kata sandinya ditetapkan `scripts/sandi-peragaan-produksi.sh`).
+- **Halaman SOP & Modul** (`/ops/sop`, tautan *SOP & modul →* di kanan atas papan "Bulan ini"
+  pada Beranda). Memuat desain program (Gambar 4.3), **Tabel 4.17 Muatan SOP dan Modul
+  Aplikasi SIGAP**, dan ringkasan SOP (Lampiran I) kata demi kata seperti naskah, dengan
+  tautan dari tiap modul ke layar yang menjalankannya: Modul 1 → Mutu Data dan Laporan
+  Petugas; Modul 2 → Peta, Analitik, IKW; Modul 3 → Peringkat 65 Kelurahan; Modul 4 → Produk
+  Bulanan; Modul 5 → Evaluasi. Halaman ini sengaja tidak masuk menu supaya susunan menu tetap
+  sama dengan Lampiran M naskah.
+
 **Administrator memegang seluruh kewenangan (19 November 2026, catatan 187).** Atas keputusan
 pemilik proyek, semua yang dapat dilakukan peran lain kini dapat dilakukan akun Administrator:
 menyusun, memeriksa (KBO), menelaah (Kasat Intelkam), dan menetapkan (Pimpinan) produk

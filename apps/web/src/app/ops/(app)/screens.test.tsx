@@ -73,6 +73,9 @@ describe("menu dan rutenya", () => {
       // 10 November 2026: persetujuannya dilebur ke Produk Bulanan; layar tetap sebagai bacaan.
       "rencana-patroli",
       "skoring",
+      // 21 November 2026 (catatan 188): SOP dan lima modul; dibuka dari beranda, bukan menu,
+      // supaya susunan menu tetap sama dengan Lampiran M naskah Taskap.
+      "sop",
       "wilayah",
     ];
     expect(onDisk.filter((name) => !inMenu.has(name)).sort()).toEqual(keptOffMenu);

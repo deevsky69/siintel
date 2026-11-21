@@ -95,7 +95,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: "Produk Bulanan",
         icon: "recommendation",
         permissions: ["monthly_product:read"],
-        hint: "Analis menyusun, KBO memeriksa, Kasat menelaah, Pimpinan menetapkan; tab Peringkat",
+        hint: "Analis menyusun, KBO dan Wakasat memeriksa, Kasat menelaah, Pimpinan menetapkan; tab Peringkat",
       },
       {
         href: "/ops/evaluasi-bulanan",
@@ -239,6 +239,7 @@ const OFF_MENU_GROUP: ReadonlyArray<readonly [string, string]> = [
   ["/ops/wilayah", "pemantauan"],
   ["/ops/pola", "pemantauan"],
   ["/ops/peringkat", "bulanan"],
+  ["/ops/sop", "bulanan"],
   ["/ops/rencana-patroli", "bulanan"],
   ["/ops/input", "laporan"],
   ["/ops/pengaturan", "sistem"],

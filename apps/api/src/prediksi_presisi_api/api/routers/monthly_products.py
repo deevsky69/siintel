@@ -209,6 +209,31 @@ def kbo(
     return products.as_dict(_load(session, month))
 
 
+@router.post("/monthly-products/{month}/wakasat", summary="Pemeriksaan Wakasat Intelkam")
+def wakasat(
+    month: str,
+    payload: OutcomeRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("monthly_product:examine"),
+) -> dict[str, Any]:
+    product = _load(session, month)
+    _run(
+        session,
+        lambda: products.wakasat_check(
+            session, product, payload.outcome, payload.reason, current.user.user_id
+        ),
+    )
+    _audit(
+        session,
+        "REVIEW_MONTHLY_PRODUCT_WAKASAT",
+        current,
+        product,
+        {"outcome": payload.outcome.upper()},
+    )
+    session.commit()
+    return products.as_dict(_load(session, month))
+
+
 @router.post("/monthly-products/{month}/kasat", summary="Telaah Kasat Intelkam")
 def kasat(
     month: str,

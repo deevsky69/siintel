@@ -3,14 +3,16 @@ import type { ProductStatus } from "@/lib/monthly-products";
 import { buildCards } from "./board";
 
 /**
- * Papan "Bulan ini" — empat tahap sejak 19 November 2026: analis menyusun, KBO memeriksa, Kasat menelaah,
- * Pimpinan menetapkan. Kartu produk hanya menandai giliran peran yang memang dinanti.
+ * Papan "Bulan ini" — lima pemeriksa sejak 21 November 2026 (naskah Taskap revisi): analis
+ * menyusun, KBO memeriksa mutu, Wakasat memeriksa, Kasat menelaah, Pimpinan menetapkan. Kartu
+ * produk hanya menandai giliran peran yang memang dinanti.
  */
 const STAF = ["monthly_product:read", "monthly_product:draft"];
 const KBO = ["monthly_product:read", "monthly_product:review"];
+const WAKASAT = ["monthly_product:read", "monthly_product:examine"];
 const KASAT = ["monthly_product:read", "monthly_product:validate"];
 const PIMPINAN = ["monthly_product:read", "monthly_product:decide"];
-const ADMIN = ["monthly_product:read"];
+const PEMBACA = ["monthly_product:read"];
 
 function produk(permissions: string[], status: ProductStatus | null) {
   const cards = buildCards({
@@ -34,13 +36,18 @@ describe("papan bulanan — giliran tiap peran", () => {
     expect(produk(PIMPINAN, "DRAFT").mine).toBe(false);
   });
 
-  it("yang sudah diperiksa analis menunggu KBO, lalu Kasat", () => {
+  it("yang sudah diperiksa analis menunggu KBO, lalu Wakasat, lalu Kasat", () => {
     expect(produk(KBO, "ANALYST_REVIEWED").mine).toBe(true);
     expect(produk(KBO, "ANALYST_REVIEWED").state).toBe("Menunggu pemeriksaan mutu KBO");
-    expect(produk(KASAT, "ANALYST_REVIEWED").mine).toBe(false);
-    expect(produk(KASAT, "KBO_CHECKED").mine).toBe(true);
-    expect(produk(KASAT, "KBO_CHECKED").state).toBe("Menunggu telaah Kasat Intelkam");
-    for (const status of ["ANALYST_REVIEWED", "KBO_CHECKED"] as const) {
+    expect(produk(WAKASAT, "ANALYST_REVIEWED").mine).toBe(false);
+    expect(produk(WAKASAT, "KBO_CHECKED").mine).toBe(true);
+    expect(produk(WAKASAT, "KBO_CHECKED").state).toBe("Menunggu pemeriksaan Wakasat Intelkam");
+    // Kasat baru dinanti setelah Wakasat meneruskan — bukan langsung sesudah KBO.
+    expect(produk(KASAT, "KBO_CHECKED").mine).toBe(false);
+    expect(produk(KASAT, "WAKASAT_CHECKED").mine).toBe(true);
+    expect(produk(KASAT, "WAKASAT_CHECKED").state).toBe("Menunggu telaah Kasat Intelkam");
+    expect(produk(WAKASAT, "WAKASAT_CHECKED").mine).toBe(false);
+    for (const status of ["ANALYST_REVIEWED", "KBO_CHECKED", "WAKASAT_CHECKED"] as const) {
       expect(produk(PIMPINAN, status).mine).toBe(false);
       expect(produk(STAF, status).mine).toBe(false);
     }
@@ -52,10 +59,18 @@ describe("papan bulanan — giliran tiap peran", () => {
     expect(produk(KASAT, "VALIDATED").mine).toBe(false);
   });
 
-  it("Administrator tidak pernah mendapat giliran di rantai ini", () => {
-    for (const status of [null, "DRAFT", "ANALYST_REVIEWED", "VALIDATED", "DECIDED"] as const) {
-      expect(produk(ADMIN, status).mine).toBe(false);
-      expect(produk(ADMIN, status).cta).toBeNull();
+  it("peran yang hanya membaca tidak pernah mendapat giliran di rantai ini", () => {
+    for (const status of [
+      null,
+      "DRAFT",
+      "ANALYST_REVIEWED",
+      "KBO_CHECKED",
+      "WAKASAT_CHECKED",
+      "VALIDATED",
+      "DECIDED",
+    ] as const) {
+      expect(produk(PEMBACA, status).mine).toBe(false);
+      expect(produk(PEMBACA, status).cta).toBeNull();
     }
   });
 });
