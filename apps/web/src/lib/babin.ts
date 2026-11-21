@@ -118,6 +118,25 @@ export type AdvisoryPreview = {
   sample: { kelurahan: string; text: string } | null;
 };
 
+/** Ringkasan wilayah untuk masyarakat: tayang setelah disetujui Humas (21 November 2026). */
+export type AreaSummaryApprovalState = {
+  period: string;
+  window_from: string;
+  window_to: string;
+  approved: boolean;
+  approved_at: string | null;
+  approval_note: string | null;
+  kelurahan: number;
+  incidents: number;
+  levels: Record<string, number>;
+};
+
+export const getAreaSummaryApproval = () =>
+  apiGet<AreaSummaryApprovalState>("/area-summary/approval");
+
+export const approveAreaSummary = (note?: string) =>
+  apiPost<AreaSummaryApprovalState>("/area-summary/approval", { note });
+
 export const getAdvisoryPreview = (month?: string) =>
   apiGet<AdvisoryPreview>(`/advisories/preview${month ? `?month=${month}` : ""}`);
 

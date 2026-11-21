@@ -39,6 +39,10 @@ export function MapCanvas({
   imbauan: ImbauanRow[];
 }) {
   const [emphasis, setEmphasis] = useState<AreaLevel | null>(null);
+  // Ringkasan yang belum disetujui Humas tidak membawa angka: hitungan "0 kecamatan" dan peta
+  // kelabu akan terbaca sebagai "tidak rawan", jadi keduanya diganti keterangan.
+  const withheld = summary && summary.published === false ? summary.notice : null;
+  const ready = summary && !withheld ? summary : null;
   const data = useMemo(
     () =>
       new Map<string, MapAreaDatum>(
@@ -90,7 +94,7 @@ export function MapCanvas({
                 Lihat di peta
               </button>
             </form>
-            {summary ? (
+            {ready ? (
               <dl className="flex flex-wrap gap-3">
                 {LEVELS.map((level) => (
                   <div key={level} className="flex-[1_1_140px] py-1">
@@ -117,7 +121,7 @@ export function MapCanvas({
               <span className="text-base font-bold text-[rgb(var(--warga-navy))]">
                 Tingkat kerawanan per kecamatan
               </span>
-              {summary ? (
+              {ready ? (
                 <fieldset className="m-0 flex min-w-0 flex-wrap gap-1.5 border-0 p-0">
                   <legend className="sr-only">Saring tingkat</legend>
                   <button
@@ -127,7 +131,7 @@ export function MapCanvas({
                     onClick={() => setEmphasis(null)}
                   >
                     Semua
-                    <b>{summary.kecamatan.length}</b>
+                    <b>{ready.kecamatan.length}</b>
                   </button>
                   {LEVELS.map((level) => (
                     <button
@@ -146,7 +150,7 @@ export function MapCanvas({
               ) : null}
             </div>
             <div className="warga-map-surface p-3 sm:p-4">
-              {summary ? (
+              {ready ? (
                 <PublicMap
                   level="kecamatan"
                   data={data}
@@ -156,9 +160,12 @@ export function MapCanvas({
                 />
               ) : (
                 <div className="flex min-h-[260px] flex-col items-center justify-center gap-2 p-6 text-center">
-                  <p className="text-sm font-semibold text-ink">Peta belum dapat dimuat.</p>
+                  <p className="text-sm font-semibold text-ink">
+                    {withheld ? "Ringkasan wilayah belum ditayangkan." : "Peta belum dapat dimuat."}
+                  </p>
                   <p className="text-xs text-ink-muted">
-                    Coba muat ulang halaman. Laporan dan nomor darurat tetap dapat dipakai.
+                    {withheld ??
+                      "Coba muat ulang halaman. Laporan dan nomor darurat tetap dapat dipakai."}
                   </p>
                 </div>
               )}

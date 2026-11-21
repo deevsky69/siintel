@@ -1,7 +1,13 @@
 "use client";
 
 import { useActionState } from "react";
-import { approve, approveAdvisoryAction, type BulletinState, generate } from "./actions";
+import {
+  approve,
+  approveAdvisoryAction,
+  approveAreaSummaryAction,
+  type BulletinState,
+  generate,
+} from "./actions";
 
 const IDLE: BulletinState = { error: null, done: null };
 
@@ -43,6 +49,29 @@ export function ApproveButton({ id }: { id: string }) {
         className="rounded border border-risk-low/60 bg-risk-low/10 px-3 py-1 text-xs font-semibold text-risk-low disabled:opacity-50"
       >
         Setujui & kirim
+      </button>
+      {state.error ? <span className="text-xs text-risk-critical">{state.error}</span> : null}
+    </form>
+  );
+}
+
+/** Persetujuan Humas atas ringkasan wilayah (naskah Taskap revisi, Lampiran K huruf I). */
+export function ApproveAreaSummaryForm() {
+  const [state, submit, pending] = useActionState(approveAreaSummaryAction, IDLE);
+  if (state.done) return <span className="text-xs text-risk-low">{state.done}</span>;
+  return (
+    <form action={submit} className="flex flex-wrap items-center gap-2">
+      <input
+        name="note"
+        placeholder="Catatan (opsional)"
+        className="rounded border border-base-700 bg-base-850 px-2 py-1 text-xs text-ink"
+      />
+      <button
+        type="submit"
+        disabled={pending}
+        className="rounded border border-risk-low/60 bg-risk-low/10 px-3 py-1 text-xs font-semibold text-risk-low disabled:opacity-50"
+      >
+        Setujui ringkasan wilayah
       </button>
       {state.error ? <span className="text-xs text-risk-critical">{state.error}</span> : null}
     </form>

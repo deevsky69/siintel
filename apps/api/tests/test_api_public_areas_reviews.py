@@ -75,10 +75,46 @@ def _login(client: TestClient, session: Session, role_name: str) -> dict[str, st
 # --- ringkasan wilayah -------------------------------------------------------------------
 
 
-def test_public_summary_is_open_simple_and_free_of_predictions(client: TestClient) -> None:
+def test_public_summary_waits_for_humas_and_then_is_simple_and_free_of_predictions(
+    client: TestClient, session: Session
+) -> None:
+    """Naskah Taskap revisi, Lampiran K huruf I: ringkasan wilayah tayang setelah disetujui
+    Humas. Sebelum itu yang keluar hanya daftar wilayah — tanpa angka dan tanpa tingkat."""
+    withheld = client.get("/api/v1/public/areas/summary")
+    assert withheld.status_code == 200
+    held = withheld.json()
+    assert held["published"] is False and held["notice"]
+    assert held["areas"] == [] and held["kecamatan"] == []
+    assert held["directory"], "daftar wilayah harus tetap ada"
+    assert set(held["directory"][0]) == {
+        "kelurahan", "kecamatan", "polsek", "rating", "rating_count",
+    }  # fmt: skip
+    for leaked in ('"total"', '"by_threat"', '"by_month"', '"level"'):
+        assert leaked not in withheld.text, leaked
+
+    # Hanya pemegang `public_info:approve` (Humas, Administrator) yang menyetujui.
+    for role in ("Pimpinan", "Kasat Intelkam"):
+        refused = client.post(
+            "/api/v1/area-summary/approval", json={}, headers=_login(client, session, role)
+        )
+        assert refused.status_code == 403, role
+    humas = _login(client, session, "Humas")
+    state = client.get("/api/v1/area-summary/approval", headers=humas).json()
+    assert state["approved"] is False and state["period"] == held["period"]
+    approved = client.post(
+        "/api/v1/area-summary/approval", json={"note": "diperiksa"}, headers=humas
+    )
+    assert approved.status_code == 201, approved.text
+    assert approved.json()["approved"] is True
+    again = client.post("/api/v1/area-summary/approval", json={}, headers=humas)
+    assert again.status_code == 409
+    entry = session.scalar(select(AuditLog).where(AuditLog.action == "APPROVE_AREA_SUMMARY"))
+    assert entry is not None and entry.resource_id == held["period"]
+
     response = client.get("/api/v1/public/areas/summary")
     assert response.status_code == 200
     body = response.json()
+    assert body["published"] is True and body["approved_at"] and body["notice"] is None
     assert body["status"] == "PROPOSED" and "tertil" in body["basis"]
     assert len(body["months"]) == 12
     assert body["areas"], "master kelurahan kosong"
@@ -180,9 +216,10 @@ def test_moderation_publishes_and_only_published_count(
     shown = client.get("/api/v1/public/reviews", params={"kelurahan": area.kelurahan}).json()
     assert code in [row["code"] for row in shown["data"]]
     assert shown["average"] is not None and shown["count"] >= 1
-    # Nilai rata-rata juga tampil pada ringkasan wilayah.
+    # Nilai rata-rata juga tampil pada daftar wilayah — tidak bergantung pada persetujuan
+    # ringkasan kejadian (survei adalah persepsi warga, bukan angka kejadian).
     summary = client.get("/api/v1/public/areas/summary").json()
-    mine = next(row for row in summary["areas"] if row["kelurahan"] == area.kelurahan)
+    mine = next(row for row in summary["directory"] if row["kelurahan"] == area.kelurahan)
     assert mine["rating_count"] >= 1
 
     entry = session.scalar(

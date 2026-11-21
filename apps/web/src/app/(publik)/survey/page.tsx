@@ -41,16 +41,22 @@ export default async function SurveyPage({
       </div>
     );
   }
-  const area = summary.areas.find((row) => row.kelurahan.toLowerCase() === wanted.toLowerCase());
+  // Daftar wilayah dan nilai survei tidak bergantung pada persetujuan ringkasan kejadian.
+  const area = summary.directory.find(
+    (row) => row.kelurahan.toLowerCase() === wanted.toLowerCase(),
+  );
   const [reviews, quarterly] = await Promise.all([
     area ? getPublicReviews(area.kelurahan).catch(() => null) : null,
     getQuarterlySurvey().catch(() => null),
   ]);
-  const byKecamatan = new Map<string, typeof summary.areas>();
-  for (const row of summary.areas) {
+  const areaLevel = area
+    ? (summary.areas.find((row) => row.kelurahan === area.kelurahan)?.level ?? null)
+    : null;
+  const byKecamatan = new Map<string, typeof summary.directory>();
+  for (const row of summary.directory) {
     byKecamatan.set(row.kecamatan, [...(byKecamatan.get(row.kecamatan) ?? []), row]);
   }
-  const reviewed = summary.areas
+  const reviewed = summary.directory
     .filter((row) => row.rating_count > 0)
     .sort((a, b) => b.rating_count - a.rating_count);
 
@@ -113,9 +119,12 @@ export default async function SurveyPage({
                 <h2 className="mt-0.5 text-2xl uppercase tracking-wide text-white">
                   Kelurahan {area.kelurahan}
                 </h2>
-                <div className="mt-2">
-                  <LevelBadge level={area.level} />
-                </div>
+                {/* Tingkat kerawanan bagian dari ringkasan wilayah: tampil setelah disetujui Humas. */}
+                {areaLevel ? (
+                  <div className="mt-2">
+                    <LevelBadge level={areaLevel} />
+                  </div>
+                ) : null}
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-[40px] font-extrabold leading-none">

@@ -21,15 +21,17 @@ from collections import defaultdict
 from datetime import date
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ...models import AreaReview, CrimeIncident, Location
+from ...models import AreaReview, AreaSummaryApproval, CrimeIncident, Location
 from ...models.area_review import STATUS_PUBLISHED
-from ...services import clock, security_guides, visibility
+from ...services import audit, clock, security_guides, visibility
 from ...services import patrol_plan as planning
-from ..deps import get_db
+from ..deps import CurrentUser, get_db, require_permission
+from ..errors import ApiError
 
 router = APIRouter(prefix="/public/areas", tags=["kanal publik"])
 
@@ -155,6 +157,18 @@ def build_summary(session: Session) -> dict[str, Any]:
     for row in kecamatan_totals.values():
         row["level"] = _level_of(int(row["total"]), kec_low, kec_high)
 
+    #: Daftar wilayah dan nilai Survey Rasa Aman — bukan bagian ringkasan kejadian, sehingga
+    #: selalu tersedia (formulir survei dan layar petugas memerlukannya).
+    directory = [
+        {
+            "kelurahan": area["kelurahan"],
+            "kecamatan": area["kecamatan"],
+            "polsek": area["polsek"],
+            "rating": area["rating"],
+            "rating_count": area["rating_count"],
+        }
+        for area in areas
+    ]
     return {
         "window_from": start.isoformat(),
         "window_to": end.isoformat(),
@@ -163,14 +177,130 @@ def build_summary(session: Session) -> dict[str, Any]:
         "level_edges": {"low_max": low_edge, "high_min": high_edge},
         "areas": areas,
         "kecamatan": sorted(kecamatan_totals.values(), key=lambda row: str(row["kecamatan"])),
+        "directory": directory,
         "status": "PROPOSED",
         "basis": SUMMARY_BASIS,
     }
 
 
+WITHHELD_NOTICE = (
+    "Ringkasan wilayah periode ini belum disetujui Humas, sehingga angkanya belum ditayangkan. "
+    "Layanan lapor, lacak laporan, cek kendaraan, panduan, dan survei tetap dapat dipakai."
+)
+
+
+def period_of(summary: dict[str, Any]) -> str:
+    """Periode ringkasan = bulan terakhir jendelanya (YYYY-MM)."""
+    return str(summary["window_to"])[:7]
+
+
+def approval_for(session: Session, period: str) -> AreaSummaryApproval | None:
+    return session.scalar(select(AreaSummaryApproval).where(AreaSummaryApproval.period == period))
+
+
+def published_summary(session: Session) -> dict[str, Any]:
+    """Ringkasan untuk masyarakat: angkanya hanya ikut bila periode itu sudah disetujui Humas
+    (naskah Taskap revisi, Lampiran K huruf I). Sebelum itu yang dikirim hanya daftar wilayah —
+    angka, tingkat kerawanan, dan rincian per jenis tidak pernah meninggalkan server."""
+    summary = build_summary(session)
+    period = period_of(summary)
+    approval = approval_for(session, period)
+    if approval is not None:
+        return {
+            **summary,
+            "published": True,
+            "period": period,
+            "approved_at": approval.approved_at,
+            "notice": None,
+        }
+    return {
+        **summary,
+        "level_edges": {"low_max": 0, "high_min": 0},
+        "areas": [],
+        "kecamatan": [],
+        "published": False,
+        "period": period,
+        "approved_at": None,
+        "notice": WITHHELD_NOTICE,
+    }
+
+
 @router.get("/summary", summary="Ringkasan historis per wilayah untuk masyarakat")
 def area_summary(session: Session = Depends(get_db)) -> dict[str, Any]:
-    return build_summary(session)
+    return published_summary(session)
+
+
+#: Sisi petugas: melihat pratinjau dan menyetujui. Router terpisah karena butuh sesi.
+approval_router = APIRouter(tags=["kanal publik"])
+
+
+class SummaryApprovalRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    note: str | None = Field(default=None, max_length=1000)
+
+
+def _approval_state(session: Session) -> dict[str, Any]:
+    summary = build_summary(session)
+    period = period_of(summary)
+    approval = approval_for(session, period)
+    return {
+        "period": period,
+        "window_from": summary["window_from"],
+        "window_to": summary["window_to"],
+        "approved": approval is not None,
+        "approved_at": approval.approved_at if approval else None,
+        "approval_note": approval.note if approval else None,
+        "kelurahan": len(summary["areas"]),
+        "incidents": sum(int(area["total"]) for area in summary["areas"]),
+        "levels": {
+            level: sum(1 for area in summary["areas"] if area["level"] == level)
+            for level in (LEVEL_HIGH, LEVEL_MID, LEVEL_LOW)
+        },
+    }
+
+
+@approval_router.get(
+    "/area-summary/approval", summary="Pratinjau dan status persetujuan ringkasan wilayah"
+)
+def summary_approval_state(
+    session: Session = Depends(get_db),
+    _: CurrentUser = require_permission("bulletin:read"),
+) -> dict[str, Any]:
+    return _approval_state(session)
+
+
+@approval_router.post(
+    "/area-summary/approval",
+    status_code=status.HTTP_201_CREATED,
+    summary="Humas menyetujui ringkasan wilayah untuk masyarakat",
+)
+def approve_summary(
+    payload: SummaryApprovalRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("public_info:approve"),
+) -> dict[str, Any]:
+    period = period_of(build_summary(session))
+    if approval_for(session, period) is not None:
+        raise ApiError(status.HTTP_409_CONFLICT, "Ringkasan periode ini sudah disetujui.")
+    row = AreaSummaryApproval(
+        period=period,
+        approved_by=current.user.user_id,
+        approved_at=clock.citizen_now(),
+        note=(payload.note or "").strip() or None,
+    )
+    session.add(row)
+    audit.record(
+        session,
+        action="APPROVE_AREA_SUMMARY",
+        resource_type="area_summary",
+        result=audit.RESULT_SUCCESS,
+        user_id=current.user.user_id,
+        resource_id=period,
+        detail={"note": bool(row.note)},
+    )
+    session.commit()
+    return _approval_state(session)
 
 
 #: Router terpisah: panduan bukan bagian `/public/areas`.

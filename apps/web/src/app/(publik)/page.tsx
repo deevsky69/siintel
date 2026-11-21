@@ -115,7 +115,9 @@ export default async function BerandaWarga() {
                 Lihat semua
               </Link>
             </div>
-            {summary ? (
+            {summary && !summary.published ? (
+              <p className="warga-empty mt-5">{summary.notice}</p>
+            ) : summary ? (
               highAreas.length > 0 ? (
                 <ol className="warga-list mt-5">
                   {highAreas.map((area, index) => (

@@ -197,12 +197,22 @@ class IncidentHistory:
         known = cutoff or default_cutoff(last + 1)
         own = self._full(kelurahan, last, known)
         siblings = [name for name in self._siblings[self.areas[kelurahan]] if name != kelurahan]
-        others = [0.0] * len(own)
-        for sibling in siblings:
-            for position, value in enumerate(self._full(sibling, last, known)):
-                others[position] += value
-        if siblings:
-            others = [value / len(siblings) for value in others]
+        series = [self._full(sibling, last, known) for sibling in siblings]
+
+        def neighbours(window: int) -> float:
+            """Rerata kelurahan lain sekecamatan pada `window` bulan terakhir, dihitung dengan
+            SATU pembagian: seluruh kejadian mereka dibagi (jumlah kelurahan × jumlah bulan).
+
+            Sampai 21 November 2026 dihitung dua langkah (rata-rata per bulan, lalu rata-rata
+            jendela). Nilainya sama secara matematis, tetapi pembulatan bilangan pecahannya
+            berbeda pada digit terakhir — dan model peka terhadapnya: dengan cara ini enam
+            kelurahan pilihan sama dengan Lampiran J naskah Taskap revisi pada seluruh 20 bulan
+            uji (190 dari 634 dan 86 dari 483). Lihat catatan 189."""
+            months = min(window, len(own))
+            if not siblings or months <= 0:
+                return 0.0
+            return sum(sum(values[-months:]) for values in series) / (len(siblings) * months)
+
         # Januari = 0: sudut 2π·(bulan−1)/12, seperti pada replikasi naskah.
         angle = 2 * math.pi * (target % 12) / 12
         return [
@@ -212,8 +222,8 @@ class IncidentHistory:
             _mean(own, 12),
             _mean(own, len(own)),
             _mean(own, 3) - _mean(own, 12),
-            _mean(others, 3),
-            _mean(others, 12),
+            neighbours(3),
+            neighbours(12),
             float(horizon),
             math.sin(angle),
             math.cos(angle),

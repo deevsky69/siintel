@@ -23,6 +23,21 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Angka model 86 dan ringkasan wilayah lewat Humas (21 November 2026, catatan 189).**
+
+- **Hasil model Januari–Agustus 2026 kini 86 dari 483**, sama dengan Lampiran J naskah; enam
+  kelurahan pilihan sama dengan naskah pada seluruh 20 bulan uji (2025: 190 dari 634). Uji
+  historis total menjadi 276 dari 1.117. Yang bergeser: uji empat kelurahan 2025 menjadi 138
+  (naskah 139) dan delapan kelurahan 237 (naskah 235). Uraian lama di modul ini yang menyebut
+  83 tidak berlaku lagi.
+- **Ringkasan wilayah di SIGAP BERSAMA menunggu persetujuan Humas.** Di **Warga → Buletin &
+  Imbauan** ada panel *Ringkasan wilayah untuk masyarakat*: akun Humas (atau Administrator)
+  membaca jumlah kejadian dan sebaran tingkatnya, lalu menekan *Setujui ringkasan wilayah*.
+  Sebelum disetujui, Beranda dan Peta warga menampilkan keterangan "belum disetujui Humas"
+  tanpa angka; lapor, lacak, cek kendaraan, panduan, dan survei tetap berjalan. Persetujuan
+  berlaku untuk satu periode (bulan terakhir jendela dua belas bulan); periode baru perlu
+  disetujui lagi.
+
 **Disamakan dengan naskah Taskap REVISI (21 November 2026, catatan 188).** Acuan kini
 `docs/TASKAP - IRKHAMUL KHAKIM - 202608003058 REVISI.docx`.
 

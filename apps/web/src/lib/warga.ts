@@ -35,8 +35,26 @@ export type PublicSummary = {
   level_edges: { low_max: number; high_min: number };
   areas: AreaSummary[];
   kecamatan: KecamatanSummary[];
+  /** Daftar wilayah dan nilai survei — selalu ada, juga saat ringkasan belum disetujui. */
+  directory: AreaDirectoryEntry[];
+  /**
+   * Sejak 21 November 2026 angka ringkasan baru tayang setelah disetujui Humas (naskah Taskap
+   * revisi, Lampiran K huruf I). `published: false` → `areas` dan `kecamatan` kosong.
+   */
+  published: boolean;
+  period: string;
+  approved_at: string | null;
+  notice: string | null;
   status: string;
   basis: string;
+};
+
+export type AreaDirectoryEntry = {
+  kelurahan: string;
+  kecamatan: string;
+  polsek: string | null;
+  rating: number | null;
+  rating_count: number;
 };
 
 export type PublicReview = {

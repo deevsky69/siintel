@@ -46,6 +46,17 @@ export default async function PetaWarga({
     );
   }
 
+  if (!summary.published) {
+    return (
+      <div className="warga-wrap py-10">
+        <div className="warga-card p-6">
+          <h1 className="text-xl text-[rgb(var(--warga-navy))]">Peta kerawanan</h1>
+          <p className="mt-2 text-sm leading-relaxed text-ink-muted">{summary.notice}</p>
+        </div>
+      </div>
+    );
+  }
+
   // Kotak cari dari beranda/panel: nama kelurahan atau kecamatan, tidak peduli huruf besar.
   const q = one("q").trim().toLowerCase();
   const foundArea = q ? summary.areas.find((row) => row.kelurahan.toLowerCase() === q) : null;

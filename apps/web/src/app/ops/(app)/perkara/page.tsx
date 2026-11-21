@@ -32,7 +32,7 @@ export default async function PerkaraPage({
   ]);
   const canWrite = profile.permissions.includes("case_file:write");
   const areas = new Map<string, string[]>();
-  for (const area of summary?.areas ?? []) {
+  for (const area of summary?.directory ?? []) {
     areas.set(area.kecamatan, [...(areas.get(area.kecamatan) ?? []), area.kelurahan]);
   }
   const areaRows = [...areas.entries()].map(([kecamatan, kelurahan]) => ({ kecamatan, kelurahan }));
