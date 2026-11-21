@@ -19,6 +19,11 @@ const summary: PublicSummary = {
     { kecamatan: "Tebet", total: 14, kelurahan: 7, by_threat: {}, level: "TINGGI" },
     { kecamatan: "Setiabudi", total: 2, kelurahan: 8, by_threat: {}, level: "RENDAH" },
   ],
+  directory: [],
+  published: true,
+  period: "2025-12",
+  approved_at: "2026-01-02T03:00:00Z",
+  notice: null,
   status: "PROPOSED",
   basis: "",
 };
@@ -58,5 +63,26 @@ describe("MapCanvas", () => {
     expect(screen.queryByRole("button", { name: /Semua/ })).toBeNull();
     expect(screen.getByRole("link", { name: /lapor kejadian/i })).toBeDefined();
     expect(screen.getByText(/Tidak ada imbauan khusus/)).toBeDefined();
+  });
+  it("ringkasan yang belum disetujui Humas tidak menampilkan hitungan maupun peta berwarna", () => {
+    render(
+      <MapCanvas
+        summary={{
+          ...summary,
+          areas: [],
+          kecamatan: [],
+          published: false,
+          approved_at: null,
+          notice: "Ringkasan wilayah periode ini belum disetujui Humas.",
+        }}
+        imbauan={[]}
+      />,
+    );
+
+    expect(screen.getByText("Ringkasan wilayah belum ditayangkan.")).toBeTruthy();
+    expect(screen.getByText(/belum disetujui Humas/)).toBeTruthy();
+    // Hitungan "0 kecamatan" akan terbaca sebagai "tidak rawan" — jadi tidak boleh ada.
+    expect(screen.queryByRole("button", { name: /Tinggi/ })).toBeNull();
+    expect(screen.queryByText("kecamatan")).toBeNull();
   });
 });

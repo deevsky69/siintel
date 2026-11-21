@@ -2,9 +2,14 @@ import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { StatusNotice } from "@/components/warnings/status-notice";
-import { getAdvisoryPreview, getBulletins } from "@/lib/babin";
+import { getAdvisoryPreview, getAreaSummaryApproval, getBulletins } from "@/lib/babin";
 import { getProfile } from "@/lib/decisions";
-import { ApproveAdvisoryForm, ApproveButton, GenerateForm } from "./bulletin-forms";
+import {
+  ApproveAdvisoryForm,
+  ApproveAreaSummaryForm,
+  ApproveButton,
+  GenerateForm,
+} from "./bulletin-forms";
 
 export const dynamic = "force-dynamic";
 
@@ -29,10 +34,11 @@ export default async function BuletinPage({
     return (Array.isArray(value) ? value[0] : value) ?? "";
   };
   const profile = await getProfile();
-  const [history, drafts, advisory] = await Promise.all([
+  const [history, drafts, advisory, areaSummary] = await Promise.all([
     getBulletins(one("minggu"), ""),
     getBulletins("", "DRAFT"),
     getAdvisoryPreview().catch(() => null),
+    getAreaSummaryApproval().catch(() => null),
   ]);
   const canManage = profile.permissions.includes("bulletin:manage");
   const canApprove = profile.permissions.includes("bulletin:approve");
@@ -84,6 +90,32 @@ export default async function BuletinPage({
           </ul>
         )}
       </Panel>
+
+      {areaSummary ? (
+        <Panel
+          title={`Ringkasan wilayah untuk masyarakat · ${areaSummary.period}`}
+          action={
+            <span className="panel-action">
+              {areaSummary.approved ? "disetujui Humas · tayang" : "menunggu persetujuan Humas"}
+            </span>
+          }
+        >
+          <p className="text-xs leading-relaxed text-ink-muted">
+            Peta dan angka kerawanan pada SIGAP BERSAMA untuk jendela {areaSummary.window_from} s.d.{" "}
+            {areaSummary.window_to}: {areaSummary.incidents} kejadian pada {areaSummary.kelurahan}{" "}
+            kelurahan — tinggi {areaSummary.levels.TINGGI ?? 0}, sedang{" "}
+            {areaSummary.levels.SEDANG ?? 0}, rendah {areaSummary.levels.RENDAH ?? 0}.{" "}
+            {areaSummary.approved
+              ? "Sudah tayang untuk masyarakat."
+              : "Belum tayang: halaman warga menampilkan keterangan menunggu persetujuan, tanpa angka."}
+          </p>
+          {!areaSummary.approved && canApproveInfo ? (
+            <div className="mt-2">
+              <ApproveAreaSummaryForm />
+            </div>
+          ) : null}
+        </Panel>
+      ) : null}
 
       {advisory ? (
         <Panel

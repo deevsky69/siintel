@@ -19,7 +19,7 @@ export default async function BabinPage() {
     getPublicSummary().catch(() => null),
   ]);
   const canManage = profile.permissions.includes("babin:manage");
-  const areas = (summary?.areas ?? []).map((area) => ({
+  const areas = (summary?.directory ?? []).map((area) => ({
     kelurahan: area.kelurahan,
     kecamatan: area.kecamatan,
     polsek: area.polsek ?? "—",

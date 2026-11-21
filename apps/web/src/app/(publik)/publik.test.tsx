@@ -51,6 +51,11 @@ const summary: PublicSummary = {
       level: "TINGGI",
     },
   ],
+  directory: [],
+  published: true,
+  period: "2025-12",
+  approved_at: "2026-01-02T03:00:00Z",
+  notice: null,
   status: "PROPOSED",
   basis: "Tingkat RENDAH/SEDANG/TINGGI adalah pembagian tertil (PROPOSED).",
 };

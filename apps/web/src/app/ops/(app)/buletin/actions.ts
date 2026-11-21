@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { ApiError } from "@/lib/api";
-import { approveAdvisory, approveBulletin, generateBulletins } from "@/lib/babin";
+import {
+  approveAdvisory,
+  approveAreaSummary,
+  approveBulletin,
+  generateBulletins,
+} from "@/lib/babin";
 
 export type BulletinState = { error: string | null; done: string | null };
 
@@ -27,6 +32,23 @@ export async function approve(_previous: BulletinState, form: FormData): Promise
     const row = await approveBulletin(id);
     revalidatePath("/ops/buletin");
     return { error: null, done: `${row.kelurahan} disetujui; bot akan mengirimnya.` };
+  } catch (error) {
+    if (error instanceof ApiError) return { error: error.message, done: null };
+    throw error;
+  }
+}
+
+/** Persetujuan Humas atas ringkasan wilayah; setelah itu angkanya tayang di SIGAP BERSAMA. */
+export async function approveAreaSummaryAction(
+  _previous: BulletinState,
+  form: FormData,
+): Promise<BulletinState> {
+  try {
+    await approveAreaSummary(String(form.get("note") ?? "") || undefined);
+    revalidatePath("/ops/buletin");
+    revalidatePath("/");
+    revalidatePath("/peta");
+    return { error: null, done: "Ringkasan wilayah disetujui dan tayang untuk masyarakat." };
   } catch (error) {
     if (error instanceof ApiError) return { error: error.message, done: null };
     throw error;

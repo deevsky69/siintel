@@ -474,7 +474,8 @@ tidak terjadi.
 
 | Method | Path | Permission | Keterangan |
 |---|---|---|---|
-| GET | `/public/areas/summary` | — | per kelurahan: jumlah 3C 12 bulan terakhir, per jenis, per bulan, tingkat RENDAH/SEDANG/TINGGI (tertil, PROPOSED), rata-rata ulasan tayang; agregat per kecamatan. Tanpa prediksi/skor/titik |
+| GET | `/public/areas/summary` | — | per kelurahan: jumlah 3C 12 bulan terakhir, per jenis, per bulan, tingkat RENDAH/SEDANG/TINGGI (tertil, PROPOSED), rata-rata ulasan tayang; agregat per kecamatan. Tanpa prediksi/skor/titik. **Sejak 21 November 2026 (0033, catatan 189):** angka hanya dikirim bila periode itu sudah disetujui Humas — sebelum itu `published: false`, `areas` dan `kecamatan` kosong, `notice` terisi; `directory` (kelurahan, kecamatan, polsek, nilai survei) selalu ada |
+| GET / POST | `/area-summary/approval` `{note?}` | `bulletin:read` / `public_info:approve` (Humas) | pratinjau dan persetujuan ringkasan wilayah periode berjalan (bulan terakhir jendela 12 bulan); POST 201, 409 bila sudah disetujui; audit `APPROVE_AREA_SUMMARY` |
 | POST | `/public/reviews` | — | ulasan anonim (kecamatan, kelurahan, rating 1–5, komentar ≤300); kuota 3/jam per alamat; masuk PENDING; audit `SUBMIT_AREA_REVIEW` |
 | GET | `/public/reviews?kelurahan=` | — | ulasan PUBLISHED + rata-rata + jumlah |
 | GET | `/public/survey/quarterly` | — | **17 November 2026 (naskah Taskap 4.7 h):** empat triwulan kalender terakhir — responden (ulasan tayang), nilai rata-rata, kelurahan terwakili dari seluruh kelurahan, `coverage_pct`; triwulan berjalan ditandai `running` |
