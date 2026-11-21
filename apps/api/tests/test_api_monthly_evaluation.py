@@ -159,6 +159,11 @@ def test_coverage_of_frozen_top_n_and_decision_review(client: TestClient, sessio
         == 200
     )
     assert client.post(f"{base}/kbo", json={"outcome": "ACCEPTED"}, headers=kbo).status_code == 200
+    wakasat = _login(client, session, "Wakasat Intelkam")
+    assert (
+        client.post(f"{base}/wakasat", json={"outcome": "ACCEPTED"}, headers=wakasat).status_code
+        == 200
+    )
     assert (
         client.post(f"{base}/kasat", json={"outcome": "ACCEPTED"}, headers=kasat).status_code == 200
     )

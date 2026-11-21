@@ -37,8 +37,18 @@ from .base import TimestampMixin, uuid_pk
 # DRAFT → ANALYST_REVIEWED → VALIDATED (telaah Kasat) → DECIDED. KBO_CHECKED dan tahap KBO
 # adalah tinggalan alur empat tahap (6–10 November 2026); dipertahankan agar baris lama
 # tetap sah dan tertelusur.
-STATUSES = ("DRAFT", "ANALYST_REVIEWED", "KBO_CHECKED", "VALIDATED", "DECIDED")
-STAGES = ("ANALYST", "KBO", "KASAT", "PIMPINAN")
+# 21 November 2026 (catatan 188, naskah Taskap revisi Gambar 4.3): LIMA tahap pemeriksaan —
+# analis → KBO → Wakasatintelkam → Kasatintelkam → Kapolres. WAKASAT_CHECKED = sudah diperiksa
+# Wakasat, menunggu telaah Kasat; KBO_CHECKED kini menunggu Wakasat.
+STATUSES = (
+    "DRAFT",
+    "ANALYST_REVIEWED",
+    "KBO_CHECKED",
+    "WAKASAT_CHECKED",
+    "VALIDATED",
+    "DECIDED",
+)
+STAGES = ("ANALYST", "KBO", "WAKASAT", "KASAT", "PIMPINAN")
 OUTCOMES = ("ACCEPTED", "REVISED", "REJECTED", "DECIDED")
 ANALYST_STATUSES = ("ACCEPTED", "REVISED", "REJECTED")
 
@@ -60,6 +70,11 @@ class MonthlyProduct(TimestampMixin, Base):
         UUID(as_uuid=True), ForeignKey("users.user_id", ondelete="SET NULL")
     )
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    #: Modul 5 (naskah Taskap Tabel 4.17, Lampiran L huruf D): skor mutu draf menurut rubrik
+    #: empat unsur dan cap waktu kerja yang tidak diketahui sistem. Kosong = belum dicatat.
+    work_log: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False, default=dict, server_default="{}"
+    )
 
     items: Mapped[list[MonthlyProductItem]] = relationship(
         back_populates="product", cascade="all, delete-orphan", order_by="MonthlyProductItem.rank"

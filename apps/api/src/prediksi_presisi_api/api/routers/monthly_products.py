@@ -57,6 +57,18 @@ class DecideRequest(BaseModel):
     reason: str | None = Field(default=None, max_length=2000)
 
 
+class WorkLogRequest(BaseModel):
+    """Skor mutu draf (0–2 per unsur) dan cap waktu kerja — naskah Taskap Lampiran L huruf D."""
+
+    model_config = ConfigDict(extra="ignore")
+    quality_sigap: dict[str, int]
+    quality_manual: dict[str, int] | None = None
+    received_at: datetime | None = None
+    data_ready_at: datetime | None = None
+    map_ready_at: datetime | None = None
+    note: str | None = Field(default=None, max_length=2000)
+
+
 class ActionRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
     unit: str | None = Field(default=None, max_length=100)
@@ -209,6 +221,31 @@ def kbo(
     return products.as_dict(_load(session, month))
 
 
+@router.post("/monthly-products/{month}/wakasat", summary="Pemeriksaan Wakasat Intelkam")
+def wakasat(
+    month: str,
+    payload: OutcomeRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("monthly_product:examine"),
+) -> dict[str, Any]:
+    product = _load(session, month)
+    _run(
+        session,
+        lambda: products.wakasat_check(
+            session, product, payload.outcome, payload.reason, current.user.user_id
+        ),
+    )
+    _audit(
+        session,
+        "REVIEW_MONTHLY_PRODUCT_WAKASAT",
+        current,
+        product,
+        {"outcome": payload.outcome.upper()},
+    )
+    session.commit()
+    return products.as_dict(_load(session, month))
+
+
 @router.post("/monthly-products/{month}/kasat", summary="Telaah Kasat Intelkam")
 def kasat(
     month: str,
@@ -228,6 +265,35 @@ def kasat(
     )
     session.commit()
     return products.as_dict(_load(session, month))
+
+
+@router.post(
+    "/monthly-products/{month}/work-log", summary="Catat mutu draf dan waktu kerja (Modul 5)"
+)
+def work_log(
+    month: str,
+    payload: WorkLogRequest,
+    session: Session = Depends(get_db),
+    current: CurrentUser = require_permission("monthly_product:review"),
+) -> dict[str, Any]:
+    """KBO mencatat hasil tiap ukuran dan memeriksa buktinya (Lampiran L huruf D)."""
+    product = _load(session, month)
+    _run(
+        session,
+        lambda: products.record_work_log(
+            session, product, payload.model_dump(), current.user.user_id
+        ),
+    )
+    summary = products.work_summary(product)
+    _audit(
+        session,
+        "RECORD_MONTHLY_WORK_LOG",
+        current,
+        product,
+        {"quality_sigap_total": summary["quality_sigap_total"]},
+    )
+    session.commit()
+    return products.work_summary(_load(session, month))
 
 
 @router.post("/monthly-products/{month}/decide", summary="Penetapan Pimpinan")

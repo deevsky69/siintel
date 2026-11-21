@@ -188,9 +188,20 @@ def test_kasat_is_told_about_products_awaiting_review(client: TestClient, sessio
     waiting = session.scalar(
         select(func.count())
         .select_from(MonthlyProduct)
-        .where(MonthlyProduct.status == "KBO_CHECKED")
+        .where(MonthlyProduct.status == "WAKASAT_CHECKED")
     )
     assert product["total"] == int(waiting or 0)
+    # Wakasat menerima antreannya sendiri: produk yang sudah diperiksa KBO (catatan 188).
+    wakasat_groups = _feed(client, _make_user(session, "Wakasat Intelkam"))["groups"]
+    assert isinstance(wakasat_groups, list)
+    examine = next(group for group in wakasat_groups if group["kind"] == "MONTHLY_PRODUCT")
+    assert "pemeriksaan Anda" in str(examine["title"])
+    checked = session.scalar(
+        select(func.count())
+        .select_from(MonthlyProduct)
+        .where(MonthlyProduct.status == "KBO_CHECKED")
+    )
+    assert examine["total"] == int(checked or 0)
     # KBO menerima antreannya sendiri: produk yang sudah divalidasi analis.
     kbo_groups = _feed(client, _make_user(session, "KBO"))["groups"]
     assert isinstance(kbo_groups, list)

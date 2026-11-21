@@ -108,9 +108,9 @@ crime_incident_revisions.incident_id → crime_incidents   (0019; riwayat koreks
 monthly_rankings.generated_by      → users              (0020; peringkat bulanan: target_month, method, scope, data_cutoff, model_version, basis_from/to, pending_count; 0024: method menerima MODEL, HISTORY_3M, HISTORY_12M, HISTORY_1M, ANNUAL)
 area_subscriptions                 (tanpa FK)           (0025; langganan imbauan warga: channel WHATSAPP/TELEGRAM, chat_id, kelurahan, subscribed_at, advisory_sent_month; unik (channel, chat_id); baris dihapus saat berhenti)
 monthly_ranking_rows.ranking_id    → monthly_rankings   (0020; rank, kelurahan, predicted_count, ikw, ikw_category, basis JSONB)
-monthly_products.ranking_id        → monthly_rankings   (0021; target_month unik, status DRAFT→ANALYST_REVIEWED→DECIDED sejak 0023 — KBO_CHECKED/VALIDATED tinggalan, facts, priority_count)
+monthly_products.ranking_id        → monthly_rankings   (0021; target_month unik, status DRAFT→ANALYST_REVIEWED→KBO_CHECKED→WAKASAT_CHECKED→VALIDATED→DECIDED sejak 0031, facts, priority_count, work_log JSONB sejak 0032 = skor mutu draf dan cap waktu kerja)
 monthly_product_items.product_id   → monthly_products   (0021; rank, kelurahan, pattern, proposal_text, proposed_function, analyst_status/text/reason, selected, decided_action)
-monthly_product_stages.product_id  → monthly_products   (0021; stage ANALYST/PIMPINAN — KBO/KASAT tinggalan sebelum 0023, outcome, reason, payload, acted_by)
+monthly_product_stages.product_id  → monthly_products   (0021; stage ANALYST/KBO/WAKASAT/KASAT/PIMPINAN sejak 0031, outcome, reason, payload, acted_by)
 monthly_actions.item_id            → monthly_product_items (0021; unit, acted_at, place, action, result, recorded_by)
 intelligence_reports.location_id   → locations
 patrol_activity.location_id        → locations

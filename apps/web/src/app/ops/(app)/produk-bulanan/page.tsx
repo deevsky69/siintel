@@ -9,6 +9,7 @@ import {
   isAwaitingDecision,
   isAwaitingKbo,
   isAwaitingReview,
+  isAwaitingWakasat,
   listProducts,
   type MonthlyProduct,
 } from "@/lib/monthly-products";
@@ -23,18 +24,25 @@ const TABS = [
 ] as const;
 
 /**
- * Empat tahap sejak 19 November 2026 (catatan 186; sama dengan naskah Taskap final): Analis
- * menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa dan mengirim; KBO
- * memeriksa mutu; Kasat Intelkam menelaah; Pimpinan menetapkan; Fungsi/Polsek mencatat. KBO
- * dan Kasat meneruskan atau mengembalikan dengan alasan, tanpa mengubah isi.
+ * Lima pemeriksa berjenjang sejak 21 November 2026 (catatan 188; naskah Taskap revisi,
+ * Gambar 4.3): Analis menyusun draf — peringkat bulan itu dibekukan sekaligus — lalu memeriksa
+ * dan mengirim; KBO memeriksa mutu; Wakasat Intelkam memeriksa; Kasat Intelkam menelaah;
+ * Pimpinan (Kapolres) menetapkan; Fungsi/Polsek mencatat. KBO, Wakasat, dan Kasat meneruskan
+ * atau mengembalikan dengan alasan, tanpa mengubah isi.
  */
 const STEPS = [
   { key: "ANALYST", label: "Analis menyusun & memeriksa" },
   { key: "KBO", label: "KBO memeriksa mutu" },
+  { key: "WAKASAT", label: "Wakasat memeriksa" },
   { key: "KASAT", label: "Kasat menelaah" },
   { key: "PIMPINAN", label: "Pimpinan menetapkan" },
   { key: "EXECUTE", label: "Pelaksanaan dicatat" },
 ] as const;
+const STAGE_NAME: Record<string, string> = {
+  KBO: "KBO",
+  WAKASAT: "Wakasat Intelkam",
+  KASAT: "Kasat Intelkam",
+};
 const THREAT_LABEL: Record<string, string> = {
   CURANMOR: "curanmor",
   CURAT: "curat",
@@ -58,9 +66,10 @@ function waktuWib(iso: string): string {
 
 function doneAt(product: MonthlyProduct | null): number {
   if (!product) return 0;
-  if (product.status === "DECIDED") return 4;
-  if (isAwaitingDecision(product.status)) return 3;
-  if (isAwaitingReview(product.status)) return 2;
+  if (product.status === "DECIDED") return 5;
+  if (isAwaitingDecision(product.status)) return 4;
+  if (isAwaitingReview(product.status)) return 3;
+  if (isAwaitingWakasat(product.status)) return 2;
   return isAwaitingKbo(product.status) ? 1 : 0;
 }
 
@@ -93,15 +102,19 @@ export default async function ProdukBulananPage({
   const analystTurn = product?.status === "DRAFT" && can("monthly_product:draft");
   const checking = product ? isAwaitingKbo(product.status) : false;
   const kboTurn = checking && can("monthly_product:review");
+  const examining = product ? isAwaitingWakasat(product.status) : false;
+  const wakasatTurn = examining && can("monthly_product:examine");
   const kasatTurn = reviewing && can("monthly_product:validate");
   const leaderTurn = awaiting && can("monthly_product:decide");
   // Draf yang dikembalikan Kasat: alasannya harus terlihat oleh staf yang memperbaikinya.
   const lastStage = product?.stages.at(-1);
   const returned =
     product?.status === "DRAFT" &&
-    (lastStage?.stage === "KASAT" || lastStage?.stage === "KBO") &&
+    (lastStage?.stage === "KASAT" ||
+      lastStage?.stage === "KBO" ||
+      lastStage?.stage === "WAKASAT") &&
     lastStage.outcome === "REJECTED"
-      ? `${lastStage.stage === "KBO" ? "KBO" : "Kasat Intelkam"}: ${lastStage.reason}`
+      ? `${STAGE_NAME[lastStage.stage]}: ${lastStage.reason}`
       : null;
   const attachedNames = new Set(
     (product?.status === "DECIDED"
@@ -175,6 +188,7 @@ export default async function ProdukBulananPage({
                 ? ` · ${product.priority_count} kelurahan prioritas`
                 : ""}
               {checking && !kboTurn ? " · menunggu pemeriksaan KBO" : ""}
+              {examining && !wakasatTurn ? " · menunggu pemeriksaan Wakasat Intelkam" : ""}
               {reviewing && !kasatTurn ? " · menunggu telaah Kasat Intelkam" : ""}
               {awaiting && !leaderTurn ? " · menunggu penetapan Pimpinan" : ""}
             </p>
@@ -187,6 +201,11 @@ export default async function ProdukBulananPage({
             {kboTurn ? (
               <div className="mb-3">
                 <KasatForm month={month} stage="KBO" />
+              </div>
+            ) : null}
+            {wakasatTurn ? (
+              <div className="mb-3">
+                <KasatForm month={month} stage="WAKASAT" />
               </div>
             ) : null}
             {kasatTurn ? (

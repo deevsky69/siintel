@@ -131,7 +131,9 @@ export default async function BerandaWarga() {
                           <span className="truncate text-base font-bold text-[rgb(var(--warga-navy))]">
                             {area.kelurahan}
                           </span>
-                          <span className="truncate text-[13px] text-ink-faint">Kec. {area.kecamatan}</span>
+                          <span className="truncate text-[13px] text-ink-faint">
+                            Kec. {area.kecamatan}
+                          </span>
                         </span>
                         <span className="ml-12 sm:ml-0">
                           <LevelBadge level={area.level} />

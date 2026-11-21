@@ -188,7 +188,7 @@ def notifications(
             {
                 "kind": "MONTHLY_PRODUCT",
                 "title": "Produk bulanan menunggu pemeriksaan mutu Anda",
-                "action": "Teruskan ke Kasat Intelkam atau kembalikan ke analis dengan alasan",
+                "action": "Teruskan ke Wakasat Intelkam atau kembalikan ke analis dengan alasan",
                 "href": "/ops/produk-bulanan",
                 "total": int(total or 0),
                 "items": [
@@ -196,6 +196,35 @@ def notifications(
                         "code": product.target_month.isoformat()[:7],
                         "headline": f"Produk bulan {product.target_month.isoformat()[:7]}",
                         "detail": "Sudah divalidasi analis; menunggu pemeriksaan mutu",
+                    }
+                    for product in rows
+                ],
+            }
+        )
+    elif _holds(current, "monthly_product:examine"):
+        rows = session.scalars(
+            select(MonthlyProduct)
+            .where(MonthlyProduct.status.in_(products.AWAITING_WAKASAT))
+            .order_by(MonthlyProduct.target_month.desc())
+            .limit(SAMPLE_LIMIT)
+        ).all()
+        total = session.scalar(
+            select(func.count())
+            .select_from(MonthlyProduct)
+            .where(MonthlyProduct.status.in_(products.AWAITING_WAKASAT))
+        )
+        groups.append(
+            {
+                "kind": "MONTHLY_PRODUCT",
+                "title": "Produk bulanan menunggu pemeriksaan Anda",
+                "action": "Teruskan ke Kasat Intelkam atau kembalikan ke analis dengan alasan",
+                "href": "/ops/produk-bulanan",
+                "total": int(total or 0),
+                "items": [
+                    {
+                        "code": product.target_month.isoformat()[:7],
+                        "headline": f"Produk bulan {product.target_month.isoformat()[:7]}",
+                        "detail": "Sudah diperiksa KBO; menunggu pemeriksaan Wakasat",
                     }
                     for product in rows
                 ],
@@ -224,7 +253,7 @@ def notifications(
                     {
                         "code": product.target_month.isoformat()[:7],
                         "headline": f"Produk bulan {product.target_month.isoformat()[:7]}",
-                        "detail": "Sudah diperiksa KBO; menunggu telaah",
+                        "detail": "Sudah diperiksa Wakasat; menunggu telaah",
                     }
                     for product in rows
                 ],

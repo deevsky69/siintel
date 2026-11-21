@@ -59,13 +59,14 @@ def test_master_seed_loads_expected_volumes(session: Session) -> None:
     # Analis Intelkam sampai 17 November 2026) dan Kasat Intelkam (dibekukan 10 November,
     # dihidupkan lagi 17 November 2026 — catatan 183).
     # 19 November 2026 (catatan 186): + KBO dan Humas, mengikuti naskah Taskap final.
-    assert counts["roles"] == 8
+    # 21 November 2026 (catatan 188): + Wakasat Intelkam, mengikuti naskah Taskap revisi.
+    assert counts["roles"] == 9
     # + panic, triage, review, case_file, babin x2, bulletin x3, ranking x2, monthly_product x6,
     #   public_info
-    assert counts["permissions"] == 64
+    assert counts["permissions"] == 65  # + monthly_product:examine
     # Enam akun tetap (dua kini Administrator) + demo.analis (Staf Intelkam) + demo.kasat
     # (Kasat Intelkam; terkunci di produksi sejak migrasi 0023).
-    assert counts["users"] == 10  # + demo.kbo, demo.humas
+    assert counts["users"] == 11  # + demo.kbo, demo.humas, demo.wakasat
 
 
 def test_master_seed_is_idempotent(session: Session) -> None:

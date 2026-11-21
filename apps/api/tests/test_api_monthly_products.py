@@ -116,6 +116,7 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     area = _seed(session)
     analyst = _login(client, session, "Analis Intelkam")
     kbo = _login(client, session, "KBO")
+    wakasat = _login(client, session, "Wakasat Intelkam")
     kasat = _login(client, session, "Kasat Intelkam")
     leader = _login(client, session, "Pimpinan")
     polsek_in = _login(client, session, "Polsek", polsek=area.polsek)
@@ -198,22 +199,38 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     assert reviewed.json()["awaiting_decision"] is False
     assert reviewed.json()["items"][1]["analyst_status"] == "REJECTED"
 
-    # Empat tahap (19 November 2026): KBO memeriksa mutu sebelum Kasat menelaah. Kasat belum
-    # dapat menelaah, dan hanya KBO yang memeriksa — bukan analis yang menulisnya.
+    # Lima pemeriksa (21 November 2026, naskah Taskap revisi): KBO memeriksa mutu, lalu Wakasat,
+    # baru Kasat menelaah. Kasat dan Wakasat belum dapat bertindak, dan hanya KBO yang memeriksa
+    # di tahap ini — bukan analis yang menulisnya.
     assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
-    for other_role in (analyst, kasat, leader):
+    assert _post(client, "wakasat", {"outcome": "ACCEPTED"}, wakasat).status_code == 409
+    for other_role in (analyst, wakasat, kasat, leader):
         assert _post(client, "kbo", {"outcome": "ACCEPTED"}, other_role).status_code == 403
     assert _post(client, "kbo", {"outcome": "REJECTED"}, kbo).status_code == 400
     checked = _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo)
     assert checked.status_code == 200, checked.text
-    assert checked.json()["status"] == "KBO_CHECKED" and checked.json()["next_stage"] == "KASAT"
-    assert checked.json()["awaiting_review"] is True
+    assert checked.json()["status"] == "KBO_CHECKED" and checked.json()["next_stage"] == "WAKASAT"
+    assert checked.json()["awaiting_wakasat"] is True
+    assert checked.json()["awaiting_review"] is False
+
+    # Wakasat memeriksa sesudah KBO: Kasat belum dapat menelaah, peran lain ditolak, pengembalian
+    # tanpa alasan ditolak.
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
+    for other_role in (analyst, kbo, kasat, leader):
+        assert _post(client, "wakasat", {"outcome": "ACCEPTED"}, other_role).status_code == 403
+    assert _post(client, "wakasat", {"outcome": "REJECTED"}, wakasat).status_code == 400
+    examined = _post(client, "wakasat", {"outcome": "ACCEPTED"}, wakasat)
+    assert examined.status_code == 200, examined.text
+    assert examined.json()["status"] == "WAKASAT_CHECKED"
+    assert examined.json()["next_stage"] == "KASAT"
+    assert examined.json()["awaiting_wakasat"] is False
+    assert examined.json()["awaiting_review"] is True
 
     pick = {"selected": [{"kelurahan": area.kelurahan}]}
     # Pimpinan belum dapat menetapkan sebelum Kasat menelaah.
     assert _post(client, "decide", pick, leader).status_code == 409
     # Telaah hanya oleh Kasat Intelkam — bukan staf yang menulisnya, bukan KBO, bukan Pimpinan.
-    for other_role in (analyst, kbo, leader):
+    for other_role in (analyst, kbo, wakasat, leader):
         assert _post(client, "kasat", {"outcome": "ACCEPTED"}, other_role).status_code == 403
     # Mengembalikan tanpa alasan ditolak; dengan alasan produk kembali menjadi draf staf.
     assert _post(client, "kasat", {"outcome": "REJECTED"}, kasat).status_code == 400
@@ -228,9 +245,11 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     resent = _post(client, "analyst", {"items": [], "note": "dasar dilengkapi"}, analyst)
     assert resent.status_code == 200, resent.text
     assert resent.json()["items"][1]["analyst_status"] == "REJECTED"
-    # Setelah dikembalikan, produk melewati KBO lagi sebelum sampai ke Kasat.
+    # Setelah dikembalikan, produk melewati KBO dan Wakasat lagi sebelum sampai ke Kasat.
     assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
     assert _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo).status_code == 200
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 409
+    assert _post(client, "wakasat", {"outcome": "ACCEPTED"}, wakasat).status_code == 200
     passed = _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat)
     assert passed.status_code == 200, passed.text
     assert passed.json()["status"] == "VALIDATED" and passed.json()["next_stage"] == "PIMPINAN"
@@ -256,7 +275,10 @@ def test_full_chain_from_draft_to_recorded_action(client: TestClient, session: S
     chosen = decided.json()["items"][0]
     assert chosen["selected"] is True and chosen["decided_action"].startswith("Patroli")
     stages = [s["stage"] for s in decided.json()["stages"]]
-    assert stages == ["ANALYST", "KBO", "KASAT", "ANALYST", "KBO", "KASAT", "PIMPINAN"]
+    assert stages == [
+        "ANALYST", "KBO", "WAKASAT", "KASAT",
+        "ANALYST", "KBO", "WAKASAT", "KASAT", "PIMPINAN",
+    ]  # fmt: skip
 
     # Pelaksanaan: Polsek wilayah mencatat; Polsek lain 404; bukan prioritas 404.
     action = {
@@ -301,11 +323,15 @@ def test_administrator_can_run_every_stage_of_the_chain(
     assert reviewed.status_code == 200, reviewed.text
     assert reviewed.json()["status"] == "ANALYST_REVIEWED"
     assert _post(client, "kbo", {"outcome": "ACCEPTED"}, admin).json()["status"] == "KBO_CHECKED"
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, admin).status_code == 409
+    examined = _post(client, "wakasat", {"outcome": "ACCEPTED"}, admin)
+    assert examined.json()["status"] == "WAKASAT_CHECKED"
     assert _post(client, "kasat", {"outcome": "ACCEPTED"}, admin).json()["status"] == "VALIDATED"
     decided = _post(client, "decide", pick, admin)
     assert decided.status_code == 200, decided.text
     assert decided.json()["status"] == "DECIDED"
-    assert [s["stage"] for s in decided.json()["stages"]] == ["ANALYST", "KBO", "KASAT", "PIMPINAN"]
+    stages = [s["stage"] for s in decided.json()["stages"]]
+    assert stages == ["ANALYST", "KBO", "WAKASAT", "KASAT", "PIMPINAN"]
 
     action = {
         "acted_at": "2032-03-05T21:00:00+07:00",
@@ -333,3 +359,62 @@ def test_kbo_can_return_a_product_to_the_analyst(client: TestClient, session: Se
     assert returned.json()["status"] == "DRAFT" and returned.json()["next_stage"] == "ANALYST"
     last = returned.json()["stages"][-1]
     assert last["stage"] == "KBO" and last["reason"] == "validasi belum lengkap"
+
+
+def test_kbo_records_draft_quality_and_work_times(client: TestClient, session: Session) -> None:
+    """Modul 5 (naskah Taskap Tabel 4.17 dan Lampiran L huruf D): skor mutu draf menurut rubrik
+    empat unsur dan cap waktu kerja dicatat KBO; "draf siap" dan "validasi selesai" diambil dari
+    catatan sistem, bukan diisi tangan."""
+    _seed(session)
+    analyst = _login(client, session, "Analis Intelkam")
+    kbo = _login(client, session, "KBO")
+    wakasat = _login(client, session, "Wakasat Intelkam")
+    kasat = _login(client, session, "Kasat Intelkam")
+    assert client.post(BASE, json={"month": MONTH}, headers=analyst).status_code == 201
+
+    full = {"traceability": 2, "place_time": 2, "field_fit": 1, "feasibility": 2}
+    body = {
+        "quality_sigap": full,
+        "quality_manual": {"traceability": 1, "place_time": 1, "field_fit": 1, "feasibility": 2},
+        "received_at": "2032-02-03T08:00:00+07:00",
+        "data_ready_at": "2032-02-03T10:30:00+07:00",
+        "map_ready_at": "2032-02-03T11:00:00+07:00",
+        "note": "diperiksa terhadap rekap Polsek",
+    }
+    # Yang menulis draf tidak menilai mutunya sendiri; Kasat pun tidak.
+    assert _post(client, "work-log", body, analyst).status_code == 403
+    assert _post(client, "work-log", body, kasat).status_code == 403
+    # Rubrik: keempat unsur wajib, tiap unsur 0–2; urutan waktu harus masuk akal.
+    assert (
+        _post(client, "work-log", {**body, "quality_sigap": {"traceability": 2}}, kbo).status_code
+        == 400
+    )
+    assert (
+        _post(
+            client, "work-log", {**body, "quality_sigap": {**full, "feasibility": 3}}, kbo
+        ).status_code
+        == 400
+    )
+    late = {**body, "data_ready_at": "2032-02-03T07:00:00+07:00"}
+    assert _post(client, "work-log", late, kbo).status_code == 400
+
+    recorded = _post(client, "work-log", body, kbo)
+    assert recorded.status_code == 200, recorded.text
+    work = recorded.json()
+    assert work["recorded"] is True
+    assert work["quality_sigap_total"] == 7 and work["quality_manual_total"] == 5
+    assert work["quality_max"] == 8 and len(work["rubric"]) == 4
+    assert work["minutes_receive_to_ready"] == 150
+    # Belum ditelaah Kasat: waktu sampai validasi belum dapat dihitung.
+    assert work["validated_at"] is None and work["minutes_ready_to_validated"] is None
+    assert work["draft_ready_at"] is not None
+
+    assert _post(client, "analyst", {"items": []}, analyst).status_code == 200
+    assert _post(client, "kbo", {"outcome": "ACCEPTED"}, kbo).status_code == 200
+    assert _post(client, "wakasat", {"outcome": "ACCEPTED"}, wakasat).status_code == 200
+    assert _post(client, "kasat", {"outcome": "ACCEPTED"}, kasat).status_code == 200
+    evaluation = client.get(f"/api/v1/evaluation/monthly?month={MONTH}", headers=kbo)
+    assert evaluation.status_code == 200, evaluation.text
+    shown = evaluation.json()["work"]
+    assert shown["quality_sigap_total"] == 7
+    assert shown["validated_at"] is not None  # dari tahap KASAT, bukan isian

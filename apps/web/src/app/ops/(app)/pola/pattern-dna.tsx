@@ -82,13 +82,9 @@ function RankedDistribution({ distribution }: { distribution: PatternDistributio
           // dengan kolom berlebar tetap meluber keluar panel begitu panelnya sempit.
           <li key={bucket.key}>
             <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-              <span className="min-w-0 break-words text-xs text-ink">
-                {humanize(bucket.label)}
-              </span>
+              <span className="min-w-0 break-words text-xs text-ink">{humanize(bucket.label)}</span>
               <span className="ml-auto flex items-baseline gap-2 text-right">
-                <span className="font-mono text-xs font-semibold text-ink">
-                  {bucket.incidents}
-                </span>
+                <span className="font-mono text-xs font-semibold text-ink">{bucket.incidents}</span>
                 <span className="text-2xs text-ink-muted">
                   {shareText(bucket.share_percent, distribution.denominator)}
                 </span>
