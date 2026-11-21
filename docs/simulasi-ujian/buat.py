@@ -72,7 +72,7 @@ AKUN = [
     ("demo.wakasat", "Wakasat Intelkam", "Memeriksa produk yang sudah lolos KBO: meneruskan ke Kasat atau mengembalikan dengan alasan."),
     ("demo.kasat", "Kasat Intelkam", "Menelaah: meneruskan ke Pimpinan atau mengembalikan dengan alasan."),
     ("demo.pimpinan", "Pimpinan", "Menetapkan kelurahan prioritas; menyetujui buletin mingguan; membaca evaluasi."),
-    ("demo.humas", "Humas", "Menyetujui imbauan bulanan untuk masyarakat sebelum dikirim bot."),
+    ("demo.humas", "Humas", "Menyetujui ringkasan wilayah yang tayang di SIGAP BERSAMA dan imbauan bulanan sebelum dikirim bot."),
     ("demo.fungsi", "Fungsi (Reskrim)", "Membaca keputusan dan mencatat pelaksanaan di kelurahan prioritas."),
     ("demo.polsek", "Polsek (Tebet)", "Seperti Fungsi, sebatas wilayah Polsek Tebet; menangani laporan warga dan berkas perkara wilayahnya."),
     ("demo.admin", "Administrator", "Pengguna, mutu data, laporan masyarakat, berkas perkara, moderasi survei, audit — dan, sejak 19 November 2026, <b>seluruh kewenangan peran lain</b> (tiap tahap produk bulanan, persetujuan buletin dan imbauan, evaluasi)."),
@@ -110,7 +110,7 @@ ISI = [
     (1, "7 · Bagian B — Petugas: siklus bulanan", "7 · Bagian B"),
     (2, "Langkah demi langkah tiap akun", "Langkah demi langkah"),
     (1, "8 · Layar tiap tahap siklus bulanan", "8 · Layar tiap tahap siklus bulanan"),
-    (2, "Alur petugas lain yang dapat diperagakan", "Alur petugas lain yang dapat diperagakan"),
+    (2, "Halaman SOP dan alur petugas lain", "8 · Halaman SOP dan alur petugas lain"),
     (1, "9 · Urutan simulasi ujian (± 15 menit)", "9 · Urutan simulasi ujian"),
     (2, "Sebelum ujian", "Sebelum ujian"),
     (2, "Yang perlu disampaikan apa adanya", "Yang perlu disampaikan apa adanya"),
@@ -218,7 +218,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 </section>
 
 <section class="page"><h1>2 · Bagian A — Masyarakat (SIGAP BERSAMA)</h1>
-<p class="lead">Dibuka di <code>{ALAMAT}</code> tanpa masuk. Yang tampil hanya angka historis per wilayah dan tingkat kerawanan kasar — tidak ada skor, prediksi, atau titik kejadian.</p>
+<p class="lead">Dibuka di <code>{ALAMAT}</code> tanpa masuk. Yang tampil hanya angka historis per wilayah dan tingkat kerawanan kasar — tidak ada skor, prediksi, atau titik kejadian. Angka dan peta kerawanan itu baru tayang setelah <b>disetujui Humas</b>; sebelum itu Beranda dan Peta menampilkan keterangan, sedangkan layanan lain tetap berjalan.</p>
 <table><thead><tr><th style="width:9mm">No</th><th style="width:36mm">Fitur</th><th style="width:22mm">Menu</th><th>Yang dapat dilakukan masyarakat</th></tr></thead><tbody>
 <tr><td class="c">A1</td><td><b>Keadaan wilayah</b></td><td>Beranda</td><td>Melihat tingkat kerawanan (rendah/sedang/tinggi) per kecamatan, angka ringkas 12 bulan, dan imbauan Polres yang berlaku.</td></tr>
 <tr><td class="c">A2</td><td><b>Peta kelurahan</b></td><td>Peta</td><td>Memilih kecamatan dan kelurahan: jumlah kejadian per jenis, tren 12 bulan, dan kontak Bhabinkamtibmas.</td></tr>
@@ -341,11 +341,13 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
  ("demo.polsek", "Bulan Ini → Produk Bulanan", "Sama, tetapi hanya pada kelurahan di wilayah Polsek Tebet.", "Kelurahan di luar wilayahnya tidak dapat diisi."),
  ("demo.kbo", "Bulan Ini → Evaluasi", "Pada panel <b>Mutu draf dan waktu kerja</b> isi skor rubrik empat unsur (0–2) dan waktu data diterima, siap olah, peta siap; tekan <b>Catat</b>.", "Skor mutu draf (dari 8) dan menit sampai validasi tampil."),
  ("demo.pimpinan", "Bulan Ini → Evaluasi", "Baca <b>cakupan</b> kelurahan pilihan dibanding peta pembanding dan <b>PAI</b>; buka <b>Uji historis model</b> (4, 6, atau 8 kelurahan).", "Tabel cakupan, uji tanda, dan skenario tetap."),
- ("demo.humas", "Warga → Buletin &amp; Imbauan", "Baca pratinjau imbauan bulanan, tekan <b>Setujui imbauan</b>.", "Bot baru mengirim imbauan ke grup dan pelanggan setelah disetujui."),
+ ("demo.humas", "Warga → Buletin &amp; Imbauan", "Pada panel <b>Ringkasan wilayah untuk masyarakat</b> baca jumlah kejadian dan sebaran tingkatnya, tekan <b>Setujui ringkasan wilayah</b>. Lalu baca pratinjau imbauan bulanan dan tekan <b>Setujui imbauan</b>.", "Peta dan angka kerawanan tayang di halaman warga; bot baru mengirim imbauan setelah disetujui."),
 ])}
 </section>
 
 <section class="page"><h1>8 · Layar tiap tahap siklus bulanan</h1>
+{fig("s11-produk-wakasat", "<b>Produk Bulanan dengan enam langkah</b> (akun Wakasat Intelkam, keadaan sekarang): analis, KBO, Wakasat, Kasat, Pimpinan, pelaksanaan. Wakasat meneruskan ke Kasat Intelkam atau mengembalikan ke analis dengan alasan.")}
+<p class="kecil">Tangkapan layar tahap analis, KBO, Kasat, Pimpinan, dan pelaksanaan di bawah ini diambil sebelum tahap Wakasat ditambahkan, sehingga deret langkah di bagian atasnya masih lima. Isi dan tombol tiap tahap tidak berubah.</p>
 <div class="two">{fig("o1-mutu-data", "<b>1 · Mutu Data</b> (Administrator).", "small")}{fig("o6-peringkat", "<b>2 · Peringkat 65 kelurahan</b> dengan alasan model dan IKW (Analis).", "small")}</div>
 <div class="two">{fig("o8-produk-draf-analis", "<b>3 · Draf produk bulanan</b>: terima, perbaiki, atau tolak (Analis).", "small")}{fig("o9b-produk-kbo", "<b>4 · Pemeriksaan mutu</b> (KBO).", "small")}</div>
 <div class="two">{fig("o10-produk-telaah-kasat", "<b>5 · Telaah</b> (Kasat Intelkam).", "small")}{fig("o11-produk-penetapan-pimpinan", "<b>6 · Penetapan prioritas</b> (Pimpinan).", "small")}</div>
@@ -353,6 +355,11 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <section class="page"><h1>8 · Layar tiap tahap siklus bulanan (lanjutan)</h1>
 <div class="two">{fig("o12-produk-pelaksanaan", "<b>7 · Pencatatan pelaksanaan</b> (Fungsi dan Polsek).", "small")}{fig("o14b-uji-historis", "<b>8 · Evaluasi</b>: uji historis, PAI, uji tanda.", "small")}</div>
 <div class="two">{fig("o15-humas-imbauan", "<b>Humas</b>: menyetujui imbauan bulanan.", "small")}{fig("o13-beranda-pimpinan", "<b>Beranda</b>: papan “Bulan ini” dengan kartu yang menunggu pembaca.", "small")}</div>
+<div class="two">{fig("s9-humas-ringkasan", "<b>Humas</b>: panel ringkasan wilayah untuk masyarakat dengan tombol persetujuan.", "small")}{fig("s10-warga-menunggu", "<b>Beranda warga sebelum disetujui Humas</b>: keterangan, tanpa angka kerawanan.", "small")}</div>
+{fig("s8-mutu-draf", "<b>Evaluasi (akun KBO)</b>: panel Mutu draf dan waktu kerja — rubrik empat unsur dan cap waktu.")}
+</section>
+<section class="page"><h1>8 · Halaman SOP dan alur petugas lain</h1>
+{fig("s7-sop", "<b>SOP &amp; modul</b> (tautan di Beranda petugas): desain program, lima modul, validasi berjenjang, Tabel 4.17, dan ringkasan SOP seperti naskah.")}
 <h2>Alur petugas lain yang dapat diperagakan</h2>
 <p class="kecil">Halaman <b>SOP &amp; modul</b> (tautan di kanan atas papan “Bulan ini” pada Beranda) menampilkan desain program (Gambar 4.3), Tabel 4.17, dan ringkasan SOP seperti naskah.</p>
 <table class="rapat"><thead><tr><th style="width:38mm">Alur</th><th style="width:36mm">Akun</th><th>Langkah</th></tr></thead><tbody>
@@ -382,11 +389,12 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <tr><td class="c">10</td><td><code>demo.pimpinan</code></td><td>Tetapkan enam kelurahan prioritas.</td><td>sda.</td><td>1 mnt</td></tr>
 <tr><td class="c">11</td><td><code>demo.fungsi</code></td><td>Catat satu kegiatan di kelurahan prioritas.</td><td>sda.</td><td>1 mnt</td></tr>
 <tr><td class="c">12</td><td><code>demo.pimpinan</code></td><td>Evaluasi: cakupan, PAI, uji historis.</td><td>Bulan yang sudah berakhir</td><td>1 mnt</td></tr>
-<tr><td class="c">13</td><td><code>demo.humas</code></td><td>Setujui imbauan bulanan (bila waktu cukup).</td><td>—</td><td>0,5 mnt</td></tr>
+<tr><td class="c">13</td><td><code>demo.humas</code></td><td>Tunjukkan panel ringkasan wilayah (sudah disetujui) dan setujui imbauan bulanan.</td><td>—</td><td>0,5 mnt</td></tr>
 </tbody></table>
 <h2>Sebelum ujian</h2>
 <ul>
 <li>Pastikan kesembilan akun dapat masuk dengan kata sandi <code>{SANDI}</code>.</li>
+<li>Pastikan <b>ringkasan wilayah sudah disetujui Humas</b> (Warga → Buletin &amp; Imbauan), supaya Beranda dan Peta warga menampilkan angka — kecuali persetujuan itu sendiri yang hendak diperagakan.</li>
 <li>Pastikan <b>belum ada produk bulanan</b> untuk bulan yang akan diperagakan — satu bulan hanya satu produk, dan produk yang sudah ditetapkan tidak dapat disusun ulang dari layar.</li>
 <li>Isi dampak beberapa kelurahan teratas (Mutu Data) supaya kolom IKW-nya tampil, bukan “ditahan”.</li>
 <li>Coba satu plat dan satu LP + PIN dari tabel; jangan menghabiskan batas pencarian (10 kali per jam per jaringan) menjelang ujian.</li>
@@ -394,7 +402,8 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 </ul>
 <h2>Yang perlu disampaikan apa adanya</h2>
 <table class="rapat"><tbody>
-<tr><td style="width:40mm"><b>Data pada layar</b></td><td>Kejadian berasal dari data Pusiknas tanpa identitas (posisi 29 September 2026); aplikasi diperagakan seolah berdiri di awal Januari 2026. Berkas perkara, PIN, kendaraan, kontak Babin, laporan warga, dan isian dampak adalah data contoh berlabel.</td></tr>
+<tr><td style="width:40mm"><b>Hasil uji model</b></td><td>Enam kelurahan pilihan: 190 dari 634 kejadian pada 2025 dan 86 dari 483 pada Januari–Agustus 2026, di atas peta pembanding terbaik (176 dan 79). Pada empat kelurahan, peta historis lebih tinggi pada 2025.</td></tr>
+<tr><td><b>Data pada layar</b></td><td>Kejadian berasal dari data Pusiknas tanpa identitas (posisi 29 September 2026); aplikasi diperagakan seolah berdiri di awal Januari 2026. Berkas perkara, PIN, kendaraan, kontak Babin, laporan warga, dan isian dampak adalah data contoh berlabel.</td></tr>
 <tr><td><b>Cek kendaraan</b></td><td>Hanya mencocokkan dengan berkas pada sistem ini, bukan seluruh data kepolisian; untuk kepastian hukum tetap ke Samsat/Polsek.</td></tr>
 <tr><td><b>Yang disebut “AI”</b></td><td>Peringkat kelurahan disusun model pembelajaran mesin. Penandaan isian, usulan padanan, dan teks usulan langkah disusun aturan tertulis, bukan model.</td></tr>
 <tr><td><b>Yang diukur</b></td><td>Ketepatan penunjukan wilayah — porsi kejadian nyata yang jatuh di kelurahan pilihan — <b>bukan</b> jumlah kejahatan yang berhasil dicegah.</td></tr>
