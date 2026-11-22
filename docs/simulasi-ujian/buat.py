@@ -341,6 +341,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
  ("demo.fungsi", "Bulan Ini → Produk Bulanan", "Pada kelurahan PRIORITAS isi waktu, tempat, tindakan, hasil, satuan; tekan <b>Catat</b>.", "Kegiatan tampil di bawah usulannya."),
  ("demo.polsek", "Bulan Ini → Produk Bulanan", "Sama, tetapi hanya pada kelurahan di wilayah Polsek Tebet.", "Kelurahan di luar wilayahnya tidak dapat diisi."),
  ("demo.kbo", "Bulan Ini → Evaluasi", "Pada panel <b>Mutu draf dan waktu kerja</b> isi skor rubrik empat unsur (0–2) dan waktu data diterima, siap olah, peta siap; tekan <b>Catat</b>.", "Skor mutu draf (dari 8) dan menit sampai validasi tampil."),
+ ("demo.kbo", "Beranda → SOP &amp; modul", "Pada <b>Kalender SOP</b> tekan <b>Catat sudah dikerjakan</b> untuk butir data diterima, data diperiksa, dan evaluasi.", "Butir berubah menjadi “sudah”, dengan nama pencatat dan waktunya."),
  ("demo.pimpinan", "Bulan Ini → Evaluasi", "Baca <b>cakupan</b> kelurahan pilihan dibanding peta pembanding dan <b>PAI</b>; buka <b>Uji historis model</b> (4, 6, atau 8 kelurahan).", "Tabel cakupan, uji tanda, dan skenario tetap."),
  ("demo.humas", "Warga → Buletin &amp; Imbauan", "Pada panel <b>Ringkasan wilayah untuk masyarakat</b> baca jumlah kejadian dan sebaran tingkatnya, tekan <b>Setujui ringkasan wilayah</b>. Lalu baca pratinjau imbauan bulanan dan tekan <b>Setujui imbauan</b>.", "Peta dan angka kerawanan tayang di halaman warga; bot baru mengirim imbauan setelah disetujui."),
 ])}
@@ -362,7 +363,8 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <section class="page"><h1>8 · Halaman SOP dan alur petugas lain</h1>
 {fig("s7-sop", "<b>SOP &amp; modul</b> (tautan di Beranda petugas): desain program, lima modul, validasi berjenjang, Tabel 4.17, dan ringkasan SOP seperti naskah.")}
 <h2>Alur petugas lain yang dapat diperagakan</h2>
-<p class="kecil">Halaman <b>SOP &amp; modul</b> (tautan di kanan atas papan “Bulan ini” pada Beranda) menampilkan desain program (Gambar 4.3), Tabel 4.17, dan ringkasan SOP seperti naskah.</p>
+<p class="kecil">Halaman <b>SOP &amp; modul</b> (tautan di kanan atas papan “Bulan ini” pada Beranda) menampilkan <b>Kalender SOP</b> — delapan butir berkala SOP bulan berjalan yang dicatat KBO, pemegang Audit Log, dan Kasat Intelkam, beserta rekap triwulan mutu draf dan waktu kerja — lalu desain program (Gambar 4.3), Tabel 4.17, dan ringkasan SOP seperti naskah.</p>
+{fig("s14-kalender-sop", "<b>Kalender SOP</b> pada halaman SOP &amp; modul, dibuka sebagai <code>demo.kbo</code>: butir pertama sudah dicatat; butir “dari sistem” tidak bertombol; rekap triwulan di bawahnya.")}
 <table class="rapat"><thead><tr><th style="width:38mm">Alur</th><th style="width:36mm">Akun</th><th>Langkah</th></tr></thead><tbody>
 <tr><td><b>B2 · Laporan masyarakat</b></td><td><code>demo.polsek</code> atau <code>demo.admin</code></td><td>Data → Laporan Masyarakat → buka laporan (termasuk yang baru dikirim pada alur A7) → ubah status menjadi terverifikasi dengan catatan. Polsek hanya melihat wilayahnya.</td></tr>
 <tr><td><b>B3 · Berkas perkara</b></td><td><code>demo.admin</code> atau <code>demo.polsek</code></td><td>Data → Berkas Perkara → pilih satu LP dummy → naikkan tahap (mis. Penyelidikan → Penyidikan) dengan catatan → buka kembali <b>Lacak</b> sebagai masyarakat dengan LP + PIN itu: tahap baru tampil.</td></tr>

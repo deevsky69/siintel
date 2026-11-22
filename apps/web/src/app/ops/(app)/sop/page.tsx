@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Panel } from "@/components/panel";
+import { getSopCalendar, type SopCalendar } from "@/lib/sop";
+import { SopCheckForm } from "./check-form";
 import { MODUL, MUATAN, PENGGUNA_PRODUK, RINGKASAN_SOP, SUMBER_DATA, VALIDASI } from "./content";
 
 /**
@@ -28,9 +30,106 @@ const kotakModul = "flex flex-1 flex-col rounded bg-accent-deep px-3 py-3 text-c
 const kotakSop =
   "rounded border border-risk-critical/50 bg-risk-critical/15 px-2 py-1.5 text-center text-2xs font-semibold text-ink";
 
-export default function SopPage() {
+export const dynamic = "force-dynamic";
+
+const waktu = (iso: string) =>
+  new Intl.DateTimeFormat("id-ID", {
+    timeZone: "Asia/Jakarta",
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(iso));
+
+/**
+ * Kalender SOP (catatan 192): butir berkala SOP yang dicatat pejabat berwenang, butir yang
+ * diketahui sistem, dan rekap triwulan mutu draf serta waktu kerja. Gagal memuat tidak
+ * menjatuhkan halaman — muatan dan desain SOP di bawahnya tetap tampil.
+ */
+function KalenderSop({ calendar }: { calendar: SopCalendar }) {
+  const q = calendar.quarter;
+  return (
+    <Panel
+      title={`Kalender SOP · ${calendar.period}`}
+      action={
+        <span className="text-2xs uppercase tracking-wider text-ink-faint">
+          {calendar.done} dari {calendar.total} butir
+        </span>
+      }
+      bodyClassName="flex flex-col gap-3"
+    >
+      <ul className="divide-y divide-base-800">
+        {calendar.items.map((item) => (
+          <li key={item.key} className="flex flex-col gap-1 py-2.5 text-xs">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span
+                className={`rounded border px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wider ${
+                  item.done
+                    ? "border-risk-low/50 bg-risk-low/10 text-risk-low"
+                    : "border-base-700 text-ink-faint"
+                }`}
+              >
+                {item.done ? "sudah" : "belum"}
+              </span>
+              <span className="font-semibold text-ink">{item.section}</span>
+              <span className="text-2xs text-ink-faint">
+                {item.source === "SYSTEM" ? "dari sistem" : `dicatat ${item.who}`}
+              </span>
+            </div>
+            <p className="leading-relaxed text-ink-muted">{item.rule}</p>
+            <p className="text-2xs leading-relaxed text-ink-faint">
+              {item.fact}
+              {item.done_at
+                ? ` Dicatat ${item.done_by ?? "—"}, ${waktu(item.done_at)}${item.note ? ` — ${item.note}` : ""}.`
+                : ""}
+            </p>
+            {item.can_record ? <SopCheckForm period={calendar.period} item={item.key} /> : null}
+          </li>
+        ))}
+      </ul>
+      <div className="rounded border border-base-800 bg-base-850 p-3">
+        <h3 className="stat-label mb-2">Rekap {q.label}</h3>
+        <dl className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-2 xl:grid-cols-4">
+          <div>
+            <dt className="text-2xs text-ink-faint">Produk bulanan dicatat</dt>
+            <dd className="mt-0.5 text-ink">
+              {q.recorded} dari {q.products} produk ({q.months.join(", ")})
+            </dd>
+          </div>
+          <div>
+            <dt className="text-2xs text-ink-faint">Median skor mutu draf SIGAP</dt>
+            <dd className="mt-0.5 text-ink">
+              {q.median_quality_sigap === null
+                ? "belum ada catatan"
+                : `${q.median_quality_sigap} dari ${q.quality_max}`}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-2xs text-ink-faint">Median skor cara kerja biasa</dt>
+            <dd className="mt-0.5 text-ink">
+              {q.median_quality_manual === null
+                ? "belum ada catatan"
+                : `${q.median_quality_manual} dari ${q.quality_max}`}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-2xs text-ink-faint">Median data siap olah → validasi</dt>
+            <dd className="mt-0.5 text-ink">
+              {q.median_minutes_ready_to_validated === null
+                ? "belum ada catatan"
+                : `${q.median_minutes_ready_to_validated} menit`}
+            </dd>
+          </div>
+        </dl>
+      </div>
+      <p className="text-2xs leading-relaxed text-ink-faint">{calendar.basis}</p>
+    </Panel>
+  );
+}
+
+export default async function SopPage() {
+  const calendar = await getSopCalendar().catch(() => null);
   return (
     <div className="space-y-3">
+      {calendar ? <KalenderSop calendar={calendar} /> : null}
       <Panel
         title="Desain Program — SOP dan Aplikasi SIGAP"
         action={
