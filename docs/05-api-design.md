@@ -568,6 +568,11 @@ skenario tetap `area_pct`/`pai`/`vs_random`, serta `area_total_km2` dan `criteri
 (`months`, `min_margin_pct`, `min_pai`). Bukti pilihan metode (`method_choice.evidence`)
 menambah `margin_pct`, `model_pai`, `met`, `criterion`. Seluruhnya penambahan field.
 
+**22 November 2026 (catatan 195).** `GET /evaluation/monthly/backtest` memakai rekaman pilihan
+naskah (`config/ranking/uji-naskah.yaml`) untuk baris `MODEL` dan `MODEL_FIXED` bila cakupan
+`VEHICLE`, seluruh wilayah, dan `top_n` ≤ 6; field baru `recorded` (`source`,
+`monthly_months`, `monthly_differing`, `fixed_months`, `fixed_differing`) atau `null`.
+
 ### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; empat tahap sejak 19 November 2026)
 
 | Method | Path | Permission | Keterangan |

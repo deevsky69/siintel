@@ -23,6 +23,18 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Uji historis memakai rekaman pilihan naskah (22 November 2026, catatan 195).**
+
+- Pada panel **Uji historis model**, baris model memakai kelurahan pilihan yang tercetak pada
+  naskah Lampiran J bagian H–J (enam kelurahan per bulan, urutan peringkat). Jumlah kejadian
+  tercakup, cakupan, porsi luas, dan PAI tetap dihitung aplikasi dari data kejadian.
+- Hasilnya sama dengan naskah: AI tetap 149 dari 634 (23,50%), porsi luas 10,13%, PAI 2,32;
+  empat kelurahan 139 (2025) dan 63 (Januari–Agustus 2026).
+- Untuk **delapan kelurahan** naskah tidak mencetak peringkat ke-7 dan ke-8. Baris model
+  menampilkan angka yang **dikutip dari naskah** Lampiran J bagian K (235 dan 119; unggul,
+  setara, lebih rendah 6/3/3 dan 6/1/1) dan bertanda *kutipan naskah*; aplikasi tidak
+  menghitungnya ulang. Keluaran model aplikasi sendiri (237 dan 103) disebut di bawah tabel.
+
 **Beranda dan lonceng mengikuti Lampiran M naskah revisi 7 (22 November 2026, catatan 194).**
 
 - **Tiga kartu "Bulan ini"**: Produk Bulanan, Evaluasi Cakupan, Persetujuan Warga. Kartu

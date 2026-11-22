@@ -90,9 +90,10 @@ export type BacktestMethod = {
 export type SignTest = {
   against: string;
   against_label: string;
-  wins: number;
-  losses: number;
-  ties: number;
+  /** Kosong bila baris model dikutip dari naskah dan hitungan per bulannya tidak tercetak. */
+  wins: number | null;
+  losses: number | null;
+  ties: number | null;
   p_value: number | null;
   /** Bulan dengan PAI model lebih tinggi; kosong bila PAI salah satunya tidak dapat dihitung. */
   pai_wins: number | null;
@@ -120,6 +121,8 @@ export type Backtest = {
     methods: BacktestMethod[];
     random: RandomBaseline;
     sign_tests: SignTest[];
+    /** Baris model dikutip dari naskah (Lampiran J bagian K), bukan dihitung ulang. */
+    quoted: { source: string; model_covered_by_app: number; against: string | null } | null;
   }[];
   /** Skenario tetap (naskah Tabel 12): informasi berhenti pada akhir masa latih. */
   fixed: {
@@ -137,6 +140,14 @@ export type Backtest = {
   };
   area_source: string | null;
   area_total_km2: number | null;
+  /** Baris model memakai pilihan kelurahan yang terekam pada naskah (Lampiran J bagian H–J). */
+  recorded: {
+    source: string | null;
+    monthly_months: number;
+    monthly_differing: string[];
+    fixed_months: number;
+    fixed_differing: number;
+  } | null;
   /** Ambang pemakaian model (naskah revisi 7 sasaran 3.3.1). */
   criterion: { months: number; min_margin_pct: number; min_pai: number; source: string };
   basis: string;
