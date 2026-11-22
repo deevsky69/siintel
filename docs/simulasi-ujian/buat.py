@@ -334,7 +334,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
  ("demo.admin", "Data → Mutu Data", "Baca <b>Kelengkapan</b>. Pada <b>Dampak belum terverifikasi</b> pilih kerugian, cedera, status, tulis rujukan sumber, tekan <b>Catat</b>. Pada <b>Laporan warga dan kejadian resmi</b> pilih padanan dan isi alasan.", "Persen kelengkapan; antrean dampak berkurang; IKW kelurahan itu tidak lagi “ditahan”."),
  ("demo.analis", "Bulan Ini → Produk Bulanan, tab Peringkat 65 Kelurahan", "Baca kolom <b>Perkiraan/bulan</b>, <b>Alasan model</b>, dan <b>IKW</b>. Buka peta pembanding lewat tautan di atas tabel.", "Peringkat bulan sasaran oleh model AI beserta alasannya."),
  ("demo.analis", "Bulan Ini → Produk Bulanan", "Tekan <b>Susun draf</b>. Untuk tiap usulan pilih <b>Terima</b>, <b>Perbaiki</b> (tulis teks dan alasan), atau <b>Tolak</b> (alasan). Tekan <b>Kirim ke KBO</b>.", "Peringkat dibekukan; usulan sepuluh kelurahan teratas; tahap berpindah ke KBO."),
- ("demo.kbo", "Bulan Ini → Produk Bulanan", "Lonceng menunjukkan produk menunggu. Periksa, lalu <b>Teruskan ke Wakasat Intelkam</b> — atau tulis alasan dan <b>Kembalikan ke analis</b>.", "Tahap berpindah ke Wakasat (atau kembali ke analis dengan alasannya)."),
+ ("demo.kbo", "Bulan Ini → Produk Bulanan", "Kartu <b>Produk bulanan</b> di Beranda berbingkai (giliran KBO). Periksa, lalu <b>Teruskan ke Wakasat Intelkam</b> — atau tulis alasan dan <b>Kembalikan ke analis</b>.", "Tahap berpindah ke Wakasat (atau kembali ke analis dengan alasannya)."),
  ("demo.wakasat", "Bulan Ini → Produk Bulanan", "Periksa produk yang sudah lolos KBO, lalu <b>Teruskan ke Kasat Intelkam</b> — atau kembalikan dengan alasan.", "Tahap berpindah ke Kasat."),
  ("demo.kasat", "Bulan Ini → Produk Bulanan", "Baca usulan dan keputusan analis. <b>Teruskan ke Pimpinan</b>, atau kembalikan dengan alasan.", "Tahap berpindah ke Pimpinan."),
  ("demo.pimpinan", "Bulan Ini → Produk Bulanan", "Centang kelurahan prioritas (jumlah bebas), ubah teks tindak lanjut bila perlu, isi alasan, tekan tombol penetapan.", "Kelurahan berlabel PRIORITAS; peta menggarisi emas kelurahan itu."),
@@ -386,7 +386,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <tr><td class="c">5</td><td><code>demo.polsek</code></td><td>Laporan tadi muncul di Laporan Masyarakat; verifikasi.</td><td>Laporan langkah 4</td><td>1 mnt</td></tr>
 <tr><td class="c">6</td><td><code>demo.admin</code></td><td>Mutu Data: kelengkapan, pencocokan laporan warga, satu isian dampak.</td><td>Antrean yang tersedia</td><td>1,5 mnt</td></tr>
 <tr><td class="c">7</td><td><code>demo.analis</code></td><td>Peringkat, alasan model, IKW; susun draf; periksa dua usulan; kirim ke KBO.</td><td>Bulan yang belum punya produk</td><td>2,5 mnt</td></tr>
-<tr><td class="c">8</td><td><code>demo.kbo</code></td><td>Lonceng; teruskan ke Wakasat.</td><td>Produk langkah 7</td><td>0,5 mnt</td></tr>
+<tr><td class="c">8</td><td><code>demo.kbo</code></td><td>Kartu Produk di Beranda; teruskan ke Wakasat.</td><td>Produk langkah 7</td><td>0,5 mnt</td></tr>
 <tr><td class="c">8b</td><td><code>demo.wakasat</code></td><td>Periksa; teruskan ke Kasat.</td><td>sda.</td><td>0,5 mnt</td></tr>
 <tr><td class="c">9</td><td><code>demo.kasat</code></td><td>Telaah; teruskan ke Pimpinan.</td><td>sda.</td><td>0,5 mnt</td></tr>
 <tr><td class="c">10</td><td><code>demo.pimpinan</code></td><td>Tetapkan enam kelurahan prioritas.</td><td>sda.</td><td>1 mnt</td></tr>

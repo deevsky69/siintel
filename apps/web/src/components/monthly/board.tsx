@@ -44,6 +44,14 @@ export function buildCards(input: BoardInput): Card[] {
   const decided = status === "DECIDED";
   const cards: Card[] = [];
 
+  // Naskah Taskap revisi 7, Lampiran M (Beranda): TIGA kartu "Bulan ini" — Produk Bulanan,
+  // Evaluasi Cakupan, Persetujuan Warga. Kartu "Kegiatan di kelurahan prioritas" yang semula
+  // berdiri sendiri dilebur ke kartu Produk (22 November 2026, catatan 194): setelah
+  // ditetapkan, kartu itu memuat jumlah kegiatan tercatat dan ajakan mencatat bagi pelaksana.
+  const selected = product?.items.filter((item) => item.selected) ?? [];
+  const recorded = selected.reduce((sum, item) => sum + item.actions.length, 0);
+  const executeTurn = can("monthly_product:execute") && decided;
+
   // 1. Produk bulanan — posisi naskah dan siapa yang dinanti.
   const productState = !status
     ? "Belum disusun"
@@ -57,7 +65,8 @@ export function buildCards(input: BoardInput): Card[] {
             ? "Menunggu telaah Kasat Intelkam"
             : awaiting
               ? "Menunggu penetapan Pimpinan"
-              : `Ditetapkan · ${summary?.priority_count ?? 0} kelurahan prioritas`;
+              : `Ditetapkan · ${summary?.priority_count ?? 0} kelurahan prioritas` +
+                (product ? ` · ${recorded} kegiatan tercatat` : "");
   const analystTurn = can("monthly_product:draft") && (!status || status === "DRAFT");
   const kboTurn = can("monthly_product:review") && checking;
   const wakasatTurn = can("monthly_product:examine") && examining;
@@ -80,28 +89,13 @@ export function buildCards(input: BoardInput): Card[] {
             ? "Telaah: teruskan atau kembalikan"
             : leaderTurn
               ? "Tetapkan kelurahan prioritas"
-              : null,
-    mine: analystTurn || kboTurn || wakasatTurn || kasatTurn || leaderTurn,
+              : executeTurn
+                ? "Catat kegiatan"
+                : null,
+    mine: analystTurn || kboTurn || wakasatTurn || kasatTurn || leaderTurn || executeTurn,
   });
 
-  // 2. Pelaksanaan — hanya bermakna setelah ditetapkan.
-  if (can("monthly_product:execute") || can("monthly_product:decide")) {
-    const selected = product?.items.filter((item) => item.selected) ?? [];
-    const recorded = selected.reduce((sum, item) => sum + item.actions.length, 0);
-    const executeTurn = can("monthly_product:execute") && decided;
-    cards.push({
-      key: "pelaksanaan",
-      title: "Kegiatan di kelurahan prioritas",
-      state: decided
-        ? `${recorded} kegiatan tercatat di ${selected.length} kelurahan`
-        : "Menunggu penetapan",
-      href: `/ops/produk-bulanan?bulan=${month}`,
-      cta: executeTurn ? "Catat kegiatan" : null,
-      mine: executeTurn,
-    });
-  }
-
-  // 3. Evaluasi — cakupan dihitung setelah bulan berakhir; tautannya selalu ada.
+  // 2. Evaluasi — cakupan dihitung setelah bulan berakhir; tautannya selalu ada.
   if (can("evaluation:read")) {
     cards.push({
       key: "evaluasi",
@@ -115,7 +109,7 @@ export function buildCards(input: BoardInput): Card[] {
     });
   }
 
-  // 4. Persetujuan warga — buletin mingguan (2.iii). Imbauan bulanan dan ringkasan wilayah
+  // 3. Persetujuan warga — buletin mingguan (2.iii). Imbauan bulanan dan ringkasan wilayah
   //    disetujui Humas di layar yang sama (catatan 186 dan 189); teks lama "otomatis" keliru
   //    sejak 19 November 2026.
   if (can("bulletin:approve") || can("bulletin:manage")) {
