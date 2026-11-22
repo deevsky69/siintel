@@ -1,0 +1,47 @@
+# Rekaman pilihan kelurahan pada uji prediksi naskah Taskap revisi 7, Lampiran J bagian H, I,
+# dan J — DISALIN DARI NASKAH, nama demi nama, dalam URUTAN PERINGKAT yang tercetak di sana
+# (22 November 2026, catatan 195; keputusan pemilik proyek).
+#
+# Yang direkam hanyalah KELURAHAN MANA yang dipilih tiap bulan. Jumlah kejadian tercakup,
+# cakupan, porsi luas, dan PAI TIDAK ditulis di sini: aplikasi menghitungnya sendiri dari data
+# kejadian. Uji historis memakai rekaman ini untuk baris model sehingga hasilnya sama dengan
+# naskah; di luar bulan yang direkam, atau bila jumlah kelurahan yang diminta melebihi yang
+# direkam (enam), model aplikasi yang dipakai.
+source: "Naskah Taskap revisi 7, Lampiran J bagian H (uji tetap), I dan J (uji bulanan)"
+scope: VEHICLE
+# AI tetap: informasi berhenti pada 31 Desember 2024 (bagian H, kolom "AI tetap").
+fixed:
+  "2025-01": ["Cipete Utara", "Gandaria Utara", "Cilandak Barat", "Kalibata", "Pulo", "Senayan"]
+  "2025-02": ["Cipete Utara", "Gandaria Utara", "Kalibata", "Cilandak Barat", "Pulo", "Senayan"]
+  "2025-03": ["Cipete Utara", "Gandaria Utara", "Kalibata", "Cilandak Barat", "Pulo", "Senayan"]
+  "2025-04": ["Cipete Utara", "Gandaria Utara", "Kalibata", "Cilandak Barat", "Pulo", "Bangka"]
+  "2025-05": ["Cipete Utara", "Gandaria Utara", "Kalibata", "Cilandak Barat", "Pulo", "Senayan"]
+  "2025-06": ["Cipete Utara", "Gandaria Utara", "Kalibata", "Cilandak Barat", "Pulo", "Senayan"]
+  "2025-07": ["Cipete Utara", "Gandaria Utara", "Kalibata", "Cilandak Barat", "Pulo", "Senayan"]
+  "2025-08": ["Gandaria Utara", "Cipete Utara", "Pulo", "Senayan", "Kalibata", "Cilandak Barat"]
+  "2025-09": ["Gandaria Utara", "Cipete Utara", "Pulo", "Senayan", "Kalibata", "Cilandak Barat"]
+  "2025-10": ["Gandaria Utara", "Cipete Utara", "Pulo", "Senayan", "Kalibata", "Cilandak Barat"]
+  "2025-11": ["Gandaria Utara", "Cipete Utara", "Pulo", "Kalibata", "Cilandak Barat", "Senayan"]
+  "2025-12": ["Gandaria Utara", "Cipete Utara", "Pulo", "Kalibata", "Cilandak Barat", "Senayan"]
+# AI per bulan (bagian I dan J, kolom "AI perbulan").
+monthly:
+  "2025-01": ["Cipete Utara", "Gandaria Utara", "Cilandak Barat", "Kalibata", "Pulo", "Senayan"]
+  "2025-02": ["Cipete Utara", "Gandaria Utara", "Pulo", "Bangka", "Senayan", "Mampang Prapatan"]
+  "2025-03": ["Gandaria Utara", "Cipete Utara", "Pulo", "Senayan", "Bangka", "Melawai"]
+  "2025-04": ["Cipete Utara", "Gandaria Utara", "Grogol Utara", "Pulo", "Cilandak Barat", "Kebayoran Lama Utara"]
+  "2025-05": ["Cipete Utara", "Gandaria Utara", "Pondok Pinang", "Cipulir", "Kebayoran Lama Utara", "Grogol Selatan"]
+  "2025-06": ["Pondok Pinang", "Cipete Utara", "Gandaria Utara", "Grogol Utara", "Kebayoran Lama Utara", "Pulo"]
+  "2025-07": ["Pondok Pinang", "Cipete Utara", "Gandaria Utara", "Grogol Utara", "Kebayoran Lama Utara", "Pulo"]
+  "2025-08": ["Gandaria Utara", "Pondok Pinang", "Grogol Utara", "Pulo", "Cipete Utara", "Kebayoran Lama Utara"]
+  "2025-09": ["Cipete Utara", "Gandaria Utara", "Grogol Utara", "Pulo", "Pondok Pinang", "Kebayoran Lama Selatan"]
+  "2025-10": ["Cipete Utara", "Gandaria Utara", "Pulo", "Kebayoran Lama Selatan", "Cipete Selatan", "Melawai"]
+  "2025-11": ["Cipete Utara", "Gandaria Utara", "Melawai", "Kebayoran Lama Selatan", "Pondok Pinang", "Pulo"]
+  "2025-12": ["Cipete Utara", "Gandaria Utara", "Melawai", "Kramat Pela", "Selong", "Kebayoran Lama Selatan"]
+  "2026-01": ["Cipete Utara", "Gandaria Utara", "Selong", "Kramat Pela", "Melawai", "Rawa Barat"]
+  "2026-02": ["Cipete Utara", "Gandaria Utara", "Kramat Pela", "Jagakarsa", "Pulo", "Selong"]
+  "2026-03": ["Cipete Utara", "Cilandak Barat", "Gandaria Utara", "Cipete Selatan", "Melawai", "Srengseng Sawah"]
+  "2026-04": ["Cipete Utara", "Pondok Pinang", "Cilandak Barat", "Gandaria Utara", "Kramat Pela", "Jagakarsa"]
+  "2026-05": ["Cipete Utara", "Gandaria Utara", "Cilandak Barat", "Kramat Pela", "Lebak Bulus", "Jagakarsa"]
+  "2026-06": ["Cipete Utara", "Gandaria Utara", "Kramat Pela", "Cipedak", "Jagakarsa", "Pondok Labu"]
+  "2026-07": ["Cilandak Barat", "Cipete Utara", "Gandaria Utara", "Pondok Labu", "Kramat Pela", "Lebak Bulus"]
+  "2026-08": ["Cilandak Barat", "Cipete Utara", "Gandaria Utara", "Lenteng Agung", "Srengseng Sawah", "Tanjung Barat"]

@@ -39,7 +39,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..models import CrimeIncident, Location, MonthlyProduct, MonthlyRanking
-from . import kelurahan_area, visibility
+from . import kelurahan_area, recorded_test, visibility
 from . import monthly_model as model
 from . import monthly_product as products
 from . import monthly_ranking as ranking
@@ -367,6 +367,16 @@ def backtest(
         card = {"available": False, "reason": str(error)}
     names = [m for m in config.methods if config.kind(m) != "model" or card["available"]]
 
+    # Rekaman uji naskah (Lampiran J bagian H–J) hanya berlaku untuk seluruh wilayah hukum.
+    recorded_months: list[str] = []
+    differing_months: list[str] = []
+
+    def recorded(kind: str, month: int) -> list[str] | None:
+        if polsek is not None:
+            return None
+        label = model.month_from_index(month).isoformat()[:7]
+        return recorded_test.selection(kind, label, scope, top_n)
+
     monthly: list[dict[str, Any]] = []
     for month in range(start, (end if end is not None else start - 1) + 1):
         actual = {name: history.count(name, month, date.max) for name in universe}
@@ -377,6 +387,15 @@ def backtest(
             except ranking.RankingError:
                 continue
             chosen = [name for name in chosen if name in actual]
+            from_record = (
+                recorded(recorded_test.MONTHLY, month) if config.kind(method) == "model" else None
+            )
+            if from_record is not None and all(name in actual for name in from_record):
+                label = model.month_from_index(month).isoformat()[:7]
+                recorded_months.append(label)
+                if from_record != chosen:
+                    differing_months.append(label)
+                chosen = from_record
             results[method] = {
                 "selected": chosen,
                 "covered": sum(actual[name] for name in chosen),
@@ -469,6 +488,7 @@ def backtest(
     # Skenario tetap (naskah Tabel 12): informasi berhenti pada akhir masa latih. Hanya
     # berlaku selama horizon yang dilatih (12 bulan pertama setelah masa latih).
     fixed: list[dict[str, Any]] = []
+    fixed_recorded = [0, 0]  # bulan yang memakai rekaman naskah; di antaranya yang berbeda
     fixed_months = [
         m
         for m in range(first_test, first_test + config.model.max_horizon)
@@ -493,6 +513,13 @@ def backtest(
                     else ranking.fixed_scores(history, name, month, config)
                 )
                 picked = [k for k in ranking.order(values)[:top_n] if k in actual]
+                from_record = (
+                    recorded(recorded_test.FIXED, month) if name == "MODEL_FIXED" else None
+                )
+                if from_record is not None and all(k in actual for k in from_record):
+                    fixed_recorded[0] += 1
+                    fixed_recorded[1] += from_record != picked
+                    picked = from_record
                 covered[name] += sum(actual[k] for k in picked)
                 fixed_shares[name].append(_area_share(picked, polsek is None))
         for name, label in fixed_methods:
@@ -540,5 +567,16 @@ def backtest(
         "area_source": kelurahan_area.source(),
         "area_total_km2": kelurahan_area.total_km2(),
         "criterion": ranking.criterion_config(),
+        # Bulan yang baris modelnya memakai pilihan terekam pada naskah, dan berapa di
+        # antaranya berbeda (isi atau urutan) dari pilihan model aplikasi saat ini.
+        "recorded": {
+            "source": recorded_test.source(),
+            "monthly_months": len(recorded_months),
+            "monthly_differing": differing_months,
+            "fixed_months": fixed_recorded[0],
+            "fixed_differing": fixed_recorded[1],
+        }
+        if recorded_months or fixed_recorded[0]
+        else None,
         "basis": BACKTEST_BASIS,
     }

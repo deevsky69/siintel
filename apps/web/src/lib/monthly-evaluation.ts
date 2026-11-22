@@ -137,6 +137,14 @@ export type Backtest = {
   };
   area_source: string | null;
   area_total_km2: number | null;
+  /** Baris model memakai pilihan kelurahan yang terekam pada naskah (Lampiran J bagian H–J). */
+  recorded: {
+    source: string | null;
+    monthly_months: number;
+    monthly_differing: string[];
+    fixed_months: number;
+    fixed_differing: number;
+  } | null;
   /** Ambang pemakaian model (naskah revisi 7 sasaran 3.3.1). */
   criterion: { months: number; min_margin_pct: number; min_pai: number; source: string };
   basis: string;

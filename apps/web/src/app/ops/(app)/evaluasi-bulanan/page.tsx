@@ -382,6 +382,11 @@ export default async function EvaluasiBulananPage({
             model diperbaiki. ({backtest.criterion.source}.) Penilaian untuk bulan sasaran tertentu
             tampil pada halaman Peringkat.
           </p>
+          <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
+            {backtest.recorded
+              ? `Baris model memakai kelurahan pilihan yang terekam pada ${backtest.recorded.source} (${backtest.recorded.monthly_months} bulan uji bulanan, ${backtest.recorded.fixed_months} bulan uji tetap); kejadian tercakup, cakupan, porsi luas, dan PAI dihitung aplikasi dari data kejadian. Pada ${backtest.recorded.monthly_differing.length} bulan, isi atau urutan pilihan itu berbeda dari keluaran model aplikasi saat ini.`
+              : `Untuk ${backtest.top_n} kelurahan, baris model memakai keluaran model aplikasi: naskah hanya merekam enam kelurahan per bulan.`}
+          </p>
           {backtest.area_source ? (
             <p className="mt-2 text-2xs text-ink-faint">
               Luas kelurahan: {backtest.area_source}; luas wilayah hukum{" "}

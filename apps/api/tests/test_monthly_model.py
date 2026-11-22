@@ -171,6 +171,32 @@ def test_area_file_holds_the_bps_areas_of_the_manuscript() -> None:
     assert kelurahan_area.share([]) is None
 
 
+def test_recorded_selections_of_the_manuscript_are_complete() -> None:
+    """Lampiran J bagian H–J: enam kelurahan per bulan, 12 bulan uji tetap dan 20 bulan uji
+    bulanan; semuanya punya luas BPS, sehingga PAI-nya dapat dihitung."""
+    from prediksi_presisi_api.services import recorded_test
+
+    areas = evaluation.kelurahan_areas()
+    months = [f"2025-{m:02d}" for m in range(1, 13)] + [f"2026-{m:02d}" for m in range(1, 9)]
+    for month in months:
+        six = recorded_test.selection(recorded_test.MONTHLY, month, "VEHICLE", 6)
+        assert six is not None and len(set(six)) == 6 and all(name in areas for name in six)
+        # Empat teratas = awalan daftar yang sama (urutan peringkat naskah).
+        assert recorded_test.selection(recorded_test.MONTHLY, month, "VEHICLE", 4) == six[:4]
+        # Naskah tidak merekam peringkat ke-7 dan ke-8, dan hanya menguji cakupan kendaraan.
+        assert recorded_test.selection(recorded_test.MONTHLY, month, "VEHICLE", 8) is None
+        assert recorded_test.selection(recorded_test.MONTHLY, month, "ALL_3C", 6) is None
+    for month in months[:12]:
+        fixed = recorded_test.selection(recorded_test.FIXED, month, "VEHICLE", 6)
+        assert fixed is not None and len(set(fixed)) == 6 and all(n in areas for n in fixed)
+    assert recorded_test.selection(recorded_test.FIXED, "2026-01", "VEHICLE", 6) is None
+    assert recorded_test.selection(recorded_test.MONTHLY, "2026-09", "VEHICLE", 6) is None
+    january = recorded_test.selection(recorded_test.MONTHLY, "2025-01", "VEHICLE", 6)
+    assert january == [
+        "Cipete Utara", "Gandaria Utara", "Cilandak Barat", "Kalibata", "Pulo", "Senayan",
+    ]  # fmt: skip
+
+
 def test_random_baseline_matches_the_manuscript() -> None:
     """Lampiran J bagian M: acak 6 dari 65 = 9,23%; 58,5 dari 634 dan 44,6 dari 483."""
     assert evaluation.random_baseline(6, 65, 634) == {
