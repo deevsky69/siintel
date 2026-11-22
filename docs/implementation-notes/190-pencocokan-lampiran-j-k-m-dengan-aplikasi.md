@@ -111,3 +111,46 @@ M; tiga laporan "beda" palsu (huruf besar pada tombol, waktu muat halaman masuk)
 ulang dengan tangan dan ternyata sama. Hasil model diambil dari
 `GET /evaluation/monthly/backtest` produksi dan dari perhitungan ulang 4, 6, 8 kelurahan pada
 data yang sama.
+
+## 4. Salinan naskah dengan angka disamakan (22 November 2026)
+
+Atas permintaan pemilik proyek ("data dibuat persis antara naskah dan aplikasi"), dibuat
+salinan `docs/TASKAP - IRKHAMUL KHAKIM - 202608003058 REVISI - angka disamakan dengan
+aplikasi.docx`. **Arahnya naskah mengikuti aplikasi** — arah sebaliknya memerlukan angka yang
+ditulis tangan ke layar. Naskah asli tidak diubah. Seluruh 44 perubahan berupa
+*perubahan terlacak* atas nama "Claude", sehingga dapat diterima atau ditolak satu per satu di
+Word (Tinjau → Terima/Tolak).
+
+Yang diubah hanya angka uji model; deskripsi data (Tabel 4.1, 4.2, 4.5) sudah sama dengan
+basis data dan tidak disentuh, begitu pula kolom AI perbulan dan seluruh pembanding historis.
+
+| Tempat | Semula | Menjadi |
+|---|---|---|
+| Tabel 4.6, AI tetap 2025 | 149 (23,50%) | 148 (23,34%) |
+| Tabel 4.6, AI bulanan Jan–Ags 2026 | 83 (17,81%) | 86 (17,81%) |
+| Lampiran J.C, AI tetap | 149 dari 634 | 148 dari 634 |
+| Lampiran J.C, AI tetap (persen) | 23,50% | 23,34% |
+| Lampiran J.F 2025-04, AI tetap | 14 | 13 |
+| Lampiran J.F jumlah AI tetap | 149 | 148 |
+| Lampiran J.K 2025, 4 kelurahan, AI | 139 (21,92%) | 138 (21,77%) |
+| Lampiran J.K 2025, 4 kelurahan, selisih | −1,58 | −1,74 |
+| Lampiran J.K 2025, 4 kelurahan, bulan unggul/setara/lebih rendah | 1 / 7 / 4 | 0 / 8 / 4 |
+| Lampiran J.K 2025, 8 kelurahan, AI | 235 (37,07%) | 237 (37,38%) |
+| Lampiran J.K 2025, 8 kelurahan, selisih | +1,74 | +2,05 |
+| Lampiran J.K 2025, 8 kelurahan, bulan unggul/setara/lebih rendah | 6 / 3 / 3 | 5 / 5 / 2 |
+| Lampiran J.K Jan–Ags 2026, 4 kelurahan, AI | 63 (13,04%) | 67 (13,87%) |
+| Lampiran J.K Jan–Ags 2026, 4 kelurahan, selisih | −0,41 | +0,41 |
+| Lampiran J.K Jan–Ags 2026, 4 kelurahan, bulan unggul/setara/lebih rendah | 3 / 2 / 3 | 3 / 3 / 2 |
+| Lampiran J.K Jan–Ags 2026, 8 kelurahan, AI | 119 (24,64%) | 103 (21,33%) |
+| Lampiran J.K Jan–Ags 2026, 8 kelurahan, selisih | +3,73 | +0,41 |
+| Lampiran J.K Jan–Ags 2026, 8 kelurahan, bulan unggul/setara/lebih rendah | 6 / 1 / 1 | 4 / 1 / 3 |
+| Lampiran J.K, kalimat sesudah tabel | Pada empat kelurahan, pembanding historis mencakup lebih banyak kej… | Pada empat kelurahan, pembanding historis mencakup lebih banyak kej… |
+| Lampiran M D.9, uji historis | 273 dari 1.117 kejadian (24,4%) | 276 dari 1.117 kejadian (24,7%) |
+| Lampiran J.H (12 baris), kolom AI tetap | daftar enam kelurahan | daftar menurut model yang berjalan (April 2025 berbeda satu kelurahan; urutan berbeda pada bulan lain) |
+| Lampiran J.I dan J.J (20 baris), kolom AI perbulan | daftar enam kelurahan | urutan menurut model yang berjalan; **himpunan enam kelurahannya sama**, kecuali yang memang sudah sama urutannya tidak diubah |
+
+Yang TIDAK diubah dan masih perlu disunting penulis sendiri (bukan angka uji): tahap
+Wakasatintelkam pada Lampiran K, L, dan M; tabel peran D.18; jumlah panel D.16; jumlah kartu
+dan isi lonceng D.3–D.4; kalimat PAI pada Bab III (lihat bagian 2 dan 3 catatan ini).
+Dibuat oleh skrip yang membaca hasil model dari basis data yang sama dengan produksi dan
+memeriksa lebih dulu bahwa kolom yang tidak diubah memang sudah sama.
