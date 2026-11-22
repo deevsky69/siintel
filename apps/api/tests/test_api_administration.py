@@ -187,6 +187,8 @@ def test_user_list_carries_the_reason_password_is_absent(
     # Pilihan penugasan berasal dari data dan konfigurasi, bukan diketik ulang di layar.
     assert "Polsek Tebet" in body["polsek_options"]
     assert {"value": "RESKRIM", "label": "Reskrim"} in body["function_options"]
+    # Naskah Taskap revisi (Gambar 4.3, Lampiran K huruf I): Bagops termasuk pengguna produk.
+    assert {"value": "BAGOPS", "label": "Bagops"} in body["function_options"]
 
 
 def test_role_list_reports_holders_and_is_not_editable(

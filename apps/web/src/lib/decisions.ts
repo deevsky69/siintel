@@ -28,6 +28,7 @@ export const FUNCTION_LABELS: Record<string, string> = {
   INTELKAM: "Intelkam",
   RESKRIM: "Reskrim",
   LANTAS: "Lantas",
+  BAGOPS: "Bagops",
 };
 
 export const PRIORITY_LABELS: Record<string, string> = {

@@ -163,7 +163,7 @@ Audit: `VIEW_SENSITIVE_DATA` untuk detail kejadian, `IMPORT_DATA` untuk impor.
 | GET | `/map/current-risk` | `map:read`, `risk_score:read` | Layer risiko berjalan; `level=kecamatan|kelurahan`, `kecamatan=` (1 Oktober 2026) |
 | GET | `/map/predictive-heatmap` | `map:read`, `prediction:read` | Layer prediktif; parameter `horizon`, `level`, `kecamatan`. Hanya prediksi **PUBLISHED** — VALIDATED milik evaluasi |
 | GET | `/map/area/{kecamatan}?kelurahan=` | `map:read` | Panel rincian dipersempit ke satu kelurahan (5 Oktober 2026): potensi ancaman, jendela rawan, prediksi + WHY, riwayat, peringatan — semua pada sel kelurahan itu; kelurahan tak dikenal → 404 |
-| GET | `/map/area/{kecamatan}` | `map:read` | Rincian wilayah: ancaman berperingkat, jam rawan, riwayat kejadian, peringatan aktif, prediksi + WHY |
+| GET | `/map/area/{kecamatan}` | `map:read` | Rincian wilayah: ancaman berperingkat, jam rawan, riwayat kejadian, peringatan aktif, prediksi + WHY. **22 November 2026 (catatan 191):** `history` memuat juga `additional_verified` (laporan warga terverifikasi tanpa padanan resmi; tidak dijumlahkan ke `total_incidents`) dan `data_updated_at` |
 | GET | `/map/grid/{location_id}` | `map:read` | Detail satu sel grid — **belum dibuat** |
 
 `/map/current-risk` dan `/map/predictive-heatmap` dipisah karena keduanya layer berbeda (docs/04).

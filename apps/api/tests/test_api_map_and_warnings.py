@@ -661,3 +661,48 @@ def test_historical_requires_both_gates(client: TestClient, session: Session) ->
     response = client.get("/api/v1/map/historical", headers=_auth(client, user))
 
     assert response.status_code == 403, response.text
+
+
+def test_area_history_shows_verified_additional_incidents_separately(
+    client: TestClient, session: Session
+) -> None:
+    """Naskah Taskap revisi, Lampiran K huruf F: peta kejadian memuat kejadian resmi DAN
+    kejadian tambahan terverifikasi, dengan waktu pembaruan. Yang dihitung sebagai tambahan
+    hanya laporan warga yang sudah diverifikasi dan diputuskan tanpa padanan resmi — dan
+    angkanya tidak pernah dijumlahkan ke kejadian resmi."""
+    from datetime import datetime
+
+    from prediksi_presisi_api.models import CitizenReport
+    from prediksi_presisi_api.services import clock
+
+    leader = _make_user(session, "Pimpinan")
+    area = session.scalar(select(Location).where(Location.kelurahan.is_not(None)).limit(1))
+    assert area is not None
+    url = f"/api/v1/map/area/{area.kecamatan}"
+    before = client.get(url, headers=_auth(client, leader)).json()["history"]
+    assert before["data_updated_at"] is not None
+
+    def lapor(status: str, decision: str | None) -> None:
+        session.add(
+            CitizenReport(
+                code=f"RPT-UJI-{uuid.uuid4().hex[:8]}",
+                reported_at=datetime(2025, 12, 20, 9, 0, tzinfo=clock.JAKARTA),
+                category="Pencurian Kendaraan",
+                description="Motor hilang dari teras.",
+                latitude=-6.2,
+                longitude=106.8,
+                geom="SRID=4326;POINT(106.8 -6.2)",
+                location_id=area.location_id,
+                status=status,
+                match_decision=decision,
+            )
+        )
+
+    lapor("VERIFIED", "NOT_MATCHED")  # kejadian tambahan terverifikasi
+    lapor("RECEIVED", None)  # belum diverifikasi — tidak dihitung
+    lapor("VERIFIED", None)  # terverifikasi tetapi belum diputuskan padanannya — tidak dihitung
+    session.flush()
+
+    after = client.get(url, headers=_auth(client, leader)).json()["history"]
+    assert after["additional_verified"] == before["additional_verified"] + 1
+    assert after["total_incidents"] == before["total_incidents"]

@@ -240,6 +240,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
       ("Sistem", "Mencocokkan", "Dengan berkas perkara curanmor yang tercatat pada sistem ini.", "ai"),
       ("Masyarakat", "Membaca jawaban", "Tercatat / tidak tercatat, jenis, kecamatan, bulan laporan. Tanpa nama pemilik dan nomor LP.", "warga"))}
 <div class="two">{fig("s2-kendaraan-tercatat", "Plat <b>B 1493 TWM</b>: tercatat dalam laporan kehilangan — jangan lanjutkan transaksi.")}{fig("s3-kendaraan-tidak", "Plat <b>B 1234 ABC</b> (tidak ada di tabel): tidak ada catatan pada sistem ini.")}</div>
+{fig("s12-cek-tertunda", "Bila sumber data tidak dapat dijangkau, yang tampil adalah <b>Pengecekan tertunda</b> — bukan “tidak tercatat”. Keadaan ini hanya muncul saat gangguan, jadi tidak perlu diperagakan.", "small")}
 <div class="note"><b>Cara memperagakan.</b> (1) Ketik satu plat dari tabel → kotak merah “Tercatat dalam laporan kehilangan”. (2) Ketik <code>B 1234 ABC</code> → “tidak ada catatan”. (3) Pilih <i>Nomor rangka</i> dan ketik rangka baris 16 → tercatat dan <b>sudah ditemukan</b>. Pencarian dibatasi 10 kali per jam dari satu jaringan.</div>
 <h3>Tabel data contoh cek kendaraan — {len(kendaraan)} kendaraan (dummy berlabel)</h3>
 <table class="data"><thead><tr><th>No</th><th>Nomor plat</th><th>Nomor rangka</th><th>Kendaraan</th><th>Kecamatan</th><th>Bulan laporan</th><th>Jawaban sistem</th></tr></thead><tbody>{baris_kendaraan}</tbody></table>
@@ -365,10 +366,10 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <table class="rapat"><thead><tr><th style="width:38mm">Alur</th><th style="width:36mm">Akun</th><th>Langkah</th></tr></thead><tbody>
 <tr><td><b>B2 · Laporan masyarakat</b></td><td><code>demo.polsek</code> atau <code>demo.admin</code></td><td>Data → Laporan Masyarakat → buka laporan (termasuk yang baru dikirim pada alur A7) → ubah status menjadi terverifikasi dengan catatan. Polsek hanya melihat wilayahnya.</td></tr>
 <tr><td><b>B3 · Berkas perkara</b></td><td><code>demo.admin</code> atau <code>demo.polsek</code></td><td>Data → Berkas Perkara → pilih satu LP dummy → naikkan tahap (mis. Penyelidikan → Penyidikan) dengan catatan → buka kembali <b>Lacak</b> sebagai masyarakat dengan LP + PIN itu: tahap baru tampil.</td></tr>
-<tr><td><b>B4 · Peta dan analitik</b></td><td>semua kecuali Humas (peta: semua)</td><td>Wilayah → Peta (historis, kelurahan prioritas digarisi) dan Wilayah → Analitik (tren, hari × rentang empat jam; tab Pola Gangguan: where, when, how, target, repeat).</td></tr>
+<tr><td><b>B4 · Peta dan analitik</b></td><td>semua kecuali Humas (peta: semua)</td><td>Wilayah → Peta (historis, kelurahan prioritas digarisi; kartu Riwayat Kejadian juga memuat jumlah <b>kejadian tambahan terverifikasi</b> dari laporan warga dan tanggal data terakhir dimuat) dan Wilayah → Analitik (tren, hari × rentang empat jam; tab Pola Gangguan: where, when, how, target, repeat).</td></tr>
 <tr><td><b>B5 · Moderasi survei</b></td><td><code>demo.admin</code></td><td>Warga → Survey Rasa Aman → tayangkan atau tolak ulasan yang dikirim pada alur A4.</td></tr>
 <tr><td><b>B6 · Kontak Babin</b></td><td><code>demo.admin</code></td><td>Warga → Babinkamtibmas → cari kelurahan, Tambah / Ubah / Hapus; kontak tampil pada peta warga.</td></tr>
-<tr><td><b>B7 · Pengguna dan audit</b></td><td><code>demo.admin</code> (audit juga <code>demo.pimpinan</code>)</td><td>Sistem → Manajemen Pengguna (akun dan peran) dan Sistem → Audit Log (siapa melakukan apa, termasuk penolakan akses).</td></tr>
+<tr><td><b>B7 · Pengguna dan audit</b></td><td><code>demo.admin</code> (audit juga <code>demo.pimpinan</code>)</td><td>Sistem → Manajemen Pengguna (akun, peran, dan fungsi — termasuk <b>Bagops</b>) dan Sistem → Audit Log (siapa melakukan apa, termasuk penolakan akses).</td></tr>
 <tr><td><b>B8 · Batas wewenang</b></td><td><code>demo.humas</code>, <code>demo.kbo</code></td><td>Tunjukkan bahwa Humas tidak memiliki menu Produk Bulanan, dan KBO tidak dapat menyusun draf maupun menetapkan — pemisahan tugas antarperan dijaga server. Hanya Administrator yang memegang semua kewenangan.</td></tr>
 </tbody></table>
 </section>

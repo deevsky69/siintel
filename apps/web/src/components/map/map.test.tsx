@@ -155,6 +155,8 @@ const areaDetail: AreaDetail = {
     total_incidents: 160,
     date_from: "2023-01-12",
     date_to: "2025-12-16",
+    additional_verified: 2,
+    data_updated_at: "2026-01-02T03:00:00Z",
     by_threat_type: [
       { threat_type: "CURANMOR", incidents: 66 },
       { threat_type: "CURAT", incidents: 31 },

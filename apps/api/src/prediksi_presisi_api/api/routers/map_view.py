@@ -38,9 +38,17 @@ from fastapi import APIRouter, Depends, Path, Query, status
 from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session
 
-from ...models import CrimeIncident, EarlyWarning, Location, Prediction, RiskScore
+from ...models import (
+    CitizenReport,
+    CrimeIncident,
+    EarlyWarning,
+    Location,
+    Prediction,
+    RiskScore,
+)
 from ...models.prediction import FORECAST_HORIZONS
 from ...services import clock
+from ...services.data_quality import VERIFIED_STATUSES
 from ..deps import CurrentUser, get_db, jurisdiction_filter, not_found, require_permission
 from ..errors import ApiError
 
@@ -643,6 +651,7 @@ def _area_history(
             func.count(),
             func.min(CrimeIncident.incident_date),
             func.max(CrimeIncident.incident_date),
+            func.max(CrimeIncident.created_at),
         )
         .select_from(CrimeIncident)
         .join(Location, Location.location_id == CrimeIncident.location_id)
@@ -651,7 +660,26 @@ def _area_history(
     )
     if kelurahan is not None:
         totals_query = totals_query.where(Location.kelurahan == kelurahan)
-    total, date_from, date_to = session.execute(totals_query).one()
+    total, date_from, date_to, data_updated_at = session.execute(totals_query).one()
+
+    # Naskah Taskap revisi, Lampiran K huruf F ("Peta kejadian"): kejadian resmi DAN kejadian
+    # tambahan terverifikasi, dengan waktu pembaruan. Kejadian tambahan = laporan warga yang
+    # sudah diverifikasi dan diputuskan tidak berpadanan dengan kejadian resmi (Mutu Data);
+    # ia ditampilkan TERPISAH dan tidak pernah dijumlahkan ke kejadian resmi.
+    additional_query = _scoped(
+        select(func.count())
+        .select_from(CitizenReport)
+        .join(Location, Location.location_id == CitizenReport.location_id)
+        .where(
+            Location.kecamatan == kecamatan,
+            CitizenReport.status.in_(VERIFIED_STATUSES),
+            CitizenReport.match_decision == "NOT_MATCHED",
+        ),
+        polsek,
+    )
+    if kelurahan is not None:
+        additional_query = additional_query.where(Location.kelurahan == kelurahan)
+    additional = session.scalar(additional_query)
 
     by_type_query = _scoped(
         select(CrimeIncident.incident_type, func.count())
@@ -668,6 +696,8 @@ def _area_history(
         "total_incidents": int(total or 0),
         "date_from": date_from,
         "date_to": date_to,
+        "additional_verified": int(additional or 0),
+        "data_updated_at": data_updated_at,
         "by_threat_type": [
             {"threat_type": incident_type, "incidents": int(count)}
             for incident_type, count in session.execute(by_type_query).all()
