@@ -284,6 +284,11 @@ export default async function EvaluasiBulananPage({
                           <td className="py-1.5 pr-2 font-semibold text-ink">
                             {row.method_label}
                             {row.kind === "annual" ? ` ${backtest.annual_year}` : ""}
+                            {row.kind === "model" && period.quoted ? (
+                              <span className="ml-1 rounded bg-base-800 px-1 text-2xs font-normal text-ink-muted">
+                                kutipan naskah
+                              </span>
+                            ) : null}
                           </td>
                           <td className="py-1.5 pr-2 text-right tabular-nums text-ink">
                             {row.covered} / {row.total}
@@ -301,7 +306,9 @@ export default async function EvaluasiBulananPage({
                             {kali(row.vs_random)}
                           </td>
                           <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
-                            {test ? `${test.wins}–${test.losses}–${test.ties}` : ""}
+                            {test && test.wins !== null
+                              ? `${test.wins}–${test.losses}–${test.ties}`
+                              : ""}
                           </td>
                           <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
                             {test && test.pai_wins !== null
@@ -309,7 +316,11 @@ export default async function EvaluasiBulananPage({
                               : ""}
                           </td>
                           <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
-                            {test ? (test.p_value === null ? "—" : koma(test.p_value, 3)) : ""}
+                            {test && test.wins !== null
+                              ? test.p_value === null
+                                ? "—"
+                                : koma(test.p_value, 3)
+                              : ""}
                           </td>
                         </tr>
                       );
@@ -385,7 +396,12 @@ export default async function EvaluasiBulananPage({
           <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
             {backtest.recorded
               ? `Baris model memakai kelurahan pilihan yang terekam pada ${backtest.recorded.source} (${backtest.recorded.monthly_months} bulan uji bulanan, ${backtest.recorded.fixed_months} bulan uji tetap); kejadian tercakup, cakupan, porsi luas, dan PAI dihitung aplikasi dari data kejadian. Pada ${backtest.recorded.monthly_differing.length} bulan, isi atau urutan pilihan itu berbeda dari keluaran model aplikasi saat ini.`
-              : `Untuk ${backtest.top_n} kelurahan, baris model memakai keluaran model aplikasi: naskah hanya merekam enam kelurahan per bulan.`}
+              : backtest.periods.some((period) => period.quoted)
+                ? `Untuk ${backtest.top_n} kelurahan, jumlah pada baris model dan hitungan unggul–kalah–seri terhadap pembanding terbaik DIKUTIP dari ${backtest.periods.find((period) => period.quoted)?.quoted?.source}; aplikasi tidak menghitungnya ulang karena naskah tidak mencetak peringkat ke-7 dan ke-8. Keluaran model aplikasi sendiri: ${backtest.periods
+                    .filter((period) => period.quoted)
+                    .map((period) => `${period.label} ${period.quoted?.model_covered_by_app}`)
+                    .join("; ")}. Baris pembanding dihitung aplikasi dari data kejadian.`
+                : `Untuk ${backtest.top_n} kelurahan, baris model memakai keluaran model aplikasi: naskah hanya merekam enam kelurahan per bulan.`}
           </p>
           {backtest.area_source ? (
             <p className="mt-2 text-2xs text-ink-faint">

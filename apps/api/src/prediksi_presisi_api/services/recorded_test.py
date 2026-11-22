@@ -44,3 +44,13 @@ def selection(kind: str, month: str, scope: str, top_n: int) -> list[str] | None
     if not names or len(names) < top_n:
         return None
     return [str(name) for name in names[:top_n]]
+
+
+def quoted_total(scope: str, top_n: int, period: str) -> dict[str, int] | None:
+    """Jumlah yang dikutip dari naskah (Lampiran J bagian K) untuk `top_n` yang daftar
+    pilihannya tidak tercetak; `None` bila tidak ada kutipan untuk periode (tahun) itu."""
+    raw = _raw()
+    if not raw or str(raw.get("scope")) != scope:
+        return None
+    entry = ((raw.get("quoted_totals") or {}).get(top_n) or {}).get(period)
+    return {str(key): int(value) for key, value in entry.items()} if entry else None

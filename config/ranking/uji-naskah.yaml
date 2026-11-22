@@ -45,3 +45,14 @@ monthly:
   "2026-06": ["Cipete Utara", "Gandaria Utara", "Kramat Pela", "Cipedak", "Jagakarsa", "Pondok Labu"]
   "2026-07": ["Cilandak Barat", "Cipete Utara", "Gandaria Utara", "Pondok Labu", "Kramat Pela", "Lebak Bulus"]
   "2026-08": ["Cilandak Barat", "Cipete Utara", "Gandaria Utara", "Lenteng Agung", "Srengseng Sawah", "Tanjung Barat"]
+# Jumlah yang DIKUTIP dari naskah (Lampiran J bagian K) untuk jumlah kelurahan yang daftar
+# pilihannya TIDAK tercetak di naskah (peringkat ke-7 dan ke-8). Keputusan pemilik proyek
+# 22 November 2026 (catatan 195): naskah adalah sumber yang lebih mutakhir. Berbeda dari
+# bagian di atas, angka di sini TIDAK dihitung ulang oleh aplikasi; layar menandainya sebagai
+# kutipan naskah dan menyebut keluaran model aplikasi sendiri di sampingnya.
+#   model      = kejadian tercakup baris AI per bulan
+#   wins/ties/losses = bulan unggul/setara/lebih rendah terhadap pembanding historis terbaik
+quoted_totals:
+  8:
+    "2025": {model: 235, wins: 6, ties: 3, losses: 3}
+    "2026": {model: 119, wins: 6, ties: 1, losses: 1}

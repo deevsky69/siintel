@@ -467,12 +467,51 @@ def backtest(
                         "pai_wins": pai_wins,
                     }
                 )
+        quoted = _apply_quoted(label, out, tests, total)
         return {
             "label": label,
             "months": len(rows),
             "methods": out,
             "random": random_baseline(top_n, len(universe), total),
             "sign_tests": tests,
+            "quoted": quoted,
+        }
+
+    def _apply_quoted(
+        label: str, out: list[dict[str, Any]], tests: list[dict[str, Any]], total: int
+    ) -> dict[str, Any] | None:
+        """Baris model diganti jumlah yang DIKUTIP dari naskah bila daftar pilihannya tidak
+        tercetak di sana (delapan kelurahan). Keluaran model aplikasi tetap dilaporkan."""
+        if polsek is not None or recorded_months or not total:
+            return None
+        years = [label] if label.isdigit() else sorted({row["month"][:4] for row in monthly})
+        entries = [recorded_test.quoted_total(scope, top_n, year) for year in years]
+        mine = next((m for m in out if m["kind"] == "model"), None)
+        if mine is None or not entries or any(entry is None for entry in entries):
+            return None
+        computed = mine["covered"]
+        mine["covered"] = sum(entry["model"] for entry in entries if entry)
+        mine["coverage_pct"] = round(mine["covered"] / total * 100, 2)
+        mine["area_pct"] = mine["pai"] = None
+        mine["vs_random"] = vs_random(mine["coverage_pct"], top_n, len(universe))
+        others = [m for m in out if m["kind"] != "model"]
+        best = max(others, key=lambda m: m["covered"]) if others else None
+        for test in tests:
+            test["pai_wins"] = None
+            # Hitungan bulan pada naskah berlaku per tahun, terhadap pembanding terbaik tahun itu.
+            if len(entries) == 1 and best is not None and test["against"] == best["method"]:
+                test["wins"] = sum(entry["wins"] for entry in entries if entry)
+                test["ties"] = sum(entry["ties"] for entry in entries if entry)
+                test["losses"] = sum(entry["losses"] for entry in entries if entry)
+                test["p_value"] = sign_test(test["wins"], test["losses"])
+                test["quoted"] = True
+            else:
+                # Hitungan per bulan terhadap pembanding lain tidak ada di naskah.
+                test["wins"] = test["losses"] = test["ties"] = test["p_value"] = None
+        return {
+            "source": "Naskah Taskap revisi 7, Lampiran J bagian K",
+            "model_covered_by_app": computed,
+            "against": best["method"] if best and len(entries) == 1 else None,
         }
 
     periods: list[dict[str, Any]] = []

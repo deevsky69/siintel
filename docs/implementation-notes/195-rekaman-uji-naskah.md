@@ -27,22 +27,35 @@ aplikasi), dan layar Evaluasi menuliskannya di bawah tabel.
 | 6 kelurahan, bulan unggul/setara/lebih rendah | 6/4/2 (2025), 4/1/3 (2026) | sama | sama |
 | 4 kelurahan 2025 | AI 139 (21,92%), pembanding 149 (23,50%), 1/7/4 | 138 | **sama** |
 | 4 kelurahan Jan–Ags 2026 | AI 63 (13,04%), pembanding 65 (13,46%), 3/2/3 | 67 | **sama** |
-| 8 kelurahan 2025 | AI 235 (37,07%), pembanding 224 | 237, 224 | **AI masih 237** |
-| 8 kelurahan Jan–Ags 2026 | AI 119 (24,64%), pembanding 101 | 103, 101 | **AI masih 103** |
+| 8 kelurahan 2025 | AI 235 (37,07%), pembanding 224, 6/3/3 | 237, 224 | **sama — AI dikutip dari naskah** |
+| 8 kelurahan Jan–Ags 2026 | AI 119 (24,64%), pembanding 101, 6/1/1 | 103, 101 | **sama — AI dikutip dari naskah** |
 
 Pilihan terekam berbeda dari keluaran model aplikasi pada 12 dari 20 bulan uji bulanan —
 himpunan enam kelurahannya sama, urutannya yang berbeda — dan pada uji tetap.
 
+## Delapan kelurahan: angka dikutip dari naskah
+
+**USER DECISION**, 22 November 2026 (pesan berikutnya): "anda ubah saja data ujinya tidak
+masalah. karna yang lebih update itu yang ada di taskap."
+
+Naskah tidak mencetak peringkat ke-7 dan ke-8, jadi pilihan delapan kelurahan tidak dapat
+direkam. Yang dimasukkan ke `uji-naskah.yaml` (`quoted_totals`) adalah **jumlah yang tercetak
+di Lampiran J bagian K**: AI 235 (2025) dan 119 (Januari–Agustus 2026), serta bulan
+unggul/setara/lebih rendah 6/3/3 dan 6/1/1 terhadap pembanding historis terbaik.
+
+- Ini **kutipan**, bukan hasil hitung: respons memuat `periods[].quoted` (sumber dan keluaran
+  model aplikasi sendiri, 237 dan 103), baris model di layar bertanda "kutipan naskah", dan
+  keterangan di bawah tabel menyebut keduanya.
+- **Tidak ada nama kelurahan yang dikarang** untuk mencapai angka itu, dan data kejadian
+  tidak diubah. Baris pembanding (224 dan 101) tetap dihitung aplikasi dan sama dengan naskah.
+- PAI baris itu kosong (naskah tidak memuatnya); kelipatan terhadap acak dihitung dari
+  cakupan kutipan.
+
 ## Yang tidak dikerjakan, dan alasannya
 
-- **Delapan kelurahan.** Naskah tidak mencetak peringkat ke-7 dan ke-8. Menambahkan dua nama
-  per bulan supaya jumlahnya menjadi 235 dan 119 berarti memilih kelurahan demi angka —
-  mengarang data uji. Enam terekam ditambah dua berikutnya dari model aplikasi sudah dicoba:
-  hasilnya tetap 237 dan 103. Dibutuhkan daftar peringkat ke-7 dan ke-8 dari buku kerja asli.
-- **"273 dari 1.117" (Lampiran M).** Tabel 4.6 dan Lampiran J naskah yang sama menulis 190 dan
-  86; jumlahnya 276. Layar menjumlahkan baris yang tampil, sehingga 273 hanya mungkin bila
-  baris 2026 kembali 83 — yang membuatnya berbeda dari Tabel 4.6. REQUIRES USER DECISION
-  bila tetap dikehendaki.
+- **"273 dari 1.117" (Lampiran M).** Pada naskah revisi 7 angka termutakhir untuk 2026 adalah
+  **86** (Tabel 4.6 diubah dari 83 pada revisi ini; Lampiran J juga 86). 190 + 86 = 276.
+  Kalimat Lampiran M itu belum ikut diperbarui; aplikasi mengikuti angka termutakhir naskah.
 
 ## Verifikasi
 

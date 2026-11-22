@@ -191,6 +191,15 @@ def test_recorded_selections_of_the_manuscript_are_complete() -> None:
         assert fixed is not None and len(set(fixed)) == 6 and all(n in areas for n in fixed)
     assert recorded_test.selection(recorded_test.FIXED, "2026-01", "VEHICLE", 6) is None
     assert recorded_test.selection(recorded_test.MONTHLY, "2026-09", "VEHICLE", 6) is None
+    # Delapan kelurahan: daftar tidak tercetak, jadi yang ada hanya KUTIPAN jumlah naskah.
+    assert recorded_test.quoted_total("VEHICLE", 8, "2025") == {
+        "model": 235, "wins": 6, "ties": 3, "losses": 3,
+    }  # fmt: skip
+    assert recorded_test.quoted_total("VEHICLE", 8, "2026") == {
+        "model": 119, "wins": 6, "ties": 1, "losses": 1,
+    }  # fmt: skip
+    assert recorded_test.quoted_total("VEHICLE", 6, "2025") is None
+    assert recorded_test.quoted_total("ALL_3C", 8, "2025") is None
     january = recorded_test.selection(recorded_test.MONTHLY, "2025-01", "VEHICLE", 6)
     assert january == [
         "Cipete Utara", "Gandaria Utara", "Cilandak Barat", "Kalibata", "Pulo", "Senayan",

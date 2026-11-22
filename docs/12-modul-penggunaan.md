@@ -30,9 +30,10 @@ Polres Metro Jakarta Selatan
   tercakup, cakupan, porsi luas, dan PAI tetap dihitung aplikasi dari data kejadian.
 - Hasilnya sama dengan naskah: AI tetap 149 dari 634 (23,50%), porsi luas 10,13%, PAI 2,32;
   empat kelurahan 139 (2025) dan 63 (Januari–Agustus 2026).
-- Untuk **delapan kelurahan** naskah tidak mencetak peringkat ke-7 dan ke-8, sehingga baris
-  model memakai keluaran model aplikasi (237 dan 103; naskah 235 dan 119). Keterangan di
-  bawah tabel menyebut sumber mana yang dipakai.
+- Untuk **delapan kelurahan** naskah tidak mencetak peringkat ke-7 dan ke-8. Baris model
+  menampilkan angka yang **dikutip dari naskah** Lampiran J bagian K (235 dan 119; unggul,
+  setara, lebih rendah 6/3/3 dan 6/1/1) dan bertanda *kutipan naskah*; aplikasi tidak
+  menghitungnya ulang. Keluaran model aplikasi sendiri (237 dan 103) disebut di bawah tabel.
 
 **Beranda dan lonceng mengikuti Lampiran M naskah revisi 7 (22 November 2026, catatan 194).**
 
