@@ -73,4 +73,26 @@ describe("papan bulanan — giliran tiap peran", () => {
       expect(produk(PEMBACA, status).cta).toBeNull();
     }
   });
+
+  it("menampilkan tiga kartu seperti Lampiran M naskah; pelaksanaan dilebur ke kartu Produk", () => {
+    const semua = [...STAF, ...KBO, ...WAKASAT, ...KASAT, ...PIMPINAN, "monthly_product:execute"];
+    const cards = buildCards({
+      permissions: [...semua, "evaluation:read", "bulletin:approve"],
+      month: "2026-01",
+      summary: { target_month: "2026-01", status: "DECIDED", priority_count: 2 },
+      product: {
+        items: [
+          { selected: true, actions: [{}, {}] },
+          { selected: true, actions: [{}] },
+          { selected: false, actions: [] },
+        ],
+      },
+      evaluation: null,
+      citizen: { draftBulletins: 0 },
+    } as unknown as Parameters<typeof buildCards>[0]);
+    expect(cards.map((card) => card.key)).toEqual(["produk", "evaluasi", "warga"]);
+    expect(cards[0]?.state).toBe("Ditetapkan · 2 kelurahan prioritas · 3 kegiatan tercatat");
+    expect(cards[0]?.cta).toBe("Catat kegiatan");
+    expect(cards[0]?.mine).toBe(true);
+  });
 });

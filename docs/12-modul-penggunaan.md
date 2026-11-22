@@ -23,6 +23,15 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Beranda dan lonceng mengikuti Lampiran M naskah revisi 7 (22 November 2026, catatan 194).**
+
+- **Tiga kartu "Bulan ini"**: Produk Bulanan, Evaluasi Cakupan, Persetujuan Warga. Kartu
+  *Kegiatan di kelurahan prioritas* dilebur ke kartu Produk: setelah ditetapkan, kartu itu
+  memuat jumlah kegiatan tercatat, dan bagi Fungsi serta Polsek tombolnya *Catat kegiatan*.
+- **Lonceng "Menunggu Anda" terbagi tiga**: permintaan bantuan darurat, laporan warga yang
+  belum diverifikasi, dan ulasan warga yang menunggu moderasi. Giliran produk bulanan dan
+  buletin tidak lagi tampil di lonceng; lihat kartu "Bulan ini" (berbingkai bila giliran Anda).
+
 **Evaluasi mengikuti naskah revisi 7 (22 November 2026, catatan 193).**
 
 - **PAI memakai luas BPS.** Luas kelurahan diambil dari naskah Lampiran J bagian M (28

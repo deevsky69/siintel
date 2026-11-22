@@ -100,3 +100,33 @@ describe("lonceng antrean pekerjaan", () => {
     expect(screen.getByText(/Itu bukan kekeliruan/)).toBeDefined();
   });
 });
+
+describe("lonceng mengikuti Lampiran M naskah revisi 7", () => {
+  it("hanya memuat darurat, laporan warga, dan ulasan; jumlahnya dihitung ulang", async () => {
+    const { bellFeed } = await import("@/lib/notifications-shape");
+    const group = (kind: string, total: number) => ({
+      kind,
+      title: kind,
+      action: "Buka",
+      href: "/ops",
+      total,
+      items: [],
+    });
+    const feed = bellFeed({
+      reference_time: "2026-01-01T00:00:00+07:00",
+      demo_clock: true,
+      role: "Administrator",
+      total: 12,
+      groups: [
+        group("PANIC", 1),
+        group("MONTHLY_PRODUCT", 1),
+        group("BULLETIN", 5),
+        group("CITIZEN_REPORT", 3),
+        group("REVIEW", 2),
+      ],
+      basis: "",
+    });
+    expect(feed.groups.map((item) => item.kind)).toEqual(["PANIC", "CITIZEN_REPORT", "REVIEW"]);
+    expect(feed.total).toBe(6);
+  });
+});

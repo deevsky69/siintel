@@ -46,3 +46,19 @@ export function urgentGroups(feed: NotificationFeed | null): NotificationGroup[]
       : Boolean(group.urgent) && (group.urgent_total ?? 0) > 0,
   );
 }
+
+/**
+ * Isi lonceng "Menunggu Anda" — naskah Taskap revisi 7, Lampiran M butir 4: daftar terbagi
+ * TIGA, yaitu permintaan bantuan darurat, laporan warga yang belum diverifikasi, dan ulasan
+ * warga yang menunggu moderasi. Giliran produk bulanan dan buletin tidak tampil di lonceng;
+ * keduanya tampil pada kartu "Bulan ini" di Beranda (22 November 2026, catatan 194).
+ * `GET /notifications` sendiri tidak berubah.
+ */
+export const BELL_KINDS = ["PANIC", "CITIZEN_REPORT", "REVIEW"] as const;
+
+export function bellFeed(feed: NotificationFeed): NotificationFeed {
+  const groups = feed.groups.filter((group) =>
+    (BELL_KINDS as readonly string[]).includes(group.kind),
+  );
+  return { ...feed, groups, total: groups.reduce((sum, group) => sum + group.total, 0) };
+}

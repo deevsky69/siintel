@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/shell/sidebar";
 import { getProfile } from "@/lib/dashboard";
 import { countAwaitingDecision } from "@/lib/monthly-products";
 import { getNotifications } from "@/lib/notifications";
+import { bellFeed } from "@/lib/notifications-shape";
 
 /**
  * Shell untuk seluruh halaman aplikasi.
@@ -38,7 +39,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <ShellFrame
       name={profile.full_name ?? profile.username}
       roleName={profile.role}
-      notifications={feed ? <NotificationBell feed={feed} /> : null}
+      notifications={feed ? <NotificationBell feed={bellFeed(feed)} /> : null}
       sidebar={<Sidebar permissions={profile.permissions} pendingDecisions={pendingDecisions} />}
     >
       <PanicBanner feed={feed} />
