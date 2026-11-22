@@ -196,6 +196,5 @@ Yang masih berbeda setelah ini, dan tidak dapat diselesaikan lewat penyuntingan 
   pada peta, status "pengecekan tertunda", Bagops sebagai penerima) — dibiarkan apa adanya di
   naskah karena keputusannya (membangun fitur atau mengubah naskah) milik pemilik proyek.
 - Gambar D.11 dan D.12 tidak diganti; isinya tidak berubah.
-- Kartu "Persetujuan warga" pada Gambar D.1 masih bertulis "imbauan bulanan otomatis": teks itu
-  keliru sejak persetujuan Humas dan sudah dibetulkan di kode pada perubahan yang sama, tetapi
-  gambar diambil sebelum pembetulan itu di-deploy.
+- Gambar D.1 diambil ulang setelah pembetulan teks kartu "Persetujuan warga" di-deploy
+  (22 November 2026), sehingga tidak lagi memuat tulisan "imbauan bulanan otomatis".
