@@ -219,6 +219,28 @@ export function VehicleForm() {
           {state.message}
         </p>
       ) : null}
+      {state.status === "pending" ? (
+        <section
+          className="mt-6 flex gap-3.5 border border-[#FDE68A] bg-[#FFFBEB] p-5"
+          aria-live="polite"
+        >
+          <span
+            className="inline-flex h-10 w-10 flex-none items-center justify-center bg-[#FEF3C7] text-[#92400E]"
+            aria-hidden="true"
+          >
+            …
+          </span>
+          <div className="min-w-0">
+            <h3 className="text-base font-bold text-[#92400E]">Pengecekan tertunda</h3>
+            <p className="mt-1 text-sm leading-relaxed text-[#92400E]">
+              Sumber data sedang tidak dapat dijangkau, sehingga “{state.query}” belum dapat
+              diperiksa. Ini <b>bukan</b> berarti kendaraan itu tidak tercatat. Coba lagi beberapa
+              saat, dan jangan lanjutkan transaksi sebelum pemeriksaan berhasil atau dikonfirmasi ke
+              Samsat/Polsek.
+            </p>
+          </div>
+        </section>
+      ) : null}
       {state.status === "done" ? (
         <section
           className={`mt-6 flex gap-3.5 p-5 ${state.data.found ? "border border-[#FECACA] bg-[#FEF2F2]" : "warga-ok"}`}

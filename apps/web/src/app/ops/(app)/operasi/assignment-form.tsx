@@ -29,6 +29,7 @@ const FUNCTION_LABELS: Record<string, string> = {
   INTELKAM: "Intelkam",
   RESKRIM: "Reskrim",
   LANTAS: "Lantas",
+  BAGOPS: "Bagops",
 };
 
 const UNIT_STATUS_LABELS: Record<string, string> = {

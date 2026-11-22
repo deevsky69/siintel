@@ -172,6 +172,10 @@ export type AreaHistory = {
   total_incidents: number;
   date_from: string | null;
   date_to: string | null;
+  /** Laporan warga terverifikasi tanpa padanan resmi — di luar hitungan kejadian resmi. */
+  additional_verified: number;
+  /** Saat data kejadian wilayah ini terakhir dimuat. */
+  data_updated_at: string | null;
   by_threat_type: { threat_type: string; incidents: number }[];
 };
 

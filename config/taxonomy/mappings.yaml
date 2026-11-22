@@ -187,6 +187,9 @@ mappings:
     Intelkam: INTELKAM
     Reskrim: RESKRIM
     Lantas: LANTAS
+    # 22 November 2026 (catatan 191): Bagops adalah pengguna produk pada naskah Taskap revisi
+    # (Gambar 4.3; Lampiran K huruf I: Kabagops mengoordinasikan tindak lanjut keputusan).
+    Bagops: BAGOPS
 
   feedback_type:
     Keluhan: COMPLAINT

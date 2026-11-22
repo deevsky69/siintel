@@ -450,6 +450,18 @@ export function DistrictDetail({
             </ul>
           </>
         )}
+        {/* Naskah Lampiran K huruf F: kejadian tambahan terverifikasi dan waktu pembaruan.
+            Ditulis terpisah supaya tidak terbaca sebagai bagian dari hitungan resmi. */}
+        <p className="mt-3 border-t border-base-800 pt-2 text-2xs leading-relaxed text-ink-muted">
+          Kejadian tambahan terverifikasi (laporan warga tanpa padanan resmi):{" "}
+          <span className="font-mono font-semibold text-ink">
+            {history.additional_verified ?? 0}
+          </span>{" "}
+          — di luar hitungan di atas.
+          {history.data_updated_at
+            ? ` Data kejadian terakhir dimuat ${formatDate(history.data_updated_at)}.`
+            : ""}
+        </p>
       </section>
 
       <section className={CARD}>

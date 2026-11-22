@@ -23,6 +23,20 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Tiga butir Lampiran K naskah ditambahkan (22 November 2026, catatan 191).**
+
+- **Kejadian tambahan terverifikasi pada panel wilayah.** Di **Wilayah → Peta**, kartu *Riwayat
+  Kejadian* kini memuat satu baris di bawah hitungan resmi: jumlah *kejadian tambahan
+  terverifikasi* — laporan warga yang sudah diverifikasi dan diputuskan tanpa padanan resmi di
+  Mutu Data — beserta tanggal data kejadian terakhir dimuat. Angka itu berdiri sendiri dan
+  tidak dijumlahkan ke kejadian resmi.
+- **Bagops sebagai fungsi.** Pilihan fungsi pada **Sistem → Manajemen Pengguna** bertambah
+  *Bagops*, sehingga akun berperan Fungsi dapat ditugaskan ke Bagops dan mencatat tindak lanjut
+  di kelurahan prioritas seperti fungsi pelaksana lain.
+- **Status "Pengecekan tertunda" pada Cek Kendaraan.** Bila sumber data tidak dapat dijangkau,
+  halaman warga menampilkan kotak kuning *Pengecekan tertunda* — bukan "tidak tercatat" — dan
+  meminta warga mencoba lagi atau mengonfirmasi ke Samsat/Polsek.
+
 **Angka model 86 dan ringkasan wilayah lewat Humas (21 November 2026, catatan 189).**
 
 - **Hasil model Januari–Agustus 2026 kini 86 dari 483**, sama dengan Lampiran J naskah; enam

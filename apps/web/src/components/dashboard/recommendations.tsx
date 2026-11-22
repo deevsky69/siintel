@@ -7,6 +7,7 @@ const FUNCTION_LABEL: Record<string, string> = {
   INTELKAM: "Intelkam",
   RESKRIM: "Reskrim",
   LANTAS: "Lantas",
+  BAGOPS: "Bagops",
 };
 
 export function RecommendationPanel({

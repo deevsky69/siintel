@@ -13,6 +13,8 @@ export type TrackState =
 export type VehicleState =
   | { status: "idle" }
   | { status: "done"; data: VehicleCheck; query: string }
+  /** Sumber data tidak dapat dijangkau: pengecekan TERTUNDA, bukan "tidak tercatat". */
+  | { status: "pending"; query: string }
   | { status: "error"; message: string };
 
 async function clientHeaders(): Promise<Record<string, string>> {
@@ -60,6 +62,10 @@ export async function checkVehicle(_previous: VehicleState, form: FormData): Pro
       cache: "no-store",
     });
     const payload = await response.json().catch(() => ({}));
+    // Naskah Taskap revisi, Lampiran K huruf H: "Saat sumber tidak tersedia, layanan
+    // menampilkan status pengecekan tertunda." Galat server (5xx) dan jaringan berarti
+    // sumbernya tidak terjangkau — bukan bahwa kendaraan itu tidak tercatat.
+    if (response.status >= 500) return { status: "pending", query: plat || rangka };
     if (!response.ok) {
       return {
         status: "error",
@@ -68,6 +74,6 @@ export async function checkVehicle(_previous: VehicleState, form: FormData): Pro
     }
     return { status: "done", data: payload as VehicleCheck, query: plat || rangka };
   } catch {
-    return { status: "error", message: "Server tidak dapat dihubungi." };
+    return { status: "pending", query: plat || rangka };
   }
 }
