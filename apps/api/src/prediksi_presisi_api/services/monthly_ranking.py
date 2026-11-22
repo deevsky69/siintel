@@ -41,7 +41,7 @@ from sqlalchemy.orm import Session
 
 from ..models import CrimeIncident, Location, MonthlyRanking, MonthlyRankingRow
 from ..seeding.paths import REPO_ROOT
-from . import clock, config_cache, ikw, visibility
+from . import clock, config_cache, ikw, kelurahan_area, visibility
 from . import monthly_model as model
 from .risk_engine import _known_by
 
@@ -82,6 +82,8 @@ class RankingConfig:
     model: model.ModelParams
     guard_months: int
     guard_min_months: int
+    guard_min_margin_pct: float
+    guard_min_pai: float
     guard_fallback: str
     default_top_n: int
 
@@ -118,6 +120,8 @@ def load_config() -> RankingConfig:
         model=model.ModelParams.from_config(raw["model"]),
         guard_months=int(raw["guard"]["months"]),
         guard_min_months=int(raw["guard"]["min_months"]),
+        guard_min_margin_pct=float(raw["guard"].get("min_margin_pct", 0.0)),
+        guard_min_pai=float(raw["guard"].get("min_pai", 0.0)),
         guard_fallback=str(raw["guard"]["fallback"]),
         default_top_n=int((raw.get("evaluation") or {}).get("default_top_n", 6)),
     )
@@ -578,6 +582,7 @@ def operational(
     methods = [config.default_method, *config.comparators()]
     covered = dict.fromkeys(methods, 0)
     total = 0
+    shares: list[float | None] = []
     try:
         for month in months:
             actual = {name: history.count(name, month, known_until) for name in history.areas}
@@ -592,6 +597,8 @@ def operational(
                     continue
                 if method in covered:
                     covered[method] += sum(actual[name] for name in chosen)
+                if method == config.default_method:
+                    shares.append(kelurahan_area.share(chosen))
     except RankingError as error:
         return MethodChoice(fallback, f"{error} Usulan memakai peta historis.", evidence)
     evidence["actual_total"] = total
@@ -602,21 +609,55 @@ def operational(
     )
     evidence["best_comparator"] = best
     mine = covered[config.default_method]
-    if mine > covered[best]:
+    # Naskah revisi 7 sasaran 3.3.1: selisih cakupan dalam poin persen DAN PAI model.
+    margin = round((mine - covered[best]) / total * 100, 2) if total else None
+    share = sum(s for s in shares if s is not None) / len(shares) if shares else None
+    if not shares or any(s is None for s in shares):
+        share = None
+    model_pai = round((mine / total) / share, 2) if total and share else None
+    evidence["margin_pct"] = margin
+    evidence["model_pai"] = model_pai
+    evidence["criterion"] = criterion_config()
+    summary = (
+        f"Pada {len(months)} siklus uji terakhir model mencakup {mine} dari {total} kejadian; "
+        f"pembanding terbaik ({config.methods[best]['label']}) {covered[best]}; selisih "
+        f"{_id(margin)} poin persen; PAI model {_id(model_pai)}."
+    )
+    enough_margin = margin is not None and margin >= config.guard_min_margin_pct
+    enough_pai = model_pai is not None and model_pai >= config.guard_min_pai
+    evidence["met"] = bool(enough_margin and enough_pai)
+    if enough_margin and enough_pai:
         return MethodChoice(
             config.default_method,
-            f"Pada {len(months)} bulan uji terakhir model mencakup {mine} dari {total} kejadian, "
-            f"lebih tinggi daripada pembanding terbaik "
-            f"({config.methods[best]['label']}: {covered[best]}).",
+            f"{summary} Memenuhi ambang (selisih sekurang-kurangnya "
+            f"{_id(config.guard_min_margin_pct)} poin persen dan PAI sekurang-kurangnya "
+            f"{_id(config.guard_min_pai)}), sehingga model menjadi dasar prioritas.",
             evidence,
         )
     return MethodChoice(
         best,
-        f"Pada {len(months)} bulan uji terakhir model mencakup {mine} dari {total} kejadian, "
-        f"tidak lebih tinggi daripada {config.methods[best]['label']} ({covered[best]}). "
-        "Usulan memakai peta historis sampai model kembali unggul.",
+        f"{summary} Belum memenuhi ambang (selisih sekurang-kurangnya "
+        f"{_id(config.guard_min_margin_pct)} poin persen dan PAI sekurang-kurangnya "
+        f"{_id(config.guard_min_pai)}), sehingga peringkat historis terbaik dipakai sebagai "
+        "dasar prioritas sementara model diperbaiki.",
         evidence,
     )
+
+
+def _id(value: float | None) -> str:
+    """Angka dengan koma desimal; 'tidak dapat dihitung' bila kosong."""
+    return "tidak dapat dihitung" if value is None else f"{value:.2f}".replace(".", ",")
+
+
+def criterion_config() -> dict[str, Any]:
+    """Ambang pemakaian model (naskah revisi 7 sasaran 3.3.1) untuk ditampilkan apa adanya."""
+    config = load_config()
+    return {
+        "months": config.guard_months,
+        "min_margin_pct": config.guard_min_margin_pct,
+        "min_pai": config.guard_min_pai,
+        "source": "Naskah Taskap revisi 7, sasaran 3.3.1 dan Lampiran L",
+    }
 
 
 def model_card(session: Session, scope: str | None = None) -> dict[str, Any] | None:

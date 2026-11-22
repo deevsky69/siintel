@@ -7,8 +7,13 @@ jumlah yang ditetapkan Pimpinan bila ada, selain itu `evaluation.default_top_n`.
 seluruh pembanding peta historis dihitung dengan N dan batas data yang SAMA.
 
 PAI (Predictive Accuracy Index, Chainey dkk. 2008) = porsi kejadian yang tercakup dibagi
-porsi LUAS kelurahan yang ditandai. Luas dari config/ranking/kelurahan-area.yaml —
-perkiraan dari poligon peta, PROPOSED sampai luas resmi tersedia.
+porsi LUAS kelurahan yang ditandai terhadap luas wilayah hukum. Luas dari
+config/ranking/kelurahan-area.yaml — luas BPS menurut naskah Taskap revisi 7 Lampiran J
+bagian M (22 November 2026, catatan 193). Kelurahan pilihan yang luasnya belum tercantum
+membuat PAI metode itu tidak dihitung, sama seperti naskah.
+
+PEMBANDING ACAK (naskah Lampiran J bagian M): nilai harapan cakupan bila N dari K kelurahan
+dipilih acak = N/K; "kelipatan terhadap acak" = cakupan metode dibagi nilai itu.
 
 UJI HISTORIS (`backtest`). Seluruh bulan di luar masa latih model, satu per satu: setiap
 metode memilih N kelurahan dari yang sudah diketahui sebelum bulan itu, lalu dicocokkan
@@ -27,7 +32,6 @@ seperti evaluasi mundur — hanya untuk pencocokan, bukan layar.
 from __future__ import annotations
 
 from datetime import date, timedelta
-from functools import lru_cache
 from math import comb
 from typing import Any
 
@@ -35,20 +39,18 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..models import CrimeIncident, Location, MonthlyProduct, MonthlyRanking
-from ..seeding.paths import REPO_ROOT
-from . import config_cache, visibility
+from . import kelurahan_area, visibility
 from . import monthly_model as model
 from . import monthly_product as products
 from . import monthly_ranking as ranking
-
-AREA_FILE = REPO_ROOT / "config" / "ranking" / "kelurahan-area.yaml"
 
 BASIS = (
     "Cakupan = kejadian aktual bulan sasaran di N kelurahan teratas / seluruh kejadian aktual "
     "yang dapat dipetakan pada cakupan yang sama. N = jumlah yang ditetapkan Pimpinan, atau "
     "default_top_n. Model dan pembanding peta historis memakai N dan batas data yang sama. "
-    "PAI = porsi kejadian tercakup / porsi luas kelurahan yang ditandai; luas kelurahan adalah "
-    "perkiraan dari poligon peta (PROPOSED)."
+    "PAI = porsi kejadian tercakup / porsi luas kelurahan yang ditandai terhadap luas wilayah "
+    "hukum; luas kelurahan dari BPS (naskah Lampiran J bagian M). PAI tidak dihitung bila ada "
+    "kelurahan pilihan yang luasnya belum tercantum, atau bila angka dibatasi ke satu Polsek."
 )
 
 BACKTEST_BASIS = (
@@ -58,7 +60,9 @@ BACKTEST_BASIS = (
     "riwayatnya yang diperbarui tiap bulan. Uji tanda satu arah menghitung peluang memperoleh "
     "sekurangnya sebanyak itu bulan unggul bila model dan pembanding sebenarnya setara "
     "(bulan seri tidak dihitung). Ini ketepatan penunjukan wilayah, bukan jumlah kejahatan "
-    "yang dicegah."
+    "yang dicegah. Pembanding acak = nilai harapan cakupan bila N dari seluruh kelurahan "
+    "dipilih acak tiap bulan (N/K); kelipatan terhadap acak = cakupan metode dibagi nilai itu. "
+    "PAI periode = cakupan periode dibagi rata-rata bulanan porsi luas kelurahan pilihan."
 )
 
 
@@ -66,22 +70,33 @@ def _default_top_n() -> int:
     return ranking.load_config().default_top_n
 
 
-@lru_cache(maxsize=1)
 def kelurahan_areas() -> dict[str, float]:
-    """Luas kelurahan (km²); kosong bila berkasnya belum dibangkitkan."""
-    if not AREA_FILE.exists():
-        return {}
-    raw: dict[str, Any] = config_cache.load_yaml(AREA_FILE)
-    return {str(name): float(value) for name, value in (raw.get("kelurahan") or {}).items()}
+    """Luas kelurahan (km²) yang tercantum pada naskah."""
+    return kelurahan_area.areas()
 
 
-def _area_share(selected: list[str], universe: list[str]) -> float | None:
-    """Porsi luas kelurahan pilihan terhadap seluruh kelurahan yang dinilai."""
-    areas = kelurahan_areas()
-    if not areas or any(name not in areas for name in universe):
+def _area_share(selected: list[str], whole: bool = True) -> float | None:
+    """Porsi luas kelurahan pilihan terhadap luas wilayah hukum; `None` bila tidak dapat
+    dihitung (lihat `kelurahan_area.share`). `whole=False`: angka dibatasi ke satu Polsek."""
+    return kelurahan_area.share(selected, whole_jurisdiction=whole)
+
+
+def random_baseline(top_n: int, kelurahan_total: int, total: int) -> dict[str, Any]:
+    """Nilai harapan cakupan bila `top_n` dari `kelurahan_total` kelurahan dipilih acak."""
+    share = top_n / kelurahan_total if kelurahan_total else 0.0
+    return {
+        "top_n": top_n,
+        "kelurahan_total": kelurahan_total,
+        "coverage_pct": round(share * 100, 2),
+        "expected_covered": round(total * share, 1),
+    }
+
+
+def vs_random(coverage_pct: float | None, top_n: int, kelurahan_total: int) -> float | None:
+    """Kelipatan cakupan terhadap pemilihan acak."""
+    if coverage_pct is None or not kelurahan_total or not top_n:
         return None
-    total = sum(areas[name] for name in universe)
-    return sum(areas[name] for name in selected) / total if total else None
+    return round(coverage_pct / (top_n / kelurahan_total * 100), 2)
 
 
 def pai(covered: int, total: int, area_share: float | None) -> float | None:
@@ -144,11 +159,12 @@ def _actual_by_kelurahan(
 
 
 def _coverage(
-    selected: list[str], actual: dict[str, int], universe: list[str] | None = None
+    selected: list[str], actual: dict[str, int], whole: bool | None = None
 ) -> dict[str, Any]:
+    """`whole`: True = seluruh wilayah hukum, False = dibatasi satu Polsek, None = tanpa PAI."""
     total = sum(actual.values())
     covered = sum(actual.get(name, 0) for name in selected)
-    share = _area_share(selected, universe) if universe else None
+    share = _area_share(selected, whole) if whole is not None else None
     return {
         "selected": selected,
         "covered": covered,
@@ -214,7 +230,9 @@ def evaluate(session: Session, month: Any, polsek: str | None = None) -> dict[st
                 "model_version": row.model_version,
                 "top_n": top_n,
                 "unmappable": unmapped,
-                **_coverage(within([r.kelurahan for r in row.rows[:top_n]]), actual, universe),
+                **_coverage(
+                    within([r.kelurahan for r in row.rows[:top_n]]), actual, polsek is None
+                ),
             }
         )
         # Pembanding: model dan peta historis lain pada N dan batas data yang sama, bila
@@ -241,7 +259,7 @@ def evaluate(session: Session, month: Any, polsek: str | None = None) -> dict[st
                     "model_version": None,
                     "top_n": top_n,
                     "unmappable": unmapped,
-                    **_coverage(within(chosen), actual, universe),
+                    **_coverage(within(chosen), actual, polsek is None),
                 }
             )
 
@@ -258,7 +276,7 @@ def evaluate(session: Session, month: Any, polsek: str | None = None) -> dict[st
         decision = {
             "status": product.status,
             "priority_count": product.priority_count,
-            **_coverage([item.kelurahan for item in decided], actual, universe),
+            **_coverage([item.kelurahan for item in decided], actual, polsek is None),
             "items": [
                 {
                     "kelurahan": item.kelurahan,
@@ -291,9 +309,16 @@ def evaluate(session: Session, month: Any, polsek: str | None = None) -> dict[st
         quality = {"analyst": tally, "reasons": reasons, "returned": returns}
         work = products.work_summary(product)
 
+    for entry in methods:
+        entry["vs_random"] = vs_random(entry["coverage_pct"], top_n, len(universe))
     return {
         "target_month": start.isoformat()[:7],
         "top_n": top_n,
+        "kelurahan_total": len(universe),
+        "random_coverage_pct": random_baseline(top_n, len(universe), 0)["coverage_pct"]
+        if universe
+        else None,
+        "area_source": kelurahan_area.source(),
         "methods": methods,
         "decision": decision,
         "quality": quality,
@@ -355,7 +380,7 @@ def backtest(
             results[method] = {
                 "selected": chosen,
                 "covered": sum(actual[name] for name in chosen),
-                "area_share": _area_share(chosen, universe),
+                "area_share": _area_share(chosen, polsek is None),
             }
         monthly.append(
             {
@@ -385,6 +410,9 @@ def backtest(
                     "coverage_pct": round(covered / total * 100, 2) if total else None,
                     "area_pct": round(share * 100, 2) if share is not None else None,
                     "pai": pai(covered, total, share),
+                    "vs_random": vs_random(
+                        round(covered / total * 100, 2) if total else None, top_n, len(universe)
+                    ),
                 }
             )
         tests: list[dict[str, Any]] = []
@@ -394,14 +422,21 @@ def backtest(
                 if entry["method"] == primary:
                     continue
                 wins = losses = ties = 0
+                pai_wins: int | None = 0
                 for row in rows:
-                    gap = (
-                        row["methods"][primary]["covered"]
-                        - row["methods"][entry["method"]]["covered"]
-                    )
+                    mine, theirs = row["methods"][primary], row["methods"][entry["method"]]
+                    gap = mine["covered"] - theirs["covered"]
                     wins += gap > 0
                     losses += gap < 0
                     ties += gap == 0
+                    # PAI bulanan: hanya bila porsi luas keduanya dapat dihitung pada SEMUA
+                    # bulan periode itu; selain itu hitungan "unggul" akan menyesatkan.
+                    ours = pai(mine["covered"], row["total"], mine["area_share"])
+                    other = pai(theirs["covered"], row["total"], theirs["area_share"])
+                    if mine["area_share"] is None or theirs["area_share"] is None:
+                        pai_wins = None
+                    elif pai_wins is not None:
+                        pai_wins += (ours or 0.0) > (other or 0.0)
                 tests.append(
                     {
                         "against": entry["method"],
@@ -410,9 +445,16 @@ def backtest(
                         "losses": losses,
                         "ties": ties,
                         "p_value": sign_test(wins, losses),
+                        "pai_wins": pai_wins,
                     }
                 )
-        return {"label": label, "months": len(rows), "methods": out, "sign_tests": tests}
+        return {
+            "label": label,
+            "months": len(rows),
+            "methods": out,
+            "random": random_baseline(top_n, len(universe), total),
+            "sign_tests": tests,
+        }
 
     periods: list[dict[str, Any]] = []
     years = sorted({row["month"][:4] for row in monthly})
@@ -440,6 +482,7 @@ def backtest(
     if fixed_months and card["available"]:
         total = 0
         covered = dict.fromkeys((name for name, _ in fixed_methods), 0)
+        fixed_shares: dict[str, list[float | None]] = {name: [] for name, _ in fixed_methods}
         for month in fixed_months:
             actual = {name: history.count(name, month, date.max) for name in universe}
             total += sum(actual.values())
@@ -449,25 +492,34 @@ def backtest(
                     if name == "ANNUAL"
                     else ranking.fixed_scores(history, name, month, config)
                 )
-                covered[name] += sum(
-                    actual[k] for k in ranking.order(values)[:top_n] if k in actual
-                )
-        fixed = [
-            {
-                "method": name,
-                "method_label": label,
-                "covered": covered[name],
-                "total": total,
-                "coverage_pct": round(covered[name] / total * 100, 2) if total else None,
-            }
-            for name, label in fixed_methods
-        ]
+                picked = [k for k in ranking.order(values)[:top_n] if k in actual]
+                covered[name] += sum(actual[k] for k in picked)
+                fixed_shares[name].append(_area_share(picked, polsek is None))
+        for name, label in fixed_methods:
+            shares = fixed_shares[name]
+            share = (
+                sum(s for s in shares if s is not None) / len(shares)
+                if shares and all(s is not None for s in shares)
+                else None
+            )
+            coverage = round(covered[name] / total * 100, 2) if total else None
+            fixed.append(
+                {
+                    "method": name,
+                    "method_label": label,
+                    "covered": covered[name],
+                    "total": total,
+                    "coverage_pct": coverage,
+                    "area_pct": round(share * 100, 2) if share is not None else None,
+                    "pai": pai(covered[name], total, share),
+                    "vs_random": vs_random(coverage, top_n, len(universe)),
+                }
+            )
 
     for row in monthly:
         for entry in row["methods"].values():
             share = entry.pop("area_share")
             entry["area_pct"] = round(share * 100, 2) if share is not None else None
-    areas = kelurahan_areas()
     return {
         "scope": scope,
         "top_n": top_n,
@@ -485,8 +537,8 @@ def backtest(
             "methods": fixed,
         },
         "monthly": monthly,
-        "area_source": "config/ranking/kelurahan-area.yaml (perkiraan dari poligon peta)"
-        if areas
-        else None,
+        "area_source": kelurahan_area.source(),
+        "area_total_km2": kelurahan_area.total_km2(),
+        "criterion": ranking.criterion_config(),
         "basis": BACKTEST_BASIS,
     }

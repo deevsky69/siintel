@@ -43,8 +43,11 @@ export default async function EvaluasiBulananPage({
     getMonthlyEvaluation(month),
     getBacktest(scope, topN).catch(() => null),
   ]);
-  const pct = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}%`);
-  const num = (value: number | null) => (value === null ? "—" : value.toFixed(2));
+  // Dua desimal dengan koma, seperti tabel naskah (29,97%; 3,05; 3,25×).
+  const koma = (value: number, digits = 2) => value.toFixed(digits).replace(".", ",");
+  const pct = (value: number | null) => (value === null ? "—" : `${koma(value)}%`);
+  const num = (value: number | null) => (value === null ? "—" : koma(value));
+  const kali = (value: number | null) => (value === null ? "—" : `${koma(value)}×`);
   const menit = (value: number | null) => (value === null ? "belum tercatat" : `${value} menit`);
   const waktu = (iso: string | null) =>
     iso === null
@@ -83,7 +86,9 @@ export default async function EvaluasiBulananPage({
                 <th className="py-1 pr-2">Cakupan data</th>
                 <th className="py-1 pr-2 text-right">Tercakup</th>
                 <th className="py-1 pr-2 text-right">Cakupan</th>
+                <th className="py-1 pr-2 text-right">Porsi luas</th>
                 <th className="py-1 pr-2 text-right">PAI</th>
+                <th className="py-1 pr-2 text-right">Kelipatan acak</th>
                 <th className="py-1 pr-2">Kelurahan ({result.top_n})</th>
               </tr>
             </thead>
@@ -108,7 +113,13 @@ export default async function EvaluasiBulananPage({
                     {pct(row.coverage_pct)}
                   </td>
                   <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                    {pct(row.area_pct)}
+                  </td>
+                  <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
                     {num(row.pai)}
+                  </td>
+                  <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                    {kali(row.vs_random)}
                   </td>
                   <td className="py-1.5 pr-2 text-ink-faint">{row.selected.join(", ")}</td>
                 </tr>
@@ -119,6 +130,11 @@ export default async function EvaluasiBulananPage({
         {result.methods[0] ? (
           <p className="mt-2 text-2xs text-ink-faint">
             {result.methods[0].unmappable} kejadian bulan ini belum dapat dipetakan ke kelurahan.
+            {result.random_coverage_pct !== null
+              ? ` Pembanding acak: ${result.top_n} dari ${result.kelurahan_total} kelurahan dipilih acak rata-rata mencakup ${pct(result.random_coverage_pct)} kejadian.`
+              : ""}{" "}
+            PAI kosong berarti ada kelurahan pilihan yang luas BPS-nya belum tercantum, atau angka
+            dibatasi ke satu Polsek.
           </p>
         ) : null}
       </Panel>
@@ -252,8 +268,11 @@ export default async function EvaluasiBulananPage({
                       <th className="py-1 pr-2">Metode</th>
                       <th className="py-1 pr-2 text-right">Tercakup</th>
                       <th className="py-1 pr-2 text-right">Cakupan</th>
+                      <th className="py-1 pr-2 text-right">Porsi luas</th>
                       <th className="py-1 pr-2 text-right">PAI</th>
+                      <th className="py-1 pr-2 text-right">Kelipatan acak</th>
                       <th className="py-1 pr-2 text-right">Model unggul–kalah–seri</th>
+                      <th className="py-1 pr-2 text-right">PAI model unggul</th>
                       <th className="py-1 pr-2 text-right">Uji tanda (p)</th>
                     </tr>
                   </thead>
@@ -273,17 +292,43 @@ export default async function EvaluasiBulananPage({
                             {pct(row.coverage_pct)}
                           </td>
                           <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                            {pct(row.area_pct)}
+                          </td>
+                          <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
                             {num(row.pai)}
+                          </td>
+                          <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                            {kali(row.vs_random)}
                           </td>
                           <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
                             {test ? `${test.wins}–${test.losses}–${test.ties}` : ""}
                           </td>
                           <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
-                            {test ? (test.p_value === null ? "—" : test.p_value.toFixed(3)) : ""}
+                            {test && test.pai_wins !== null
+                              ? `${test.pai_wins} dari ${period.months} bulan`
+                              : ""}
+                          </td>
+                          <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                            {test ? (test.p_value === null ? "—" : koma(test.p_value, 3)) : ""}
                           </td>
                         </tr>
                       );
                     })}
+                    <tr>
+                      <td className="py-1.5 pr-2 font-semibold text-ink">
+                        Acak {period.random.top_n} dari {period.random.kelurahan_total}
+                      </td>
+                      <td className="py-1.5 pr-2 text-right tabular-nums text-ink">
+                        {koma(period.random.expected_covered, 1)} / {period.methods[0]?.total ?? 0}
+                      </td>
+                      <td className="py-1.5 pr-2 text-right tabular-nums font-semibold text-ink">
+                        {pct(period.random.coverage_pct)}
+                      </td>
+                      <td className="py-1.5 pr-2 text-right text-ink-muted">–</td>
+                      <td className="py-1.5 pr-2 text-right text-ink-muted">–</td>
+                      <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">1,00×</td>
+                      <td colSpan={3} />
+                    </tr>
                   </tbody>
                 </table>
               ))}
@@ -294,6 +339,16 @@ export default async function EvaluasiBulananPage({
               <caption className="pb-1 text-left text-2xs uppercase tracking-wide text-ink-faint">
                 Skenario tetap · {backtest.fixed.span} · informasi berhenti pada akhir masa latih
               </caption>
+              <thead className="text-left text-2xs uppercase tracking-wide text-ink-faint">
+                <tr>
+                  <th className="py-1 pr-2">Metode</th>
+                  <th className="py-1 pr-2 text-right">Tercakup</th>
+                  <th className="py-1 pr-2 text-right">Cakupan</th>
+                  <th className="py-1 pr-2 text-right">Porsi luas</th>
+                  <th className="py-1 pr-2 text-right">PAI</th>
+                  <th className="py-1 pr-2 text-right">Kelipatan acak</th>
+                </tr>
+              </thead>
               <tbody className="divide-y divide-base-800">
                 {backtest.fixed.methods.map((row) => (
                   <tr key={row.method}>
@@ -304,10 +359,35 @@ export default async function EvaluasiBulananPage({
                     <td className="py-1.5 pr-2 text-right tabular-nums font-semibold text-ink">
                       {pct(row.coverage_pct)}
                     </td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                      {pct(row.area_pct)}
+                    </td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                      {num(row.pai)}
+                    </td>
+                    <td className="py-1.5 pr-2 text-right tabular-nums text-ink-muted">
+                      {kali(row.vs_random)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          ) : null}
+          <p className="mt-3 rounded border border-base-800 bg-base-850 p-2 text-2xs leading-relaxed text-ink-muted">
+            <span className="font-semibold text-ink">Ambang pemakaian model.</span> Rata-rata
+            cakupan AI dalam {backtest.criterion.months} siklus berturut-turut melampaui metode
+            historis terbaik sekurang-kurangnya {koma(backtest.criterion.min_margin_pct, 0)} poin
+            persen dengan PAI sekurang-kurangnya {koma(backtest.criterion.min_pai, 1)}; apabila
+            belum tercapai, peringkat historis terbaik dipakai sebagai dasar prioritas sementara
+            model diperbaiki. ({backtest.criterion.source}.) Penilaian untuk bulan sasaran tertentu
+            tampil pada halaman Peringkat.
+          </p>
+          {backtest.area_source ? (
+            <p className="mt-2 text-2xs text-ink-faint">
+              Luas kelurahan: {backtest.area_source}; luas wilayah hukum{" "}
+              {backtest.area_total_km2 === null ? "—" : koma(backtest.area_total_km2)} km². PAI
+              kosong berarti ada kelurahan pilihan yang luasnya belum tercantum.
+            </p>
           ) : null}
           <p className="mt-3 text-2xs text-ink-faint">
             {backtest.model.model_version

@@ -1,73 +1,43 @@
-# DIBANGKITKAN OLEH scripts/bangun-luas-kelurahan.py — JANGAN DISUNTING TANGAN.
+# Luas kelurahan (km²) untuk Predictive Accuracy Index — naskah Taskap revisi 7,
+# Lampiran J bagian M (22 November 2026, catatan 193). DISALIN DARI NASKAH, angka demi angka.
 #
-# Luas kelurahan (km²) untuk Predictive Accuracy Index. PERKIRAAN: dihitung dari
-# poligon peta yang sudah disederhanakan (OpenStreetMap, ODbL 1.0), bukan luas resmi.
-source: "OpenStreetMap lewat apps/web/src/lib/wilayah.generated.ts, diambil 2026-09-08"
-status: PROPOSED
-total_km2: 145.732
+# Sumber menurut naskah: BPS Kota Jakarta Selatan, Kecamatan Dalam Angka (luas menurut
+# Keputusan Gubernur Provinsi DKI Jakarta Nomor 171 Tahun 2007); luas wilayah hukum dari
+# Kota Jakarta Selatan Dalam Angka 2025.
+#
+# Naskah hanya mencantumkan 28 kelurahan yang pernah terpilih pada pengujian. Kelurahan lain
+# BELUM punya luas di sini: bila salah satunya terpilih, PAI metode itu TIDAK DIHITUNG —
+# sama dengan naskah — alih-alih memakai perkiraan dari sumber lain. Menambah kelurahan =
+# menambah baris dengan angka BPS-nya.
+source: "BPS Kota Jakarta Selatan, Kecamatan Dalam Angka (Kepgub DKI Jakarta 171/2007); naskah Taskap revisi 7 Lampiran J bagian M"
+status: FINAL
+total_km2: 144.75
 kelurahan:
-  "Bangka": 3.150  # Mampang Prapatan
-  "Bintaro": 4.597  # Pesanggrahan
-  "Bukit Duri": 1.098  # Tebet
-  "Ciganjur": 3.630  # Jagakarsa
-  "Cikoko": 0.705  # Pancoran
-  "Cilandak Barat": 5.918  # Cilandak
-  "Cilandak Timur": 3.847  # Pasar Minggu
-  "Cipedak": 4.107  # Jagakarsa
-  "Cipete Selatan": 2.414  # Cilandak
-  "Cipete Utara": 1.744  # Kebayoran Baru
-  "Cipulir": 1.712  # Kebayoran Lama
-  "Duren Tiga": 2.004  # Pancoran
-  "Gandaria Selatan": 1.361  # Cilandak
-  "Gandaria Utara": 1.546  # Kebayoran Baru
-  "Grogol Selatan": 2.873  # Kebayoran Lama
-  "Grogol Utara": 3.309  # Kebayoran Lama
-  "Guntur": 0.675  # Setiabudi
-  "Gunung": 1.422  # Kebayoran Baru
-  "Jagakarsa": 5.160  # Jagakarsa
-  "Jati Padang": 2.409  # Pasar Minggu
-  "Kalibata": 2.329  # Pancoran
-  "Karet": 0.984  # Setiabudi
-  "Karet Kuningan": 1.698  # Setiabudi
-  "Karet Semanggi": 0.928  # Setiabudi
-  "Kebagusan": 2.799  # Pasar Minggu
-  "Kebayoran Lama Selatan": 2.111  # Kebayoran Lama
-  "Kebayoran Lama Utara": 2.299  # Kebayoran Lama
-  "Kebon Baru": 1.264  # Tebet
-  "Kramat Pela": 1.291  # Kebayoran Baru
-  "Kuningan Barat": 0.963  # Mampang Prapatan
-  "Kuningan Timur": 2.216  # Setiabudi
-  "Lebak Bulus": 4.419  # Cilandak
-  "Lenteng Agung": 3.165  # Jagakarsa
-  "Mampang Prapatan": 0.811  # Mampang Prapatan
-  "Manggarai": 1.063  # Tebet
-  "Manggarai Selatan": 0.568  # Tebet
-  "Melawai": 1.268  # Kebayoran Baru
-  "Menteng Atas": 1.052  # Setiabudi
-  "Menteng Dalam": 2.468  # Tebet
-  "Pancoran": 1.416  # Pancoran
-  "Pasar Manggis": 0.765  # Setiabudi
-  "Pasar Minggu": 1.966  # Pasar Minggu
-  "Pejaten Barat": 3.070  # Pasar Minggu
-  "Pejaten Timur": 2.931  # Pasar Minggu
-  "Pela Mampang": 1.951  # Mampang Prapatan
-  "Pengadegan": 0.962  # Pancoran
-  "Pesanggrahan": 1.999  # Pesanggrahan
-  "Petogogan": 0.862  # Kebayoran Baru
-  "Petukangan Selatan": 2.140  # Pesanggrahan
-  "Petukangan Utara": 2.672  # Pesanggrahan
-  "Pondok Labu": 3.561  # Cilandak
-  "Pondok Pinang": 7.087  # Kebayoran Lama
-  "Pulo": 1.108  # Kebayoran Baru
-  "Ragunan": 4.788  # Pasar Minggu
-  "Rawa Barat": 0.643  # Kebayoran Baru
-  "Rawajati": 1.504  # Pancoran
-  "Selong": 1.445  # Kebayoran Baru
-  "Senayan": 1.474  # Kebayoran Baru
-  "Setiabudi": 0.674  # Setiabudi
-  "Srengseng Sawah": 5.657  # Jagakarsa
-  "Tanjung Barat": 3.613  # Jagakarsa
-  "Tebet Barat": 1.619  # Tebet
-  "Tebet Timur": 1.320  # Tebet
-  "Tegal Parang": 1.057  # Mampang Prapatan
-  "Ulujami": 2.071  # Pesanggrahan
+  "Bangka": 3.30  # Mampang Prapatan
+  "Bintaro": 4.55  # Pesanggrahan
+  "Cilandak Barat": 6.08  # Cilandak
+  "Cipedak": 3.97  # Jagakarsa
+  "Cipete Selatan": 2.33  # Cilandak
+  "Cipete Utara": 1.83  # Kebayoran Baru
+  "Cipulir": 1.95  # Kebayoran Lama
+  "Gandaria Utara": 1.52  # Kebayoran Baru
+  "Grogol Selatan": 2.85  # Kebayoran Lama
+  "Grogol Utara": 3.33  # Kebayoran Lama
+  "Jagakarsa": 4.85  # Jagakarsa
+  "Kalibata": 2.29  # Pancoran
+  "Kebayoran Lama Selatan": 2.57  # Kebayoran Lama
+  "Kebayoran Lama Utara": 1.78  # Kebayoran Lama
+  "Kramat Pela": 1.23  # Kebayoran Baru
+  "Lebak Bulus": 4.11  # Cilandak
+  "Lenteng Agung": 2.28  # Jagakarsa
+  "Mampang Prapatan": 0.78  # Mampang Prapatan
+  "Melawai": 1.25  # Kebayoran Baru
+  "Pondok Labu": 3.91  # Cilandak
+  "Pondok Pinang": 6.84  # Kebayoran Lama
+  "Pulo": 1.27  # Kebayoran Baru
+  "Ragunan": 5.05  # Pasar Minggu
+  "Rawa Barat": 0.69  # Kebayoran Baru
+  "Selong": 1.40  # Kebayoran Baru
+  "Senayan": 1.53  # Kebayoran Baru
+  "Srengseng Sawah": 6.75  # Jagakarsa
+  "Tanjung Barat": 3.65  # Jagakarsa

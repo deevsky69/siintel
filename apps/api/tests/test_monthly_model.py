@@ -152,10 +152,40 @@ def test_sign_test_and_pai() -> None:
     assert evaluation.pai(30, 0, 0.10) is None and evaluation.pai(30, 100, None) is None
 
 
-def test_area_file_covers_every_kelurahan_once() -> None:
+def test_area_file_holds_the_bps_areas_of_the_manuscript() -> None:
+    """Naskah revisi 7 Lampiran J bagian M: 28 kelurahan berluas BPS, wilayah hukum 144,75 km²."""
+    from prediksi_presisi_api.services import kelurahan_area
+
     areas = evaluation.kelurahan_areas()
-    assert len(areas) == 65 and all(value > 0 for value in areas.values())
-    assert 140 < sum(areas.values()) < 150  # Jakarta Selatan sekitar 145 km²
+    assert len(areas) == 28 and all(value > 0 for value in areas.values())
+    assert kelurahan_area.total_km2() == 144.75
+    assert areas["Cipete Utara"] == 1.83 and areas["Pondok Pinang"] == 6.84
+    assert areas["Rawa Barat"] == 0.69 and areas["Srengseng Sawah"] == 6.75
+    # Januari 2025 pada naskah: enam kelurahan pilihan AI.
+    chosen = ["Cipete Utara", "Gandaria Utara", "Cilandak Barat", "Kalibata", "Pulo", "Senayan"]
+    share = kelurahan_area.share(chosen)
+    assert share == pytest.approx((1.83 + 1.52 + 6.08 + 2.29 + 1.27 + 1.53) / 144.75)
+    # Kelurahan tanpa luas pada naskah, atau angka sebatas satu Polsek: PAI tidak dihitung.
+    assert kelurahan_area.share([*chosen[:5], "Karet Kuningan"]) is None
+    assert kelurahan_area.share(chosen, whole_jurisdiction=False) is None
+    assert kelurahan_area.share([]) is None
+
+
+def test_random_baseline_matches_the_manuscript() -> None:
+    """Lampiran J bagian M: acak 6 dari 65 = 9,23%; 58,5 dari 634 dan 44,6 dari 483."""
+    assert evaluation.random_baseline(6, 65, 634) == {
+        "top_n": 6,
+        "kelurahan_total": 65,
+        "coverage_pct": 9.23,
+        "expected_covered": 58.5,
+    }
+    assert evaluation.random_baseline(6, 65, 483)["expected_covered"] == 44.6
+    # Kelipatan terhadap acak: 29,97% → 3,25×; 17,81% → 1,93×; 16,36% → 1,77×.
+    assert evaluation.vs_random(29.97, 6, 65) == 3.25
+    assert evaluation.vs_random(27.76, 6, 65) == 3.01
+    assert evaluation.vs_random(17.81, 6, 65) == 1.93
+    assert evaluation.vs_random(16.36, 6, 65) == 1.77
+    assert evaluation.vs_random(None, 6, 65) is None
 
 
 def test_guard_falls_back_until_the_model_is_tested_and_reports_evidence(
@@ -173,9 +203,18 @@ def test_guard_falls_back_until_the_model_is_tested_and_reports_evidence(
     covered = later.evidence["covered"]
     assert set(covered) == set(config.methods)
     best = max(v for k, v in covered.items() if k != "MODEL")
-    # Aturan naskah: model hanya dipakai bila LEBIH tepat daripada pembanding terbaik.
-    assert (later.method == "MODEL") == (covered["MODEL"] > best)
-    assert len(later.evidence["months"]) == 12
+    # Naskah revisi 7 sasaran 3.3.1: tiga siklus; selisih cakupan sekurang-kurangnya 1 poin
+    # persen DAN PAI sekurang-kurangnya 2,0 — selain itu peringkat historis terbaik.
+    assert len(later.evidence["months"]) == 3
+    assert (config.guard_months, config.guard_min_margin_pct, config.guard_min_pai) == (3, 1.0, 2.0)
+    total = later.evidence["actual_total"]
+    margin = later.evidence["margin_pct"]
+    assert margin == pytest.approx((covered["MODEL"] - best) / total * 100, abs=0.01)
+    pai = later.evidence["model_pai"]
+    met = margin >= 1.0 and pai is not None and pai >= 2.0
+    assert later.evidence["met"] is met and (later.method == "MODEL") is met
+    assert ("Memenuhi ambang" in later.reason) is met
+    assert ("peringkat historis terbaik dipakai" in later.reason) is not met
 
 
 model_train = model.train

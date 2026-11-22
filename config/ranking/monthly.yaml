@@ -58,14 +58,21 @@ model:
   l2_regularization: 2
   random_state: 42
 
-# Penjaga pemakaian model. Dinilai pada `months` bulan terakhir sebelum bulan sasaran yang
-# berada DI LUAR masa latih, pada `evaluation.default_top_n` kelurahan, dengan batas data
-# yang sama untuk semua metode. Model dipakai hanya bila cakupannya LEBIH TINGGI daripada
-# pembanding terbaik; bila bulan ujinya kurang dari `min_months`, atau model belum dapat
-# dilatih, usulan memakai `fallback`.
+# Penjaga pemakaian model — naskah Taskap revisi 7, sasaran 3.3.1 dan Lampiran L
+# (22 November 2026, catatan 193): model menjadi dasar prioritas hanya bila pada `months`
+# siklus bulanan terakhir sebelum bulan sasaran (di LUAR masa latih, pada
+# `evaluation.default_top_n` kelurahan, batas data sama untuk semua metode)
+#   - cakupannya melampaui metode historis terbaik sekurang-kurangnya `min_margin_pct`
+#     poin persen, DAN
+#   - PAI-nya sekurang-kurangnya `min_pai`.
+# Bila belum tercapai, peringkat historis terbaik dipakai sementara model diperbaiki. Bila
+# siklus ujinya kurang dari `min_months`, atau model belum dapat dilatih, dipakai `fallback`.
+# Sebelum 22 November 2026: 12 bulan, cukup "lebih tinggi", tanpa syarat PAI.
 guard:
-  months: 12
+  months: 3
   min_months: 3
+  min_margin_pct: 1.0
+  min_pai: 2.0
   fallback: HISTORY_3M
 
 # Cakupan kejadian yang dihitung: seluruh 3C, atau hanya berobjek kendaraan bermotor.
