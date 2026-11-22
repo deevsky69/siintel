@@ -154,3 +154,48 @@ Wakasatintelkam pada Lampiran K, L, dan M; tabel peran D.18; jumlah panel D.16; 
 dan isi lonceng D.3–D.4; kalimat PAI pada Bab III (lihat bagian 2 dan 3 catatan ini).
 Dibuat oleh skrip yang membaca hasil model dari basis data yang sama dengan produksi dan
 memeriksa lebih dulu bahwa kolom yang tidak diubah memang sudah sama.
+
+## 5. Bagian non-angka pada salinan naskah ikut disunting (22 November 2026)
+
+Atas permintaan pemilik proyek ("tolong anda yang sunting agar datanya menjadi sama persis"),
+salinan pada bagian 4 disunting lagi: 24 perubahan terlacak tambahan dan lima gambar
+Lampiran M diganti dengan tangkapan layar produksi 22 November 2026 (ukuran sama dengan
+gambar asal): D.1 Beranda, D.10 Produk Bulanan, D.13 uji historis, D.26 dan D.27 Buletin &
+Imbauan. Penggantian gambar tidak dapat ditandai sebagai perubahan terlacak.
+
+| Tempat | Semula | Menjadi |
+|---|---|---|
+| Bab III, kalimat PAI | dihitung pada uji penerapan setelah luas resmi setiap kel… | dihitung pada uji penerapan setelah luas resmi setiap kelurahan dimasukkan ke dalam kam… |
+| Lampiran K huruf A butir 6 | KBO memeriksa mutu; Kasatintelkam menelaah dan menyampaik… | KBO memeriksa mutu, Wakasatintelkam memeriksa, lalu Kasatintelkam menelaah dan menyampa… |
+| Lampiran K huruf D, baris baru | (baris baru) | Wakasatintelkam | Memeriksa produk yang sudah lolos pemeriksaan KBO sebelum ditelaah Ka… |
+| Lampiran L huruf A, formulir validasi | Penelaahan KBO/Kasatintelkam | Penelaahan KBO/Wakasatintelkam/Kasatintelkam |
+| Lampiran M B.1 | disusun analis, diperiksa KBO, ditelaah Kasatintelkam, la… | disusun analis, diperiksa KBO dan Wakasatintelkam, ditelaah Kasatintelkam, lalu ditetap… |
+| Lampiran M C.2, persetujuan Humas | Angka itu bukan ramalan tentang orang tertentu, sebagaima… | Angka itu bukan ramalan tentang orang tertentu, sebagaimana ditegaskan pada bagian bawa… |
+| Lampiran M D.3, kartu | Tiga kartu "Bulan ini". | Kartu "Bulan ini" — tiga sampai empat kartu menurut kewenangan akun; pada akun administ… |
+| Lampiran M D.3, langkah 1 | Baca tiga kartu "Bulan ini" | Baca kartu "Bulan ini" |
+| Lampiran M D.3, contoh tahap | (pada contoh: menunggu telaah Kasatintelkam) | (pada contoh: menunggu pemeriksaan Wakasatintelkam) |
+| Lampiran M, keterangan Gambar D.1 | Beranda SIGAP: baris atas, menu kiri, pita "Segera", dan … | Beranda SIGAP: baris atas, menu kiri, pita "Segera", dan kartu "Bulan ini". |
+| Lampiran M D.4, lonceng | Daftar terbagi tiga: permintaan bantuan darurat yang haru… | Daftar memuat permintaan bantuan darurat yang harus diterima dan ditindaklanjuti, lapor… |
+| Lampiran M D.7, tahap | Lima tahap berjenjang di bagian atas: (1) analis menyusun… | Enam tahap berjenjang di bagian atas: (1) analis menyusun dan memeriksa, (2) KBO memeri… |
+| Lampiran M D.7, langkah 3 | KBO memeriksa mutu daftar itu. Kasatintelkam kemudian men… | KBO memeriksa mutu daftar itu, lalu Wakasatintelkam memeriksanya. Kasatintelkam kemudia… |
+| Lampiran M D.7, langkah 6 | pelaksanaannya dicatat pada tahap kelima. | pelaksanaannya dicatat pada tahap keenam. |
+| Lampiran M, keterangan Gambar D.10 | Produk Bulanan: lima tahap persetujuan dan daftar kelurah… | Produk Bulanan: enam tahap persetujuan dan daftar kelurahan prioritas. |
+| Lampiran M D.16, panel | Halaman terdiri atas empat panel. Menunggu persetujuan me… | Halaman terdiri atas lima panel. Ringkasan wilayah untuk masyarakat memuat jumlah kejad… |
+| Lampiran M D.18, jumlah peran | Panel Peran & Kewenangan memuat enam peran: | Panel Peran & Kewenangan memuat sembilan peran: |
+| Lampiran M D.18, baris KBO | (baris baru) | 3 | KBO | 18 | Seluruh wilayah; memeriksa mutu produk bulanan |
+| Lampiran M D.18, baris Wakasatintelkam | (baris baru) | 2 | Wakasatintelkam | 18 | Seluruh wilayah; memeriksa produk bulanan sesudah KBO |
+| Lampiran M D.18, baris Humas | (baris baru) | 4 | Humas | 8 | Seluruh wilayah; menyetujui informasi untuk masyarakat |
+| Lampiran M D.18, nama peran | Staf Intelkam | Analis Intelkam |
+| Lampiran M D.18, kewenangan Administrator | 55 | 65 |
+| Lampiran M D.18, batas Administrator | Seluruh wilayah; berwenang menyetujui rekomendasi | Seluruh wilayah; memegang seluruh kewenangan peran lain |
+| Lampiran M E.5 | Analis menyusun, KBO memeriksa mutu, Kasatintelkam menela… | Analis menyusun, KBO memeriksa mutu, Wakasatintelkam memeriksa, Kasatintelkam menelaah,… |
+
+Yang masih berbeda setelah ini, dan tidak dapat diselesaikan lewat penyuntingan naskah:
+
+- Lampiran K huruf F, H, dan I menyebut tiga hal yang belum ada di aplikasi (kejadian tambahan
+  pada peta, status "pengecekan tertunda", Bagops sebagai penerima) — dibiarkan apa adanya di
+  naskah karena keputusannya (membangun fitur atau mengubah naskah) milik pemilik proyek.
+- Gambar D.11 dan D.12 tidak diganti; isinya tidak berubah.
+- Kartu "Persetujuan warga" pada Gambar D.1 masih bertulis "imbauan bulanan otomatis": teks itu
+  keliru sejak persetujuan Humas dan sudah dibetulkan di kode pada perubahan yang sama, tetapi
+  gambar diambil sebelum pembetulan itu di-deploy.

@@ -115,15 +115,16 @@ export function buildCards(input: BoardInput): Card[] {
     });
   }
 
-  // 4. Persetujuan warga — buletin mingguan (2.iii). Imbauan bulanan otomatis sejak
-  //    10 November 2026, jadi tidak pernah "menunggu" siapa pun.
+  // 4. Persetujuan warga — buletin mingguan (2.iii). Imbauan bulanan dan ringkasan wilayah
+  //    disetujui Humas di layar yang sama (catatan 186 dan 189); teks lama "otomatis" keliru
+  //    sejak 19 November 2026.
   if (can("bulletin:approve") || can("bulletin:manage")) {
     const waiting = input.citizen.draftBulletins;
     const approveTurn = can("bulletin:approve") && waiting > 0;
     cards.push({
       key: "warga",
       title: "Persetujuan warga",
-      state: `${waiting} buletin draf · imbauan bulanan otomatis`,
+      state: `${waiting} buletin draf · imbauan dan ringkasan wilayah lewat Humas`,
       href: "/ops/buletin",
       cta: approveTurn ? `Setujui (${waiting})` : null,
       mine: approveTurn,
