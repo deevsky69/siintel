@@ -13,14 +13,19 @@ export type MethodCoverage = {
   covered: number;
   mappable_total: number;
   coverage_pct: number | null;
-  /** Porsi luas kelurahan pilihan; kosong bila luas belum tersedia. */
+  /** Porsi luas kelurahan pilihan; kosong bila ada kelurahan yang luas BPS-nya belum tercantum. */
   area_pct: number | null;
   pai: number | null;
+  /** Kelipatan cakupan terhadap pemilihan acak (N dari seluruh kelurahan). */
+  vs_random: number | null;
 };
 
 export type MonthlyEvaluation = {
   target_month: string;
   top_n: number;
+  kelurahan_total: number;
+  random_coverage_pct: number | null;
+  area_source: string | null;
   methods: MethodCoverage[];
   decision: {
     status: string;
@@ -79,6 +84,7 @@ export type BacktestMethod = {
   coverage_pct: number | null;
   area_pct: number | null;
   pai: number | null;
+  vs_random: number | null;
 };
 
 export type SignTest = {
@@ -88,6 +94,16 @@ export type SignTest = {
   losses: number;
   ties: number;
   p_value: number | null;
+  /** Bulan dengan PAI model lebih tinggi; kosong bila PAI salah satunya tidak dapat dihitung. */
+  pai_wins: number | null;
+};
+
+/** Pembanding acak (naskah Lampiran J bagian M): N dari seluruh kelurahan dipilih acak. */
+export type RandomBaseline = {
+  top_n: number;
+  kelurahan_total: number;
+  coverage_pct: number;
+  expected_covered: number;
 };
 
 export type Backtest = {
@@ -102,6 +118,7 @@ export type Backtest = {
     span: string;
     months: number;
     methods: BacktestMethod[];
+    random: RandomBaseline;
     sign_tests: SignTest[];
   }[];
   /** Skenario tetap (naskah Tabel 12): informasi berhenti pada akhir masa latih. */
@@ -113,9 +130,15 @@ export type Backtest = {
       covered: number;
       total: number;
       coverage_pct: number | null;
+      area_pct: number | null;
+      pai: number | null;
+      vs_random: number | null;
     }[];
   };
   area_source: string | null;
+  area_total_km2: number | null;
+  /** Ambang pemakaian model (naskah revisi 7 sasaran 3.3.1). */
+  criterion: { months: number; min_margin_pct: number; min_pai: number; source: string };
   basis: string;
 };
 

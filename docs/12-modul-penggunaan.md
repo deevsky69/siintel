@@ -23,6 +23,24 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Evaluasi mengikuti naskah revisi 7 (22 November 2026, catatan 193).**
+
+- **PAI memakai luas BPS.** Luas kelurahan diambil dari naskah Lampiran J bagian M (28
+  kelurahan; luas wilayah hukum 144,75 km²). Pada layar **Evaluasi** tampil kolom **Porsi
+  luas**, **PAI**, dan **Kelipatan acak**. Pada data Pusiknas: 2025 model 190 dari 634
+  (29,97%), porsi luas 9,84%, PAI 3,05; peta 3 bulan 176, PAI 2,64. Januari–Agustus 2026 model
+  86 dari 483 (17,81%), PAI 1,47; peta 12 bulan 79, PAI 1,29. **PAI kosong** berarti ada
+  kelurahan pilihan yang luas BPS-nya belum tercantum (atau angka dibatasi ke satu Polsek) —
+  bukan nol.
+- **Pembanding acak.** Baris *Acak 6 dari 65* = 9,23%: cakupan rata-rata bila enam kelurahan
+  dipilih acak. Kelipatan acak = cakupan metode dibagi angka itu (model 2025: 3,25×).
+- **Ambang pemakaian model.** Model menjadi dasar prioritas hanya bila pada tiga siklus
+  terakhir cakupannya melampaui metode historis terbaik sekurang-kurangnya 1 poin persen
+  **dan** PAI-nya sekurang-kurangnya 2,0. Bila belum, peringkat historis terbaik yang dipakai;
+  alasannya tertulis di atas tabel pada halaman Peringkat. Peringkat yang sudah dibekukan
+  tidak berubah.
+- Persentase pada layar Evaluasi kini dua desimal dengan koma, seperti tabel naskah.
+
 **Kalender SOP dan pencadangan terjadwal (22 November 2026, catatan 192).**
 
 - **Kalender SOP** ada di bagian atas halaman **SOP & modul** (tautan di Beranda). Delapan butir
@@ -190,7 +208,7 @@ sejalan dengan Bab IV naskah:
   186 dari 634 kejadian (peta 3 bulan 176); Januari–Agustus 2026 model 88 dari 483 (peta
   12 bulan 79). Keunggulan atas dua pembanding terkuat **belum bermakna** menurut uji tanda —
   baca sebagai "lebih tinggi, dievaluasi ulang tiap bulan", bukan "terbukti lebih baik".
-  Luas kelurahan untuk PAI adalah perkiraan dari poligon peta.
+  Sejak 22 November 2026 luas kelurahan untuk PAI memakai angka BPS dari naskah (catatan 193).
 - **SIGAP BERSAMA bertambah tiga layanan.** Halaman **Panduan** (pengamanan kos, tempat
   parkir, gedung, dan RT/RW, disertai pola kejadian setahun terakhir pada jenis tempat itu);
   **langganan imbauan** per warga lewat bot (`/langganan <kelurahan>`, berhenti dengan

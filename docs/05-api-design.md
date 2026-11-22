@@ -556,8 +556,17 @@ untuk pencocokan.
 Sejak 17 November 2026 `GET /evaluation/monthly` juga menilai MODEL, bulan sebelumnya, dan
 peta tahunan tetap pada N dan batas data yang sama; setiap baris membawa `method_label`,
 `area_pct`, dan `pai` (tidak lagi `null`). PAI = porsi kejadian tercakup / porsi luas
-kelurahan pilihan; luas dari `config/ranking/kelurahan-area.yaml` (perkiraan dari poligon
-peta, PROPOSED).
+kelurahan pilihan; luas dari `config/ranking/kelurahan-area.yaml`.
+
+**22 November 2026 (naskah revisi 7, catatan 193).** Luas kini angka BPS dari naskah
+Lampiran J bagian M (28 kelurahan, wilayah hukum 144,75 km²); `area_pct`/`pai` bernilai
+`null` bila ada kelurahan pilihan tanpa luas atau angka dibatasi satu Polsek.
+`GET /evaluation/monthly` menambah `kelurahan_total`, `random_coverage_pct`, `area_source`,
+dan `vs_random` per metode. `GET /evaluation/monthly/backtest` menambah per periode `random`
+(`coverage_pct`, `expected_covered`), per metode `vs_random`, per uji tanda `pai_wins`, pada
+skenario tetap `area_pct`/`pai`/`vs_random`, serta `area_total_km2` dan `criterion`
+(`months`, `min_margin_pct`, `min_pai`). Bukti pilihan metode (`method_choice.evidence`)
+menambah `margin_pct`, `model_pai`, `met`, `criterion`. Seluruhnya penambahan field.
 
 ### 2.11i Produk bulanan (Modul 4 mekanisme, 6 November 2026; empat tahap sejak 19 November 2026)
 

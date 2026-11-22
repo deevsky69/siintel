@@ -355,7 +355,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <div class="two">{fig("o10-produk-telaah-kasat", "<b>5 · Telaah</b> (Kasat Intelkam).", "small")}{fig("o11-produk-penetapan-pimpinan", "<b>6 · Penetapan prioritas</b> (Pimpinan).", "small")}</div>
 </section>
 <section class="page"><h1>8 · Layar tiap tahap siklus bulanan (lanjutan)</h1>
-<div class="two">{fig("o12-produk-pelaksanaan", "<b>7 · Pencatatan pelaksanaan</b> (Fungsi dan Polsek).", "small")}{fig("o14b-uji-historis", "<b>8 · Evaluasi</b>: uji historis, PAI, uji tanda.", "small")}</div>
+<div class="two">{fig("o12-produk-pelaksanaan", "<b>7 · Pencatatan pelaksanaan</b> (Fungsi dan Polsek).", "small")}{fig("o14b-uji-historis", "<b>8 · Evaluasi</b>: uji historis, porsi luas, PAI, pembanding acak, uji tanda, dan ambang pemakaian model.", "small")}</div>
 <div class="two">{fig("o15-humas-imbauan", "<b>Humas</b>: menyetujui imbauan bulanan.", "small")}{fig("o13-beranda-pimpinan", "<b>Beranda</b>: papan “Bulan ini” dengan kartu yang menunggu pembaca.", "small")}</div>
 <div class="two">{fig("s9-humas-ringkasan", "<b>Humas</b>: panel ringkasan wilayah untuk masyarakat dengan tombol persetujuan.", "small")}{fig("s10-warga-menunggu", "<b>Beranda warga sebelum disetujui Humas</b>: keterangan, tanpa angka kerawanan.", "small")}</div>
 {fig("s8-mutu-draf", "<b>Evaluasi (akun KBO)</b>: panel Mutu draf dan waktu kerja — rubrik empat unsur dan cap waktu.")}
@@ -405,7 +405,8 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 </ul>
 <h2>Yang perlu disampaikan apa adanya</h2>
 <table class="rapat"><tbody>
-<tr><td style="width:40mm"><b>Hasil uji model</b></td><td>Enam kelurahan pilihan: 190 dari 634 kejadian pada 2025 dan 86 dari 483 pada Januari–Agustus 2026, di atas peta pembanding terbaik (176 dan 79). Pada empat kelurahan, peta historis lebih tinggi pada 2025.</td></tr>
+<tr><td style="width:40mm"><b>Hasil uji model</b></td><td>Enam kelurahan pilihan: 190 dari 634 kejadian pada 2025 dan 86 dari 483 pada Januari–Agustus 2026, di atas peta pembanding terbaik (176 dan 79) dan jauh di atas pemilihan acak enam kelurahan (9,23%). Dengan luas kelurahan BPS, PAI model 3,05 pada 2025 (pembanding 2,64) dan 1,47 pada 2026 (pembanding 1,29). Pada empat kelurahan, peta historis lebih tinggi pada 2025.</td></tr>
+<tr><td><b>Ambang pemakaian model</b></td><td>Model menjadi dasar prioritas hanya bila pada tiga siklus terakhir cakupannya melampaui metode historis terbaik sekurang-kurangnya 1 poin persen dan PAI-nya sekurang-kurangnya 2,0; bila belum, peringkat historis terbaik yang dipakai. Untuk bulan peragaan (Januari 2026) ambang terpenuhi.</td></tr>
 <tr><td><b>Data pada layar</b></td><td>Kejadian berasal dari data Pusiknas tanpa identitas (posisi 29 September 2026); aplikasi diperagakan seolah berdiri di awal Januari 2026. Berkas perkara, PIN, kendaraan, kontak Babin, laporan warga, dan isian dampak adalah data contoh berlabel.</td></tr>
 <tr><td><b>Cek kendaraan</b></td><td>Hanya mencocokkan dengan berkas pada sistem ini, bukan seluruh data kepolisian; untuk kepastian hukum tetap ke Samsat/Polsek.</td></tr>
 <tr><td><b>Yang disebut “AI”</b></td><td>Peringkat kelurahan disusun model pembelajaran mesin. Penandaan isian, usulan padanan, dan teks usulan langkah disusun aturan tertulis, bukan model.</td></tr>
