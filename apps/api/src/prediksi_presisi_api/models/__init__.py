@@ -53,6 +53,7 @@ from .public_alert import PublicAlert
 from .rbac import Permission, Role, RolePermission, User
 from .recommendation import Recommendation
 from .risk_score import RiskScore
+from .sop_check import SopCheck
 
 __all__ = [
     "ATTACHMENT_KINDS",
@@ -96,5 +97,6 @@ __all__ = [
     "RiskScore",
     "Role",
     "RolePermission",
+    "SopCheck",
     "User",
 ]

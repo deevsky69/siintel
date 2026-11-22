@@ -23,6 +23,21 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Kalender SOP dan pencadangan terjadwal (22 November 2026, catatan 192).**
+
+- **Kalender SOP** ada di bagian atas halaman **SOP & modul** (tautan di Beranda). Delapan butir
+  berkala SOP untuk bulan berjalan ditampilkan bersama fakta sistemnya. Enam butir **dicatat
+  pejabat**: KBO mencatat data diterima, data diperiksa, dan evaluasi dilakukan; pemegang Audit
+  Log (Pimpinan, Administrator) mencatat catatan akses dan pencadangan sudah diperiksa; Kasat
+  Intelkam mencatat laporan triwulan. Tekan *Catat sudah dikerjakan* (catatan boleh diisi);
+  satu butir hanya dapat dicatat sekali per bulan dan tercatat di Audit Log. Dua butir
+  **dari sistem** — peringkat sudah dibekukan dan produk sudah ditelaah — tidak dapat dicentang.
+  Aplikasi menyimpan siapa dan kapan, dan tidak menilai tepat-waktunya.
+- **Rekap triwulan** di bawah kalender: median skor mutu draf (SIGAP dan cara kerja biasa) dan
+  median menit dari data siap olah sampai validasi, dari catatan Evaluasi pada triwulan itu.
+- **Pencadangan harian** basis data dijalankan `infra/cadangan-harian.sh` lewat crontab server
+  (14 hari terakhir disimpan); hasilnya diperiksa dari log server lalu dicatat pada kalender.
+
 **Tiga butir Lampiran K naskah ditambahkan (22 November 2026, catatan 191).**
 
 - **Kejadian tambahan terverifikasi pada panel wilayah.** Di **Wilayah → Peta**, kartu *Riwayat

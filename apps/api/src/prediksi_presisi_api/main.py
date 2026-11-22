@@ -53,6 +53,7 @@ from .api.routers import (
     rankings,
     reviews,
     scoring,
+    sop,
     standardization,
     warning_actions,
 )
@@ -119,6 +120,7 @@ def create_app() -> FastAPI:
     api.include_router(public_areas.router)
     api.include_router(public_areas.guides_router)
     api.include_router(public_areas.approval_router)
+    api.include_router(sop.router)
     api.include_router(reviews.router)
     api.include_router(public_cases.router)
     api.include_router(case_files.router)

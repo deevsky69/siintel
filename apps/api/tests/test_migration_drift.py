@@ -80,6 +80,7 @@ EXPECTED_TABLES = {
     # 0022 — persetujuan imbauan bulanan (6 November 2026)
     "advisory_approvals",
     "area_summary_approvals",
+    "sop_checks",
     "area_subscriptions",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat

@@ -97,7 +97,7 @@ belum dipilah.
 | F "Tindak lanjut", "Evaluasi", "Rekomendasi", "Prediksi" | — | ada (Produk Bulanan, Evaluasi, Peringkat) |
 | G | kalender harian sampai tahunan | aturan kerja; aplikasi tidak menjadwalkan atau mengingatkan |
 | H | status "pengecekan tertunda" saat sumber tidak tersedia | **belum ada** pada Cek Kendaraan |
-| H | pencocokan informasi warga dengan laporan SPKT | ada pada Mutu Data (wilayah sama, selisih ≤ 3 hari); belum memakai nomor laporan, ciri objek, dan uraian |
+| H | pencocokan informasi warga dengan laporan SPKT | ada pada Mutu Data (wilayah sama, selisih ≤ 3 hari). *Ralat 22 November 2026:* naskah revisi tidak menyebut pencocokan dengan nomor laporan, ciri objek, dan uraian — itu rincian naskah sebelumnya — jadi butir ini bukan perbedaan |
 | I | Kabagops mengoordinasikan tindak lanjut; Humas menyajikan ringkasan yang disetujui | Humas sudah; **Bagops belum** menjadi pilihan fungsi (fungsi yang dikenal: Samapta, Binmas, Intelkam, Reskrim, Lantas) |
 
 Tiga butir "belum ada" (kejadian tambahan pada peta, status pengecekan tertunda, Bagops
