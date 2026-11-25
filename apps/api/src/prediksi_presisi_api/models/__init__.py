@@ -46,6 +46,7 @@ from .operational_action import OperationalAction
 from .panic_event import PanicEvent
 from .patrol_activity import PatrolActivity
 from .patrol_plan_decision import PatrolPlanDecision
+from .polda_recap import PoldaRecap
 from .police_unit import PoliceUnit
 from .prediction import Prediction
 from .prediction_actual import PredictionActual
@@ -89,6 +90,7 @@ __all__ = [
     "PatrolActivity",
     "PatrolPlanDecision",
     "Permission",
+    "PoldaRecap",
     "PoliceUnit",
     "Prediction",
     "PredictionActual",
