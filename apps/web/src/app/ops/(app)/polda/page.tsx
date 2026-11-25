@@ -119,7 +119,7 @@ export default async function PoldaPage() {
         </p>
       </Panel>
 
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
+      <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,3fr)_minmax(0,9fr)]">
         <Panel title={`Peta 3C per Polres · ${label(current)}`}>
           <PetaPolres units={polres} year={current} />
         </Panel>
