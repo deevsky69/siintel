@@ -35,8 +35,15 @@ Polres Metro Jakarta Selatan
   membuka **Rincian** Polres itu: laporan keseluruhan dan 3C per tahun, CC, CR, jenis 3C, porsi
   terhadap Polda, peringkat, dan perubahan periode setara. Nama Polres pada tabel juga dapat
   diklik (termasuk Pelabuhan Tanjung Priok, Bandara Soekarno-Hatta, dan Kepulauan Seribu yang
-  tidak digambar pada peta). Untuk Polres lain hanya rekap per tahun yang tersedia; kecamatan
-  dan kelurahannya tidak dapat diselami karena datanya tidak ada pada sistem.
+  tidak digambar pada peta). Untuk Polres lain hanya rekap per tahun yang tersedia.
+- **Peta kecamatan Polres lain (25 November 2026, catatan 198).** Panel Rincian memuat peta
+  **garis batas kecamatan** wilayah Polres itu beserta namanya. Peta ini tidak diwarnai dan
+  tidak dapat diklik lebih jauh, karena angka per kecamatan dan kelurahan untuk Polres lain
+  tidak ada pada sistem. Batas diambil dari OpenStreetMap: Jakarta Barat, Pusat, Timur, Utara,
+  Kota Tangerang, Tangerang Selatan, dan Kepulauan Seribu lengkap; Kota Depok baru 8 kecamatan
+  (bagian yang belum dipetakan tampil abu-abu); Kota Bekasi dan Kabupaten Bekasi belum
+  dipetakan sehingga petanya belum ada. Untuk Jakarta Selatan, panel Rincian menautkan ke peta
+  kecamatan dan kelurahan yang berangka di Beranda.
 - **Ini data agregat per satuan**, dihitung menurut tanggal laporan. Angkanya tidak sama dengan
   layar lain (Peta, Analitik, Evaluasi) yang menghitung kejadian Jakarta Selatan menurut tanggal
   kejadian, dan tidak dipakai model prediksi. Tahun berjalan bertanda * belum penuh.

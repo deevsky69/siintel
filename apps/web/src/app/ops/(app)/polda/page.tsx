@@ -5,6 +5,7 @@ import { ApiError } from "@/lib/api";
 import { getPoldaRecap, type PoldaRecap, type RecapUnit } from "@/lib/polda";
 import { poldaHref, UNIT_AREA } from "@/lib/polda-area";
 import { OFF_FRAME_AREAS, polygonPoints, shapesAt, viewBoxOf } from "@/lib/wilayah";
+import { POLDA_KECAMATAN } from "@/lib/wilayah-polda.generated";
 
 export const dynamic = "force-dynamic";
 
@@ -490,12 +491,104 @@ function RincianSatuan({
           </tbody>
         </table>
       </div>
+      <PetaKecamatan unit={unit} />
       <p className="text-2xs leading-relaxed text-ink-faint">
         {unit.home
           ? "Rincian sampai kelurahan untuk satuan ini ada pada Peta dan Analitik (dihitung dari data per kejadian, menurut tanggal kejadian — angkanya berbeda dasar dengan rekap ini)."
           : "Untuk satuan ini yang tersedia hanya rekap per tahun; data per kejadian, kecamatan, dan kelurahannya tidak ada pada sistem."}
       </p>
     </Panel>
+  );
+}
+
+/**
+ * Peta kecamatan wilayah satu Polres (catatan 198). HANYA GARIS BATAS dan nama: rekap tidak
+ * memuat angka per kecamatan, jadi tidak ada yang diwarnai — warna apa pun akan menyiratkan
+ * pengetahuan yang tidak ada. Untuk Jakarta Selatan, peta kecamatan yang berangka ada di
+ * Beranda; di sini cukup tautannya.
+ */
+function PetaKecamatan({ unit }: { unit: RecapUnit }) {
+  const area = UNIT_AREA[unit.name];
+  if (unit.home) {
+    return (
+      <p className="text-xs text-ink-muted">
+        <Link href="/ops?tingkat=kecamatan" className="font-semibold text-accent">
+          Buka peta kecamatan dan kelurahan {unit.name} →
+        </Link>
+      </p>
+    );
+  }
+  const shapes = area ? (POLDA_KECAMATAN[area] ?? []) : [];
+  // Garis kota/kabupatennya digambar di bawah: kecamatan yang belum dipetakan di sumber
+  // tampak sebagai bagian kosong, bukan lubang yang terbaca seperti peta rusak.
+  const outline = shapesAt("polda").find((shape) => shape.name === area);
+  if (shapes.length === 0) {
+    return (
+      <p className="rounded border border-base-800 bg-base-850 px-3 py-2 text-xs text-ink-muted">
+        {area
+          ? `Batas kecamatan ${area} belum dipetakan pada sumber peta (OpenStreetMap), sehingga peta kecamatannya belum dapat ditampilkan.`
+          : "Satuan ini tidak memiliki wilayah tersendiri pada peta."}
+      </p>
+    );
+  }
+  const span =
+    Math.max(...shapes.flatMap((shape) => shape.rings.flatMap((ring) => ring.map(([x]) => x)))) -
+    Math.min(...shapes.flatMap((shape) => shape.rings.flatMap((ring) => ring.map(([x]) => x))));
+  return (
+    <figure className="rounded border border-base-800 bg-base-850 p-3">
+      <figcaption className="stat-label mb-2">
+        Peta kecamatan · {area} · {shapes.length} kecamatan pada sumber peta
+      </figcaption>
+      <svg
+        viewBox={viewBoxOf(shapes, 0.04)}
+        role="img"
+        aria-label={`Peta batas kecamatan ${area}`}
+        className="mx-auto h-auto max-h-[70vh] w-full max-w-3xl"
+      >
+        {outline?.rings.map((ring) => (
+          <polygon
+            key={`o-${polygonPoints(ring).slice(0, 48)}`}
+            points={polygonPoints(ring)}
+            className="fill-base-800 stroke-base-600"
+            strokeWidth={span / 300}
+          />
+        ))}
+        {shapes.map((shape) => (
+          <g key={shape.name}>
+            <title>{`Kecamatan ${shape.name}`}</title>
+            {shape.rings.map((ring) => (
+              <polygon
+                key={polygonPoints(ring).slice(0, 48)}
+                points={polygonPoints(ring)}
+                className="fill-accent/10 stroke-accent-deep"
+                strokeWidth={span / 420}
+              />
+            ))}
+          </g>
+        ))}
+        {shapes.map((shape) => (
+          <text
+            key={`t-${shape.name}`}
+            x={shape.label[0]}
+            y={shape.label[1]}
+            textAnchor="middle"
+            pointerEvents="none"
+            className="fill-ink font-heading font-semibold"
+            style={{ fontSize: span / 48, paintOrder: "stroke" }}
+            stroke="rgb(var(--base-900))"
+            strokeWidth={span / 190}
+          >
+            {shape.name}
+          </text>
+        ))}
+      </svg>
+      <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
+        Hanya garis batas kecamatan. Angka per kecamatan dan kelurahan untuk satuan ini tidak ada
+        pada sistem — rekap hanya memuat jumlah per Polres — sehingga peta ini tidak diwarnai dan
+        tidak dapat diselami lebih jauh. Bagian abu-abu tanpa nama adalah kecamatan yang batasnya
+        belum dipetakan pada sumber. © Kontributor OpenStreetMap.
+      </p>
+    </figure>
   );
 }
 
