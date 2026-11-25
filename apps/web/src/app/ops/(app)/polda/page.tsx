@@ -69,6 +69,17 @@ export default async function PoldaPage({
   const chosen = recap.units.find((unit) => unit.name === wanted) ?? null;
   const label = (year: string) => (year === current ? `${year}*` : year);
 
+  // Satu wilayah diklik → HANYA data wilayah itu (25 November 2026, catatan 199). Ringkasan
+  // Polda dan tabel seluruh Polres tidak ikut tampil; keduanya ada di balik tautan kembali.
+  if (chosen) {
+    return (
+      <div className="space-y-3">
+        <RincianSatuan unit={chosen} recap={recap} years={years} label={label} />
+        <DasarAngka recap={recap} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       <Panel
@@ -131,11 +142,9 @@ export default async function PoldaPage({
         </p>
       </Panel>
 
-      {chosen ? <RincianSatuan unit={chosen} recap={recap} years={years} label={label} /> : null}
-
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,3fr)_minmax(0,9fr)]">
         <Panel title={`Peta 3C per Polres · ${label(current)}`}>
-          <PetaPolres units={polres} year={current} chosen={chosen?.name ?? null} />
+          <PetaPolres units={polres} year={current} />
         </Panel>
         <Panel title="3C per Polres" bodyClassName="p-0">
           <TabelSatuan units={polres} years={years} scope="c3" label={label} />
@@ -263,17 +272,23 @@ export default async function PoldaPage({
         </Panel>
       </div>
 
-      <Panel title="Dasar angka">
-        <p className="text-xs leading-relaxed text-ink-muted">{recap.basis}</p>
-        <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
-          Sumber: {recap.source}. Dimasukkan {tanggal(recap.imported_at, true)} WIB
-          {recap.imported_by ? ` oleh ${recap.imported_by}` : ""}
-          {recap.source_sha256 ? ` · SHA-256 ${recap.source_sha256.slice(0, 16)}…` : ""}. Rekap ini
-          berlabel rahasia pada sumbernya: hanya untuk akun yang analitiknya mencakup seluruh
-          wilayah, dan tidak ditampilkan pada layanan warga.
-        </p>
-      </Panel>
+      <DasarAngka recap={recap} />
     </div>
+  );
+}
+
+function DasarAngka({ recap }: { recap: Ready }) {
+  return (
+    <Panel title="Dasar angka">
+      <p className="text-xs leading-relaxed text-ink-muted">{recap.basis}</p>
+      <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
+        Sumber: {recap.source}. Dimasukkan {tanggal(recap.imported_at, true)} WIB
+        {recap.imported_by ? ` oleh ${recap.imported_by}` : ""}
+        {recap.source_sha256 ? ` · SHA-256 ${recap.source_sha256.slice(0, 16)}…` : ""}. Rekap ini
+        berlabel rahasia pada sumbernya: hanya untuk akun yang analitiknya mencakup seluruh wilayah,
+        dan tidak ditampilkan pada layanan warga.
+      </p>
+    </Panel>
   );
 }
 
@@ -426,14 +441,18 @@ function RincianSatuan({
   const current = String(recap.current_year);
   return (
     <Panel
-      title={`Rincian · ${unit.name}`}
+      title={unit.name}
       action={
-        <Link href="/ops/polda" scroll={false} className="panel-action">
-          Tutup rincian
+        <Link href="/ops/polda" className="panel-action">
+          ← Seluruh Polda Metro
         </Link>
       }
       bodyClassName="flex flex-col gap-3"
     >
+      <p className="text-2xs uppercase tracking-wider text-ink-faint">
+        Posisi data {tanggal(recap.position_at, true)} WIB · *) {recap.current_year} sampai{" "}
+        {tanggal(recap.current_until)}, belum setahun penuh
+      </p>
       <p className="text-xs leading-relaxed text-ink">
         {unit.kind === "POLRES"
           ? `Pada ${label(current)}: 3C ${angka(unit.c3[current]?.ct)} laporan (${persen(unit.c3[current]?.share_pct)} dari 3C Polda), peringkat ${unit.rank_c3} dari ${recap.polres_count} Polres; kriminal keseluruhan ${angka(unit.overall[current]?.ct)} laporan (${persen(unit.overall[current]?.share_pct)} dari Polda), peringkat ${unit.rank_overall}.`
@@ -598,15 +617,7 @@ function PetaKecamatan({ unit }: { unit: RecapUnit }) {
  * angkanya tertulis pada label dan tabel di sampingnya. Digambar di server (SVG polos);
  * tiap Polres adalah tautan ke rinciannya.
  */
-function PetaPolres({
-  units,
-  year,
-  chosen,
-}: {
-  units: RecapUnit[];
-  year: string;
-  chosen: string | null;
-}) {
+function PetaPolres({ units, year }: { units: RecapUnit[]; year: string }) {
   const shapes = shapesAt("polda");
   const byArea = new Map(
     units.flatMap((unit) => {
@@ -630,7 +641,7 @@ function PetaPolres({
         {shapes.map((shape) => {
           const unit = byArea.get(shape.name);
           const count = unit?.c3[year]?.ct ?? null;
-          const marked = unit !== undefined && (unit.home || unit.name === chosen);
+          const marked = unit?.home === true;
           const drawn = (
             <>
               <title>
@@ -650,7 +661,7 @@ function PetaPolres({
                       : "fill-base-800 stroke-base-600"
                   }
                   fillOpacity={count === null ? 1 : 0.12 + 0.78 * (count / highest)}
-                  strokeWidth={unit?.name === chosen ? 70 : unit?.home ? 45 : 10}
+                  strokeWidth={unit?.home ? 45 : 10}
                 />
               ))}
             </>
@@ -684,9 +695,9 @@ function PetaPolres({
         })}
       </svg>
       <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
-        Makin pekat, makin banyak laporan 3C; garis tebal = {units.find((unit) => unit.home)?.name}
-        {chosen ? ` dan satuan yang sedang dibuka` : ""}. Klik sebuah Polres untuk rinciannya.
-        Wilayah abu-abu tidak tercantum sebagai satuan tersendiri pada rekap.
+        Makin pekat, makin banyak laporan 3C; garis tebal = {units.find((unit) => unit.home)?.name}.
+        Klik sebuah Polres untuk membuka data Polres itu saja. Wilayah abu-abu tidak tercantum
+        sebagai satuan tersendiri pada rekap.
         {offMap.length > 0
           ? ` Tidak digambar pada peta (buka dari tabel): ${offMap
               .map((unit) => `${unit.name} (${angka(unit.c3[year]?.ct)})`)

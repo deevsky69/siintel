@@ -36,6 +36,11 @@ Polres Metro Jakarta Selatan
   terhadap Polda, peringkat, dan perubahan periode setara. Nama Polres pada tabel juga dapat
   diklik (termasuk Pelabuhan Tanjung Priok, Bandara Soekarno-Hatta, dan Kepulauan Seribu yang
   tidak digambar pada peta). Untuk Polres lain hanya rekap per tahun yang tersedia.
+- **Satu wilayah diklik, hanya data wilayah itu yang tampil (25 November 2026, catatan 199).**
+  Mengklik sebuah Polres — pada peta Beranda, peta halaman Peta, peta halaman Polda Metro, atau
+  namanya pada tabel — membuka halaman yang hanya memuat Polres itu: angkanya per tahun dan
+  peta kecamatannya. Ringkasan Polda dan tabel seluruh Polres tidak ikut tampil; tautan
+  **← Seluruh Polda Metro** di kanan atas mengembalikan ke tampilan seluruh Polres.
 - **Peta kecamatan Polres lain (25 November 2026, catatan 198).** Panel Rincian memuat peta
   **garis batas kecamatan** wilayah Polres itu beserta namanya. Peta ini tidak diwarnai dan
   tidak dapat diklik lebih jauh, karena angka per kecamatan dan kelurahan untuk Polres lain
