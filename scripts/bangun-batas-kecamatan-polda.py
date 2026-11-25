@@ -35,8 +35,8 @@ assert spec and spec.loader
 batas = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(batas)
 
-#: Lebih kasar daripada kecamatan Jakarta Selatan (30 m): di sini hanya garis batas penunjuk.
-TOLERANCE_M = 60.0
+#: Setara kecamatan Jakarta Selatan (30 m): pada 60 m kecamatan kecil Jakarta Pusat saling tindih.
+TOLERANCE_M = 25.0
 HOME = batas.POLDA_METRO_JAYA[batas.JAKARTA_SELATAN]
 
 #: Nama dari OpenStreetMap adalah data luar yang akan ditulis ke berkas sumber. Hanya huruf,
