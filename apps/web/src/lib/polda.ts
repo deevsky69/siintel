@@ -54,22 +54,4 @@ export type PoldaRecap =
 
 export const getPoldaRecap = () => apiGet<PoldaRecap>("/polda/recap");
 
-/**
- * Padanan nama satuan pada rekap dengan wilayah pada peta tingkat Polda. Tiga Polres tidak
- * punya poligon sendiri (pelabuhan, bandara) atau berada di luar bingkai (Kepulauan Seribu);
- * ketiganya tetap tampil pada tabel. Kabupaten Tangerang ada di peta tetapi tidak ada pada
- * rekap sebagai satuan tersendiri.
- */
-export const UNIT_AREA: Readonly<Record<string, string>> = {
-  "Polres Metro Jakarta Selatan": "Jakarta Selatan",
-  "Polres Metro Jakarta Timur": "Jakarta Timur",
-  "Polres Metro Jakarta Pusat": "Jakarta Pusat",
-  "Polres Metro Jakarta Barat": "Jakarta Barat",
-  "Polres Metro Jakarta Utara": "Jakarta Utara",
-  "Polres Metro Tangerang Kota": "Kota Tangerang",
-  "Polres Tangerang Selatan": "Kota Tangerang Selatan",
-  "Polres Metro Bekasi Kota": "Kota Bekasi",
-  "Polres Metro Bekasi": "Kabupaten Bekasi",
-  "Polres Metro Depok": "Kota Depok",
-  "Polres Kepulauan Seribu": "Kepulauan Seribu",
-};
+export { UNIT_AREA } from "./polda-area";

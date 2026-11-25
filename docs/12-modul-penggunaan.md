@@ -30,6 +30,13 @@ Polres Metro Jakarta Selatan
   Polres, jenis 3C per Polres, satuan kerja tingkat Polda, laporan per bulan, dua puluh jenis
   kejahatan terbanyak, dan bentuk penyelesaian 3C. Polres Metro Jakarta Selatan disorot beserta
   peringkatnya di antara Polres.
+- **Membuka Polres lain dari peta (25 November 2026, catatan 197).** Pada peta tingkat Polda —
+  di Beranda, di halaman Peta, dan di halaman Polda Metro — klik wilayah Polres lain untuk
+  membuka **Rincian** Polres itu: laporan keseluruhan dan 3C per tahun, CC, CR, jenis 3C, porsi
+  terhadap Polda, peringkat, dan perubahan periode setara. Nama Polres pada tabel juga dapat
+  diklik (termasuk Pelabuhan Tanjung Priok, Bandara Soekarno-Hatta, dan Kepulauan Seribu yang
+  tidak digambar pada peta). Untuk Polres lain hanya rekap per tahun yang tersedia; kecamatan
+  dan kelurahannya tidak dapat diselami karena datanya tidak ada pada sistem.
 - **Ini data agregat per satuan**, dihitung menurut tanggal laporan. Angkanya tidak sama dengan
   layar lain (Peta, Analitik, Evaluasi) yang menghitung kejadian Jakarta Selatan menurut tanggal
   kejadian, dan tidak dipakai model prediksi. Tahun berjalan bertanda * belum penuh.
