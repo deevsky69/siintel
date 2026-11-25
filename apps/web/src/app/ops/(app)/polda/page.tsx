@@ -75,7 +75,6 @@ export default async function PoldaPage({
     return (
       <div className="space-y-3">
         <RincianSatuan unit={chosen} recap={recap} years={years} label={label} />
-        <DasarAngka recap={recap} />
       </div>
     );
   }
@@ -129,17 +128,7 @@ export default async function PoldaPage({
             {angka(home.overall[current]?.ct)} laporan, peringkat {home.rank_overall}.
           </p>
         ) : null}
-        <p className="text-2xs leading-relaxed text-ink-faint">
-          *) {recap.current_year} sampai {tanggal(recap.current_until)}; belum setahun penuh. Kolom
-          Perubahan pada tabel = periode setara {recap.current_year} terhadap tahun sebelumnya.{" "}
-          {recap.equal_period
-            ? `Periode setara (${recap.equal_period.label}): 3C ${years
-                .map((year) => `${year} ${angka(recap.equal_period?.c3[year]?.ct)}`)
-                .join(", ")}; keseluruhan ${years
-                .map((year) => `${year} ${angka(recap.equal_period?.overall[year]?.ct)}`)
-                .join(", ")}.`
-            : ""}
-        </p>
+        <Keterangan recap={recap} />
       </Panel>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,3fr)_minmax(0,9fr)]">
@@ -271,24 +260,43 @@ export default async function PoldaPage({
           </div>
         </Panel>
       </div>
-
-      <DasarAngka recap={recap} />
     </div>
   );
 }
 
-function DasarAngka({ recap }: { recap: Ready }) {
+/**
+ * Arti singkatan dan tanda pada tabel — daftar butir pendek, ditaruh DI ATAS tabel (permintaan
+ * pemilik proyek 25 November 2026, catatan 201), bukan paragraf di kaki halaman.
+ */
+function Keterangan({ recap, single = false }: { recap: Ready; single?: boolean }) {
+  const butir: [string, string][] = [
+    ["CT", "Crime Total — jumlah Laporan Polisi pada tahun itu, dihitung menurut tanggal laporan"],
+    ["CC", "Crime Clearance — laporan yang diselesaikan pada tahun itu"],
+    ["CR", "Clearance Rate — CC dibagi CT"],
+    ["3C", "curat, curas, dan curanmor"],
+    ...(single
+      ? ([
+          ["3C dari keseluruhan", "porsi 3C terhadap seluruh laporan Polres ini"],
+          ["Porsi 3C Polda", "porsi 3C Polres ini terhadap 3C seluruh Polda"],
+        ] as [string, string][])
+      : ([
+          [
+            "Perubahan",
+            `${recap.equal_period?.label ?? "periode setara"} ${recap.current_year} dibanding periode yang sama tahun sebelumnya`,
+          ],
+        ] as [string, string][])),
+    ["*", `tahun berjalan, baru sampai ${tanggal(recap.current_until)}`],
+    ["Sumber", "rekap Pusiknas per satuan (Polres termasuk Polsek) — bukan data per kejadian"],
+  ];
   return (
-    <Panel title="Dasar angka">
-      <p className="text-xs leading-relaxed text-ink-muted">{recap.basis}</p>
-      <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
-        Sumber: {recap.source}. Dimasukkan {tanggal(recap.imported_at, true)} WIB
-        {recap.imported_by ? ` oleh ${recap.imported_by}` : ""}
-        {recap.source_sha256 ? ` · SHA-256 ${recap.source_sha256.slice(0, 16)}…` : ""}. Rekap ini
-        berlabel rahasia pada sumbernya: hanya untuk akun yang analitiknya mencakup seluruh wilayah,
-        dan tidak ditampilkan pada layanan warga.
-      </p>
-    </Panel>
+    <ul className="grid grid-cols-1 gap-x-6 gap-y-1 rounded border border-base-800 bg-base-850 px-3 py-2 text-xs sm:grid-cols-2">
+      {butir.map(([istilah, arti]) => (
+        <li key={istilah} className="flex gap-2 leading-relaxed">
+          <span className="shrink-0 font-semibold text-ink">{istilah}</span>
+          <span className="text-ink-muted">{arti}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -450,8 +458,7 @@ function RincianSatuan({
       bodyClassName="flex flex-col gap-3"
     >
       <p className="text-2xs uppercase tracking-wider text-ink-faint">
-        Posisi data {tanggal(recap.position_at, true)} WIB · *) {recap.current_year} sampai{" "}
-        {tanggal(recap.current_until)}, belum setahun penuh
+        Posisi data {tanggal(recap.position_at, true)} WIB
       </p>
       <p className="text-xs leading-relaxed text-ink">
         {unit.kind === "POLRES"
@@ -460,6 +467,7 @@ function RincianSatuan({
         Perubahan periode setara {recap.current_year} terhadap tahun sebelumnya: 3C{" "}
         {perubahan(unit.change_c3_pct)}, keseluruhan {perubahan(unit.change_overall_pct)}.
       </p>
+      <Keterangan recap={recap} single />
       <div className="table-scroll">
         <table className="data-table">
           <thead>
@@ -511,11 +519,6 @@ function RincianSatuan({
         </table>
       </div>
       <PetaKecamatan unit={unit} />
-      <p className="text-2xs leading-relaxed text-ink-faint">
-        {unit.home
-          ? "Rincian sampai kelurahan untuk satuan ini ada pada Peta dan Analitik (dihitung dari data per kejadian, menurut tanggal kejadian — angkanya berbeda dasar dengan rekap ini)."
-          : "Untuk satuan ini yang tersedia hanya rekap per tahun; data per kejadian, kecamatan, dan kelurahannya tidak ada pada sistem."}
-      </p>
     </Panel>
   );
 }
@@ -557,7 +560,7 @@ function PetaKecamatan({ unit }: { unit: RecapUnit }) {
   return (
     <figure className="rounded border border-base-800 bg-base-850 p-3">
       <figcaption className="stat-label mb-2">
-        Peta kecamatan · {area} · {shapes.length} kecamatan
+        Peta kecamatan · {area} · {shapes.length} kecamatan · garis batas saja, tanpa angka
       </figcaption>
       <svg
         viewBox={viewBoxOf(shapes, 0.04)}
@@ -603,11 +606,8 @@ function PetaKecamatan({ unit }: { unit: RecapUnit }) {
         ))}
       </svg>
       <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
-        Hanya garis batas kecamatan. Angka per kecamatan dan kelurahan untuk satuan ini tidak ada
-        pada sistem — rekap hanya memuat jumlah per Polres — sehingga peta ini tidak diwarnai dan
-        tidak dapat diselami lebih jauh.{" "}
         {area && POLDA_KECAMATAN_HDX.includes(area)
-          ? "Batas kecamatan: geoBoundaries (OCHA ROAP/HDX atas data BPS), CC BY 3.0 IGO; garis kota: © Kontributor OpenStreetMap."
+          ? "Batas: geoBoundaries (OCHA ROAP/HDX atas data BPS), CC BY 3.0 IGO; © Kontributor OpenStreetMap."
           : "© Kontributor OpenStreetMap."}
       </p>
     </figure>
@@ -697,13 +697,9 @@ function PetaPolres({ units, year }: { units: RecapUnit[]; year: string }) {
         })}
       </svg>
       <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
-        Makin pekat, makin banyak laporan 3C; garis tebal = {units.find((unit) => unit.home)?.name}.
-        Klik sebuah Polres untuk membuka data Polres itu saja. Wilayah abu-abu tidak tercantum
-        sebagai satuan tersendiri pada rekap.
+        Makin pekat = makin banyak laporan 3C. Klik Polres untuk membuka datanya.
         {offMap.length > 0
-          ? ` Tidak digambar pada peta (buka dari tabel): ${offMap
-              .map((unit) => `${unit.name} (${angka(unit.c3[year]?.ct)})`)
-              .join(", ")}.`
+          ? ` Tanpa gambar di peta (buka dari tabel): ${offMap.map((unit) => unit.name).join(", ")}.`
           : ""}{" "}
         © Kontributor OpenStreetMap.
       </p>
