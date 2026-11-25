@@ -21,7 +21,9 @@ Jalankan:  python3 scripts/bangun-batas-kecamatan-polda.py
 from __future__ import annotations
 
 import importlib.util
+import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -36,6 +38,18 @@ spec.loader.exec_module(batas)
 #: Lebih kasar daripada kecamatan Jakarta Selatan (30 m): di sini hanya garis batas penunjuk.
 TOLERANCE_M = 60.0
 HOME = batas.POLDA_METRO_JAYA[batas.JAKARTA_SELATAN]
+
+#: Nama dari OpenStreetMap adalah data luar yang akan ditulis ke berkas sumber. Hanya huruf,
+#: angka, spasi, titik, tanda hubung, dan apostrof yang diterima; nama lain menghentikan
+#: pembangunan alih-alih ikut tertulis. Penulisannya sendiri memakai `json.dumps`.
+SAFE_NAME = re.compile(r"^[\w .'’-]{1,80}$")
+
+
+def literal(value: str) -> str:
+    """Nilai teks sebagai literal yang aman untuk berkas TypeScript."""
+    if not SAFE_NAME.match(value):
+        raise SystemExit(f"nama wilayah tidak lazim, pembangunan dihentikan: {value!r}")
+    return json.dumps(value, ensure_ascii=False)
 
 
 def main() -> None:
@@ -119,14 +133,14 @@ def main() -> None:
     ]
     for region, shapes in out.items():
         shapes.sort(key=lambda s: s["name"])
-        lines.append(f"  {region!r}: [".replace("'", '"'))
+        lines.append(f"  {literal(region)}: [")
         for shape in shapes:
             rings = ",".join(
                 "[" + ",".join(f"[{x},{y}]" for x, y in ring) + "]" for ring in shape["rings"]
             )
             lines.append(
-                f'    {{ name: "{shape["name"]}", parent: "{region}", '
-                f'label: [{shape["label"][0]},{shape["label"][1]}], rings: [{rings}] }},'
+                f"    {{ name: {literal(shape['name'])}, parent: {literal(region)}, "
+                f"label: [{shape['label'][0]},{shape['label'][1]}], rings: [{rings}] }},"
             )
         lines.append("  ],")
         points = sum(len(r) for s in shapes for r in s["rings"])

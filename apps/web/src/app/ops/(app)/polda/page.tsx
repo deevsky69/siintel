@@ -4,7 +4,7 @@ import { Panel } from "@/components/panel";
 import { ApiError } from "@/lib/api";
 import { getPoldaRecap, type PoldaRecap, type RecapUnit } from "@/lib/polda";
 import { poldaHref, UNIT_AREA } from "@/lib/polda-area";
-import { OFF_FRAME_AREAS, polygonPoints, shapesAt, viewBoxOf } from "@/lib/wilayah";
+import { boundsOf, OFF_FRAME_AREAS, polygonPoints, shapesAt, viewBoxOf } from "@/lib/wilayah";
 import { POLDA_KECAMATAN } from "@/lib/wilayah-polda.generated";
 
 export const dynamic = "force-dynamic";
@@ -531,9 +531,10 @@ function PetaKecamatan({ unit }: { unit: RecapUnit }) {
       </p>
     );
   }
-  const span =
-    Math.max(...shapes.flatMap((shape) => shape.rings.flatMap((ring) => ring.map(([x]) => x)))) -
-    Math.min(...shapes.flatMap((shape) => shape.rings.flatMap((ring) => ring.map(([x]) => x))));
+  // Bentang sisi terpanjang: tebal garis dan ukuran huruf dinyatakan sebagai pecahannya,
+  // supaya wilayah yang jangkung (Jakarta Timur) tidak mendapat huruf yang terlalu kecil.
+  const bounds = boundsOf(shapes);
+  const span = Math.max(bounds.width, bounds.height);
   return (
     <figure className="rounded border border-base-800 bg-base-850 p-3">
       <figcaption className="stat-label mb-2">
@@ -574,7 +575,7 @@ function PetaKecamatan({ unit }: { unit: RecapUnit }) {
             textAnchor="middle"
             pointerEvents="none"
             className="fill-ink font-heading font-semibold"
-            style={{ fontSize: span / 48, paintOrder: "stroke" }}
+            style={{ fontSize: span / 46, paintOrder: "stroke" }}
             stroke="rgb(var(--base-900))"
             strokeWidth={span / 190}
           >
