@@ -36,6 +36,9 @@ Polres Metro Jakarta Selatan
   terhadap Polda, peringkat, dan perubahan periode setara. Nama Polres pada tabel juga dapat
   diklik (termasuk Pelabuhan Tanjung Priok, Bandara Soekarno-Hatta, dan Kepulauan Seribu yang
   tidak digambar pada peta). Untuk Polres lain hanya rekap per tahun yang tersedia.
+- **Keterangan singkatan di atas tabel (25 November 2026, catatan 201).** Arti CT, CC, CR, 3C,
+  Perubahan, dan tanda * ditulis sebagai butir pendek di atas tabel — pada halaman seluruh
+  Polda maupun halaman satu Polres. Panel penjelasan panjang di kaki halaman dihapus.
 - **Satu wilayah diklik, hanya data wilayah itu yang tampil (25 November 2026, catatan 199).**
   Mengklik sebuah Polres — pada peta Beranda, peta halaman Peta, peta halaman Polda Metro, atau
   namanya pada tabel — membuka halaman yang hanya memuat Polres itu: angkanya per tahun dan
@@ -44,11 +47,13 @@ Polres Metro Jakarta Selatan
 - **Peta kecamatan Polres lain (25 November 2026, catatan 198).** Panel Rincian memuat peta
   **garis batas kecamatan** wilayah Polres itu beserta namanya. Peta ini tidak diwarnai dan
   tidak dapat diklik lebih jauh, karena angka per kecamatan dan kelurahan untuk Polres lain
-  tidak ada pada sistem. Batas diambil dari OpenStreetMap: Jakarta Barat, Pusat, Timur, Utara,
-  Kota Tangerang, Tangerang Selatan, dan Kepulauan Seribu lengkap; Kota Depok baru 8 kecamatan
-  (bagian yang belum dipetakan tampil abu-abu); Kota Bekasi dan Kabupaten Bekasi belum
-  dipetakan sehingga petanya belum ada. Untuk Jakarta Selatan, panel Rincian menautkan ke peta
-  kecamatan dan kelurahan yang berangka di Beranda.
+  tidak ada pada sistem. Sepuluh wilayah tergambar lengkap: Jakarta Barat, Pusat, Timur, Utara, Kota Tangerang,
+  Tangerang Selatan, Kepulauan Seribu (batas dari OpenStreetMap), serta Kota Bekasi (12
+  kecamatan), Kabupaten Bekasi (23), dan Kota Depok (11) — tiga yang terakhir memakai batas
+  geoBoundaries/HDX atas data BPS sejak 25 November 2026 (catatan 200), karena kecamatannya
+  belum dipetakan di OpenStreetMap. Polres Pelabuhan Tanjung Priok dan Polresta Bandara
+  Soekarno-Hatta tidak punya wilayah tersendiri, jadi tanpa peta. Untuk Jakarta Selatan,
+  halaman rincian menautkan ke peta kecamatan dan kelurahan yang berangka di Beranda.
 - **Ini data agregat per satuan**, dihitung menurut tanggal laporan. Angkanya tidak sama dengan
   layar lain (Peta, Analitik, Evaluasi) yang menghitung kejadian Jakarta Selatan menurut tanggal
   kejadian, dan tidak dipakai model prediksi. Tahun berjalan bertanda * belum penuh.
