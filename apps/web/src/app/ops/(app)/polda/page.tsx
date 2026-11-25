@@ -5,7 +5,7 @@ import { ApiError } from "@/lib/api";
 import { getPoldaRecap, type PoldaRecap, type RecapUnit } from "@/lib/polda";
 import { poldaHref, UNIT_AREA } from "@/lib/polda-area";
 import { boundsOf, OFF_FRAME_AREAS, polygonPoints, shapesAt, viewBoxOf } from "@/lib/wilayah";
-import { POLDA_KECAMATAN } from "@/lib/wilayah-polda.generated";
+import { POLDA_KECAMATAN, POLDA_KECAMATAN_HDX } from "@/lib/wilayah-polda.generated";
 
 export const dynamic = "force-dynamic";
 
@@ -557,7 +557,7 @@ function PetaKecamatan({ unit }: { unit: RecapUnit }) {
   return (
     <figure className="rounded border border-base-800 bg-base-850 p-3">
       <figcaption className="stat-label mb-2">
-        Peta kecamatan · {area} · {shapes.length} kecamatan pada sumber peta
+        Peta kecamatan · {area} · {shapes.length} kecamatan
       </figcaption>
       <svg
         viewBox={viewBoxOf(shapes, 0.04)}
@@ -605,8 +605,10 @@ function PetaKecamatan({ unit }: { unit: RecapUnit }) {
       <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
         Hanya garis batas kecamatan. Angka per kecamatan dan kelurahan untuk satuan ini tidak ada
         pada sistem — rekap hanya memuat jumlah per Polres — sehingga peta ini tidak diwarnai dan
-        tidak dapat diselami lebih jauh. Bagian abu-abu tanpa nama adalah kecamatan yang batasnya
-        belum dipetakan pada sumber. © Kontributor OpenStreetMap.
+        tidak dapat diselami lebih jauh.{" "}
+        {area && POLDA_KECAMATAN_HDX.includes(area)
+          ? "Batas kecamatan: geoBoundaries (OCHA ROAP/HDX atas data BPS), CC BY 3.0 IGO; garis kota: © Kontributor OpenStreetMap."
+          : "© Kontributor OpenStreetMap."}
       </p>
     </figure>
   );

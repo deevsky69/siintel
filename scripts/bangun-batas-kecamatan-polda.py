@@ -20,6 +20,7 @@ Jalankan:  python3 scripts/bangun-batas-kecamatan-polda.py
 
 from __future__ import annotations
 
+import gzip
 import importlib.util
 import json
 import math
@@ -38,6 +39,7 @@ spec.loader.exec_module(batas)
 #: Setara kecamatan Jakarta Selatan (30 m): pada 60 m kecamatan kecil Jakarta Pusat saling tindih.
 TOLERANCE_M = 25.0
 HOME = batas.POLDA_METRO_JAYA[batas.JAKARTA_SELATAN]
+HDX = ROOT / "data" / "batas-osm" / "kecamatan-hdx.json.gz"
 
 #: Nama dari OpenStreetMap adalah data luar yang akan ditulis ke berkas sumber. Hanya huruf,
 #: angka, spasi, titik, tanda hubung, dan apostrof yang diterima; nama lain menghentikan
@@ -82,6 +84,28 @@ def main() -> None:
     }
     tolerance = TOLERANCE_M / batas.METRES_PER_UNIT
     out: dict[str, list[dict]] = {name: [] for name in sorted(parents)}
+
+    # Wilayah yang kecamatannya belum (lengkap) dipetakan di OpenStreetMap memakai potongan
+    # geoBoundaries/HDX (lihat ambil-batas-kecamatan-hdx.py) — SELURUH kecamatan wilayah itu
+    # dari satu sumber, supaya garis antarkecamatan tidak berasal dari dua pemetaan berbeda.
+    hdx_regions: set[str] = set()
+    if HDX.exists():
+        with gzip.open(HDX, "rt", encoding="utf-8") as handle:
+            for item in json.load(handle)["kecamatan"]:
+                rings = [[project(*point) for point in ring] for ring in item["rings"]]
+                rings = [batas.simplify(ring, tolerance) for ring in rings]
+                rings = [ring for ring in rings if len(ring) >= 4]
+                if not rings or item["region"] not in out:
+                    continue
+                hdx_regions.add(item["region"])
+                label = batas.label_anchor(rings)
+                out[item["region"]].append(
+                    {
+                        "name": item["name"],
+                        "label": (round(label[0], 1), round(label[1], 1)),
+                        "rings": [[(round(x, 1), round(y, 1)) for x, y in ring] for ring in rings],
+                    }
+                )
     dropped: list[str] = []
     seen: set[tuple[str, str]] = set()
     for element in kecamatan["elements"]:
@@ -103,6 +127,8 @@ def main() -> None:
         if parent is None:
             dropped.append(name)
             continue
+        if parent in hdx_regions:
+            continue
         if (parent, name) in seen:
             continue
         seen.add((parent, name))
@@ -123,6 +149,8 @@ def main() -> None:
         "//",
         f'// Sumber: OpenStreetMap lewat Overpass API, diambil "{batas._today()}".',
         '// Lisensi: ODbL 1.0 — "© Kontributor OpenStreetMap" wajib dicantumkan di kaki peta.',
+        "// Kota Bekasi, Kabupaten Bekasi, dan Kota Depok: geoBoundaries gbHumanitarian ADM3",
+        "// (OCHA ROAP/HDX atas data BPS), CC BY 3.0 IGO — atribusinya juga di kaki peta.",
         "//",
         "// Batas KECAMATAN wilayah Polres lain di Polda Metro Jaya, pada sistem koordinat yang",
         "// sama dengan wilayah.generated.ts. Hanya garis batas: tidak ada angka per kecamatan.",
@@ -145,7 +173,15 @@ def main() -> None:
         lines.append("  ],")
         points = sum(len(r) for s in shapes for r in s["rings"])
         print(f"  {region}: {len(shapes)} kecamatan, {points} titik", file=sys.stderr)
-    lines += ["};", ""]
+    lines += [
+        "};",
+        "",
+        "/** Wilayah yang batas kecamatannya dari geoBoundaries/HDX (BPS), bukan OpenStreetMap. */",
+        "export const POLDA_KECAMATAN_HDX: readonly string[] = ["
+        + ", ".join(literal(name) for name in sorted(hdx_regions))
+        + "];",
+        "",
+    ]
     OUTPUT.write_text("\n".join(lines))
     if dropped:
         print(f"  dibuang (di luar wilayah hukum): {len(dropped)} — {sorted(dropped)[:12]}", file=sys.stderr)
