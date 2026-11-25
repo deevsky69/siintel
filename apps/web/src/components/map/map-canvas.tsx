@@ -256,6 +256,7 @@ export function MapCanvas({
   level = "kecamatan",
   focus = null,
   priority = [],
+  outsideLinks,
 }: {
   districts: MapDistrict[];
   layer: MapLayer;
@@ -295,6 +296,12 @@ export function MapCanvas({
   level?: MapLevel;
   /** Kecamatan yang kelurahannya digambar; hanya berarti pada tingkat `kelurahan`. */
   focus?: string | null;
+  /**
+   * Tingkat Polda: wilayah di luar Jakarta Selatan → alamat rekap Polres yang membawahinya
+   * (25 November 2026, catatan 197). Berupa peta nama → alamat, bukan fungsi, karena alasan
+   * yang sama dengan `linkTo`. Tanpa ini wilayah lain tidak dapat diklik.
+   */
+  outsideLinks?: Readonly<Record<string, string>>;
 }) {
   // Dikunci menurut nama yang DIGAMBAR: kecamatan pada peta Polres, kelurahan pada peta
   // yang diperbesar. `name` kosong hanya pada bentuk data lama.
@@ -356,7 +363,8 @@ export function MapCanvas({
     if (level === "polda") {
       // Hanya Jakarta Selatan yang dapat diselami: sebelas wilayah lain berada di luar
       // wilayah hukum Polres ini, dan sistem tidak memegang datanya.
-      if (name !== HOME_AREA) return null;
+      // Wilayah lain tidak dapat diselami, tetapi rekap Polresnya dapat dibuka bila ada.
+      if (name !== HOME_AREA) return outsideLinks?.[name] ?? null;
       return linkTo === "home"
         ? "/ops?tingkat=kecamatan"
         : mapHref(null, layer, months, "kecamatan");
@@ -605,7 +613,9 @@ export function MapCanvas({
           <p className="font-heading text-xs font-semibold text-ink">{hoveredShape.name}</p>
           <p className="mt-0.5 text-2xs text-ink-faint">
             {level === "polda"
-              ? "Di luar wilayah hukum Polres Metro Jakarta Selatan"
+              ? outsideLinks?.[hoveredShape.name]
+                ? "Polres lain — klik untuk membuka rekapnya"
+                : "Di luar wilayah hukum Polres Metro Jakarta Selatan"
               : level === "kelurahan"
                 ? "Belum ada data setingkat kelurahan"
                 : "Tidak ada data"}

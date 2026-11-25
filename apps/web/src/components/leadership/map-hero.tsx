@@ -5,6 +5,7 @@ import { RiskLegend } from "@/components/map/legend";
 import { MapCanvas } from "@/components/map/map-canvas";
 import { Panel } from "@/components/panel";
 import type { AreaDetail, KelurahanOverlay, MapData } from "@/lib/map-data";
+import { AREA_LINKS } from "@/lib/polda-area";
 import { type CitizenRow, type CrimeRow, jamKejadian } from "@/lib/reports";
 import { RISK_LABELS, RISK_TEXT, riskClassOf } from "@/lib/risk";
 import { HOME_AREA } from "@/lib/wilayah";
@@ -141,11 +142,12 @@ export function MapHero({
                 // Klik tetap di beranda: rinciannya muncul di panel sebelah, bukan dengan
                 // meninggalkan halaman yang baru saja dibuka pengguna.
                 linkTo="home"
+                outsideLinks={AREA_LINKS}
               />
               {level !== "polda" ? <RiskLegend /> : null}
               <p className="text-2xs leading-relaxed text-ink-faint">
                 {level === "polda"
-                  ? `Hanya ${HOME_AREA} yang diwarnai — sebelas wilayah lain di luar wilayah hukum Polres ini. Klik untuk membuka peta kecamatannya.`
+                  ? `Hanya ${HOME_AREA} yang diwarnai — sebelas wilayah lain di luar wilayah hukum Polres ini. Klik untuk membuka peta kecamatannya; klik wilayah lain untuk rekap Polres itu.`
                   : zoomed
                     ? `Kelurahan di Kecamatan ${selected} diwarnai dari sel penilaian setingkat kelurahan. Klik kelurahan untuk rinciannya.`
                     : "Arahkan kursor untuk ringkasan, klik kecamatan untuk membuka peta kelurahannya."}

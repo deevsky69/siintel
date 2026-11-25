@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Basis } from "@/components/basis";
 import { Panel } from "@/components/panel";
 import type { AreaDetail, KelurahanOverlay, MapData } from "@/lib/map-data";
+import { AREA_LINKS } from "@/lib/polda-area";
 import { HOME_AREA, shapesAt } from "@/lib/wilayah";
 import type { HistoricalMonths, MapLayer, MapLevel } from "./area";
 import { HISTORICAL_MONTH_LABELS, HISTORICAL_MONTHS, MAP_LAYERS, mapHref } from "./area";
@@ -172,6 +173,7 @@ export function RiskMap({
             level={level}
             focus={selected}
             priority={priority}
+            outsideLinks={AREA_LINKS}
           />
 
           <RiskLegend

@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { EmptyState } from "@/components/data-state";
 import { Panel } from "@/components/panel";
 import { ApiError } from "@/lib/api";
-import { getPoldaRecap, type PoldaRecap, type RecapUnit, UNIT_AREA } from "@/lib/polda";
+import { getPoldaRecap, type PoldaRecap, type RecapUnit } from "@/lib/polda";
+import { poldaHref, UNIT_AREA } from "@/lib/polda-area";
 import { OFF_FRAME_AREAS, polygonPoints, shapesAt, viewBoxOf } from "@/lib/wilayah";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +37,13 @@ type Ready = Extract<PoldaRecap, { available: true }>;
  * sehingga layar ini hanya membandingkan satuan; ia tidak menurunkan apa pun ke kelurahan
  * dan tidak dipakai model. Polres Metro Jakarta Selatan disorot karena aplikasi ini miliknya.
  */
-export default async function PoldaPage() {
+export default async function PoldaPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const raw = (await searchParams).polres;
+  const wanted = (Array.isArray(raw) ? raw[0] : raw) ?? null;
   let recap: PoldaRecap;
   try {
     recap = await getPoldaRecap();
@@ -55,6 +63,9 @@ export default async function PoldaPage() {
   const polres = recap.units.filter((unit) => unit.kind === "POLRES");
   const satker = recap.units.filter((unit) => unit.kind === "SATKER");
   const home = recap.units.find((unit) => unit.home) ?? null;
+  // Satuan yang rinciannya dibuka — dari klik pada peta (halaman ini, Beranda, atau Peta)
+  // atau pada nama di tabel. Nama yang tidak dikenal diabaikan, bukan galat.
+  const chosen = recap.units.find((unit) => unit.name === wanted) ?? null;
   const label = (year: string) => (year === current ? `${year}*` : year);
 
   return (
@@ -119,9 +130,11 @@ export default async function PoldaPage() {
         </p>
       </Panel>
 
+      {chosen ? <RincianSatuan unit={chosen} recap={recap} years={years} label={label} /> : null}
+
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,3fr)_minmax(0,9fr)]">
         <Panel title={`Peta 3C per Polres · ${label(current)}`}>
-          <PetaPolres units={polres} year={current} />
+          <PetaPolres units={polres} year={current} chosen={chosen?.name ?? null} />
         </Panel>
         <Panel title="3C per Polres" bodyClassName="p-0">
           <TabelSatuan units={polres} years={years} scope="c3" label={label} />
@@ -158,7 +171,11 @@ export default async function PoldaPage() {
             <tbody>
               {polres.map((unit) => (
                 <tr key={unit.name} className={unit.home ? "bg-accent/5" : ""}>
-                  <td className="whitespace-nowrap font-semibold text-ink">{unit.name}</td>
+                  <td className="whitespace-nowrap font-semibold text-ink">
+                    <Link href={poldaHref(unit.name)} scroll={false} className="hover:text-accent">
+                      {unit.name}
+                    </Link>
+                  </td>
                   {years.flatMap((year) =>
                     (["curat", "curas", "curanmor"] as const).map((kind) => (
                       <td key={`${year}-${kind}`} className="text-right tabular-nums">
@@ -310,7 +327,11 @@ function TabelSatuan({
             const change = scope === "c3" ? unit.change_c3_pct : unit.change_overall_pct;
             return (
               <tr key={unit.name} className={unit.home ? "bg-accent/5" : ""}>
-                <td className="whitespace-nowrap font-semibold text-ink">{unit.name}</td>
+                <td className="whitespace-nowrap font-semibold text-ink">
+                  <Link href={poldaHref(unit.name)} scroll={false} className="hover:text-accent">
+                    {unit.name}
+                  </Link>
+                </td>
                 {years.flatMap((year) => {
                   const row = unit[scope][year];
                   return [
@@ -387,11 +408,111 @@ function TabelBulan({
 }
 
 /**
- * Peta tingkat Polda yang diwarnai menurut jumlah laporan 3C. Warna hanya penanda urutan;
- * angkanya tertulis pada label dan tabel di sampingnya. Digambar di server (SVG polos) —
- * tidak ada interaksi yang memerlukan komponen klien.
+ * Rincian satu satuan: dibuka dari klik pada peta (halaman ini, Beranda, atau Peta) atau dari
+ * nama pada tabel. Isinya hanya yang ada pada rekap — jumlah per tahun, bukan kelurahan.
  */
-function PetaPolres({ units, year }: { units: RecapUnit[]; year: string }) {
+function RincianSatuan({
+  unit,
+  recap,
+  years,
+  label,
+}: {
+  unit: RecapUnit;
+  recap: Ready;
+  years: string[];
+  label: (year: string) => string;
+}) {
+  const current = String(recap.current_year);
+  return (
+    <Panel
+      title={`Rincian · ${unit.name}`}
+      action={
+        <Link href="/ops/polda" scroll={false} className="panel-action">
+          Tutup rincian
+        </Link>
+      }
+      bodyClassName="flex flex-col gap-3"
+    >
+      <p className="text-xs leading-relaxed text-ink">
+        {unit.kind === "POLRES"
+          ? `Pada ${label(current)}: 3C ${angka(unit.c3[current]?.ct)} laporan (${persen(unit.c3[current]?.share_pct)} dari 3C Polda), peringkat ${unit.rank_c3} dari ${recap.polres_count} Polres; kriminal keseluruhan ${angka(unit.overall[current]?.ct)} laporan (${persen(unit.overall[current]?.share_pct)} dari Polda), peringkat ${unit.rank_overall}.`
+          : `Satuan kerja tingkat Polda. Pada ${label(current)}: kriminal keseluruhan ${angka(unit.overall[current]?.ct)} laporan, 3C ${angka(unit.c3[current]?.ct)} laporan.`}{" "}
+        Perubahan periode setara {recap.current_year} terhadap tahun sebelumnya: 3C{" "}
+        {perubahan(unit.change_c3_pct)}, keseluruhan {perubahan(unit.change_overall_pct)}.
+      </p>
+      <div className="table-scroll">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Tahun</th>
+              <th className="text-right">Keseluruhan CT</th>
+              <th className="text-right">CC</th>
+              <th className="text-right">CR</th>
+              <th className="text-right">3C CT</th>
+              <th className="text-right">CC</th>
+              <th className="text-right">CR</th>
+              <th className="text-right">Curat</th>
+              <th className="text-right">Curas</th>
+              <th className="text-right">Curanmor</th>
+              <th className="text-right">3C dari keseluruhan</th>
+              <th className="text-right">Porsi 3C Polda</th>
+            </tr>
+          </thead>
+          <tbody>
+            {years.map((year) => (
+              <tr key={year}>
+                <td className="font-semibold text-ink">{label(year)}</td>
+                <td className="text-right tabular-nums">{angka(unit.overall[year]?.ct)}</td>
+                <td className="text-right tabular-nums text-ink-muted">
+                  {angka(unit.overall[year]?.cc)}
+                </td>
+                <td className="text-right tabular-nums text-ink-muted">
+                  {persen(unit.overall[year]?.cr)}
+                </td>
+                <td className="text-right tabular-nums">{angka(unit.c3[year]?.ct)}</td>
+                <td className="text-right tabular-nums text-ink-muted">
+                  {angka(unit.c3[year]?.cc)}
+                </td>
+                <td className="text-right tabular-nums text-ink-muted">
+                  {persen(unit.c3[year]?.cr)}
+                </td>
+                <td className="text-right tabular-nums">{angka(unit.c3[year]?.curat)}</td>
+                <td className="text-right tabular-nums">{angka(unit.c3[year]?.curas)}</td>
+                <td className="text-right tabular-nums">{angka(unit.c3[year]?.curanmor)}</td>
+                <td className="text-right tabular-nums text-ink-muted">
+                  {persen(unit.c3[year]?.of_overall_pct)}
+                </td>
+                <td className="text-right tabular-nums text-ink-muted">
+                  {persen(unit.c3[year]?.share_pct)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-2xs leading-relaxed text-ink-faint">
+        {unit.home
+          ? "Rincian sampai kelurahan untuk satuan ini ada pada Peta dan Analitik (dihitung dari data per kejadian, menurut tanggal kejadian — angkanya berbeda dasar dengan rekap ini)."
+          : "Untuk satuan ini yang tersedia hanya rekap per tahun; data per kejadian, kecamatan, dan kelurahannya tidak ada pada sistem."}
+      </p>
+    </Panel>
+  );
+}
+
+/**
+ * Peta tingkat Polda yang diwarnai menurut jumlah laporan 3C. Warna hanya penanda urutan;
+ * angkanya tertulis pada label dan tabel di sampingnya. Digambar di server (SVG polos);
+ * tiap Polres adalah tautan ke rinciannya.
+ */
+function PetaPolres({
+  units,
+  year,
+  chosen,
+}: {
+  units: RecapUnit[];
+  year: string;
+  chosen: string | null;
+}) {
   const shapes = shapesAt("polda");
   const byArea = new Map(
     units.flatMap((unit) => {
@@ -415,11 +536,12 @@ function PetaPolres({ units, year }: { units: RecapUnit[]; year: string }) {
         {shapes.map((shape) => {
           const unit = byArea.get(shape.name);
           const count = unit?.c3[year]?.ct ?? null;
-          return (
-            <g key={shape.name}>
+          const marked = unit !== undefined && (unit.home || unit.name === chosen);
+          const drawn = (
+            <>
               <title>
                 {unit
-                  ? `${unit.name}: ${angka(count)} laporan 3C`
+                  ? `${unit.name}: ${angka(count)} laporan 3C — klik untuk rincian`
                   : `${shape.name}: tidak ada pada rekap`}
               </title>
               {shape.rings.map((ring) => (
@@ -428,16 +550,23 @@ function PetaPolres({ units, year }: { units: RecapUnit[]; year: string }) {
                   points={polygonPoints(ring)}
                   className={
                     unit
-                      ? unit.home
+                      ? marked
                         ? "fill-accent stroke-accent-deep"
                         : "fill-accent stroke-base-600"
                       : "fill-base-800 stroke-base-600"
                   }
                   fillOpacity={count === null ? 1 : 0.12 + 0.78 * (count / highest)}
-                  strokeWidth={unit?.home ? 45 : 10}
+                  strokeWidth={unit?.name === chosen ? 70 : unit?.home ? 45 : 10}
                 />
               ))}
-            </g>
+            </>
+          );
+          return unit ? (
+            <a key={shape.name} href={poldaHref(unit.name)} aria-label={`Rincian ${unit.name}`}>
+              {drawn}
+            </a>
+          ) : (
+            <g key={shape.name}>{drawn}</g>
           );
         })}
         {shapes.map((shape) => {
@@ -449,6 +578,7 @@ function PetaPolres({ units, year }: { units: RecapUnit[]; year: string }) {
               x={shape.label[0]}
               y={shape.label[1]}
               textAnchor="middle"
+              pointerEvents="none"
               className="fill-ink font-heading font-semibold"
               style={{ fontSize: 290, paintOrder: "stroke" }}
               stroke="rgb(var(--base-900))"
@@ -460,10 +590,11 @@ function PetaPolres({ units, year }: { units: RecapUnit[]; year: string }) {
         })}
       </svg>
       <p className="mt-2 text-2xs leading-relaxed text-ink-faint">
-        Makin pekat, makin banyak laporan 3C; garis tebal = {units.find((unit) => unit.home)?.name}.
+        Makin pekat, makin banyak laporan 3C; garis tebal = {units.find((unit) => unit.home)?.name}
+        {chosen ? ` dan satuan yang sedang dibuka` : ""}. Klik sebuah Polres untuk rinciannya.
         Wilayah abu-abu tidak tercantum sebagai satuan tersendiri pada rekap.
         {offMap.length > 0
-          ? ` Tidak digambar pada peta: ${offMap
+          ? ` Tidak digambar pada peta (buka dari tabel): ${offMap
               .map((unit) => `${unit.name} (${angka(unit.c3[year]?.ct)})`)
               .join(", ")}.`
           : ""}{" "}
