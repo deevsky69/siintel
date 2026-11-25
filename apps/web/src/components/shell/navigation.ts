@@ -83,6 +83,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         permissions: ["analytics:read"],
         hint: "Tren, pola waktu, perbandingan wilayah; tab Pola Gangguan",
       },
+      {
+        href: "/ops/polda",
+        label: "Polda Metro",
+        icon: "analytics",
+        permissions: ["analytics:read"],
+        hint: "Rekap kriminal keseluruhan dan 3C seluruh Polres",
+      },
     ],
   },
   {

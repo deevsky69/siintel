@@ -81,6 +81,7 @@ EXPECTED_TABLES = {
     "advisory_approvals",
     "area_summary_approvals",
     "sop_checks",
+    "polda_recaps",
     "area_subscriptions",
     "prediction_actual",
     # Revisi 8 September 2026 — lampiran laporan masyarakat

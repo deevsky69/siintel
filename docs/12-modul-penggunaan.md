@@ -23,6 +23,23 @@ Polres Metro Jakarta Selatan
 | `sigap.awansurya.com/` | **masyarakat**, tanpa akun | **SIGAP BERSAMA**: peta tingkat kerawanan kasar per kecamatan/kelurahan dengan angka historis 12 bulan, imbauan yang berlaku, **Survey Rasa Aman** (ulasan anonim per kelurahan, tayang setelah moderasi), Lapor Kejadian, tombol Darurat 110 |
 | `sigap.awansurya.com/ops/…` | **petugas** (Pimpinan, Administrator, Polsek, Fungsi) | aplikasi SIGAP seperti dijelaskan modul ini; masuk di `/ops/masuk` |
 
+**Rekap Polda Metro Jaya per Polres (25 November 2026, catatan 196).**
+
+- Menu **Wilayah → Polda Metro** menampilkan rekap Pusiknas seluruh Polres di Polda Metro Jaya:
+  kriminal keseluruhan dan 3C per tahun (CT = laporan, CC = selesai, CR = CC ÷ CT), peta 3C per
+  Polres, jenis 3C per Polres, satuan kerja tingkat Polda, laporan per bulan, dua puluh jenis
+  kejahatan terbanyak, dan bentuk penyelesaian 3C. Polres Metro Jakarta Selatan disorot beserta
+  peringkatnya di antara Polres.
+- **Ini data agregat per satuan**, dihitung menurut tanggal laporan. Angkanya tidak sama dengan
+  layar lain (Peta, Analitik, Evaluasi) yang menghitung kejadian Jakarta Selatan menurut tanggal
+  kejadian, dan tidak dipakai model prediksi. Tahun berjalan bertanda * belum penuh.
+- **Yang dapat membuka**: akun yang analitiknya mencakup seluruh wilayah (Pimpinan, Kasat,
+  Wakasat, KBO, Analis, Fungsi, Administrator). Akun Polsek dan Humas melihat keterangan
+  "Tidak berwenang". Rekap tidak tampil di layanan warga.
+- **Memperbarui data**: Administrator menjalankan
+  `scripts/import/rekap_polda.py BERKAS.xlsx --kirim ALAMAT --pengguna AKUN`. Skrip mencocokkan
+  seluruh jumlah dengan baris JUMLAH pada berkas sebelum mengirim; satu selisih menggagalkan impor.
+
 **Uji historis memakai rekaman pilihan naskah (22 November 2026, catatan 195).**
 
 - Pada panel **Uji historis model**, baris model memakai kelurahan pilihan yang tercetak pada

@@ -94,7 +94,7 @@ describe("penyaringan menu menurut kewenangan", () => {
     ]) {
       expect(routes).not.toContain(gone);
     }
-    expect(NAV_ITEMS).toHaveLength(15);
+    expect(NAV_ITEMS).toHaveLength(16);
   });
 
   it("membuang kelompok yang tidak menyisakan satu pun submenu", () => {
