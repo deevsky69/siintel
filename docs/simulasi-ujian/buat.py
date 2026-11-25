@@ -111,6 +111,7 @@ ISI = [
     (2, "Langkah demi langkah tiap akun", "Langkah demi langkah"),
     (1, "8 · Layar tiap tahap siklus bulanan", "8 · Layar tiap tahap siklus bulanan"),
     (2, "Halaman SOP dan alur petugas lain", "8 · Halaman SOP dan alur petugas lain"),
+    (2, "Rekap Polda Metro Jaya per Polres", "Rekap Polda Metro Jaya per Polres"),
     (1, "9 · Urutan simulasi ujian (± 15 menit)", "9 · Urutan simulasi ujian"),
     (2, "Sebelum ujian", "Sebelum ujian"),
     (2, "Yang perlu disampaikan apa adanya", "Yang perlu disampaikan apa adanya"),
@@ -373,7 +374,15 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <tr><td><b>B6 · Kontak Babin</b></td><td><code>demo.admin</code></td><td>Warga → Babinkamtibmas → cari kelurahan, Tambah / Ubah / Hapus; kontak tampil pada peta warga.</td></tr>
 <tr><td><b>B7 · Pengguna dan audit</b></td><td><code>demo.admin</code> (audit juga <code>demo.pimpinan</code>)</td><td>Sistem → Manajemen Pengguna (akun, peran, dan fungsi — termasuk <b>Bagops</b>) dan Sistem → Audit Log (siapa melakukan apa, termasuk penolakan akses).</td></tr>
 <tr><td><b>B8 · Batas wewenang</b></td><td><code>demo.humas</code>, <code>demo.kbo</code></td><td>Tunjukkan bahwa Humas tidak memiliki menu Produk Bulanan, dan KBO tidak dapat menyusun draf maupun menetapkan — pemisahan tugas antarperan dijaga server. Hanya Administrator yang memegang semua kewenangan.</td></tr>
+<tr><td><b>B9 · Rekap Polda Metro</b></td><td><code>demo.kasat</code>, <code>demo.pimpinan</code>, <code>demo.admin</code></td><td>Wilayah → Polda Metro → baca ringkasan per tahun dan sorotan Polres Metro Jakarta Selatan, lalu peta dan tabel 3C per Polres. Akun <code>demo.polsek</code> dan <code>demo.humas</code> mendapat keterangan “Tidak berwenang”.</td></tr>
 </tbody></table>
+</section>
+
+<section class="page"><h1>8 · Rekap Polda Metro Jaya</h1>
+<h2>Rekap Polda Metro Jaya per Polres</h2>
+<p class="kecil">Menu <b>Wilayah → Polda Metro</b> memuat rekap Pusiknas untuk <b>13 Polres dan 7 satuan kerja tingkat Polda</b>, posisi data 10 November 2026: kriminal keseluruhan dan 3C per tahun (CT = laporan, CC = selesai, CR = CC ÷ CT), peta 3C per Polres, jenis 3C per Polres, laporan per bulan, dua puluh jenis kejahatan terbanyak, dan bentuk penyelesaian 3C. Polres Metro Jakarta Selatan disorot beserta peringkatnya.</p>
+{fig("s15-polda-metro", "<b>Wilayah → Polda Metro</b> (akun <code>demo.kasat</code>): ringkasan Polda per tahun, sorotan Polres Metro Jakarta Selatan, peta dan tabel 3C per Polres. Tanda * = tahun berjalan, belum penuh.")}
+<div class="note"><b>Yang perlu disampaikan.</b> Ini data <b>agregat per satuan</b>, dihitung menurut tanggal laporan — bukan data per kejadian. Angkanya karena itu tidak sama dengan Peta, Analitik, dan Evaluasi (yang menghitung kejadian Jakarta Selatan menurut tanggal kejadian), dan tidak dipakai model prediksi. Rekap hanya untuk akun yang analitiknya mencakup seluruh wilayah dan tidak tampil pada layanan warga.</div>
 </section>
 
 <section class="page"><h1>9 · Urutan simulasi ujian (± 15 menit)</h1>
@@ -392,6 +401,7 @@ html = f"""<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Pro
 <tr><td class="c">10</td><td><code>demo.pimpinan</code></td><td>Tetapkan enam kelurahan prioritas.</td><td>sda.</td><td>1 mnt</td></tr>
 <tr><td class="c">11</td><td><code>demo.fungsi</code></td><td>Catat satu kegiatan di kelurahan prioritas.</td><td>sda.</td><td>1 mnt</td></tr>
 <tr><td class="c">12</td><td><code>demo.pimpinan</code></td><td>Evaluasi: cakupan, PAI, uji historis.</td><td>Bulan yang sudah berakhir</td><td>1 mnt</td></tr>
+<tr><td class="c">12b</td><td><code>demo.kasat</code></td><td>Wilayah → Polda Metro: posisi Jakarta Selatan di antara 13 Polres.</td><td>Rekap posisi 10 November 2026</td><td>0,5 mnt</td></tr>
 <tr><td class="c">13</td><td><code>demo.humas</code></td><td>Tunjukkan panel ringkasan wilayah (sudah disetujui) dan setujui imbauan bulanan.</td><td>—</td><td>0,5 mnt</td></tr>
 </tbody></table>
 <h2>Sebelum ujian</h2>
